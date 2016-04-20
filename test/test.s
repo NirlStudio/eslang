@@ -27,6 +27,10 @@
   "function"
 
   "opr-if"
+
+  "flow"
+  "pipe"
+  "premise"
 ).
 
 ($ ($run-"test")

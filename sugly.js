@@ -171,9 +171,13 @@ function seval (clause, $) {
   try {
     return func.apply(subject, args)
   } catch (signal) {
-    if (signal instanceof SuglySignal && signal.type === 'return') {
-      return signal.value
+    if (signal instanceof SuglySignal) {
+      if (signal.type === 'return') {
+        return signal.value
+      }
+      throw signal // ingore unexpected signal
     }
+    // TODO - filter & swallow some native errors?
     throw signal
   }
 }
@@ -411,8 +415,16 @@ $operators[SymbolObject] = function ($, clause) {
 }
 
 // as operators, object and array are the readable version of @
-$operators[Symbol.for('object')] = $operators[SymbolObject]
-$operators[Symbol.for('array')] = $operators[SymbolObject]
+$operators[Symbol.for('object')] = function ($, clause) {
+  if (clause.length < 2) {
+    return $.object()
+  }
+  return $operators[SymbolObject]($, clause)
+}
+// force to create an array
+$operators[Symbol.for('array')] = function ($, clause) {
+  return arrayCreate($, clause)
+}
 
 // (= symbols > params body ...)
 // symbols can be symbol or (symbol ...) or (@ prop: value ...)
@@ -453,7 +465,7 @@ function lambdaCreate ($, symbols, params, body) {
   return $.lambda(enclosing, params, body)
 }
 
-const SymbolLambda = SymbolDerive
+const SymbolLambdaShort = SymbolDerive
 
 $operators[Symbol.for('=')] = function ($, clause) {
   if (clause.length < 3) {
@@ -468,7 +480,7 @@ $operators[Symbol.for('=')] = function ($, clause) {
     return lambdaCreate($, [], clause[2], clause.slice(3))
   }
 
-  if (clause[2] === SymbolLambda) {
+  if (clause[2] === SymbolLambdaShort) {
     // (= enclosing > params body)
     if (clause.length < 5) {
       return null
@@ -484,8 +496,9 @@ $operators[Symbol.for('=')] = function ($, clause) {
 $operators[Symbol.for('function')] = $operators[Symbol.for('=')]
 $operators[Symbol.for('closure')] = $operators[Symbol.for('=')]
 
+const SymbolLambda = Symbol.for('=>')
 // (=> params body)
-$operators[Symbol.for('=>')] = function ($, clause) {
+$operators[SymbolLambda] = function ($, clause) {
   if (clause.length < 3) {
     return null
   }
@@ -833,20 +846,106 @@ $operators[Symbol.for('for')] = function ($, clause) {
   return result
 }
 
-// TODO - logic-integration patterns
 const SymbolFlow = Symbol.for('->')
 // (-> clause sub-clause1 sub-clause2 ...).
-$operators[SymbolFlow] = function ($, clause) { return null }
+$operators[SymbolFlow] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+  var subject = seval(clause[1], $)
+  for (var i = 2; subject !== null && i < length; i++) {
+    var next = clause[i]
+    var stmt = [subject]
+    if (Array.isArray(next)) {
+      stmt.push.apply(stmt, next)
+    } else {
+      stmt.push(next)
+    }
+    subject = seval(stmt, $)
+  }
+  return subject
+}
 $operators[Symbol.for('flow')] = $operators[SymbolFlow]
 
 const SymbolPipe = Symbol.for('|')
 // (| clause1 clause2 ... )
-$operators[SymbolPipe] = function ($, clause) { return null }
+$operators[SymbolPipe] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+  var output = seval(clause[1], $)
+  for (var i = 2; i < length; i++) {
+    var next = clause[i]
+    var stmt = Array.isArray(next) ? next.slice(0) : [next]
+    if (Array.isArray(output)) {
+      // expand array to arguments
+      for (var j = 0; j < output.length; j++) {
+        var value = output[j]
+        var arg
+        if (Array.isArray(value)) {
+          // value to expression
+          arg = [SymbolObject]
+          arg.push.apply(arg, value)
+        } else if (typeof value === 'symbol') {
+          arg = [SymbolQuote, value] // symbol to quote
+        } else {
+          arg = value
+        }
+        stmt.push(arg)
+      }
+    } else {
+      stmt.push(output)
+    }
+    output = seval(stmt, $)
+  }
+  return output
+}
 $operators[Symbol.for('pipe')] = $operators[SymbolPipe]
 
 const SymbolPremise = Symbol.for('?')
-// (? entry cb1 cb2 ...)
-$operators[SymbolPremise] = function ($, clause) { return null }
+const SymbolThen = Symbol.for('then')
+const SymbolNext = Symbol.for('next')
+// (? entry cb1 cb2 ...) - reversed pipe
+$operators[SymbolPremise] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+  var offset = length - 1
+  var output = seval(clause[offset], $)
+  for (offset -= 1; offset > 0; offset--) {
+    var pre = clause[offset]
+    var stmt = Array.isArray(pre) ? pre.slice(0) : [pre]
+    if (stmt[0] === SymbolThen) {
+      // (then params body) to (=> next > params body)
+      stmt.splice(0, 1, SymbolLambda, SymbolNext, SymbolLambdaShort)
+      stmt = [SymbolContext, stmt]
+    }
+    if (Array.isArray(output)) {
+      // expand array result
+      for (var i = 0; i < output.length; i++) {
+        var value = output[i]
+        var arg
+        if (Array.isArray(value)) {
+          // value to expression
+          arg = [SymbolObject]
+          arg.push.apply(arg, value)
+        } else if (typeof value === 'symbol') {
+          arg = [SymbolQuote, value] // symbol to quote
+        } else {
+          arg = value
+        }
+        stmt.push(arg)
+      }
+    } else {
+      stmt.push(output)
+    }
+    output = seval(stmt, $)
+  }
+  return output
+}
 $operators[Symbol.for('premise')] = $operators[SymbolPremise]
 
 function populateOperatorCtx (operands, ctx) {
@@ -1155,6 +1254,110 @@ $operators[Symbol.for('!=')] = function ($, clause) {
   return false
 }
 
+$operators[Symbol.for('>')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return false // null === null
+  }
+
+  var left = clause[1]
+  if (typeof left === 'symbol') {
+    left = resolve($, left)
+  } else if (Array.isArray(left)) {
+    left = seval(left, $)
+  }
+  if (length < 3) {
+    return true
+  }
+
+  var right = clause[2]
+  if (typeof right === 'symbol') {
+    right = resolve($, right)
+  } else if (Array.isArray(right)) {
+    right = seval(right, $)
+  }
+
+  return left > right
+}
+
+$operators[Symbol.for('>=')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return false // null === null
+  }
+
+  var left = clause[1]
+  if (typeof left === 'symbol') {
+    left = resolve($, left)
+  } else if (Array.isArray(left)) {
+    left = seval(left, $)
+  }
+  if (length < 3) {
+    return true
+  }
+
+  var right = clause[2]
+  if (typeof right === 'symbol') {
+    right = resolve($, right)
+  } else if (Array.isArray(right)) {
+    right = seval(right, $)
+  }
+
+  return left >= right
+}
+
+$operators[Symbol.for('<')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return false // null === null
+  }
+
+  var left = clause[1]
+  if (typeof left === 'symbol') {
+    left = resolve($, left)
+  } else if (Array.isArray(left)) {
+    left = seval(left, $)
+  }
+  if (length < 3) {
+    return false
+  }
+
+  var right = clause[2]
+  if (typeof right === 'symbol') {
+    right = resolve($, right)
+  } else if (Array.isArray(right)) {
+    right = seval(right, $)
+  }
+
+  return left < right
+}
+
+$operators[Symbol.for('<=')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return false // null === null
+  }
+
+  var left = clause[1]
+  if (typeof left === 'symbol') {
+    left = resolve($, left)
+  } else if (Array.isArray(left)) {
+    left = seval(left, $)
+  }
+  if (length < 3) {
+    return false
+  }
+
+  var right = clause[2]
+  if (typeof right === 'symbol') {
+    right = resolve($, right)
+  } else if (Array.isArray(right)) {
+    right = seval(right, $)
+  }
+
+  return left <= right
+}
+
 $operators[Symbol.for('&&')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
@@ -1380,7 +1583,7 @@ function $lambdaIn ($) {
     params = formatParameters(params)
     var fixedArgs = params.shift()
 
-    if (body[0] === SymbolLambda) {
+    if (body[0] === SymbolLambdaShort) {
       return createLambda($, enclosing, params, body)
     } else {
       return createClosure($, enclosing, params, fixedArgs, body)
