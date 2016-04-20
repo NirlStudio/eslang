@@ -28,6 +28,8 @@
 
   "opr-if"
 
+  "bitwise"
+
   "flow"
   "pipe"
   "premise"

@@ -49,6 +49,71 @@ function copyJSObject (name, jsObject) {
   return copied
 }
 
+function createBitwiseFunctions () {
+  var Bit = {}
+  Bit[SymbolIdentityName] = '($"Bit")'
+
+  exportTo(Bit, 'and', function Bit$and (left, right) {
+    if (!Number.isInteger(left)) {
+      left = 0
+    }
+    if (!Number.isInteger(right)) {
+      right = 0
+    }
+    return left & right
+  })
+
+  exportTo(Bit, 'or', function Bit$or (left, right) {
+    if (!Number.isInteger(left)) {
+      left = 0
+    }
+    if (!Number.isInteger(right)) {
+      right = 0
+    }
+    return left | right
+  })
+
+  exportTo(Bit, 'xor', function Bit$xor (left, right) {
+    if (!Number.isInteger(left)) {
+      left = 0
+    }
+    if (!Number.isInteger(right)) {
+      right = 0
+    }
+    return left ^ right
+  })
+
+  exportTo(Bit, 'not', function Bit$not (bits) {
+    if (!Number.isInteger(bits)) {
+      bits = 0
+    }
+    return ~bits
+  })
+
+  exportTo(Bit, 'lshift', function Bit$lshift (bits, offset) {
+    if (!Number.isInteger(bits)) {
+      bits = 0
+    }
+    return bits << offset
+  })
+
+  exportTo(Bit, 'rshift', function Bit$lshift (bits, offset) {
+    if (!Number.isInteger(bits)) {
+      bits = 0
+    }
+    return bits >> offset
+  })
+
+  exportTo(Bit, 'zrshift', function Bit$lshift (bits, offset) {
+    if (!Number.isInteger(bits)) {
+      bits = 0
+    }
+    return bits >>> offset
+  })
+
+  return Bit
+}
+
 function exportURIFunctions () {
   var URI = {}
   URI[SymbolIdentityName] = '($"URI")'
@@ -96,7 +161,8 @@ function initializeSpace ($) {
   })
 
   exportTo($, 'symbol', function $symbol (key) {
-    return typeof key === 'string' ? Symbol.for(key) : null // no duplicated symbol instances
+    // no duplicated symbol instances
+    return typeof key === 'string' ? Symbol.for(key) : null
   })
 
   exportJSFunction($, 'number', JS.Number)
@@ -108,6 +174,7 @@ function initializeSpace ($) {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
   })
 
+  exportTo($, 'Bit', createBitwiseFunctions())
   exportTo($, 'URI', exportURIFunctions())
   exportTo($, 'Math', copyJSObject('Math', JS.Math))
   exportTo($, 'JSON', copyJSObject('JSON', JS.JSON))

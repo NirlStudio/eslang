@@ -105,7 +105,7 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global objects ', function () {
-    var objects = ['(Math "random")', '(JSON "parse")', '(URI "encode")']
+    var objects = ['(Bit "and")', '(Math "random")', '(JSON "parse")', '(URI "encode")']
     for (var i = 0; i < objects.length; i++) {
       (function (o) {
         should('have ' + o, function () {
