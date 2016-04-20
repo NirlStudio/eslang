@@ -29,6 +29,7 @@
   "opr-if"
 
   "bitwise"
+  "logical"
 
   "flow"
   "pipe"
