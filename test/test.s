@@ -29,6 +29,7 @@
 
   "if"
   "while"
+  "for"
 
   "bitwise"
   "logical"
