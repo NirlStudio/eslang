@@ -28,6 +28,7 @@
   "iterate"
 
   "if"
+  "while"
 
   "bitwise"
   "logical"
