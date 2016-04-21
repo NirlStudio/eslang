@@ -55,7 +55,7 @@
     (let obj (@ p1: 1))
     (let iter ($iterate obj),
     (assert equal true (iter next),
-    (assert equal (` p1) (iter "key"),
+    (assert equal "p1" (iter "key"),
     (assert equal 1 (iter "value"),
 
     (let obj (@ p1: 1 p2: 2))

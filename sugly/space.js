@@ -1,19 +1,16 @@
 'use strict'
 
-const SymbolIdentityName = Symbol.for('identityName')
-
 let JS = global || window
 
 function exportTo (container, name, obj) {
   if (typeof obj === 'object' || typeof obj === 'function') {
-    if (!obj[SymbolIdentityName]) {
-      var owner = container[SymbolIdentityName]
-      obj[SymbolIdentityName] = '(' + owner + ' "' + name + '")'
+    if (!obj.identityName) {
+      var owner = container.identityName
+      obj.identityName = '(' + owner + ' "' + name + '")'
     }
   }
 
   container[name] = obj
-  container[Symbol.for(name)] = obj
   return obj
 }
 
@@ -34,7 +31,7 @@ function exportFunction (container, name, owner, func) {
 
 function copyJSObject (name, jsObject) {
   var copied = {}
-  copied[SymbolIdentityName] = '($"' + name + '")'
+  copied.identityName = '($"' + name + '")'
 
   var keys = Object.getOwnPropertyNames(jsObject)
   for (var i = 0; i < keys.length; i++) {
@@ -51,7 +48,7 @@ function copyJSObject (name, jsObject) {
 
 function createBitwiseFunctions () {
   var Bit = {}
-  Bit[SymbolIdentityName] = '($"Bit")'
+  Bit.identityName = '($"Bit")'
 
   exportTo(Bit, 'and', function Bit$and (left, right) {
     if (!Number.isInteger(left)) {
@@ -116,7 +113,7 @@ function createBitwiseFunctions () {
 
 function exportURIFunctions () {
   var URI = {}
-  URI[SymbolIdentityName] = '($"URI")'
+  URI.identityName = '($"URI")'
 
   exportJSFunction(URI, 'encode', JS.encodeURI)
   exportJSFunction(URI, 'encodeComponent', JS.encodeURIComponent)
@@ -185,7 +182,7 @@ function initializeSpace ($) {
 
 module.exports = function (/* options */) {
   var $ = Object.create(null)
-  $[SymbolIdentityName] = '$'
+  $.identityName = '$'
 
   // meta information
   var sugly = exportTo($, 'sugly', {})

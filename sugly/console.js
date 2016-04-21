@@ -1,15 +1,12 @@
 'use strict'
 
-const SymbolIdentityName = Symbol.for('identityName')
-
 let JS = global || window
 
 function exportTo (container, name, obj) {
-  var owner = container[SymbolIdentityName]
-  obj[SymbolIdentityName] = '(' + owner + ' "' + name + '")'
+  var owner = container.identityName
+  obj.identityName = '(' + owner + ' "' + name + '")'
 
   container[name] = obj
-  container[Symbol.for(name)] = obj
   return obj
 }
 
@@ -47,7 +44,7 @@ module.exports = function ($, output) {
   var formatCode = formatter($, true)
 
   var $console = {}
-  $console[SymbolIdentityName] = '($"console")'
+  $console.identityName = '($"console")'
 
   exportTo($console, 'log', function () {
     output.log.apply(output, format.apply(null, arguments))

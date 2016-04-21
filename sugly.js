@@ -3,7 +3,6 @@
 const SymbolContext = Symbol.for('$')
 
 var makeSpace = require('./sugly/space')
-var nativelyResolve = require('./sugly/resolver')()
 
 function resolve ($, sym) {
   if (SymbolContext === sym) {
@@ -14,8 +13,8 @@ function resolve ($, sym) {
     return null
   }
 
-  var value = $[sym]
-  return typeof value !== 'undefined' ? value : nativelyResolve($, sym)
+  var value = $[Symbol.keyFor(sym)]
+  return typeof value !== 'undefined' ? value : null
 }
 
 function set (subject, sym, value) {
@@ -23,7 +22,10 @@ function set (subject, sym, value) {
     return null
   }
 
-  subject[sym] = value
+  var key = Symbol.keyFor(sym)
+  if (!key.startsWith('$') && !key.startsWith('__')) {
+    subject[key] = value
+  }
   return value
 }
 
@@ -32,17 +34,13 @@ function getter (subject, key) {
     return null
   }
 
-  if (typeof key === 'string') {
-    key = Symbol.for(key)
+  if (typeof key === 'symbol') {
+    key = Symbol.keyFor(key)
   }
 
   var value = subject[key]
   if (typeof value !== 'undefined') {
     return value
-  }
-
-  if (typeof key === 'symbol') {
-    return nativelyResolve(subject, key)
   }
   return null
 }
@@ -278,7 +276,7 @@ function objectCreate ($, clause) {
         value = expr
       }
     }
-    obj[key] = value
+    set(obj, key, value)
     i += 2 // next :
   }
   return obj
@@ -318,7 +316,7 @@ function objectAssign ($, clause) {
         value = expr
       }
     }
-    obj[key] = value
+    set(obj, key, value)
     i += 2 // next :
   }
   return obj
@@ -365,7 +363,7 @@ function objectDerive ($, clause) {
         value = expr
       }
     }
-    obj[key] = value
+    set(obj, key, value)
     i += 2 // next :
   }
   return obj
@@ -457,7 +455,7 @@ function lambdaCreate ($, symbols, params, body) {
     for (let i = 0; i < symbols.length; i++) {
       let s = symbols[i]
       if (typeof s === 'symbol') {
-        enclosing[s] = resolve($, s)
+        set(enclosing, s, resolve($, s))
       }
     }
   }
@@ -652,12 +650,12 @@ $operators[Symbol.for('null')] = function ($, clause) {
 
 const SymbolBool = Symbol.for('bool')
 $operators[SymbolBool] = function ($, clause) {
-  return $[SymbolBool](clause.length < 2 ? undefined : seval(clause[1], $))
+  return $.bool(clause.length < 2 ? undefined : seval(clause[1], $))
 }
 
 const SymbolNumber = Symbol.for('number')
 $operators[SymbolNumber] = function ($, clause) {
-  return clause.length < 2 ? 0 : $[SymbolNumber](seval(clause[1], $))
+  return clause.length < 2 ? 0 : $.number(seval(clause[1], $))
 }
 
 const SymbolString = Symbol.for('string')
@@ -671,17 +669,17 @@ $operators[SymbolString] = function ($, clause) {
   for (var i = 1; i < length; i++) {
     values.push(seval(clause[i], $))
   }
-  return $[SymbolString].apply($, values)
+  return $.string.apply($, values)
 }
 
 const SymbolSymbol = Symbol.for('symbol')
 $operators[SymbolSymbol] = function ($, clause) {
-  return clause.length < 2 ? null : $[SymbolSymbol](seval(clause[1], $))
+  return clause.length < 2 ? null : $.symbol(seval(clause[1], $))
 }
 
 const SymbolDate = Symbol.for('date')
 $operators[SymbolDate] = function ($, clause) {
-  return $[SymbolDate](clause.length < 2 ? 0 : seval(clause[1], $))
+  return $.date(clause.length < 2 ? 0 : seval(clause[1], $))
 }
 
 const SymbolElse = Symbol.for('else')
@@ -852,9 +850,9 @@ function forEach ($, clause) {
   var result = null
   $.$loops.push(iterator)
   while (iterator.next()) {
-    $[valueSymbol] = resolve(iterator, SymbolValue)
+    set($, valueSymbol, resolve(iterator, SymbolValue))
     if (keySymbol) {
-      $[keySymbol] = resolve(iterator, SymbolKey)
+      set($, keySymbol, resolve(iterator, SymbolKey))
     }
     try {
       result = beval($, body)
@@ -1032,9 +1030,9 @@ $operators[Symbol.for('premise')] = $operators[SymbolPremise]
 
 function populateOperatorCtx (operands, ctx) {
   var oprdc = operands.length
-  ctx[Symbol.for('OPRDC')] = oprdc
+  ctx.OPRDC = oprdc
   for (var i = 0; i < 10; i++) {
-    ctx[Symbol.for('OPRD' + i)] = i < oprdc ? operands[i] : null
+    ctx['OPRD' + i] = i < oprdc ? operands[i] : null
   }
 }
 
@@ -1158,7 +1156,7 @@ $operators[Symbol.for('+=')] = function ($, clause) {
   var result = plus($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    $[sym] = result
+    set($, sym, result)
   }
   return result
 }
@@ -1196,7 +1194,7 @@ $operators[Symbol.for('-=')] = function ($, clause) {
   var result = subtract($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    $[sym] = result
+    set($, sym, result)
   }
   return result
 }
@@ -1236,7 +1234,7 @@ $operators[Symbol.for('*=')] = function ($, clause) {
   var result = multiply($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    $[sym] = result
+    set($, sym, result)
   }
   return result
 }
@@ -1276,7 +1274,7 @@ $operators[Symbol.for('/=')] = function ($, clause) {
   var result = divide($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    $[sym] = result
+    set($, sym, result)
   }
   return result
 }
@@ -1295,7 +1293,7 @@ $operators[Symbol.for('++')] = function ($, clause) {
     } else {
       value = 1
     }
-    $[sym] = value
+    set($, sym, value)
     return value
   }
 
@@ -1319,7 +1317,7 @@ $operators[Symbol.for('--')] = function ($, clause) {
     } else {
       value = -1
     }
-    $[sym] = value
+    set($, sym, value)
     return value
   }
 
@@ -1700,10 +1698,6 @@ function formatParameters (params) {
   return formatted
 }
 
-const SymbolThis = Symbol.for(':') // TODO - [experimental] any potential conflict with indexer?
-const SymbolArgc = Symbol.for('argc')
-const SymbolArgv = Symbol.for('argv')
-
 function $functionIn ($) {
   var createSpace = $.createSpace
 
@@ -1720,16 +1714,16 @@ function $functionIn ($) {
       var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
       // new namespace
       var ns = createSpace($)
-      ns[SymbolThis] = this
+      ns[':'] = this
       if (!fixedArgs) {
-        ns[SymbolArgc] = args.length
-        ns[SymbolArgv] = args
+        ns['argc'] = args.length
+        ns['argv'] = args
       }
 
       // binding arguments with default values
       for (var i = 0; i < params.length; i++) {
         var p = params[i]
-        ns[p[0]] = args.length > i ? args[i] : p[1]
+        set(ns, p[0], args.length > i ? args[i] : p[1])
       }
       return beval(ns, body)
     }
@@ -1748,19 +1742,19 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
     var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
     // new namespace
     var ns = createSpace($)
-    ns[SymbolThis] = this
+    ns[':'] = this
     Object.assign(ns, enclosing)
 
     // variant arguments
     if (!fixedArgs) {
-      ns[SymbolArgc] = args.length
-      ns[SymbolArgv] = args
+      ns['argc'] = args.length
+      ns['argv'] = args
     }
 
     // aguments or parameter default values can overrride enclosed values.
     for (var i = 0; i < params.length; i++) {
       var p = params[i]
-      ns[p[0]] = args.length > i ? args[i] : p[1]
+      set(ns, p[0], args.length > i ? args[i] : p[1])
     }
     return beval(ns, body)
   }
@@ -1779,7 +1773,7 @@ function createLambda ($, enclosing, params, body) {
     enclosing = Object.assign({}, enclosing)
     for (var i = 0; i < params.length; i++) {
       var p = params[i]
-      enclosing[p[0]] = args.length > i ? args[i] : p[1]
+      set(enclosing, p[0], args.length > i ? args[i] : p[1])
     }
 
     return $.lambda(enclosing, body[1], body.slice(2))

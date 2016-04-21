@@ -6,14 +6,9 @@ function PropertyIterator (obj) {
   this._object = obj
   this._index = -1
 
-  this._keys = Object.getOwnPropertySymbols(obj)
-  // expose native properties
+  this._keys = []
   for (var key in obj) {
-    if (key.startsWith('$') || key.startsWith('__')) {
-      continue
-    }
-    var sym = Symbol.for(key)
-    if (!this._object.hasOwnProperty(sym)) {
+    if (!key.startsWith('$') && !key.startsWith('__')) {
       this._keys.push(key)
     }
   }

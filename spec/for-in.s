@@ -139,7 +139,7 @@
       (* v 2)
     ),
     (assert equal counter 2)
-    (assert equal k (` p2))
+    (assert equal k "p2")
     (assert equal v 2)
     (assert equal result 4)
 ).

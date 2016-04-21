@@ -1,14 +1,10 @@
 'use strict'
 
-const SymbolIdentityName = Symbol.for('identityName')
-const SymbolTypeIdentifier = Symbol.for('typeIdentifier')
-
 function exportTo (container, name, obj) {
-  var owner = container[SymbolIdentityName]
-  obj[SymbolIdentityName] = '(' + owner + ' "' + name + '")'
+  var owner = container.identityName
+  obj.identityName = '(' + owner + ' "' + name + '")'
 
   container[name] = obj
-  container[Symbol.for(name)] = obj
   return obj
 }
 
@@ -46,18 +42,16 @@ function encoder (pretty) {
   }
 
   function encodeObject (obj) {
-    var identityName = obj[SymbolIdentityName]
-    if (identityName) {
-      return identityName
+    if (obj.identityName) {
+      return obj.identityName
     }
 
     var code = '(@'
-    var typeIdentifier = obj[SymbolTypeIdentifier]
-    if (typeIdentifier) {
-      code += typeIdentifier + '>'
+    if (obj.typeIdentifier) {
+      code += obj.typeIdentifier + '>'
     }
 
-    var keys = Object.getOwnPropertySymbols(obj)
+    var keys = Object.getOwnPropertyNames(obj)
     if (keys.length < 1) {
       return code.endsWith('>') ? code + ')' : code + '>)'
     }
@@ -65,7 +59,7 @@ function encoder (pretty) {
     increaseIndent()
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
-      code += (i === 0 ? '' : '\n' + indent) + Symbol.keyFor(key) + ': '
+      code += (i === 0 ? '' : '\n' + indent) + key + ': '
       code += encodeValue(obj[key])
     }
     decreaseIndent()
@@ -74,15 +68,12 @@ function encoder (pretty) {
 
   function encodeNativeFunction (func) {
     // encode anonymous function to null.
-    return func[SymbolIdentityName] || func.name || null
+    return func.identityName || func.name || null
   }
 
   function encodeSuglyFunction (func) {
-    if (func.hasOwnProperty(SymbolIdentityName)) {
-      var name = func[SymbolIdentityName]
-      if (name) {
-        return name
-      }
+    if (func.identityName) {
+      return func.identityName
     }
 
     var code = '(='
@@ -203,7 +194,7 @@ function encoder (pretty) {
   }
 
   // export functions
-  encode[SymbolIdentityName] = '($"encode")'
+  encode.identityName = '($"encode")'
 
   exportTo(encode, 'string', function (str) {
     if (typeof str !== 'string') {
@@ -267,5 +258,5 @@ function encoder (pretty) {
   return encode
 }
 
-encoder[SymbolIdentityName] = '($"encoder")'
+encoder.identityName = '($"encoder")'
 module.exports = encoder

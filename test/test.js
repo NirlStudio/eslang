@@ -150,9 +150,9 @@ define('Sugly Bootstrapping', function () {
       ensure(function () {
         var obj = $.exec('(@ p1: 1 p2:"string" p3: true)')
         assert.isOk(obj, 'failed to create a new object.')
-        assert.equal(obj[Symbol.for('p1')], 1, 'invalid number value.')
-        assert.equal(obj[Symbol.for('p2')], 'string', 'invalid string value.')
-        assert.equal(obj[Symbol.for('p3')], true, 'invalid boolean value.')
+        assert.equal(obj.p1, 1, 'invalid number value.')
+        assert.equal(obj.p2, 'string', 'invalid string value.')
+        assert.equal(obj.p3, true, 'invalid boolean value.')
       })
     })
     should('($ (= (x y) (+ x y 20)) 1 10)', 'create a function and call it.', function () {
