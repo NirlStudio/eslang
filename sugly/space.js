@@ -174,6 +174,7 @@ function initializeSpace ($) {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
   })
 
+  exportTo($, 'range', require('./range'))
   exportTo($, 'iterate', require('./iterate'))
 
   exportTo($, 'Bit', createBitwiseFunctions())

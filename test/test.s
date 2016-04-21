@@ -14,10 +14,8 @@
       ($assert true).
 
 (let run- (=> type > (*)
-  (let i 0)
-  (for (!= i argc) (++ i)
-    (let name (argv:i),
-    ($define (+ "$" name) (= (type name) > ()
+  (for name in argv
+    ($define name (= (type name) > ()
       ($run (+ type "/" name ".s").
 
 ($ ($run-"spec")
@@ -30,6 +28,7 @@
   "if"
   "while"
   "for"
+  "for-in"
 
   "bitwise"
   "logical"

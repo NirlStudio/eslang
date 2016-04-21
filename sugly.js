@@ -800,17 +800,99 @@ $operators[Symbol.for('while')] = function ($, clause) {
   return result
 }
 
+const SymbolKey = Symbol.for('key')
+const SymbolValue = Symbol.for('value')
+// (for value in iterable body) OR
+// (for (value) in iterable body) OR
+// (for (key value) in iterable body)
+function forEach ($, clause) {
+  var length = clause.length
+  if (length < 5) {
+    return null // short circuit - no loop body
+  }
+
+  var keySymbol, valueSymbol
+  var fields = clause[1]
+  if (typeof fields === 'symbol') {
+    keySymbol = null
+    valueSymbol = fields
+  } else if (Array.isArray(fields)) {
+    if (fields.length > 1) {
+      keySymbol = fields[0]
+      valueSymbol = fields[1]
+      if (typeof keySymbol !== 'symbol' || typeof valueSymbol !== 'symbol') {
+        return null // invalid fields expresion
+      }
+    } else if (fields.length > 0) {
+      keySymbol = null
+      valueSymbol = fields[0]
+      if (typeof valueSymbol !== 'symbol') {
+        return null // invalid fields expresion
+      }
+    } else {
+      return null // missing fields expression
+    }
+  } else {
+    return null // invalid field(s) expression
+  }
+
+  var iterable = clause[3]
+  if (typeof iterable === 'symbol') {
+    iterable = resolve($, iterable)
+  } else if (Array.isArray(iterable)) {
+    iterable = seval(iterable, $)
+  }
+
+  var iterator = $.iterate(iterable)
+  if (iterator === null || typeof iterator.next !== 'function') {
+    return null // not an iterable object.
+  }
+
+  var body = clause.slice(4)
+  var result = null
+  $.$loops.push(iterator)
+  while (iterator.next()) {
+    $[valueSymbol] = resolve(iterator, SymbolValue)
+    if (keySymbol) {
+      $[keySymbol] = resolve(iterator, SymbolKey)
+    }
+    try {
+      result = beval($, body)
+    } catch (signal) {
+      if (signal instanceof SuglySignal) {
+        if (signal.type === 'continue') {
+          result = signal.value
+          continue
+        }
+        if (signal.type === 'break') {
+          result = signal.value
+          break
+        }
+      }
+      $.$loops.pop()
+      throw signal
+    }
+  }
+  $.$loops.pop()
+  return result
+}
+
+const SymbolIn = Symbol.for('in')
+// (for condition incremental body)
 $operators[Symbol.for('for')] = function ($, clause) {
   var length = clause.length
   if (length < 4) {
     return null // short circuit - no loop body
   }
 
+  var step = clause[2]
+  if (step === SymbolIn) {
+    return forEach($, clause)
+  }
+  var runStep = Array.isArray(step)
+
   var test = loopTest($, clause[1])
   var dynamicTest = typeof test === 'function'
-
-  var step = clause[2]
-  var runStep = Array.isArray(step)
 
   var body = clause.slice(3)
   var result = null

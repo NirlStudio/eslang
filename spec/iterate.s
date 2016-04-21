@@ -3,11 +3,11 @@
     (let iter ($iterate 0),
     (assert equal false (iter next),
 
-    (let iter ($iterate 3 0 -1),
+    (let iter ($iterate ($range 0 3 -1),
     (assert equal true (iter next),
     (assert equal false (iter next),
 
-    (let iter ($iterate -3 0 1),
+    (let iter ($iterate ($range 0 -3 1),
     (assert equal true (iter next),
     (assert equal false (iter next),
 
@@ -25,7 +25,7 @@
     (assert equal -1 (iter "value"),
     (assert equal false (iter next),
 
-    (let iter ($iterate 2 0 2),
+    (let iter ($iterate ($range 0 2 2),
     (assert equal true (iter next),
     (assert equal 0 (iter "value"),
     (assert equal false (iter next),

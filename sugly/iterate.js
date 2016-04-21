@@ -1,24 +1,6 @@
 'use strict'
 
-function SeqenceIterator (to, from, step) {
-  this._to = to
-  this._from = from
-  this._step = step
-
-  this.value = from - step
-}
-
-SeqenceIterator.prototype.next = function () {
-  this.value += this._step
-
-  if (this.value >= this._from && this.value < this._to) {
-    return true
-  }
-  if (this.value <= this._from && this.value > this._to) {
-    return true
-  }
-  return false
-}
+var range = require('./range')
 
 function PropertyIterator (obj) {
   this._object = obj
@@ -38,17 +20,17 @@ function PropertyIterator (obj) {
 
   this.key = null
   this.value = null
+}
 
-  this.next = function () {
-    this._index += 1
-    if (this._index >= this._keys.length) {
-      return false
-    }
-
-    this.key = this._keys[this._index]
-    this.value = this._object[this.key]
-    return true
+PropertyIterator.prototype.next = function () {
+  this._index += 1
+  if (this._index >= this._keys.length) {
+    return false
   }
+
+  this.key = this._keys[this._index]
+  this.value = this._object[this.key]
+  return true
 }
 
 function ArrayIterator (array) {
@@ -56,35 +38,33 @@ function ArrayIterator (array) {
 
   this.key = -1
   this.value = null
-
-  this.next = function () {
-    this.key += 1
-    if (this.key >= this._array.length) {
-      return false
-    }
-
-    this.value = this._array[this.key]
-    return true
-  }
 }
 
-module.exports = function (to, from, step) {
-  if (typeof to === 'number') {
-    if (typeof from !== 'number') {
-      from = 0
-    }
-    if (typeof step !== 'number' || step === 0) {
-      step = (to - from) >= 0 ? 1 : -1
-    }
-    return new SeqenceIterator(to, from, step)
+ArrayIterator.prototype.next = function () {
+  this.key += 1
+  if (this.key >= this._array.length) {
+    return false
   }
 
-  if (Array.isArray(to)) {
-    return new ArrayIterator(to)
+  this.value = this._array[this.key]
+  return true
+}
+
+module.exports = function iterate (target) {
+  if (typeof target === 'undefined' || target === null) {
+    return null
   }
 
-  if (typeof to === 'object' || typeof to === 'function') {
-    return typeof to.iterate === 'function' ? to.iterate() : new PropertyIterator(to)
+  if (Array.isArray(target)) {
+    return new ArrayIterator(target)
+  }
+
+  if (typeof target === 'number') {
+    return range(target).iterate()
+  }
+
+  if (typeof target === 'object' || typeof target === 'function') {
+    return typeof target.iterate === 'function' ? target.iterate() : new PropertyIterator(target)
   }
 
   return null
