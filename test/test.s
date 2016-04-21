@@ -30,6 +30,10 @@
 
   "bitwise"
   "logical"
+  "arithmetic"
+  "concat"
+  "equivalence"
+  "ordering"
 
   "flow"
   "pipe"

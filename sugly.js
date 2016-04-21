@@ -998,6 +998,59 @@ $operators[Symbol.for('operator')] = function ($, impl) {
   return null
 }
 
+function concat ($, str, clause) {
+  var length = clause.length
+  for (var i = 2; i < length; i++) {
+    let value = clause[i]
+    if (typeof value === 'symbol') {
+      value = resolve($, value)
+    } else if (Array.isArray(value)) {
+      value = seval(value, $)
+    }
+    if (typeof value === 'string') {
+      str += value
+    } else {
+      if (str.length > 0) {
+        str += ' '
+      }
+      str += $.encode.value(value)
+    }
+  }
+  return str
+}
+
+$operators[Symbol.for('concat')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) { return '' }
+
+  var str = clause[1]
+  if (typeof result === 'symbol') {
+    str = resolve($, str)
+  } else if (Array.isArray(str)) {
+    str = seval(str, $)
+  }
+  if (typeof str !== 'string') {
+    str = $.encode.value(str)
+  }
+  return length > 2 ? concat($, str, clause) : str
+}
+
+function sum ($, num, clause) {
+  var length = clause.length
+  for (var i = 2; i < length; i++) {
+    let value = clause[i]
+    if (typeof value === 'symbol') {
+      value = resolve($, value)
+    } else if (Array.isArray(value)) {
+      value = seval(value, $)
+    }
+    if (typeof value === 'number') {
+      num += value
+    }
+  }
+  return num
+}
+
 function plus ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
@@ -1009,17 +1062,13 @@ function plus ($, clause) {
     result = seval(result, $)
   }
 
-  for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      result += resolve($, value)
-    } else if (Array.isArray(value)) {
-      result += seval(value, $)
-    } else {
-      result += value
-    }
+  if (typeof result === 'number') {
+    return length > 2 ? sum($, result, clause) : result
+  } else if (typeof result === 'string') {
+    return length > 2 ? concat($, result, clause) : result
+  } else {
+    return length > 2 ? sum($, 0, clause) : 0
   }
-  return result
 }
 
 $operators[Symbol.for('+')] = plus
@@ -1032,7 +1081,7 @@ $operators[Symbol.for('+=')] = function ($, clause) {
   return result
 }
 
-function minus ($, clause) {
+function subtract ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
@@ -1043,7 +1092,7 @@ function minus ($, clause) {
     result = seval(result, $)
   }
   if (typeof result !== 'number') {
-    return 0
+    result = 0
   }
 
   for (var i = 2; i < length; i++) {
@@ -1060,9 +1109,9 @@ function minus ($, clause) {
   return result
 }
 
-$operators[Symbol.for('-')] = minus
+$operators[Symbol.for('-')] = subtract
 $operators[Symbol.for('-=')] = function ($, clause) {
-  var result = minus($, clause)
+  var result = subtract($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
     $[sym] = result
@@ -1070,7 +1119,7 @@ $operators[Symbol.for('-=')] = function ($, clause) {
   return result
 }
 
-function times ($, clause) {
+function multiply ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
@@ -1093,14 +1142,16 @@ function times ($, clause) {
     }
     if (typeof value === 'number') {
       result *= value
+    } else {
+      return 0
     }
   }
   return result
 }
 
-$operators[Symbol.for('*')] = times
+$operators[Symbol.for('*')] = multiply
 $operators[Symbol.for('*=')] = function ($, clause) {
-  var result = times($, clause)
+  var result = multiply($, clause)
   var sym = clause[1]
   if (typeof sym === 'symbol') {
     $[sym] = result
@@ -1131,6 +1182,8 @@ function divide ($, clause) {
     }
     if (typeof value === 'number') {
       result /= value
+    } else {
+      return Infinity
     }
   }
   return result
@@ -1194,6 +1247,23 @@ $operators[Symbol.for('--')] = function ($, clause) {
   return typeof sym === 'number' ? sym - 1 : -1
 }
 
+function equalDate ($, base, clause) {
+  var length = clause.length
+  base = base.getTime()
+  for (var i = 2; i < length; i++) {
+    let value = clause[i]
+    if (typeof value === 'symbol') {
+      value = resolve($, value)
+    } else if (Array.isArray(value)) {
+      value = seval(value, $)
+    }
+    if (!(value instanceof Date) || base !== value.getTime()) {
+      return false
+    }
+  }
+  return true
+}
+
 $operators[Symbol.for('==')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
@@ -1208,6 +1278,9 @@ $operators[Symbol.for('==')] = function ($, clause) {
   }
   if (length < 3) {
     return base === null
+  }
+  if (base instanceof Date) {
+    return equalDate($, base, clause)
   }
 
   for (var i = 2; i < length; i++) {
@@ -1239,6 +1312,9 @@ $operators[Symbol.for('!=')] = function ($, clause) {
   if (length < 3) {
     return base !== null
   }
+  if (base instanceof Date) {
+    return !equalDate($, base, clause)
+  }
 
   for (var i = 2; i < length; i++) {
     let value = clause[i]
@@ -1267,7 +1343,16 @@ $operators[Symbol.for('>')] = function ($, clause) {
     left = seval(left, $)
   }
   if (length < 3) {
-    return true
+    return false
+  }
+
+  var type = typeof left
+  if (type !== 'number' && type !== 'string') {
+    if (left instanceof Date) {
+      type = 'date'
+    } else {
+      return false
+    }
   }
 
   var right = clause[2]
@@ -1277,13 +1362,20 @@ $operators[Symbol.for('>')] = function ($, clause) {
     right = seval(right, $)
   }
 
-  return left > right
+  if (type === 'date') {
+    if (right instanceof Date) {
+      return left.getTime() > right.getTime()
+    }
+  } else if (typeof right === type) {
+    return left > right
+  }
+  return false
 }
 
 $operators[Symbol.for('>=')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
-    return false // null === null
+    return false
   }
 
   var left = clause[1]
@@ -1293,7 +1385,16 @@ $operators[Symbol.for('>=')] = function ($, clause) {
     left = seval(left, $)
   }
   if (length < 3) {
-    return true
+    return false
+  }
+
+  var type = typeof left
+  if (type !== 'number' && type !== 'string') {
+    if (left instanceof Date) {
+      type = 'date'
+    } else {
+      return false
+    }
   }
 
   var right = clause[2]
@@ -1303,13 +1404,20 @@ $operators[Symbol.for('>=')] = function ($, clause) {
     right = seval(right, $)
   }
 
-  return left >= right
+  if (type === 'date') {
+    if (right instanceof Date) {
+      return left.getTime() >= right.getTime()
+    }
+  } else if (typeof right === type) {
+    return left >= right
+  }
+  return false
 }
 
 $operators[Symbol.for('<')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
-    return false // null === null
+    return false
   }
 
   var left = clause[1]
@@ -1322,6 +1430,15 @@ $operators[Symbol.for('<')] = function ($, clause) {
     return false
   }
 
+  var type = typeof left
+  if (type !== 'number' && type !== 'string') {
+    if (left instanceof Date) {
+      type = 'date'
+    } else {
+      return false
+    }
+  }
+
   var right = clause[2]
   if (typeof right === 'symbol') {
     right = resolve($, right)
@@ -1329,13 +1446,20 @@ $operators[Symbol.for('<')] = function ($, clause) {
     right = seval(right, $)
   }
 
-  return left < right
+  if (type === 'date') {
+    if (right instanceof Date) {
+      return left.getTime() < right.getTime()
+    }
+  } else if (typeof right === type) {
+    return left < right
+  }
+  return false
 }
 
 $operators[Symbol.for('<=')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
-    return false // null === null
+    return false
   }
 
   var left = clause[1]
@@ -1348,6 +1472,15 @@ $operators[Symbol.for('<=')] = function ($, clause) {
     return false
   }
 
+  var type = typeof left
+  if (type !== 'number' && type !== 'string') {
+    if (left instanceof Date) {
+      type = 'date'
+    } else {
+      return false
+    }
+  }
+
   var right = clause[2]
   if (typeof right === 'symbol') {
     right = resolve($, right)
@@ -1355,7 +1488,14 @@ $operators[Symbol.for('<=')] = function ($, clause) {
     right = seval(right, $)
   }
 
-  return left <= right
+  if (type === 'date') {
+    if (right instanceof Date) {
+      return left.getTime() <= right.getTime()
+    }
+  } else if (typeof right === type) {
+    return left <= right
+  }
+  return false
 }
 
 $operators[Symbol.for('&&')] = function ($, clause) {
