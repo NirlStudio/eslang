@@ -25,6 +25,7 @@
   "eval"
   "space"
   "function"
+  "iterate"
 
   "opr-if"
 
