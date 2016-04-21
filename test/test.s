@@ -27,7 +27,7 @@
   "function"
   "iterate"
 
-  "opr-if"
+  "if"
 
   "bitwise"
   "logical"
