@@ -58,6 +58,22 @@
   ($should code "return 1120" ($assert-exec code 1120),
 ).
 
+($define "($call function subject args)" (= ()
+  ($should "execute an function with an subject and arguments from an array" (= ()
+    (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
+    (let r ($call f),
+    (assert equal null (r s))
+    (assert equal 0 (r argc))
+
+    (let s (object))
+    (let args (@ 1 2))
+    (let r ($call f s args),
+    (assert equal true (is s (r s)),
+    (assert equal 2 (r argc))
+    (assert equal 1 ((r argv):0),
+    (assert equal 2 (-> r argv (:1),
+).
+
 ($define "Function object" (= ()
   ($should "be reserved" (= ()
     (assert equal "object" (typeof ($Function)))
