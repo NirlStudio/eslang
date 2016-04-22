@@ -305,6 +305,16 @@ const SymbolObject = Symbol.for('@')
 
 $operators[SymbolObject] = function ($, clause) {
   var length = clause.length
+  if (length > 1) {
+    switch (clause[1]) {
+      case SymbolIndexer:
+        return null
+      case SymbolAssign:
+        return null
+      case SymbolDerive:
+        return objectDerive($, clause)
+    }
+  }
   if (length > 2) {
     switch (clause[2]) {
       case SymbolIndexer:
@@ -316,10 +326,6 @@ $operators[SymbolObject] = function ($, clause) {
       case SymbolDerive:
         return objectDerive($, clause)
     }
-  } else if (length === 2 && clause[1] === SymbolDerive) {
-    // (@> prop: value ...) is allowed.
-    // (@>) to be used to represent an empty object.
-    return objectDerive($, clause)
   }
   return arrayCreate($, clause)
 }
@@ -561,7 +567,12 @@ $operators[SymbolSymbol] = function ($, clause) {
 
 const SymbolDate = Symbol.for('date')
 $operators[SymbolDate] = function ($, clause) {
-  return $.date(clause.length < 2 ? 0 : seval(clause[1], $))
+  var length = clause.length
+  var args = []
+  for (var i = 1; i < length; i++) {
+    args.push(seval(clause[i], $))
+  }
+  return $.date.apply(null, args)
 }
 
 const SymbolElse = Symbol.for('else')
@@ -965,6 +976,47 @@ $operators[Symbol.for('concat')] = function ($, clause) {
   return length > 2 ? concat($, str, clause) : str
 }
 
+function mixin ($, base, clause, target) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+
+  if (typeof target !== 'object' || target === null) {
+    target = base
+    if (typeof target !== 'object' || target === null) {
+      return null
+    }
+  } else {
+    Object.assign(target, base)
+  }
+
+  for (var i = 2; i < length; i++) {
+    Object.assign(target, seval(clause[i], $))
+  }
+  return target
+}
+
+$operators[Symbol.for('combine')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+
+  var base = seval(clause[1], $)
+  return length > 2 ? mixin($, base, clause, $.object()) : base
+}
+
+$operators[Symbol.for('mixin')] = function ($, clause) {
+  var length = clause.length
+  if (length < 2) {
+    return null
+  }
+
+  var base = seval(clause[1], $)
+  return length > 2 ? mixin($, base, clause, null) : base
+}
+
 function sum ($, num, clause) {
   var length = clause.length
   for (var i = 2; i < length; i++) {
@@ -976,28 +1028,52 @@ function sum ($, num, clause) {
   return num
 }
 
-function plus ($, clause) {
+$operators[Symbol.for('+')] = function ($, clause) {
   var length = clause.length
-  if (length < 2) { return 0 }
-
-  var result = seval(clause[1], $)
-  if (typeof result === 'number') {
-    return length > 2 ? sum($, result, clause) : result
-  } else if (typeof result === 'string') {
-    return length > 2 ? concat($, result, clause) : result
-  } else {
-    return length > 2 ? sum($, 0, clause) : 0
+  if (length < 2) {
+    return 0
   }
+
+  var base = seval(clause[1], $)
+  if (length === 2) {
+    return base
+  }
+
+  if (typeof base === 'number') {
+    return sum($, base, clause)
+  }
+  if (typeof base === 'string') {
+    return concat($, base, clause)
+  }
+  if (typeof base === 'object') {
+    return mixin($, base, clause, $.object()) // combination
+  }
+  return base // return the first argument for other types
 }
 
-$operators[Symbol.for('+')] = plus
 $operators[Symbol.for('+=')] = function ($, clause) {
-  var result = plus($, clause)
-  var sym = clause[1]
-  if (typeof sym === 'symbol') {
-    set($, sym, result)
+  var length = clause.length
+  if (length < 2) {
+    return 0
   }
-  return result
+
+  var sym = clause[1]
+  var base = seval(sym, $)
+  if (length === 2) {
+    return base
+  }
+
+  if (typeof base === 'number') {
+    base = sum($, base, clause)
+  } else if (typeof base === 'string') {
+    base = concat($, base, clause)
+  } else if (typeof base === 'object') {
+    return mixin($, base, clause, null) // mixin
+  } else {
+    return base // for other types
+  }
+  // try to assign value back for primal types
+  return typeof sym === 'symbol' ? set($, sym, base) : base
 }
 
 function subtract ($, clause) {

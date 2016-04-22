@@ -46,6 +46,74 @@ function copyJSObject (name, jsObject) {
   return copied
 }
 
+function createNumberFunctions () {
+  var $Number = {}
+  $Number.identityName = '($"Number")'
+
+  $Number.NaN = JS.NaN
+  $Number.Infinity = JS.Infinity
+
+  $Number.MAX_VALUE = Number.MAX_VALUE
+  $Number.MIN_VALUE = Number.MIN_VALUE
+
+  $Number.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || (Math.pow(2, 53) - 1)
+  $Number.MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -(Math.pow(2, 53) - 1)
+
+  $Number.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
+  $Number.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
+
+  exportTo($Number, 'isFinite', function Number$isFinite (value) {
+    return typeof value === 'number' ? JS.isFinite(value) : false
+  })
+  exportTo($Number, 'isNaN', function Number$isNaN (value) {
+    return typeof value === 'number' ? JS.isNaN(value) : true
+  })
+
+  exportTo($Number, 'isInteger', Number.isInteger ? function Number$isInteger (value) {
+    return Number.isInteger(value)
+  } : function Number$isInteger (value) {
+    return typeof value === 'number' &&
+      isFinite(value) &&
+      Math.floor(value) === value
+  })
+  exportTo($Number, 'isSafeInteger', Number.isSafeInteger ? function Number$isSafeInteger (value) {
+    return Number.isSafeInteger(value)
+  } : function Number$isSafeInteger (value) {
+    return $Number.isInteger(value) && Math.abs(value) <= $Number.MAX_SAFE_INTEGER
+  })
+
+  exportTo($Number, 'parseFloat', function Number$parseFloat (value) {
+    return typeof value === 'undefined' || value === null ? 0 : JS.parseFloat(value)
+  })
+  exportTo($Number, 'parseInt', function Number$parseInt (value, radix) {
+    return typeof value === 'undefined' || value === null ? 0 : JS.parseInt(value, radix)
+  })
+
+  return $Number
+}
+
+function createDateFunctions () {
+  var $Date = {}
+  $Date.identityName = '($"Date")'
+
+  exportTo($Date, 'now', function Date$now () {
+    return new Date()
+  })
+  exportTo($Date, 'getTime', Date.now ? function Date$time () {
+    return Date.now()
+  } : function Date$time () {
+    return new Date().getTime()
+  })
+  exportTo($Date, 'parse', function Date$parse (value) {
+    return typeof value !== 'string' ? new Date(0) : new Date(value)
+  })
+  exportTo($Date, 'utc', function Date$utc () {
+    return new Date(Date.UTC.apply(Date, arguments))
+  })
+
+  return $Date
+}
+
 function createBitwiseFunctions () {
   var Bit = {}
   Bit.identityName = '($"Bit")'
@@ -111,38 +179,25 @@ function createBitwiseFunctions () {
   return Bit
 }
 
-function exportURIFunctions () {
-  var URI = {}
-  URI.identityName = '($"URI")'
+function exportUriFunctions () {
+  var Uri = {}
+  Uri.identityName = '($"Uri")'
 
-  exportJSFunction(URI, 'encode', JS.encodeURI)
-  exportJSFunction(URI, 'encodeComponent', JS.encodeURIComponent)
-  exportJSFunction(URI, 'decode', JS.decodeURI)
-  exportJSFunction(URI, 'decodeComponent', JS.decodeURIComponent)
+  exportJSFunction(Uri, 'encode', JS.encodeURI)
+  exportJSFunction(Uri, 'encodeComponent', JS.encodeURIComponent)
+  exportJSFunction(Uri, 'decode', JS.decodeURI)
+  exportJSFunction(Uri, 'decodeComponent', JS.decodeURIComponent)
 
-  return URI
+  return Uri
 }
 
 function initializeSpace ($) {
-  exportTo($, 'Infinity', JS.Infinity)
-  exportTo($, 'NaN', JS.NaN)
-
-  exportJSFunction($, 'isFinite')
-  exportJSFunction($, 'isNaN')
-  exportJSFunction($, 'parseFloat')
-  exportJSFunction($, 'parseInt')
-
-  exportTo($, 'object', function $object (prototype) {
-    if (typeof prototype !== 'object' || prototype === null) {
-      prototype = Object.prototype
-    }
-    return Object.create(prototype)
-  })
-
+  exportTo($, 'Bool', {}) // reserve Bool
   exportTo($, 'bool', function $bool (value) {
     return typeof value !== 'undefined' && value !== false && value !== null && value !== 0
   })
 
+  exportTo($, 'String', {}) // reserve String
   exportTo($, 'string', function $string () {
     var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
     var str = ''
@@ -151,51 +206,85 @@ function initializeSpace ($) {
       if (typeof value === 'string') {
         str += value
       } else {
-        str += (str.endsWith(' ') ? '' : ' ') + $.encode.value(value)
+        str += (str.length > 0 ? ' ' : '') + $.encode.value(value)
       }
     }
     return str
   })
-  exportTo($, 'chars', function $stringOf () {
+  exportTo($, 'stringOfChars', function $stringOfChars () {
     return String.fromCharCode.apply(String, arguments)
   })
 
+  exportTo($, 'Symbol', {}) // reserve Symbol
   exportTo($, 'symbol', function $symbol (key) {
     // no duplicated symbol instances
     return typeof key === 'string' ? Symbol.for(key) : null
   })
-  exportTo($, 'keyOfSymbol', function $nameOf (sym) {
+  exportTo($, 'keyOfSymbol', function $keyOfSymbol (sym) {
     // no duplicated symbol instances
     return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
   })
 
-  exportJSFunction($, 'number', JS.Number)
+  exportTo($, 'Number', createNumberFunctions())
+  exportTo($, 'number', function $number (value) {
+    if (typeof value === 'string') {
+      return parseFloat(value)
+    }
+    if (typeof value === 'number') {
+      return value
+    }
+    return typeof value === 'undefined' || value === null ? 0 : NaN
+  })
+
+  exportTo($, 'Object', {}) // reserve Object
+  exportTo($, 'object', function $object (prototype) {
+    if (typeof prototype !== 'object' || prototype === null) {
+      prototype = Object.prototype
+    }
+
+    var obj = Object.create(prototype)
+    if (arguments.length > 1) {
+      var args = [obj]
+      args.push.apply(args, Array.prototype.slice.call(arguments, 1))
+      Object.assign.apply(Object, args)
+    }
+    return obj
+  })
+
+  exportTo($, 'Function', {}) // reserve Function
+
+  exportTo($, 'Date', createDateFunctions())
   exportTo($, 'date', function $date () {
     var args = [null]
     args.push.apply(args, arguments)
     return new (Date.bind.apply(Date, args))
   })
-  exportTo($, 'utc', function $utc () {
-    return Date.UTC.apply(Date, arguments)
-  })
 
+  exportTo($, 'Array', {}) // reserve array
   exportTo($, 'array', function $array () {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
   })
-
-  exportTo($, 'regex', function $regex () {
-    var args = [null]
-    args.push.apply(args, arguments)
-    return new (RegExp.bind.apply(RegExp, arguments))
+  exportTo($, 'arrayOf', function $arrayOf () {
+    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+    var result = []
+    for (var i = 0; i < args.length; i++) {
+      var item = args[i]
+      if (Array.isArray(item)) {
+        result.push.apply(result, item)
+      } else {
+        result.push(item)
+      }
+    }
+    return result
   })
 
   exportTo($, 'range', require('./range'))
   exportTo($, 'iterate', require('./iterate'))
 
   exportTo($, 'Bit', createBitwiseFunctions())
-  exportTo($, 'URI', exportURIFunctions())
+  exportTo($, 'Uri', exportUriFunctions())
   exportTo($, 'Math', copyJSObject('Math', JS.Math))
-  exportTo($, 'JSON', copyJSObject('JSON', JS.JSON))
+  exportTo($, 'Json', copyJSObject('Json', JS.JSON))
 }
 
 module.exports = function (/* options */) {

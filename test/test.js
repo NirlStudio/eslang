@@ -90,15 +90,16 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global functions ', function () {
-    var functions = ['object', 'function', 'lambda', 'call',
-                    'bool', 'string', 'chars', 'symbol', 'keyOfSymbol', 'number',
-                    'date', 'utc', 'array', 'regex', 'range', 'iterate',
-                    'eval', 'beval', 'exec', 'run', 'require']
+    var functions = ['bool', 'string', 'stringOfChars', 'symbol', 'keyOfSymbol',
+                     'number', 'object', 'date', 'array', 'range', 'iterate',
+                     'compiler', 'compile', 'encoder', 'encode',
+                     'function', 'lambda', 'call',
+                     'eval', 'beval', 'exec', 'run', 'require']
     for (var i = 0; i < functions.length; i++) {
       (function (f) {
         should('have ' + f, function () {
           ensure(function () {
-            assert.typeOf($.exec('($ "' + f + '")'), 'function')
+            assert.typeOf($[f], 'function')
           })
         })
       })(functions[i])
@@ -106,7 +107,8 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global objects ', function () {
-    var objects = ['(Bit "and")', '(Math "random")', '(JSON "parse")', '(URI "encode")']
+    var objects = ['(Number "parseInt")', '(Date "now")', '(Bit "and")', '(Uri "encode")',
+                   '(Math "random")', '(Json "parse")', '(console "log")']
     for (var i = 0; i < objects.length; i++) {
       (function (o) {
         should('have ' + o, function () {
@@ -124,15 +126,15 @@ define('Sugly Bootstrapping', function () {
         assert.typeOf($.exec('(Math random)'), 'number')
       })
     })
-    should('(JSON parse "{v:32}")', 'return an object with property v=32', function () {
+    should('(Json parse "{v:32}")', 'return an object with property v=32', function () {
       ensure(function () {
-        var obj = $.exec('(JSON parse "{\\"v\\":32}")')
+        var obj = $.exec('(Json parse "{\\"v\\":32}")')
         assert.equal(obj.v, 32)
       })
     })
-    should('(URI encode "my test.asp?name=ståle&car=saab")\n\t', 'return encoded special characters', function () {
+    should('(Uri encode "my test.asp?name=ståle&car=saab")\n\t', 'return encoded special characters', function () {
       ensure(function () {
-        var uri = $.exec('(URI encode "my test.asp?name=ståle&car=saab")')
+        var uri = $.exec('(Uri encode "my test.asp?name=ståle&car=saab")')
         assert.equal(uri, 'my%20test.asp?name=st%C3%A5le&car=saab')
       })
     })

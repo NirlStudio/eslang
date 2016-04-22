@@ -22,8 +22,18 @@
   # run all specification.
   "eval"
   "space"
-  "function"
+
+  "bool"
+  "string"
+  "symbol"
+  "number"
+
+  "date"
+  "array"
   "iterate"
+
+  "object"
+  "function"
 
   "if"
   "while"

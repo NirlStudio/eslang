@@ -57,3 +57,8 @@
   (let code "($ ($(lambda (bx by) > (x y) (+ x y bx by)) 1000 100) 10 10)."),
   ($should code "return 1120" ($assert-exec code 1120),
 ).
+
+($define "Function object" (= ()
+  ($should "be reserved" (= ()
+    (assert equal "object" (typeof ($Function)))
+).

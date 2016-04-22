@@ -1,5 +1,5 @@
-($define "sequence generator" (= ()
-  ($should "return a sequence iterator with finite states" ( =()
+($define "range iterator" (= ()
+  ($should "return a sequence iterator in a range with finite states" ( =()
     (let iter ($iterate 0),
     (assert equal false (iter next),
 
