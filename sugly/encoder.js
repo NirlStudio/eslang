@@ -88,7 +88,7 @@ function encoder (pretty) {
     }
     code += '('
 
-    for (let i = 0; i < func.params.length; i++) {
+    for (var i = 0; i < func.params.length; i++) {
       var p = func.params[i]
       if (p[1] == null) {
         code += Symbol.keyFor(p[0]) + ' '
@@ -103,8 +103,8 @@ function encoder (pretty) {
     code += ')'
 
     increaseIndent()
-    for (let i = 0; i < func.body.length; i++) {
-      var c = func.body[i]
+    for (var j = 0; j < func.body.length; j++) {
+      var c = func.body[j]
       code += (Array.isArray(c) ? '\n' + indent : ' ') + encodeClause(c)
     }
     decreaseIndent()

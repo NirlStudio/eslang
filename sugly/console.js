@@ -1,6 +1,6 @@
 'use strict'
 
-let JS = global || window
+var JS = global || window
 
 function exportTo (container, name, obj) {
   var owner = container.identityName

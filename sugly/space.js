@@ -1,6 +1,6 @@
 'use strict'
 
-let JS = global || window
+var JS = global || window
 
 function exportTo (container, name, obj) {
   if (typeof obj === 'object' || typeof obj === 'function') {

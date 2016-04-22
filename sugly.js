@@ -81,11 +81,7 @@ function SuglySignal (type, value) {
 function seval (clause, $) {
   if (!Array.isArray(clause)) {
     // not a clause.
-    if (typeof clause === 'symbol') {
-      return resolve($, clause)
-    } else {
-      return clause // immediate value.
-    }
+    return typeof clause === 'symbol' ? resolve($, clause) : clause
   }
 
   var length = clause.length
@@ -154,15 +150,7 @@ function seval (clause, $) {
   }
   var args = []
   for (var i = 2; i < max; i++) {
-    var expr = clause[i]
-    // accelerate evaluation.
-    if (Array.isArray(expr)) {
-      args.push(seval(expr, $))
-    } else if (typeof expr === 'symbol') {
-      args.push(resolve($, expr))
-    } else {
-      args.push(expr)
-    }
+    args.push(seval(clause[i], $))
   }
 
   // execute the clause.
@@ -190,7 +178,7 @@ $operators[SymbolQuote] = function ($, clause) {
     case 1:
       return null
     case 2:
-      let c1 = clause[1]
+      var c1 = clause[1]
       return Array.isArray(c1) ? [c1] : c1
     default:
       return clause.slice(1)
@@ -210,19 +198,7 @@ $operators[Symbol.for('let')] = function $let ($, clause) {
   var c1 = clause[1]
   // (let symbol value)
   if (typeof c1 === 'symbol') {
-    if (length < 3) {
-      return set($, c1, null)
-    }
-
-    // accelerate evaluation.
-    let c2 = clause[2]
-    if (Array.isArray(c2)) {
-      return set($, c1, seval(c2, $))
-    } else if (typeof c2 === 'symbol') {
-      return set($, c1, resolve($, c2))
-    } else {
-      return set($, c1, c2)
-    }
+    return set($, c1, length < 3 ? null : seval(clause[2], $))
   } else if (!Array.isArray(c1)) {
     return null
   }
@@ -232,17 +208,9 @@ $operators[Symbol.for('let')] = function $let ($, clause) {
   for (var i = 1; i < length; i++) {
     var pair = clause[i]
     if (Array.isArray(pair) && pair.length > 1) {
-      let p0 = pair[0]
+      var p0 = pair[0]
       if (typeof p0 === 'symbol') {
-        let p1 = pair[1]
-        // accelerate evaluation.
-        if (Array.isArray(p1)) {
-          last = set($, p0, seval(p1, $))
-        } else if (typeof clause === 'symbol') {
-          last = set($, p0, resolve($, p1))
-        } else {
-          last = set($, p0, p1)
-        }
+        last = set($, p0, seval(pair[1], $))
         continue
       }
     }
@@ -265,18 +233,7 @@ function objectCreate ($, clause) {
     }
 
     i += 1
-    let value = null
-    if (i < length) {
-      let expr = clause[i]
-      if (Array.isArray(expr)) {
-        value = seval(expr, $)
-      } else if (typeof expr === 'symbol') {
-        value = resolve($, expr)
-      } else {
-        value = expr
-      }
-    }
-    set(obj, key, value)
+    set(obj, key, i < length ? seval(clause[i], $) : null)
     i += 2 // next :
   }
   return obj
@@ -284,12 +241,7 @@ function objectCreate ($, clause) {
 
 // (@ obj < prop: value ...)
 function objectAssign ($, clause) {
-  var obj = clause[1]
-  if (typeof obj === 'symbol') {
-    obj = resolve($, obj)
-  } else if (Array.isArray(obj)) {
-    obj = seval(obj, $)
-  }
+  var obj = seval(clause[1], $)
   if (!obj && typeof obj !== 'object' && typeof obj !== 'function') {
     return null
   }
@@ -305,18 +257,7 @@ function objectAssign ($, clause) {
     }
 
     i += 1
-    let value = null
-    if (i < length) {
-      let expr = clause[i]
-      if (Array.isArray(expr)) {
-        value = seval(expr, $)
-      } else if (typeof expr === 'symbol') {
-        value = resolve($, expr)
-      } else {
-        value = expr
-      }
-    }
-    set(obj, key, value)
+    set(obj, key, i < length ? seval(clause[i], $) : null)
     i += 2 // next :
   }
   return obj
@@ -324,18 +265,13 @@ function objectAssign ($, clause) {
 
 // (@ optional-prototype > prop: value ...).
 function objectDerive ($, clause) {
-  var prototype, i
+  var i, prototype
   if (clause[1] === SymbolDerive) {
-    prototype = null
     i = 3
+    prototype = null
   } else {
-    prototype = clause[1]
     i = 4
-    if (typeof prototype === 'symbol') {
-      prototype = resolve($, prototype)
-    } else if (Array.isArray(prototype)) {
-      prototype = seval(prototype, $)
-    }
+    prototype = seval(clause[1], $)
     if (typeof prototype !== 'object') {
       return null // non-object cannot derive an object.
     }
@@ -352,18 +288,7 @@ function objectDerive ($, clause) {
     }
 
     i += 1
-    let value = null
-    if (i < length) {
-      let expr = clause[i]
-      if (Array.isArray(expr)) {
-        value = seval(expr, $)
-      } else if (typeof expr === 'symbol') {
-        value = resolve($, expr)
-      } else {
-        value = expr
-      }
-    }
-    set(obj, key, value)
+    set(obj, key, i < length ? seval(clause[i], $) : null)
     i += 2 // next :
   }
   return obj
@@ -374,14 +299,7 @@ function arrayCreate ($, clause) {
   var result = []
   var i = 1
   while (i < clause.length) {
-    let expr = clause[i]
-    if (typeof expr === 'symbol') {
-      result.push(resolve($, expr))
-    } else if (Array.isArray(expr)) {
-      result.push(seval(expr, $))
-    } else {
-      result.push(expr)
-    }
+    result.push(seval(clause[i], $))
     i += 1
   }
   return result
@@ -394,15 +312,15 @@ const SymbolObject = Symbol.for('@')
 $operators[SymbolObject] = function ($, clause) {
   var length = clause.length
   if (length > 2) {
-    let sym = clause[2]
-    if (sym === SymbolIndexer) {
-      return objectCreate($, clause)
-    }
-    if (sym === SymbolAssign) {
-      return objectAssign($, clause)
-    }
-    if (sym === SymbolDerive) {
-      return objectDerive($, clause)
+    switch (clause[2]) {
+      case SymbolIndexer:
+        return objectCreate($, clause)
+
+      case SymbolAssign:
+        return objectAssign($, clause)
+
+      case SymbolDerive:
+        return objectDerive($, clause)
     }
   } else if (length === 2 && clause[1] === SymbolDerive) {
     // (@> prop: value ...) is allowed.
@@ -443,7 +361,7 @@ function lambdaCreate ($, symbols, params, body) {
   var enclosing
   if (symbols[0] === SymbolObject) {
     // it should be an object expression: (@ prop: value ...)
-    let obj = seval(symbols, $)
+    var obj = seval(symbols, $)
     if (typeof obj === 'object' && obj !== null) {
       enclosing = obj
     } else {
@@ -452,8 +370,8 @@ function lambdaCreate ($, symbols, params, body) {
   } else {
     // it should be an symbol list: (sym ...)
     enclosing = {}
-    for (let i = 0; i < symbols.length; i++) {
-      let s = symbols[i]
+    for (var i = 0; i < symbols.length; i++) {
+      var s = symbols[i]
       if (typeof s === 'symbol') {
         set(enclosing, s, resolve($, s))
       }
@@ -511,25 +429,12 @@ function createSignalOf (type) {
       var c1 = clause[1]
       if (length === 2) {
         // return the only argument directly
-        if (Array.isArray(c1)) {
-          result = seval(c1, $)
-        } else if (typeof c1 === 'symbol') {
-          result = resolve($, c1)
-        } else {
-          result = c1
-        }
+        result = seval(c1, $)
       } else {
         // return multiple arguments in an array.
         result = []
         for (var i = 1; i < length; i++) {
-          let ci = clause[i]
-          if (Array.isArray(ci)) {
-            result.push(seval(ci, $))
-          } else if (typeof ci === 'symbol') {
-            result.push(resolve($, ci))
-          } else {
-            result.push(ci)
-          }
+          result.push(seval(clause[i], $))
         }
       }
     }
@@ -553,22 +458,12 @@ $operators[Symbol.for('is')] = function ($, clause) {
     return true
   }
 
-  var left = clause[1]
-  if (typeof left === 'symbol') {
-    left = resolve($, left)
-  } else if (Array.isArray(left)) {
-    left = seval(left, $)
-  }
+  var left = seval(clause[1], $)
   if (length < 3) {
     return left === null
   }
 
-  var right = clause[2]
-  if (typeof right === 'symbol') {
-    right = resolve($, right)
-  } else if (Array.isArray(right)) {
-    right = seval(right, $)
-  }
+  var right = seval(clause[2], $)
   return Object.is(left, right)
 }
 
@@ -579,13 +474,7 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
     return 'null'
   }
 
-  var value = clause[1]
-  if (typeof value === 'symbol') {
-    value = resolve($, value)
-  } else if (Array.isArray(value)) {
-    value = seval(value, $)
-  }
-
+  var value = seval(clause[1], $)
   if (length < 3) {
     if (value === null) {
       return 'null'
@@ -599,13 +488,7 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
     return typeof value
   }
 
-  var expected = clause[2]
-  if (typeof expected === 'symbol') {
-    expected = resolve($, expected)
-  } else if (Array.isArray(expected)) {
-    expected = seval(expected, $)
-  }
-
+  var expected = seval(clause[2], $)
   if (typeof expected === 'string') {
     switch (expected) {
       case 'null':
@@ -691,42 +574,26 @@ $operators[Symbol.for('if')] = function ($, clause) {
   }
 
   // look for else
-  var cond, tb, fb
   var offset = clause.indexOf(SymbolElse, 1)
+  if (offset === 1) {
+    return null // short circuit - the cond is required.
+  }
+
+  var cond = seval(clause[1], $)
+  var tb, fb
   if (offset > 0) {
-    if (offset === 1) {
-      return null // short circuit - the cond is required.
-    }
-    cond = clause[1]
     tb = clause.slice(2, offset)
     fb = clause.slice(offset + 1)
   } else {
-    cond = clause[1]
     tb = length > 2 ? [clause[2]] : []
     fb = length > 3 ? clause.slice(3) : []
-  }
-
-  if (typeof cond === 'symbol') {
-    cond = resolve($, cond)
-  } else if (Array.isArray(cond)) {
-    cond = seval(cond, $)
   }
 
   var option = cond !== false && cond !== null && cond !== 0 ? tb : fb
   if (option.length < 1) {
     return null
   }
-  if (option.length === 1) {
-    option = option[0]
-    if (typeof option === 'symbol') {
-      return resolve($, option)
-    } else if (Array.isArray(option)) {
-      return seval(option, $)
-    }
-    return option
-  }
-
-  return beval($, option)
+  return option.length === 1 ? seval(option[0], $) : beval($, option)
 }
 
 function createLoopSignal (type) {
@@ -834,13 +701,7 @@ function forEach ($, clause) {
     return null // invalid field(s) expression
   }
 
-  var iterable = clause[3]
-  if (typeof iterable === 'symbol') {
-    iterable = resolve($, iterable)
-  } else if (Array.isArray(iterable)) {
-    iterable = seval(iterable, $)
-  }
-
+  var iterable = seval(clause[3], $)
   var iterator = $.iterate(iterable)
   if (iterator === null || typeof iterator.next !== 'function') {
     return null // not an iterable object.
@@ -1081,12 +942,7 @@ $operators[Symbol.for('operator')] = function ($, impl) {
 function concat ($, str, clause) {
   var length = clause.length
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (typeof value === 'string') {
       str += value
     } else {
@@ -1103,12 +959,7 @@ $operators[Symbol.for('concat')] = function ($, clause) {
   var length = clause.length
   if (length < 2) { return '' }
 
-  var str = clause[1]
-  if (typeof result === 'symbol') {
-    str = resolve($, str)
-  } else if (Array.isArray(str)) {
-    str = seval(str, $)
-  }
+  var str = seval(clause[1], $)
   if (typeof str !== 'string') {
     str = $.encode.value(str)
   }
@@ -1118,12 +969,7 @@ $operators[Symbol.for('concat')] = function ($, clause) {
 function sum ($, num, clause) {
   var length = clause.length
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (typeof value === 'number') {
       num += value
     }
@@ -1135,13 +981,7 @@ function plus ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
-  var result = clause[1]
-  if (typeof result === 'symbol') {
-    result = resolve($, result)
-  } else if (Array.isArray(result)) {
-    result = seval(result, $)
-  }
-
+  var result = seval(clause[1], $)
   if (typeof result === 'number') {
     return length > 2 ? sum($, result, clause) : result
   } else if (typeof result === 'string') {
@@ -1165,23 +1005,13 @@ function subtract ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
-  var result = clause[1]
-  if (typeof result === 'symbol') {
-    result = resolve($, result)
-  } else if (Array.isArray(result)) {
-    result = seval(result, $)
-  }
+  var result = seval(clause[1], $)
   if (typeof result !== 'number') {
     result = 0
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (typeof value === 'number') {
       result -= value
     }
@@ -1203,23 +1033,13 @@ function multiply ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
-  var result = clause[1]
-  if (typeof result === 'symbol') {
-    result = resolve($, result)
-  } else if (Array.isArray(result)) {
-    result = seval(result, $)
-  }
+  var result = seval(clause[1], $)
   if (typeof result !== 'number') {
     return 0
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (typeof value === 'number') {
       result *= value
     } else {
@@ -1243,23 +1063,13 @@ function divide ($, clause) {
   var length = clause.length
   if (length < 2) { return 0 }
 
-  var result = clause[1]
-  if (typeof result === 'symbol') {
-    result = resolve($, result)
-  } else if (Array.isArray(result)) {
-    result = seval(result, $)
-  }
+  var result = seval(clause[1], $)
   if (typeof result !== 'number') {
     return 0
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (typeof value === 'number') {
       result /= value
     } else {
@@ -1287,7 +1097,7 @@ $operators[Symbol.for('++')] = function ($, clause) {
 
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    let value = resolve($, sym)
+    var value = resolve($, sym)
     if (typeof value === 'number') {
       value += 1
     } else {
@@ -1311,7 +1121,7 @@ $operators[Symbol.for('--')] = function ($, clause) {
 
   var sym = clause[1]
   if (typeof sym === 'symbol') {
-    let value = resolve($, sym)
+    var value = resolve($, sym)
     if (typeof value === 'number') {
       value -= 1
     } else {
@@ -1331,12 +1141,7 @@ function equalDate ($, base, clause) {
   var length = clause.length
   base = base.getTime()
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (!(value instanceof Date) || base !== value.getTime()) {
       return false
     }
@@ -1350,12 +1155,7 @@ $operators[Symbol.for('==')] = function ($, clause) {
     return true // null === null
   }
 
-  var base = clause[1]
-  if (typeof base === 'symbol') {
-    base = resolve($, base)
-  } else if (Array.isArray(base)) {
-    base = seval(base, $)
-  }
+  var base = seval(clause[1], $)
   if (length < 3) {
     return base === null
   }
@@ -1364,12 +1164,7 @@ $operators[Symbol.for('==')] = function ($, clause) {
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (base !== value) {
       return false
     }
@@ -1383,12 +1178,7 @@ $operators[Symbol.for('!=')] = function ($, clause) {
     return false // null !== null
   }
 
-  var base = clause[1]
-  if (typeof base === 'symbol') {
-    base = resolve($, base)
-  } else if (Array.isArray(base)) {
-    base = seval(base, $)
-  }
+  var base = seval(clause[1], $)
   if (length < 3) {
     return base !== null
   }
@@ -1397,12 +1187,7 @@ $operators[Symbol.for('!=')] = function ($, clause) {
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (base !== value) {
       return true
     }
@@ -1416,12 +1201,7 @@ $operators[Symbol.for('>')] = function ($, clause) {
     return false // null === null
   }
 
-  var left = clause[1]
-  if (typeof left === 'symbol') {
-    left = resolve($, left)
-  } else if (Array.isArray(left)) {
-    left = seval(left, $)
-  }
+  var left = seval(clause[1], $)
   if (length < 3) {
     return false
   }
@@ -1435,13 +1215,7 @@ $operators[Symbol.for('>')] = function ($, clause) {
     }
   }
 
-  var right = clause[2]
-  if (typeof right === 'symbol') {
-    right = resolve($, right)
-  } else if (Array.isArray(right)) {
-    right = seval(right, $)
-  }
-
+  var right = seval(clause[2], $)
   if (type === 'date') {
     if (right instanceof Date) {
       return left.getTime() > right.getTime()
@@ -1458,12 +1232,7 @@ $operators[Symbol.for('>=')] = function ($, clause) {
     return false
   }
 
-  var left = clause[1]
-  if (typeof left === 'symbol') {
-    left = resolve($, left)
-  } else if (Array.isArray(left)) {
-    left = seval(left, $)
-  }
+  var left = seval(clause[1], $)
   if (length < 3) {
     return false
   }
@@ -1477,13 +1246,7 @@ $operators[Symbol.for('>=')] = function ($, clause) {
     }
   }
 
-  var right = clause[2]
-  if (typeof right === 'symbol') {
-    right = resolve($, right)
-  } else if (Array.isArray(right)) {
-    right = seval(right, $)
-  }
-
+  var right = seval(clause[2], $)
   if (type === 'date') {
     if (right instanceof Date) {
       return left.getTime() >= right.getTime()
@@ -1500,12 +1263,7 @@ $operators[Symbol.for('<')] = function ($, clause) {
     return false
   }
 
-  var left = clause[1]
-  if (typeof left === 'symbol') {
-    left = resolve($, left)
-  } else if (Array.isArray(left)) {
-    left = seval(left, $)
-  }
+  var left = seval(clause[1], $)
   if (length < 3) {
     return false
   }
@@ -1519,13 +1277,7 @@ $operators[Symbol.for('<')] = function ($, clause) {
     }
   }
 
-  var right = clause[2]
-  if (typeof right === 'symbol') {
-    right = resolve($, right)
-  } else if (Array.isArray(right)) {
-    right = seval(right, $)
-  }
-
+  var right = seval(clause[2], $)
   if (type === 'date') {
     if (right instanceof Date) {
       return left.getTime() < right.getTime()
@@ -1542,12 +1294,7 @@ $operators[Symbol.for('<=')] = function ($, clause) {
     return false
   }
 
-  var left = clause[1]
-  if (typeof left === 'symbol') {
-    left = resolve($, left)
-  } else if (Array.isArray(left)) {
-    left = seval(left, $)
-  }
+  var left = seval(clause[1], $)
   if (length < 3) {
     return false
   }
@@ -1561,13 +1308,7 @@ $operators[Symbol.for('<=')] = function ($, clause) {
     }
   }
 
-  var right = clause[2]
-  if (typeof right === 'symbol') {
-    right = resolve($, right)
-  } else if (Array.isArray(right)) {
-    right = seval(right, $)
-  }
-
+  var right = seval(clause[2], $)
   if (type === 'date') {
     if (right instanceof Date) {
       return left.getTime() <= right.getTime()
@@ -1584,20 +1325,9 @@ $operators[Symbol.for('&&')] = function ($, clause) {
     return null
   }
 
-  var base = clause[1]
-  if (typeof base === 'symbol') {
-    base = resolve($, base)
-  } else if (Array.isArray(base)) {
-    base = seval(base, $)
-  }
-
+  var base = seval(clause[1], $)
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (value === false || value === null || value === 0) {
       return value
     } else {
@@ -1613,23 +1343,13 @@ $operators[Symbol.for('||')] = function ($, clause) {
     return null
   }
 
-  var base = clause[1]
-  if (typeof base === 'symbol') {
-    base = resolve($, base)
-  } else if (Array.isArray(base)) {
-    base = seval(base, $)
-  }
+  var base = seval(clause[1], $)
   if (base !== false && base !== null && base !== 0) {
     return base
   }
 
   for (var i = 2; i < length; i++) {
-    let value = clause[i]
-    if (typeof value === 'symbol') {
-      value = resolve($, value)
-    } else if (Array.isArray(value)) {
-      value = seval(value, $)
-    }
+    var value = seval(clause[i], $)
     if (value !== false && value !== null && value !== 0) {
       return value
     } else {
@@ -1645,12 +1365,7 @@ $operators[Symbol.for('!')] = function ($, clause) {
     return true // !null
   }
 
-  var base = clause[1]
-  if (typeof base === 'symbol') {
-    base = resolve($, base)
-  } else if (Array.isArray(base)) {
-    base = seval(base, $)
-  }
+  var base = seval(clause[1], $)
   return base === false || base === null || base === 0
 }
 
@@ -1678,7 +1393,7 @@ function formatParameters (params) {
   }
 
   for (var i = 0; i < params.length; i++) {
-    let p = params[i]
+    var p = params[i]
     if (typeof p === 'symbol') {
       if (p === SymbolRepeat) {
         formatted[0] = false // variant arguments
@@ -1689,7 +1404,7 @@ function formatParameters (params) {
       if (p.length < 1) {
         continue
       }
-      let sym = p[0]
+      var sym = p[0]
       if (typeof sym === 'symbol') {
         formatted.push([sym, p.length > 1 ? p[1] : null]) // no evaluation.
       }
