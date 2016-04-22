@@ -90,8 +90,9 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global functions ', function () {
-    var functions = ['object', 'function', 'lambda',
-                    'bool', 'string', 'symbol', 'number', 'date', 'array', 'iterate',
+    var functions = ['object', 'function', 'lambda', 'call',
+                    'bool', 'string', 'chars', 'symbol', 'keyOfSymbol', 'number',
+                    'date', 'utc', 'array', 'regex', 'range', 'iterate',
                     'eval', 'beval', 'exec', 'run', 'require']
     for (var i = 0; i < functions.length; i++) {
       (function (f) {

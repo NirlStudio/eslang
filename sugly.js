@@ -157,13 +157,7 @@ function seval (clause, $) {
   try {
     return func.apply(subject, args)
   } catch (signal) {
-    if (signal instanceof SuglySignal) {
-      if (signal.type === 'return') {
-        return signal.value
-      }
-      throw signal // ingore unexpected signal
-    }
-    // TODO - filter & swallow some native errors?
+    // TODO - filter native errors
     throw signal
   }
 }
@@ -485,6 +479,10 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
     if (value instanceof Date) {
       return 'date'
     }
+    // app defined type identifier
+    if (typeof value === 'object' && value.typeIdentifier) {
+      return value.typeIdentifier
+    }
     return typeof value
   }
 
@@ -511,9 +509,10 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
       case 'date':
         return value instanceof Date // Would frame-boundary be a problem?
       default:
-        return false // unknow type name
+        return typeof value === 'object' && value.typeIdentifier === expected
     }
-  } else if (typeof expected === 'object' && typeof value === 'object') {
+  }
+  if (typeof expected === 'object' && typeof value === 'object') {
     var last = null
     while (last !== value && value) {
       last = value
@@ -1440,7 +1439,15 @@ function $functionIn ($) {
         var p = params[i]
         set(ns, p[0], args.length > i ? args[i] : p[1])
       }
-      return beval(ns, body)
+
+      try {
+        return beval(ns, body)
+      } catch (signal) {
+        if (signal instanceof SuglySignal && signal.type === 'return') {
+          return signal.value
+        }
+        throw signal
+      }
     }
 
     f.fixedArgs = fixedArgs
@@ -1471,7 +1478,15 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
       var p = params[i]
       set(ns, p[0], args.length > i ? args[i] : p[1])
     }
-    return beval(ns, body)
+
+    try {
+      return beval(ns, body)
+    } catch (signal) {
+      if (signal instanceof SuglySignal && signal.type === 'return') {
+        return signal.value
+      }
+      throw signal
+    }
   }
 
   $C.enclosing = enclosing
@@ -1662,6 +1677,15 @@ function populate ($) {
   // global function & lambda generator.
   $.$export('function', $functionIn($))
   $.$export('lambda', $lambdaIn($))
+
+  $.$export('call', function (subject, func, args) {
+    try {
+      return func.apply(subject, args)
+    } catch (signal) {
+      // TODO - filter native errors
+      throw signal
+    }
+  })
 
   // evaluate a symbol or a clause, or return the value itself.
   $.$export('eval', function (expr, space) {

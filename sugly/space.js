@@ -151,24 +151,42 @@ function initializeSpace ($) {
       if (typeof value === 'string') {
         str += value
       } else {
-        str += $.encode.value(value)
+        str += (str.endsWith(' ') ? '' : ' ') + $.encode.value(value)
       }
     }
     return str
+  })
+  exportTo($, 'chars', function $stringOf () {
+    return String.fromCharCode.apply(String, arguments)
   })
 
   exportTo($, 'symbol', function $symbol (key) {
     // no duplicated symbol instances
     return typeof key === 'string' ? Symbol.for(key) : null
   })
+  exportTo($, 'keyOfSymbol', function $nameOf (sym) {
+    // no duplicated symbol instances
+    return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
+  })
 
   exportJSFunction($, 'number', JS.Number)
-  exportTo($, 'date', function $date (value) {
-    return new Date(value)
+  exportTo($, 'date', function $date () {
+    var args = [null]
+    args.push.apply(args, arguments)
+    return new (Date.bind.apply(Date, args))
+  })
+  exportTo($, 'utc', function $utc () {
+    return Date.UTC.apply(Date, arguments)
   })
 
   exportTo($, 'array', function $array () {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+  })
+
+  exportTo($, 'regex', function $regex () {
+    var args = [null]
+    args.push.apply(args, arguments)
+    return new (RegExp.bind.apply(RegExp, arguments))
   })
 
   exportTo($, 'range', require('./range'))

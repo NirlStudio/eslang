@@ -2,12 +2,14 @@
   "name": "sugly",
   "version": "0.0.1-preview",
   "description": "A conceptual implementation of Sugly programming language.",
+  "author": "Leevi@Nirl Studio, V-Lab.",
+  "license": "GPL 3.0/MIT",
+  "repository": "nirlstudio/sugly-lang",
+
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "author": "Leevi@Nirl Studio, V-Lab.",
-  "license": "GPL 3.0/MIT",
   "dependencies": {
     "chai": "^3.5.0"
   }
