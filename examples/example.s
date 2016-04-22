@@ -29,19 +29,19 @@
 
 (console log "---------" function)
 ($"add" (= (x y) (+ x y 10).
-(console log ($add 1 2).
+(console log ($add 3 2).
 
-($"add" ($function (` x y) (` (+ x y 10).
-(console log ($add 1 2).
+($"add" ($function (`(x y)) (`( (+ x y 10)).
+(console log ($add 3 2).
 
 ($"add" (= (x y)
   (+ x y 100).
 (console log ($add 1 2).
 
-($"sumWithBase" ($function (`base) (`
+($"sumWithBase" ($function (`base) (`(
   ($"ctx" ($object),
   (ctx "base" base),
-  ($lambda ctx (` x y) (` (+ base x y).
+  ($lambda ctx (`(x y)) (`( (+ base x y).
 
 ($"sum" ($sumWithBase 100).
 (console log ($sum 10 1).
@@ -108,8 +108,14 @@
 (console log (obj"b").
  #" 12312312
 
-
 ($require "express" "js")
+
+(let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
+(let s (object))
+(let args (@ 1 2))
+(let r ($call f s args),
+(console log (-> r "argv" (:1)),
+
 (exit -1 2)
 (return 0)
 (return 1)

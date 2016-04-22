@@ -28,6 +28,9 @@ $.$export('should', function (subject, behaviour, cb) {
     behaviour = subject
     subject = ''
   } else {
+    if (!subject) {
+      subject = ''
+    }
     if (!subject.endsWith(' ')) {
       subject += ' '
     }

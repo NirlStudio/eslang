@@ -165,17 +165,12 @@ function seval (clause, $) {
 var $operators = {}
 
 const SymbolQuote = Symbol.for('`')
-
+// (` symbol) or (` (...))
 $operators[SymbolQuote] = function ($, clause) {
-  var length = clause.length
-  switch (length) {
-    case 1:
-      return null
-    case 2:
-      var c1 = clause[1]
-      return Array.isArray(c1) ? [c1] : c1
-    default:
-      return clause.slice(1)
+  if (clause.length > 1) {
+    return clause[1]
+  } else {
+    return null
   }
 }
 
@@ -807,6 +802,9 @@ $operators[SymbolFlow] = function ($, clause) {
   var subject = seval(clause[1], $)
   for (var i = 2; subject !== null && i < length; i++) {
     var next = clause[i]
+    if (Array.isArray(subject) || typeof subject === 'symbol') {
+      subject = [SymbolQuote, subject]
+    }
     var stmt = [subject]
     if (Array.isArray(next)) {
       stmt.push.apply(stmt, next)
@@ -834,17 +832,10 @@ $operators[SymbolPipe] = function ($, clause) {
       // expand array to arguments
       for (var j = 0; j < output.length; j++) {
         var value = output[j]
-        var arg
-        if (Array.isArray(value)) {
-          // value to expression
-          arg = [SymbolObject]
-          arg.push.apply(arg, value)
-        } else if (typeof value === 'symbol') {
-          arg = [SymbolQuote, value] // symbol to quote
-        } else {
-          arg = value
+        if (Array.isArray(value) || typeof value === 'symbol') {
+          value = [SymbolQuote, value] // symbol to quote
         }
-        stmt.push(arg)
+        stmt.push(value)
       }
     } else {
       stmt.push(output)
@@ -878,17 +869,10 @@ $operators[SymbolPremise] = function ($, clause) {
       // expand array result
       for (var i = 0; i < output.length; i++) {
         var value = output[i]
-        var arg
-        if (Array.isArray(value)) {
-          // value to expression
-          arg = [SymbolObject]
-          arg.push.apply(arg, value)
-        } else if (typeof value === 'symbol') {
-          arg = [SymbolQuote, value] // symbol to quote
-        } else {
-          arg = value
+        if (Array.isArray(value) || typeof value === 'symbol') {
+          value = [SymbolQuote, value] // symbol to quote
         }
-        stmt.push(arg)
+        stmt.push(value)
       }
     } else {
       stmt.push(output)
@@ -1754,7 +1738,16 @@ function populate ($) {
   $.$export('function', $functionIn($))
   $.$export('lambda', $lambdaIn($))
 
-  $.$export('call', function (subject, func, args) {
+  $.$export('call', function (func, subject, args) {
+    if (typeof func !== 'function') {
+      return null
+    }
+    if (typeof subject === 'undefined') {
+      subject = null
+    }
+    if (!Array.isArray(args)) {
+      args = []
+    }
     try {
       return func.apply(subject, args)
     } catch (signal) {
