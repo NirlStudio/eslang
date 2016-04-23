@@ -62,13 +62,13 @@
   ($should "return the quotient of dividing the first argument by other arguments" (= ()
     (assert equal 0 (/),
     (assert equal 1 (/ 1),
-    (assert equal (Number "Infinity") (/ 1 0),
+    (assert equal false (Number isFinite (/ 1 0),
     (assert equal 2 (/ 4 2),
     (assert equal 3 (/ 18 2 3),
 
-    (assert equal (Number "Infinity") (/ 1 ""),
-    (assert equal (Number "Infinity") (/ 1 "1"),
-    (assert equal (Number "Infinity") (/ 1 (@)),
+    (assert equal true (Number isNaN (/ 1 ""),
+    (assert equal true (Number isNaN (/ 1 "1"),
+    (assert equal true (Number isNaN (/ 1 (@)),
 ).
 
 ($define "divide & save: /=" (= ()

@@ -35,6 +35,10 @@
   "object"
   "function"
 
+  "is"
+  "typeof"
+  "mixin"
+
   "if"
   "while"
   "for"
@@ -44,6 +48,7 @@
   "logical"
   "arithmetic"
   "concat"
+
   "equivalence"
   "ordering"
 

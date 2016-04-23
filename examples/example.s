@@ -108,7 +108,7 @@
 (console log (obj"b").
  #" 12312312
 
-($require "express" "js")
+(console log (typeof ($require "chai" "js").
 
 (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
 (let s (object))

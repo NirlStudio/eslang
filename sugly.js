@@ -1,12 +1,22 @@
 'use strict'
 
 const SymbolContext = Symbol.for('$')
+const SymbolNull = Symbol.for('null')
+const SymbolTrue = Symbol.for('true')
+const SymbolFalse = Symbol.for('false')
 
 var makeSpace = require('./sugly/space')
 
 function resolve ($, sym) {
-  if (SymbolContext === sym) {
-    return $ // $ is always the current space.
+  switch (sym) {
+    case SymbolContext:
+      return $ // $ is always the current space.
+    case SymbolNull:
+      return null
+    case SymbolTrue:
+      return true
+    case SymbolFalse:
+      return false
   }
 
   if (typeof $ !== 'object' && typeof $ !== 'function') {
@@ -447,19 +457,48 @@ $operators[Symbol.for('exit')] = createSignalOf('exit')
 // request to quit the whole application.
 $operators[Symbol.for('halt')] = createSignalOf('halt')
 
+const SymbolLike = Symbol.for('like')
+
 $operators[Symbol.for('is')] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return true
   }
 
-  var left = seval(clause[1], $)
+  var left = clause[1]
+  if (left === SymbolLike) {
+    return false // (is like ...) is invalid
+  }
+  left = seval(left, $)
   if (length < 3) {
     return left === null
   }
 
-  var right = seval(clause[2], $)
-  return Object.is(left, right)
+  if (left && typeof left.hasOwnProperty !== 'function') {
+    return false
+  }
+
+  var right = clause[2]
+  if (right !== SymbolLike) {
+    return Object.is(left, seval(right, $))
+  }
+
+  for (var i = 3; i < length; i++) {
+    var value = seval(clause[i], $)
+    if (value === null || Object.is(left, value)) {
+      continue
+    } else if (typeof left !== typeof value) {
+      return false
+    } else if (value.isPrototypeOf && value.isPrototypeOf(left)) {
+      continue
+    }
+    for (var key in value) {
+      if (!left || !left.hasOwnProperty(key)) {
+        return false
+      }
+    }
+  }
+  return true // all objects are alike with null.
 }
 
 // typeof: query base type name, test a value, check object's prototype chain
@@ -484,7 +523,8 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
     if (typeof value === 'object' && value.typeIdentifier) {
       return value.typeIdentifier
     }
-    return typeof value
+    var type = typeof value
+    return type === 'boolean' ? 'bool' : type
   }
 
   var expected = seval(clause[2], $)
@@ -499,7 +539,7 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
       case 'string':
         return typeof value === 'string'
       case 'symbol':
-        return typeof value === 'number'
+        return typeof value === 'symbol'
       case 'function':
         return typeof value === 'function'
       case 'object':
@@ -513,24 +553,24 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
         return typeof value === 'object' && value.typeIdentifier === expected
     }
   }
-  if (typeof expected === 'object' && typeof value === 'object') {
-    var last = null
-    while (last !== value && value) {
-      last = value
-      value = Object.getPrototypeOf(value)
-      if (value === expected) {
-        return true
-      }
-    }
+  if (expected && expected.isPrototypeOf && expected.isPrototypeOf(value)) {
+    return true
   }
   return false
 }
 
-// generic type operators being identical with the function version.
-$operators[Symbol.for('null')] = function ($, clause) {
+// operator form of const values
+$operators[SymbolNull] = function ($, clause) {
   return null
 }
+$operators[SymbolTrue] = function ($, clause) {
+  return true
+}
+$operators[SymbolFalse] = function ($, clause) {
+  return false
+}
 
+// generic type operators being identical with the function version.
 const SymbolBool = Symbol.for('bool')
 $operators[SymbolBool] = function ($, clause) {
   return $.bool(clause.length < 2 ? undefined : seval(clause[1], $))
@@ -988,7 +1028,7 @@ $operators[Symbol.for('combine')] = function ($, clause) {
   }
 
   var base = seval(clause[1], $)
-  return length > 2 ? mixin($, base, clause, $.object()) : base
+  return mixin($, base, clause, $.object())
 }
 
 $operators[Symbol.for('mixin')] = function ($, clause) {
@@ -1020,7 +1060,7 @@ $operators[Symbol.for('+')] = function ($, clause) {
 
   var base = seval(clause[1], $)
   if (length === 2) {
-    return base
+    return typeof base === 'object' ? mixin($, base, clause, $.object()) : base
   }
 
   if (typeof base === 'number') {
@@ -1132,7 +1172,7 @@ function divide ($, clause) {
     if (typeof value === 'number') {
       result /= value
     } else {
-      return Infinity
+      return NaN
     }
   }
   return result
