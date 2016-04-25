@@ -154,7 +154,7 @@ function seval (clause, $) {
   }
 
   // evaluate arguments.
-  var max = func.fixedArgs ? func.params.length + 2 : length
+  var max = func.$fixedArgs ? func.$params.length + 2 : length
   if (max > length) {
     max = length
   }
@@ -1550,9 +1550,9 @@ function $functionIn ($) {
       }
     }
 
-    f.fixedArgs = fixedArgs
-    f.params = params
-    f.body = body
+    f.$fixedArgs = fixedArgs
+    f.$params = params
+    f.$body = body
     return f
   }
 }
@@ -1589,10 +1589,10 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
     }
   }
 
-  $C.enclosing = enclosing
-  $C.fixedArgs = fixedArgs
-  $C.params = params
-  $C.body = body
+  $C.$enclosing = enclosing
+  $C.$fixedArgs = fixedArgs
+  $C.$params = params
+  $C.$body = body
   return $C
 }
 
@@ -1609,10 +1609,10 @@ function createLambda ($, enclosing, params, body) {
     return $.lambda(enclosing, body[1], body.slice(2))
   }
 
-  $L.enclosing = enclosing
-  $L.fixedArgs = true
-  $L.params = params
-  $L.body = body
+  $L.$enclosing = enclosing
+  $L.$fixedArgs = true
+  $L.$params = params
+  $L.$body = body
   return $L
 }
 

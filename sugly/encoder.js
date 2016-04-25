@@ -1,8 +1,7 @@
 'use strict'
 
 function exportTo (container, name, obj) {
-  var owner = container.identityName
-  obj.identityName = '(' + owner + ' "' + name + '")'
+  obj.identityName = '(' + container.identityName + ' "' + name + '")'
 
   container[name] = obj
   return obj
@@ -38,7 +37,7 @@ function encoder (pretty) {
   }
 
   function encodeDate (date) {
-    return '($date ' + date.toString() + ')'
+    return '(date ' + date.getTime() + ')'
   }
 
   function encodeObject (obj) {
@@ -77,9 +76,10 @@ function encoder (pretty) {
     }
 
     var code = '(='
-    if (func.enclosing) {
-      var obj = encodeObject(func.enclosing)
-      if (obj.length > 4) {
+    var enclosing = func.$enclosing
+    if (enclosing && typeof enclosing === 'object') {
+      var obj = encodeObject(enclosing)
+      if (obj.length > 4) { // not an empty onject.
         code += ' ' + obj + ' > '
       } else {
         // enclosing an empty object, a null is equivilant here.
@@ -88,31 +88,26 @@ function encoder (pretty) {
     }
     code += '('
 
-    for (var i = 0; i < func.params.length; i++) {
-      var p = func.params[i]
-      if (p[1] == null) {
+    var params = func.$params
+    for (var i = 0; i < params.length; i++) {
+      var p = params[i]
+      if (p[1] === null) {
         code += Symbol.keyFor(p[0]) + ' '
       } else {
-        code += '(' + Symbol.keyFor(p[0]) + ' '
-        code += encode(p[1]) + ') '
+        code += '(' + Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ') '
       }
     }
-    if (!func.fixedArgs) {
+    if (!func.$fixedArgs) {
       code += '*'
     }
     code += ')'
 
-    increaseIndent()
-    for (var j = 0; j < func.body.length; j++) {
-      var c = func.body[j]
-      code += (Array.isArray(c) ? '\n' + indent : ' ') + encodeClause(c)
-    }
-    decreaseIndent()
+    code += encodeProgram(func.$body)
     return code + ')'
   }
 
   function encodeFunction (func) {
-    return func.params && func.body ? encodeSuglyFunction(func) : encodeNativeFunction(func)
+    return func.$params && func.$body ? encodeSuglyFunction(func) : encodeNativeFunction(func)
   }
 
   function encodeArray (array) {
@@ -146,13 +141,19 @@ function encoder (pretty) {
       case 'function':
         return encodeFunction(value)
       default:
-        return 'null'
+        return 'null' // unknown enitities
     }
   }
 
-  function encodeProgram (program) {
-    // TODO - value-based clauses
-    return '()'
+  function encodeProgram (clauses) {
+    var code = ''
+    increaseIndent()
+    for (var i = 0; i < clauses.length; i++) {
+      var c = clauses[i]
+      code += (Array.isArray(c) ? '\n' + indent : ' ') + encodeClause(c)
+    }
+    decreaseIndent()
+    return code
   }
 
   // value, symbol or clause
@@ -182,53 +183,30 @@ function encoder (pretty) {
 
   // encode a piece of program(clauses): [[]]
   function encode (clauses) {
-    if (!Array.isArray(clauses)) {
-      return '(console log "Invalid program:" ' + encode.value(clauses) + ')'
-    }
-
-    var code = ''
-    for (var i = 0; i < clauses.length; i++) {
-      code += encodeClause(clauses[i]) + '\n'
-    }
-    return code
+    return Array.isArray(clauses) ? encodeProgram(clauses) : '()'
   }
 
   // export functions
   encode.identityName = '($"encode")'
 
   exportTo(encode, 'string', function (str) {
-    if (typeof str !== 'string') {
-      return '""'
-    }
-    return encodeString(str)
+    return typeof str !== 'string' ? '""' : encodeString(str)
   })
 
   exportTo(encode, 'symbol', function (sym) {
-    if (typeof sym !== 'symbol') {
-      return ''
-    }
-    return encodeSymbol(sym)
+    return typeof sym !== 'symbol' ? '' : encodeSymbol(sym)
   })
 
   exportTo(encode, 'number', function (num) {
-    if (typeof num !== 'number') {
-      return 'NaN'
-    }
-    return encodeNumber(num)
+    return typeof num !== 'number' ? 'NaN' : encodeNumber(num)
   })
 
   exportTo(encode, 'bool', function (bool) {
-    if (typeof bool !== 'boolean') {
-      return false
-    }
-    return encodeBool(bool)
+    return typeof bool !== 'boolean' ? 'false' : encodeBool(bool)
   })
 
   exportTo(encode, 'date', function (date) {
-    if (!date instanceof Date) {
-      return '($date 0)'
-    }
-    return encodeDate(date)
+    return date instanceof Date ? encodeDate(date) : '(date 0)'
   })
 
   exportTo(encode, 'object', function (obj) {
@@ -239,21 +217,14 @@ function encoder (pretty) {
   })
 
   exportTo(encode, 'function', function (func) {
-    if (typeof func !== 'function') {
-      return 'null'
-    }
-    return encodeFunction(func)
+    return typeof func !== 'function' ? 'null' : encodeFunction(func)
   })
 
   exportTo(encode, 'array', function (arr) {
-    if (!Array.isArray(arr)) {
-      return '(@)' // an empty array
-    }
-    return encodeArray(arr)
+    return Array.isArray(arr) ? encodeArray(arr) : '(@)'
   })
 
   exportTo(encode, 'value', encodeValue)
-  exportTo(encode, 'program', encodeProgram)
   exportTo(encode, 'clause', encodeClause)
   return encode
 }

@@ -39,17 +39,10 @@
 
     (let obj (= x x))
     (let iter ($iterate obj),
-    (assert equal true (iter next),
-    (assert equal true (iter next),
-    (assert equal true (iter next),
     (assert equal false (iter next),
 
     (let obj (= base > x x))
     (let iter ($iterate obj),
-    (assert equal true (iter next),
-    (assert equal true (iter next),
-    (assert equal true (iter next),
-    (assert equal true (iter next),
     (assert equal false (iter next),
 
     (let obj (@ p1: 1))
