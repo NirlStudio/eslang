@@ -1,6 +1,7 @@
 'use strict'
 
-const RegexNumber = /^-?\d+\.?\d*$/
+var RegexNumber = /^-?\d+\.?\d*$/
+var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
 const keywords = {
   'null': null,
@@ -47,11 +48,13 @@ var Tokenizer = function (lines, source) {
 
       case '$':
       case '`':
-      case "'": // reserved.
       case '@':
       case ':':
         // single character symbols.
         return this._finalizeToken(this._createToken('symbol'), Symbol.for(c))
+
+      case "'": // reserved as a punctuation.
+        return this.next()
 
       case '"':
         return this._readString()
@@ -172,7 +175,7 @@ var Tokenizer = function (lines, source) {
 
     var n = this._nextChar()
     while (n) {
-      if ('()$`\'@:" \r\n#\t\\'.indexOf(n) >= 0) {
+      if (n.match(InvalidSymbol)) {
         break
       }
       s += n

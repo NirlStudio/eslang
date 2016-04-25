@@ -1,6 +1,8 @@
 'use strict'
 
 var JS = global || window
+var SpecialSymbol = /^[\$\`\@\:]{1}$/
+var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
 function exportTo (container, name, obj) {
   if (typeof obj === 'object' || typeof obj === 'function') {
@@ -218,7 +220,10 @@ function initializeSpace ($) {
   exportTo($, 'Symbol', {}) // reserve Symbol
   exportTo($, 'symbol', function $symbol (key) {
     // no duplicated symbol instances
-    return typeof key === 'string' ? Symbol.for(key) : null
+    if (typeof key !== 'string') {
+      return null
+    }
+    return key.match(SpecialSymbol) || !key.match(InvalidSymbol) ? Symbol.for(key) : null
   })
   exportTo($, 'keyOfSymbol', function $keyOfSymbol (sym) {
     // no duplicated symbol instances
