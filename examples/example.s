@@ -64,7 +64,7 @@
 
 
 ($"sumWithBase" (= base
-  (= ((base (* base 2))) > (x y)
+  (= (base) > (x y)
     (+ base x y).
 ($"sum" ($sumWithBase 10000).
 (console log ($sum 10 1).

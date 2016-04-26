@@ -387,8 +387,10 @@ $operators['array'] = function ($, clause) {
 // (= symbols > params body ...)
 // symbols can be symbol or (symbol ...) or (@ prop: value ...)
 function lambdaCreate ($, symbols, params, body) {
+  var enclosing = {}
   if (isSymbol(symbols)) {
-    return $.lambda(resolve($, symbols), params, body)
+    set(enclosing, symbols, resolve($, symbols))
+    return $.lambda(enclosing, params, body)
   }
 
   if (!Array.isArray(symbols)) {
@@ -396,22 +398,18 @@ function lambdaCreate ($, symbols, params, body) {
   }
 
   if (symbols.length < 1) {
-    return $.lambda({}, params, body)
+    return $.lambda(enclosing, params, body)
   }
 
   // enclosing context values.
-  var enclosing
   if (symbols[0] === SymbolObject) {
     // it should be an object expression: (@ prop: value ...)
     var obj = seval(symbols, $)
     if (typeof obj === 'object' && obj !== null) {
       enclosing = obj
-    } else {
-      enclosing = {}
     }
   } else {
     // it should be an symbol list: (sym ...)
-    enclosing = {}
     for (var i = 0; i < symbols.length; i++) {
       var s = symbols[i]
       if (isSymbol(s)) {
