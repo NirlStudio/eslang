@@ -1,8 +1,6 @@
 'use strict'
 
 var JS = global || window
-var SpecialSymbol = /^[\$\`\@\:]{1}$/
-var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
 function exportTo (container, name, obj) {
   if (typeof obj === 'object' || typeof obj === 'function') {
@@ -42,13 +40,25 @@ function copyJSObject (name, jsObject) {
     if (typeof prop === 'function') {
       exportFunction(copied, key, jsObject, prop)
     } else {
-      copied[Symbol.for(key)] = prop
+      copied[key] = prop
     }
   }
   return copied
 }
 
-function createNumberFunctions () {
+function exportSymbol () {
+  var $Symbol = require('./symbol')()
+  $Symbol.identityName = '($"Symbol")'
+
+  $Symbol.for.identityName = '(Symbol "for")'
+  $Symbol.keyFor.identityName = '(Symbol "keyFor")'
+  $Symbol.isKey.identityName = '(Symbol "isKey")'
+  $Symbol.is.identityName = '(Symbol "is")'
+
+  return $Symbol
+}
+
+function exportNumber () {
   var $Number = {}
   $Number.identityName = '($"Number")'
 
@@ -94,7 +104,7 @@ function createNumberFunctions () {
   return $Number
 }
 
-function createDateFunctions () {
+function exportDate () {
   var $Date = {}
   $Date.identityName = '($"Date")'
 
@@ -116,7 +126,7 @@ function createDateFunctions () {
   return $Date
 }
 
-function createBitwiseFunctions () {
+function exportBitwiseOperators () {
   var Bit = {}
   Bit.identityName = '($"Bit")'
 
@@ -217,20 +227,12 @@ function initializeSpace ($) {
     return String.fromCharCode.apply(String, arguments)
   })
 
-  exportTo($, 'Symbol', {}) // reserve Symbol
+  exportTo($, 'Symbol', exportSymbol())
   exportTo($, 'symbol', function $symbol (key) {
-    // no duplicated symbol instances
-    if (typeof key !== 'string') {
-      return null
-    }
-    return key.match(SpecialSymbol) || !key.match(InvalidSymbol) ? Symbol.for(key) : null
-  })
-  exportTo($, 'keyOfSymbol', function $keyOfSymbol (sym) {
-    // no duplicated symbol instances
-    return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
+    return $.Symbol.for(key)
   })
 
-  exportTo($, 'Number', createNumberFunctions())
+  exportTo($, 'Number', exportNumber())
   exportTo($, 'number', function $number (value) {
     if (typeof value === 'string') {
       return parseFloat(value)
@@ -258,7 +260,7 @@ function initializeSpace ($) {
 
   exportTo($, 'Function', {}) // reserve Function
 
-  exportTo($, 'Date', createDateFunctions())
+  exportTo($, 'Date', exportDate())
   exportTo($, 'date', function $date () {
     var args = [null]
     args.push.apply(args, arguments)
@@ -286,7 +288,7 @@ function initializeSpace ($) {
   exportTo($, 'range', require('./range'))
   exportTo($, 'iterate', require('./iterate'))
 
-  exportTo($, 'Bit', createBitwiseFunctions())
+  exportTo($, 'Bit', exportBitwiseOperators())
   exportTo($, 'Uri', exportUriFunctions())
   exportTo($, 'Math', copyJSObject('Math', JS.Math))
   exportTo($, 'Json', copyJSObject('Json', JS.JSON))
@@ -305,19 +307,16 @@ module.exports = function (/* options */) {
   // import objects from JS environment
   initializeSpace($)
 
-  // compile function factory
-  exportTo($, 'compiler', require('./compiler'))
-
   // compile a piece of code to program/clauses: [[]].
   exportTo($, 'compile', function (code, src) {
-    return $.compiler()(code, src)
+    return require('./compiler')($)(code, src)
   })
 
   // encode function factory
   exportTo($, 'encoder', require('./encoder'))
 
   // default encode function
-  exportTo($, 'encode', $.encoder(true))
+  exportTo($, 'encode', require('./encoder')($, true))
 
   // customized console object. depending on $.encode
   exportTo($, 'console', require('./console')($))

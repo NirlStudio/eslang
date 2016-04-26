@@ -7,7 +7,8 @@ function exportTo (container, name, obj) {
   return obj
 }
 
-function encoder (pretty) {
+function encoder ($, pretty) {
+  var $Symbol = $.Symbol
   var indent = ''
   function increaseIndent () {
     if (pretty) {
@@ -25,7 +26,8 @@ function encoder (pretty) {
   }
 
   function encodeSymbol (sym) {
-    return '(` ' + Symbol.keyFor(sym) + ')'
+    var key = $Symbol.keyFor(sym)
+    return key.length > 0 ? '(` ' + key + ')' : key
   }
 
   function encodeNumber (num) {
@@ -58,6 +60,9 @@ function encoder (pretty) {
     increaseIndent()
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
+      if (key.startsWith('$') || key.startsWith('__')) {
+        continue
+      }
       code += (i === 0 ? '' : '\n' + indent) + key + ': '
       code += encodeValue(obj[key])
     }
@@ -92,9 +97,9 @@ function encoder (pretty) {
     for (var i = 0; i < params.length; i++) {
       var p = params[i]
       if (p[1] === null) {
-        code += Symbol.keyFor(p[0]) + ' '
+        code += $Symbol.keyFor(p[0]) + ' '
       } else {
-        code += '(' + Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ') '
+        code += '(' + $Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ') '
       }
     }
     if (!func.$fixedArgs) {
@@ -137,7 +142,10 @@ function encoder (pretty) {
       case 'symbol':
         return encodeSymbol(value)
       case 'object':
-        return value === null ? 'null' : encodeObject(value)
+        if (value === null) {
+          return null
+        }
+        return $Symbol.is(value) ? encodeSymbol(value) : encodeObject(value)
       case 'function':
         return encodeFunction(value)
       default:
@@ -159,8 +167,8 @@ function encoder (pretty) {
   // value, symbol or clause
   function encodeClause (clause) {
     if (!Array.isArray(clause)) {
-      if (typeof clause === 'symbol') {
-        return Symbol.keyFor(clause)
+      if ($Symbol.is(clause)) {
+        return $Symbol.keyFor(clause)
       } else {
         return encodeValue(clause)
       }
@@ -194,7 +202,7 @@ function encoder (pretty) {
   })
 
   exportTo(encode, 'symbol', function (sym) {
-    return typeof sym !== 'symbol' ? '' : encodeSymbol(sym)
+    return encodeSymbol(sym)
   })
 
   exportTo(encode, 'number', function (num) {
@@ -210,7 +218,7 @@ function encoder (pretty) {
   })
 
   exportTo(encode, 'object', function (obj) {
-    if (typeof obj !== 'object') {
+    if (typeof obj !== 'object' || $Symbol.is(obj)) {
       return '(@>)' // empty object
     }
     return obj === null ? 'null' : encodeObject(obj)

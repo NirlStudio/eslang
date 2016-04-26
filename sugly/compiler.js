@@ -2,7 +2,7 @@
 
 var tokenizer = require('./tokenizer')
 
-module.exports = function (/* options */) {
+module.exports = function ($) {
   var stack = [[]]
 
   function beginClause (t) {
@@ -108,9 +108,9 @@ module.exports = function (/* options */) {
     ]
   }
 
-  function compile (code, src) {
-    var tokens = tokenizer(code, src)
-    var t = tokens.next()
+  return function compile (code, src/*, options */) {
+    var nextToken = tokenizer($, code, src)
+    var t = nextToken()
 
     while (t) {
       switch (t.type) {
@@ -136,7 +136,7 @@ module.exports = function (/* options */) {
         default:
           break
       }
-      t = tokens.next()
+      t = nextToken()
     }
 
     if (stack.length > 1) {
@@ -144,6 +144,4 @@ module.exports = function (/* options */) {
     }
     return stack[0]
   }
-
-  return compile
 }

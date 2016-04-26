@@ -1,21 +1,52 @@
 'use strict'
 
-const SymbolContext = Symbol.for('$')
-const SymbolNull = Symbol.for('null')
-const SymbolTrue = Symbol.for('true')
-const SymbolFalse = Symbol.for('false')
-
 var makeSpace = require('./sugly/space')
 
+var symbolFor, symbolKeyFor, isSymbol
+var SymbolContext, SymbolQuote, SymbolIndexer, SymbolAssign, SymbolDerive,
+  SymbolLambdaShort, SymbolObject, SymbolLambda, SymbolLike, SymbolElse,
+  SymbolIn, SymbolThen, SymbolNext, SymbolRepeat
+
+function initializeSymbols ($) {
+  if (symbolFor) {
+    return
+  }
+  symbolFor = $.Symbol.for
+  symbolKeyFor = $.Symbol.keyFor
+  isSymbol = $.Symbol.is
+
+  SymbolContext = symbolFor('$')
+  SymbolQuote = symbolFor('`')
+  SymbolIndexer = symbolFor(':')
+
+  SymbolAssign = symbolFor('<')
+  SymbolDerive = symbolFor('>')
+  SymbolLambdaShort = SymbolDerive
+  SymbolObject = symbolFor('@')
+
+  SymbolLambda = symbolFor('=>')
+
+  SymbolLike = symbolFor('like')
+  SymbolElse = symbolFor('else')
+  SymbolIn = symbolFor('in')
+
+  SymbolThen = symbolFor('then')
+  SymbolNext = symbolFor('next')
+
+  SymbolRepeat = symbolFor('*')
+}
+
 function resolve ($, sym) {
-  switch (sym) {
-    case SymbolContext:
+  var key = symbolKeyFor(sym)
+  switch (key) {
+    case '$':
       return $ // $ is always the current space.
-    case SymbolNull:
+    case '':
+    case 'null':
       return null
-    case SymbolTrue:
+    case 'true':
       return true
-    case SymbolFalse:
+    case 'false':
       return false
   }
 
@@ -23,7 +54,7 @@ function resolve ($, sym) {
     return null
   }
 
-  var value = $[Symbol.keyFor(sym)]
+  var value = $[key]
   return typeof value !== 'undefined' ? value : null
 }
 
@@ -32,7 +63,7 @@ function set (subject, sym, value) {
     return null
   }
 
-  var key = Symbol.keyFor(sym)
+  var key = symbolKeyFor(sym)
   if (!key.startsWith('$') && !key.startsWith('__')) {
     subject[key] = value
   }
@@ -44,8 +75,8 @@ function getter (subject, key) {
     return null
   }
 
-  if (typeof key === 'symbol') {
-    key = Symbol.keyFor(key)
+  if (isSymbol(key)) {
+    key = symbolKeyFor(key)
   }
 
   var value = subject[key]
@@ -54,8 +85,6 @@ function getter (subject, key) {
   }
   return null
 }
-
-const SymbolIndexer = Symbol.for(':')
 
 function indexer (key, value) {
   if (key === null) {
@@ -68,9 +97,9 @@ function indexer (key, value) {
 
   // setting property
   if (typeof key === 'string') {
-    return set(this, Symbol.for(key), value)
+    return set(this, symbolFor(key), value)
   }
-  if (typeof key === 'symbol') {
+  if (isSymbol(key)) {
     return set(this, key, value)
   }
 
@@ -91,7 +120,7 @@ function SuglySignal (type, value) {
 function seval (clause, $) {
   if (!Array.isArray(clause)) {
     // not a clause.
-    return typeof clause === 'symbol' ? resolve($, clause) : clause
+    return isSymbol(clause) ? resolve($, clause) : clause
   }
 
   var length = clause.length
@@ -101,9 +130,10 @@ function seval (clause, $) {
 
   var subject = clause[0]
   // intercept subject
-  if (typeof subject === 'symbol') {
-    if ($.$operators.hasOwnProperty(subject)) {
-      return $.$operators[subject]($, clause)
+  if (isSymbol(subject)) {
+    var key = symbolKeyFor(subject)
+    if ($.$operators.hasOwnProperty(key)) {
+      return $.$operators[key]($, clause)
     }
     if (subject === SymbolContext) {
       subject = $ // shortcut
@@ -132,10 +162,10 @@ function seval (clause, $) {
   var func
   switch (typeof predicate) {
     case 'string': // an immediate string indicating get/set command.
-      var sym = Symbol.for(predicate)
+      var sym = symbolFor(predicate)
       return length > 2 ? set(subject, sym, seval(clause[2], $)) : resolve(subject, sym)
 
-    case 'symbol':
+    case 'symbol': // native symbol
       func = resolve(subject, predicate)
       if (!func && predicate === SymbolIndexer) {
         func = indexer // overridable indexer
@@ -147,6 +177,18 @@ function seval (clause, $) {
     case 'function':
       func = predicate
       break
+
+    case 'object':
+      if (isSymbol(predicate)) { // polyfill symbol
+        func = resolve(subject, predicate)
+        if (!func && predicate === SymbolIndexer) {
+          func = indexer // overridable indexer
+        } else if (typeof func !== 'function') {
+          return func
+        }
+        break
+      }
+      return predicate // ordinary object
 
     default:
       // short circuit - other type of value type will be evaluated to itself.
@@ -174,9 +216,8 @@ function seval (clause, $) {
 
 var $operators = {}
 
-const SymbolQuote = Symbol.for('`')
 // (` symbol) or (` (...))
-$operators[SymbolQuote] = function ($, clause) {
+$operators['`'] = function ($, clause) {
   if (clause.length > 1) {
     return clause[1]
   } else {
@@ -185,10 +226,10 @@ $operators[SymbolQuote] = function ($, clause) {
 }
 
 // a more readable version of `
-$operators[Symbol.for('quote')] = $operators[SymbolQuote]
+$operators['quote'] = $operators['`']
 
 // (let var value) or (let (var value) ...)
-$operators[Symbol.for('let')] = function $let ($, clause) {
+$operators['let'] = function $let ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -196,7 +237,7 @@ $operators[Symbol.for('let')] = function $let ($, clause) {
 
   var c1 = clause[1]
   // (let symbol value)
-  if (typeof c1 === 'symbol') {
+  if (isSymbol(c1)) {
     return set($, c1, length < 3 ? null : seval(clause[2], $))
   } else if (!Array.isArray(c1)) {
     return null
@@ -208,7 +249,7 @@ $operators[Symbol.for('let')] = function $let ($, clause) {
     var pair = clause[i]
     if (Array.isArray(pair) && pair.length > 1) {
       var p0 = pair[0]
-      if (typeof p0 === 'symbol') {
+      if (isSymbol(p0)) {
         last = set($, p0, seval(pair[1], $))
         continue
       }
@@ -226,8 +267,8 @@ function objectCreate ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = Symbol.for(key)
-    } else if (typeof key !== 'symbol') {
+      key = symbolFor(key)
+    } else if (!isSymbol(key)) {
       break
     }
 
@@ -250,8 +291,8 @@ function objectAssign ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = Symbol.for(key)
-    } else if (typeof key !== 'symbol') {
+      key = symbolFor(key)
+    } else if (!isSymbol(key)) {
       break
     }
 
@@ -281,8 +322,8 @@ function objectDerive ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = Symbol.for(key)
-    } else if (typeof key !== 'symbol') {
+      key = symbolFor(key)
+    } else if (!isSymbol(key)) {
       break
     }
 
@@ -304,11 +345,7 @@ function arrayCreate ($, clause) {
   return result
 }
 
-const SymbolAssign = Symbol.for('<')
-const SymbolDerive = Symbol.for('>')
-const SymbolObject = Symbol.for('@')
-
-$operators[SymbolObject] = function ($, clause) {
+$operators['@'] = function ($, clause) {
   var length = clause.length
   if (length > 1) {
     switch (clause[1]) {
@@ -336,21 +373,21 @@ $operators[SymbolObject] = function ($, clause) {
 }
 
 // as operators, object and array are the readable version of @
-$operators[Symbol.for('object')] = function ($, clause) {
+$operators['object'] = function ($, clause) {
   if (clause.length < 2) {
     return $.object()
   }
-  return $operators[SymbolObject]($, clause)
+  return $operators['@']($, clause)
 }
 // force to create an array
-$operators[Symbol.for('array')] = function ($, clause) {
+$operators['array'] = function ($, clause) {
   return arrayCreate($, clause)
 }
 
 // (= symbols > params body ...)
 // symbols can be symbol or (symbol ...) or (@ prop: value ...)
 function lambdaCreate ($, symbols, params, body) {
-  if (typeof symbols === 'symbol') {
+  if (isSymbol(symbols)) {
     return $.lambda(resolve($, symbols), params, body)
   }
 
@@ -377,7 +414,7 @@ function lambdaCreate ($, symbols, params, body) {
     enclosing = {}
     for (var i = 0; i < symbols.length; i++) {
       var s = symbols[i]
-      if (typeof s === 'symbol') {
+      if (isSymbol(s)) {
         set(enclosing, s, resolve($, s))
       }
     }
@@ -386,9 +423,7 @@ function lambdaCreate ($, symbols, params, body) {
   return $.lambda(enclosing, params, body)
 }
 
-const SymbolLambdaShort = SymbolDerive
-
-$operators[Symbol.for('=')] = function ($, clause) {
+$operators['='] = function ($, clause) {
   if (clause.length < 3) {
     return null
   }
@@ -414,12 +449,11 @@ $operators[Symbol.for('=')] = function ($, clause) {
 }
 
 // operator function and closure are more readable aliases of '='
-$operators[Symbol.for('function')] = $operators[Symbol.for('=')]
-$operators[Symbol.for('closure')] = $operators[Symbol.for('=')]
+$operators['function'] = $operators['=']
+$operators['closure'] = $operators['=']
 
-const SymbolLambda = Symbol.for('=>')
 // (=> params body)
-$operators[SymbolLambda] = function ($, clause) {
+$operators['=>'] = function ($, clause) {
   if (clause.length < 3) {
     return null
   }
@@ -448,18 +482,16 @@ function createSignalOf (type) {
 }
 
 // operator lambda is a more readable version of '=>'
-$operators[Symbol.for('lambda')] = $operators[Symbol.for('=>')]
+$operators['lambda'] = $operators['=>']
 
 // leave function or module.
-$operators[Symbol.for('return')] = createSignalOf('return')
+$operators['return'] = createSignalOf('return')
 // leave a module or an event callback
-$operators[Symbol.for('exit')] = createSignalOf('exit')
+$operators['exit'] = createSignalOf('exit')
 // request to quit the whole application.
-$operators[Symbol.for('halt')] = createSignalOf('halt')
+$operators['halt'] = createSignalOf('halt')
 
-const SymbolLike = Symbol.for('like')
-
-$operators[Symbol.for('is')] = function ($, clause) {
+$operators['is'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return true
@@ -502,7 +534,7 @@ $operators[Symbol.for('is')] = function ($, clause) {
 }
 
 // typeof: query base type name, test a value, check object's prototype chain
-$operators[Symbol.for('typeof')] = function ($, clause) {
+$operators['typeof'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return 'null'
@@ -520,8 +552,12 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
       return 'date'
     }
     // app defined type identifier
-    if (typeof value === 'object' && value.typeIdentifier) {
-      return value.typeIdentifier
+    if (typeof value === 'object') {
+      if (value.typeIdentifier) {
+        return value.typeIdentifier
+      } else if (isSymbol(value)) {
+        return 'symbol' // polyfill symbol
+      }
     }
     var type = typeof value
     return type === 'boolean' ? 'bool' : type
@@ -539,7 +575,7 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
       case 'string':
         return typeof value === 'string'
       case 'symbol':
-        return typeof value === 'symbol'
+        return isSymbol(value)
       case 'function':
         return typeof value === 'function'
       case 'object':
@@ -560,29 +596,29 @@ $operators[Symbol.for('typeof')] = function ($, clause) {
 }
 
 // operator form of const values
-$operators[SymbolNull] = function ($, clause) {
+$operators[''] = function ($, clause) {
   return null
 }
-$operators[SymbolTrue] = function ($, clause) {
+$operators['null'] = function ($, clause) {
+  return null
+}
+$operators['true'] = function ($, clause) {
   return true
 }
-$operators[SymbolFalse] = function ($, clause) {
+$operators['false'] = function ($, clause) {
   return false
 }
 
 // generic type operators being identical with the function version.
-const SymbolBool = Symbol.for('bool')
-$operators[SymbolBool] = function ($, clause) {
+$operators['bool'] = function ($, clause) {
   return $.bool(clause.length < 2 ? undefined : seval(clause[1], $))
 }
 
-const SymbolNumber = Symbol.for('number')
-$operators[SymbolNumber] = function ($, clause) {
+$operators['number'] = function ($, clause) {
   return clause.length < 2 ? 0 : $.number(seval(clause[1], $))
 }
 
-const SymbolString = Symbol.for('string')
-$operators[SymbolString] = function ($, clause) {
+$operators['string'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return ''
@@ -595,13 +631,11 @@ $operators[SymbolString] = function ($, clause) {
   return $.string.apply($, values)
 }
 
-const SymbolSymbol = Symbol.for('symbol')
-$operators[SymbolSymbol] = function ($, clause) {
+$operators['symbol'] = function ($, clause) {
   return clause.length < 2 ? null : $.symbol(seval(clause[1], $))
 }
 
-const SymbolDate = Symbol.for('date')
-$operators[SymbolDate] = function ($, clause) {
+$operators['date'] = function ($, clause) {
   var length = clause.length
   var args = []
   for (var i = 1; i < length; i++) {
@@ -610,9 +644,7 @@ $operators[SymbolDate] = function ($, clause) {
   return $.date.apply(null, args)
 }
 
-const SymbolElse = Symbol.for('else')
-
-$operators[Symbol.for('if')] = function ($, clause) {
+$operators['if'] = function ($, clause) {
   var length = clause.length
   if (length < 3) {
     return null // short circuit - the result will be null anyway.
@@ -651,12 +683,12 @@ function createLoopSignal (type) {
   }
 }
 
-$operators[Symbol.for('break')] = createLoopSignal('break')
-$operators[Symbol.for('continue')] = createLoopSignal('continue')
+$operators['break'] = createLoopSignal('break')
+$operators['continue'] = createLoopSignal('continue')
 
 function loopTest ($, cond) {
   // loop test function returns a BREAK flag
-  if (typeof cond === 'symbol') {
+  if (isSymbol(cond)) {
     return function loopTestOfSymbol () {
       var value = resolve($, cond)
       return value === false || value === null || value === 0
@@ -673,7 +705,7 @@ function loopTest ($, cond) {
   return cond === false || cond === null || cond === 0
 }
 
-$operators[Symbol.for('while')] = function ($, clause) {
+$operators['while'] = function ($, clause) {
   var length = clause.length
   if (length < 3) {
     return null // short circuit - no loop body
@@ -710,8 +742,6 @@ $operators[Symbol.for('while')] = function ($, clause) {
   return result
 }
 
-const SymbolKey = Symbol.for('key')
-const SymbolValue = Symbol.for('value')
 // (for value in iterable body) OR
 // (for (value) in iterable body) OR
 // (for (key value) in iterable body)
@@ -723,20 +753,20 @@ function forEach ($, clause) {
 
   var keySymbol, valueSymbol
   var fields = clause[1]
-  if (typeof fields === 'symbol') {
+  if (isSymbol(fields)) {
     keySymbol = null
     valueSymbol = fields
   } else if (Array.isArray(fields)) {
     if (fields.length > 1) {
       keySymbol = fields[0]
       valueSymbol = fields[1]
-      if (typeof keySymbol !== 'symbol' || typeof valueSymbol !== 'symbol') {
+      if (!isSymbol(keySymbol) || !isSymbol(valueSymbol)) {
         return null // invalid fields expresion
       }
     } else if (fields.length > 0) {
       keySymbol = null
       valueSymbol = fields[0]
-      if (typeof valueSymbol !== 'symbol') {
+      if (!isSymbol(valueSymbol)) {
         return null // invalid fields expresion
       }
     } else {
@@ -756,9 +786,9 @@ function forEach ($, clause) {
   var result = null
   $.$loops.push(iterator)
   while (iterator.next()) {
-    set($, valueSymbol, resolve(iterator, SymbolValue))
+    set($, valueSymbol, typeof iterator.value !== 'undefined' ? iterator.value : null)
     if (keySymbol) {
-      set($, keySymbol, resolve(iterator, SymbolKey))
+      set($, keySymbol, typeof iterator.key !== 'undefined' ? iterator.key : null)
     }
     try {
       result = beval($, body)
@@ -781,9 +811,8 @@ function forEach ($, clause) {
   return result
 }
 
-const SymbolIn = Symbol.for('in')
 // (for condition incremental body)
-$operators[Symbol.for('for')] = function ($, clause) {
+$operators['for'] = function ($, clause) {
   var length = clause.length
   if (length < 4) {
     return null // short circuit - no loop body
@@ -832,9 +861,8 @@ $operators[Symbol.for('for')] = function ($, clause) {
   return result
 }
 
-const SymbolFlow = Symbol.for('->')
 // (-> clause sub-clause1 sub-clause2 ...).
-$operators[SymbolFlow] = function ($, clause) {
+$operators['->'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -842,7 +870,7 @@ $operators[SymbolFlow] = function ($, clause) {
   var subject = seval(clause[1], $)
   for (var i = 2; subject !== null && i < length; i++) {
     var next = clause[i]
-    if (Array.isArray(subject) || typeof subject === 'symbol') {
+    if (Array.isArray(subject) || isSymbol(subject)) {
       subject = [SymbolQuote, subject]
     }
     var stmt = [subject]
@@ -855,11 +883,10 @@ $operators[SymbolFlow] = function ($, clause) {
   }
   return subject
 }
-$operators[Symbol.for('flow')] = $operators[SymbolFlow]
+$operators['flow'] = $operators['->']
 
-const SymbolPipe = Symbol.for('|')
 // (| clause1 clause2 ... )
-$operators[SymbolPipe] = function ($, clause) {
+$operators['|'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -872,7 +899,7 @@ $operators[SymbolPipe] = function ($, clause) {
       // expand array to arguments
       for (var j = 0; j < output.length; j++) {
         var value = output[j]
-        if (Array.isArray(value) || typeof value === 'symbol') {
+        if (Array.isArray(value) || isSymbol(value)) {
           value = [SymbolQuote, value] // symbol to quote
         }
         stmt.push(value)
@@ -884,13 +911,10 @@ $operators[SymbolPipe] = function ($, clause) {
   }
   return output
 }
-$operators[Symbol.for('pipe')] = $operators[SymbolPipe]
+$operators['pipe'] = $operators['|']
 
-const SymbolPremise = Symbol.for('?')
-const SymbolThen = Symbol.for('then')
-const SymbolNext = Symbol.for('next')
 // (? entry cb1 cb2 ...) - reversed pipe
-$operators[SymbolPremise] = function ($, clause) {
+$operators['?'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -909,7 +933,7 @@ $operators[SymbolPremise] = function ($, clause) {
       // expand array result
       for (var i = 0; i < output.length; i++) {
         var value = output[i]
-        if (Array.isArray(value) || typeof value === 'symbol') {
+        if (Array.isArray(value) || isSymbol(value)) {
           value = [SymbolQuote, value] // symbol to quote
         }
         stmt.push(value)
@@ -921,7 +945,7 @@ $operators[SymbolPremise] = function ($, clause) {
   }
   return output
 }
-$operators[Symbol.for('premise')] = $operators[SymbolPremise]
+$operators['premise'] = $operators['?']
 
 function populateOperatorCtx (operands, ctx) {
   var oprdc = operands.length
@@ -932,7 +956,7 @@ function populateOperatorCtx (operands, ctx) {
 }
 
 // app defined operator: (operator name clause ...)
-$operators[Symbol.for('operator')] = function ($, impl) {
+$operators['operator'] = function ($, impl) {
   if ($.moduleSpaceIdentifier !== $.spaceIdentifier) {
     return null // operator can only be defined in module scope
   }
@@ -943,14 +967,17 @@ $operators[Symbol.for('operator')] = function ($, impl) {
   }
 
   var length = impl.length
-  if (length < 2 || typeof impl[1] !== 'symbol') {
+  if (length < 2) {
     return null
   }
 
   var name = impl[1]
-  var statements = impl.slice(1)
+  if (!isSymbol(name)) {
+    return null
+  }
 
-  $.$operators[name] = function $OPR (ctx, clause) {
+  var statements = impl.slice(1)
+  $.$operators[symbolKeyFor(name)] = function $OPR (ctx, clause) {
     var oprds = clause.slice(1)
     var oprStack = ctx.$OprStack
 
@@ -969,6 +996,8 @@ $operators[Symbol.for('operator')] = function ($, impl) {
       }
       throw signal
     }
+    oprStack.pop()
+    return value
   }
   return null
 }
@@ -989,7 +1018,7 @@ function concat ($, str, clause) {
   return str
 }
 
-$operators[Symbol.for('concat')] = function ($, clause) {
+$operators['concat'] = function ($, clause) {
   var length = clause.length
   if (length < 2) { return '' }
 
@@ -1021,7 +1050,7 @@ function mixin ($, base, clause, target) {
   return target
 }
 
-$operators[Symbol.for('combine')] = function ($, clause) {
+$operators['combine'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -1031,7 +1060,7 @@ $operators[Symbol.for('combine')] = function ($, clause) {
   return mixin($, base, clause, $.object())
 }
 
-$operators[Symbol.for('mixin')] = function ($, clause) {
+$operators['mixin'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -1052,7 +1081,7 @@ function sum ($, num, clause) {
   return num
 }
 
-$operators[Symbol.for('+')] = function ($, clause) {
+$operators['+'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return 0
@@ -1075,7 +1104,7 @@ $operators[Symbol.for('+')] = function ($, clause) {
   return base // return the first argument for other types
 }
 
-$operators[Symbol.for('+=')] = function ($, clause) {
+$operators['+='] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return 0
@@ -1097,7 +1126,7 @@ $operators[Symbol.for('+=')] = function ($, clause) {
     return base // for other types
   }
   // try to assign value back for primal types
-  return typeof sym === 'symbol' ? set($, sym, base) : base
+  return isSymbol(sym) ? set($, sym, base) : base
 }
 
 function subtract ($, clause) {
@@ -1118,11 +1147,11 @@ function subtract ($, clause) {
   return result
 }
 
-$operators[Symbol.for('-')] = subtract
-$operators[Symbol.for('-=')] = function ($, clause) {
+$operators['-'] = subtract
+$operators['-='] = function ($, clause) {
   var result = subtract($, clause)
   var sym = clause[1]
-  if (typeof sym === 'symbol') {
+  if (isSymbol(sym)) {
     set($, sym, result)
   }
   return result
@@ -1148,11 +1177,11 @@ function multiply ($, clause) {
   return result
 }
 
-$operators[Symbol.for('*')] = multiply
-$operators[Symbol.for('*=')] = function ($, clause) {
+$operators['*'] = multiply
+$operators['*='] = function ($, clause) {
   var result = multiply($, clause)
   var sym = clause[1]
-  if (typeof sym === 'symbol') {
+  if (isSymbol(sym)) {
     set($, sym, result)
   }
   return result
@@ -1178,24 +1207,24 @@ function divide ($, clause) {
   return result
 }
 
-$operators[Symbol.for('/')] = divide
-$operators[Symbol.for('/=')] = function ($, clause) {
+$operators['/'] = divide
+$operators['/='] = function ($, clause) {
   var result = divide($, clause)
   var sym = clause[1]
-  if (typeof sym === 'symbol') {
+  if (isSymbol(sym)) {
     set($, sym, result)
   }
   return result
 }
 
-$operators[Symbol.for('++')] = function ($, clause) {
+$operators['++'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return 1
   }
 
   var sym = clause[1]
-  if (typeof sym === 'symbol') {
+  if (isSymbol(sym)) {
     var value = resolve($, sym)
     if (typeof value === 'number') {
       value += 1
@@ -1212,14 +1241,14 @@ $operators[Symbol.for('++')] = function ($, clause) {
   return typeof sym === 'number' ? sym + 1 : 1
 }
 
-$operators[Symbol.for('--')] = function ($, clause) {
+$operators['--'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return -1
   }
 
   var sym = clause[1]
-  if (typeof sym === 'symbol') {
+  if (isSymbol(sym)) {
     var value = resolve($, sym)
     if (typeof value === 'number') {
       value -= 1
@@ -1248,7 +1277,7 @@ function equalDate ($, base, clause) {
   return true
 }
 
-$operators[Symbol.for('==')] = function ($, clause) {
+$operators['=='] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return true // null === null
@@ -1271,7 +1300,7 @@ $operators[Symbol.for('==')] = function ($, clause) {
   return true
 }
 
-$operators[Symbol.for('!=')] = function ($, clause) {
+$operators['!='] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return false // null !== null
@@ -1294,7 +1323,7 @@ $operators[Symbol.for('!=')] = function ($, clause) {
   return false
 }
 
-$operators[Symbol.for('>')] = function ($, clause) {
+$operators['>'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return false // null === null
@@ -1325,7 +1354,7 @@ $operators[Symbol.for('>')] = function ($, clause) {
   return false
 }
 
-$operators[Symbol.for('>=')] = function ($, clause) {
+$operators['>='] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return false
@@ -1356,7 +1385,7 @@ $operators[Symbol.for('>=')] = function ($, clause) {
   return false
 }
 
-$operators[Symbol.for('<')] = function ($, clause) {
+$operators['<'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return false
@@ -1387,7 +1416,7 @@ $operators[Symbol.for('<')] = function ($, clause) {
   return false
 }
 
-$operators[Symbol.for('<=')] = function ($, clause) {
+$operators['<='] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return false
@@ -1418,7 +1447,7 @@ $operators[Symbol.for('<=')] = function ($, clause) {
   return false
 }
 
-$operators[Symbol.for('&&')] = function ($, clause) {
+$operators['&&'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -1436,7 +1465,7 @@ $operators[Symbol.for('&&')] = function ($, clause) {
   return base
 }
 
-$operators[Symbol.for('||')] = function ($, clause) {
+$operators['||'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return null
@@ -1458,7 +1487,7 @@ $operators[Symbol.for('||')] = function ($, clause) {
   return base
 }
 
-$operators[Symbol.for('!')] = function ($, clause) {
+$operators['!'] = function ($, clause) {
   var length = clause.length
   if (length < 2) {
     return true // !null
@@ -1476,8 +1505,6 @@ function beval ($, clauses) {
   return result
 }
 
-const SymbolRepeat = Symbol.for('*')
-
 // param or (param ...) or ((param value) ...)
 function formatParameters (params) {
   var formatted = [true] // eliminate unwanted arguments.
@@ -1485,7 +1512,7 @@ function formatParameters (params) {
     return formatted
   }
 
-  if (typeof params === 'symbol') {
+  if (isSymbol(params)) {
     params = [params] // single parameter
   } else if (!Array.isArray(params)) {
     return formatted
@@ -1493,7 +1520,7 @@ function formatParameters (params) {
 
   for (var i = 0; i < params.length; i++) {
     var p = params[i]
-    if (typeof p === 'symbol') {
+    if (isSymbol(p)) {
       if (p === SymbolRepeat) {
         formatted[0] = false // variant arguments
         break // the repeat indicator is always the last one
@@ -1504,7 +1531,7 @@ function formatParameters (params) {
         continue
       }
       var sym = p[0]
-      if (typeof sym === 'symbol') {
+      if (isSymbol(sym)) {
         formatted.push([sym, p.length > 1 ? p[1] : null]) // no evaluation.
       }
     }
@@ -1641,8 +1668,8 @@ function $lambdaIn ($) {
 function $exportTo ($) {
   return function $export (key, value) {
     if (typeof key === 'string') {
-      key = Symbol.for(key)
-    } else if (typeof key !== 'symbol') {
+      key = symbolFor(key)
+    } else if (!isSymbol(key)) {
       return null
     }
     return set($, key, typeof value === 'undefined' ? null : value)
@@ -1854,6 +1881,7 @@ function populate ($) {
 
 module.exports = function (load) {
   var space = makeSpace()
+  initializeSymbols(space)
   if (load) {
     space.$export('load', load)
   }

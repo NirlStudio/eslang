@@ -92,7 +92,7 @@
     (let obj1 (@p1:11))
     (let obj2 (@  obj1 > p2:22))
     (assert equal true (is obj1 like obj1),
-    (assert equal false (is obj1 like obj2),
+    (assert equal false (is obj1 like obj2) "here"),
     (assert equal true (is obj2 like obj1),
 
     (let obj1 (@ 1 2))

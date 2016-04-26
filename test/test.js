@@ -29,13 +29,19 @@ define('Javascript Environment', function () {
         assert.isOk(console.error, 'no console.error.')
       })
     })
-    should('support Symbol type', function () {
-      ensure(function () {
-        assert.isOk(Symbol, 'no Symbol.')
-        assert.isOk(Symbol.for, 'no Symbol.for.')
-        assert.isOk(Symbol.keyFor, 'no Symbol.keyFor.')
+    if (typeof $.symbol('s') === 'symbol') {
+      should('be using native Symbol type', function () {
+        ensure(function () {
+          assert(true)
+        })
       })
-    })
+    } else {
+      should('be using polyfill Symbol type', function () {
+        ensure(function () {
+          assert(true)
+        })
+      })
+    }
   })
 
   define('Object', function () {
@@ -90,9 +96,9 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global functions ', function () {
-    var functions = ['bool', 'string', 'stringOfChars', 'symbol', 'keyOfSymbol',
-                     'number', 'object', 'date', 'array', 'range', 'iterate',
-                     'compiler', 'compile', 'encoder', 'encode',
+    var functions = ['bool', 'string', 'stringOfChars', 'symbol', 'number',
+                     'object', 'date', 'array', 'range', 'iterate',
+                     'compile', 'encoder', 'encode',
                      'function', 'lambda', 'call',
                      'eval', 'beval', 'exec', 'run', 'require']
     for (var i = 0; i < functions.length; i++) {
@@ -107,8 +113,9 @@ define('Sugly Bootstrapping', function () {
   })
 
   define('global objects ', function () {
-    var objects = ['(Number "parseInt")', '(Date "now")', '(Bit "and")', '(Uri "encode")',
-                   '(Math "random")', '(Json "parse")', '(console "log")']
+    var objects = ['(Symbol "for")', '(Number "parseInt")', '(Date "now")',
+                   '(Bit "and")', '(Uri "encode")', '(Math "random")',
+                   '(Json "parse")', '(console "log")']
     for (var i = 0; i < objects.length; i++) {
       (function (o) {
         should('have ' + o, function () {
