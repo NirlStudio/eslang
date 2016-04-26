@@ -11,11 +11,10 @@ function runAsApp () {
   if (proc.argv.length < 3) {
     // TODO - interactive line interpreter.
   } else {
-    proc.argv.forEach(function (source, index, array) {
-      if (index > 1) {
-        $.console.log($.run(source))
-      }
-    })
+    for (var index = 2; index < proc.argv.length; index++) {
+      var source = proc.argv[index]
+      $.console.log($.run(source))
+    }
   }
 }
 

@@ -2,6 +2,7 @@
 
 // load Sugly testing space
 var $ = require('../sugly-test')
+var polyfill = require('../sugly/polyfill')
 
 // TODO - to implement a Sugly assert.
 var assert = $.assert
@@ -20,6 +21,14 @@ function ensure (func) {
 }
 
 define('Javascript Environment', function () {
+  define('Polyfill', function () {
+    if (polyfill.functions.length > 0) {
+      var functions = polyfill.functions.join('\n\t- ')
+      should('be using polyfill functions: \n\t- ' + functions, function () {
+        assert(true)
+      })
+    }
+  })
   define('global || window', function () {
     should('have console object', function () {
       ensure(function () {
@@ -47,7 +56,13 @@ define('Javascript Environment', function () {
   define('Object', function () {
     should('implement Object.assign', function () {
       ensure(function () {
-        assert.typeOf(Object.assign, 'function')
+        assert.typeOf(Object.assign, 'function', 'no Object.assign')
+
+        var t = {}
+        var s = { p: 1 }
+        Object.assign(t, s)
+        assert.typeOf(t.p, 'number')
+        assert.equal(t.p, 1)
       })
     })
   })
@@ -56,11 +71,15 @@ define('Javascript Environment', function () {
     should('implement String.prototype.startsWith', function () {
       ensure(function () {
         assert.typeOf(String.prototype.startsWith, 'function')
+        assert('-123'.startsWith('-'))
+        assert(!'+123'.startsWith('-'))
       })
     })
     should('implement String.prototype.endsWith', function () {
       ensure(function () {
         assert.typeOf(String.prototype.endsWith, 'function')
+        assert('123-'.endsWith('-'))
+        assert(!'123+'.endsWith('-'))
       })
     })
   })
@@ -69,11 +88,8 @@ define('Javascript Environment', function () {
     should('implement Array.isArray', function () {
       ensure(function () {
         assert.typeOf(Array.isArray, 'function')
-      })
-    })
-    should('implement Array.prototype.forEach', function () {
-      ensure(function () {
-        assert.typeOf(Array.prototype.forEach, 'function')
+        assert(Array.isArray([]))
+        assert(!Array.isArray({}))
       })
     })
   })
@@ -82,14 +98,26 @@ define('Javascript Environment', function () {
 // Sugly bootstrap verification
 define('Sugly Bootstrapping', function () {
   define('Pretest', function () {
-    should('"()"', 'be evaluated to null', function () {
+    should('\'()\'', 'be evaluated to null', function () {
       ensure(function () {
         assert.equal($.exec('()'), null)
       })
     })
-    should('\'(let var "value") 32 var (var)\'', 'return the string "value"', function () {
+    should('\'(let var "value")\'', 'return the string "value"', function () {
       ensure(function () {
-        var code = '(let var "value") 32 var (var)'
+        var code = '(let var "value")'
+        assert.equal($.exec(code), 'value')
+      })
+    })
+    should('\'(let var "value") var\'', 'return the string "value"', function () {
+      ensure(function () {
+        var code = '(let var "value") var'
+        assert.equal($.exec(code), 'value')
+      })
+    })
+    should('\'(let var "value") (var)\'', 'return the string "value"', function () {
+      ensure(function () {
+        var code = '(let var "value") (var)'
         assert.equal($.exec(code), 'value')
       })
     })

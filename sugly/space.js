@@ -1,5 +1,7 @@
 'use strict'
 
+require('./polyfill')
+
 var JS = global || window
 
 function exportTo (container, name, obj) {
