@@ -11,6 +11,7 @@ var keywords = {
 function tokenizer ($, lines, source) {
   var InvalidSymbol = $.Symbol.$InvalidSymbol
   var symbolFor = $.Symbol.for
+  var warn = $.print.warn
 
   var lineNo = 0
   var offset = 0
@@ -94,8 +95,15 @@ function tokenizer ($, lines, source) {
       offset = index
       return finalizeToken(token, JSON.parse(str))
     } catch (err) {
-      finalizeToken(token, 'Invalid string input.', 'error')
-      token.data = str
+      warn({
+        from: '$/sugly/tokenizer',
+        message: 'Invalid string input: ' + str,
+        source: source,
+        line: lineNo,
+        offset: offset,
+        inner: err
+      })
+      finalizeToken(token, '', 'error')
       return token
     }
   }
@@ -185,7 +193,14 @@ function tokenizer ($, lines, source) {
         if (indent < 0) {
           return nextToken()
         }
-        return finalizeToken(createToken('error'), 'Indent TAB is not allowed.')
+        warn({
+          from: '$/sugly/tokenizer',
+          message: 'TAB is not allowed to be used as an indent character in source code.',
+          source: source,
+          line: lineNo,
+          offset: offset
+        })
+        return finalizeToken(createToken('error'))
 
       default:
         return readSymbolOrValue(c)

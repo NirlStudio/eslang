@@ -1,10 +1,8 @@
 'use strict'
 
-// file system module loader
-var load = require('./loader-fs')()
-
-// load Sugly runtime
-var $ = require('./sugly')(load)
+// load Sugly runtime with local filesystem loader
+var loader = require('./loader-fs')
+var $ = require('./sugly')(loader)
 
 function runAsApp () {
   var proc = require('process')
@@ -13,7 +11,7 @@ function runAsApp () {
   } else {
     for (var index = 2; index < proc.argv.length; index++) {
       var source = proc.argv[index]
-      $.console.log($.run(source))
+      $.print($.run(source))
     }
   }
 }
@@ -27,7 +25,7 @@ if (require.main === module) {
     runAsApp()
   } catch (signal) {
     if (signal instanceof $.$SuglySignal) {
-      $.console.log(signal.value)
+      $.print(signal.value)
       process.exit(0) // only halt signal will arrive here.
     }
     throw signal

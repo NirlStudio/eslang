@@ -2,15 +2,17 @@
 
 var makeSpace = require('./sugly/space')
 
+var warn
 var symbolFor, symbolKeyFor, isSymbol
 var SymbolContext, SymbolQuote, SymbolIndexer, SymbolAssign, SymbolDerive,
   SymbolLambdaShort, SymbolObject, SymbolLambda, SymbolLike, SymbolElse,
   SymbolIn, SymbolThen, SymbolNext, SymbolRepeat
 
-function initializeSymbols ($) {
-  if (symbolFor) {
+function initializeSharedContext ($) {
+  if (warn) {
     return
   }
+  warn = $.print.warn
   symbolFor = $.Symbol.for
   symbolKeyFor = $.Symbol.keyFor
   isSymbol = $.Symbol.is
@@ -107,7 +109,12 @@ function indexer (key, value) {
   try {
     this[key] = value
   } catch (err) {
-    console.error('Indexer/set error', err, key, value)
+    warn({
+      from: '$/sugly',
+      message: 'Indexer/set error for ' + key,
+      value: value,
+      inner: err
+    })
     return null
   }
 }
@@ -207,7 +214,8 @@ function seval (clause, $) {
 
   // execute the clause.
   try {
-    return func.apply(subject, args)
+    var result = func.apply(subject, args)
+    return typeof result === 'undefined' ? null : result
   } catch (signal) {
     // TODO - filter native errors
     throw signal
@@ -1550,7 +1558,7 @@ function $functionIn ($) {
     var fixedArgs = params.shift()
 
     var f = function $F () {
-      var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
+      var args = Array.prototype.slice.apply(arguments)
       // new namespace
       var ns = createSpace($)
       ns[':'] = this
@@ -1586,7 +1594,7 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
   var createSpace = $.createSpace
 
   function $C () {
-    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+    var args = Array.prototype.slice.apply(arguments)
     // new namespace
     var ns = createSpace($)
     ns[':'] = this
@@ -1623,7 +1631,7 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
 
 function createLambda ($, enclosing, params, body) {
   function $L () {
-    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+    var args = Array.prototype.slice.apply(arguments)
 
     enclosing = Object.assign({}, enclosing)
     for (var i = 0; i < params.length; i++) {
@@ -1760,7 +1768,10 @@ function importJSModule ($, name) {
   try {
     return require(name)
   } catch (err) {
-    $.console.error('failed to load JS moudle: ' + name)
+    warn({
+      form: '$/sugly',
+      message: 'failed to load JS moudle: ' + name
+    })
     return null
   }
 }
@@ -1877,15 +1888,15 @@ function populate ($) {
   return $
 }
 
-module.exports = function (load) {
-  var space = makeSpace()
-  initializeSymbols(space)
-  if (load) {
-    space.$export('load', load)
-  }
-
+module.exports = function (loader, output/*, more options */) {
+  var space = makeSpace(output)
   space.$spaceCounter = 0
   space.spaceIdentifier = 'space-0'
   space.moduleSpaceIdentifier = space.spaceIdentifier
+
+  initializeSharedContext(space)
+  if (typeof loader === 'function') {
+    space.$export('load', loader(space))
+  }
   return populate(space)
 }

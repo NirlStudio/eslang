@@ -1,5 +1,5 @@
 (if fails is-missing
-  (console code "# Are you kidding me? What have you done to me?")
+  (print code "# Are you kidding me? What have you done to me?")
   (halt -1).
 
 (if define is-missing ($fails "missing function $define").
@@ -32,6 +32,8 @@
   "array"
   "iterate"
 
+  "encode"
+
   "object"
   "function"
 
@@ -59,4 +61,5 @@
 
 ($ ($run-"test")
   # run extra test cases.
+  # "compile"
 ).

@@ -3,62 +3,68 @@
 var fs = require('fs')
 var path = require('path')
 
-function notFound (source) {
-  source = JSON.stringify(source)
-  return '(console warn "File not found:" ' + source + ').' +
-    '(@statusCode: 404 ' +
-      'statusDescription: "File not found" ' +
-      'source: ' + source + ').'
-}
+module.exports = function ($) {
+  var warn = $.print.warn
 
-function failedInReading (source, err) {
-  source = JSON.stringify(source)
-  return '(console warn "Failed to read file:" ' + source + ').' +
-    '(@statusCode: 500 ' +
-      'statusDescription: "Failed in reading file" ' +
-      'source: ' + source + ' ' +
-      'error: ' + JSON.stringify(err.toString()) + ').'
-}
-
-function loadFile (source, cb) {
-  fs.exists(source, function (exists) {
-    if (!exists) {
-      return cb(notFound(source))
-    }
-
-    fs.readFile(source, 'utf8', function (err, code) {
-      if (err) {
-        return cb(failedInReading(source, err))
-      } else {
-        return cb(code)
-      }
+  function notFound (source) {
+    warn({
+      from: '$/loader-fs',
+      message: 'File not found: ' + source
     })
-  })
-}
-
-function loadFileSync (source) {
-  if (!fs.existsSync(source)) {
-    return notFound(source)
+    return '()'
   }
-  try {
-    return fs.readFileSync(source, 'utf8')
-  } catch (err) {
-    return failedInReading(source, err)
+
+  function failedInReading (source, err) {
+    warn({
+      from: '$/loader-fs',
+      message: 'Failed to read file: ' + source,
+      inner: err.toString()
+    })
+    return '()'
   }
-}
 
-function load (source, cb) {
-  if (!source) {
-    return typeof cb === 'function' ? cb(null) : null
+  function loadFile (source, cb) {
+    fs.exists(source, function (exists) {
+      if (!exists) {
+        return cb(notFound(source))
+      }
+
+      fs.readFile(source, 'utf8', function (err, code) {
+        if (err) {
+          return cb(failedInReading(source, err))
+        } else {
+          return cb(code)
+        }
+      })
+    })
   }
-  source = path.resolve(source) // to absolute path.
-  return typeof cb === 'function' ? loadFile(source, cb) : loadFileSync(source)
-}
 
-load.normalize = function (source) {
-  return 'file://' + (source ? path.resolve(source) : '') // to FQDN
-}
+  function loadFileSync (source) {
+    if (!fs.existsSync(source)) {
+      return notFound(source)
+    }
+    try {
+      return fs.readFileSync(source, 'utf8')
+    } catch (err) {
+      return failedInReading(source, err)
+    }
+  }
 
-module.exports = function (/* options */) {
+  function load (source, cb) {
+    if (typeof source !== 'string') {
+      warn({
+        from: '$/loader-fs',
+        message: '"source" should be a string: ' + typeof source
+      })
+      return typeof cb === 'function' ? cb(null) : null
+    }
+    source = path.resolve(source) // to absolute path.
+    return typeof cb === 'function' ? loadFile(source, cb) : loadFileSync(source)
+  }
+
+  load.normalize = function (source) {
+    return 'file://' + (source ? path.resolve(source) : '') // to FQDN
+  }
+
   return load
 }

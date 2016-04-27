@@ -9,16 +9,37 @@ function exportTo (container, name, obj) {
 
 function encoder ($, pretty) {
   var $Symbol = $.Symbol
-  var indent = ''
+  var SymbolContext = $Symbol.for('$')
+  var SymbolFor = $Symbol.for('for')
+
+  var indentStack = []
+  var indentValue = ''
+  var indentTouched = true
+
+  function getIndent () {
+    indentTouched = true
+    return indentValue
+  }
+
   function increaseIndent () {
-    if (pretty) {
-      indent += '  '
+    if (!pretty) {
+      return
+    }
+    indentStack.push([indentValue, indentTouched])
+    if (indentTouched) {
+      indentValue += '  '
+      indentTouched = false
     }
   }
+
   function decreaseIndent () {
-    if (pretty && indent.length >= 2) {
-      indent = indent.substring(0, indent.length - 2)
+    if (!pretty || indentStack.length < 1) {
+      return
     }
+
+    var last = indentStack.pop()
+    indentValue = last[0]
+    indentTouched = last[1]
   }
 
   function encodeString (str) {
@@ -27,7 +48,7 @@ function encoder ($, pretty) {
 
   function encodeSymbol (sym) {
     var key = $Symbol.keyFor(sym)
-    return key.length > 0 ? '(` ' + key + ')' : key
+    return key.length > 0 ? '(` ' + key + ')' : ''
   }
 
   function encodeNumber (num) {
@@ -43,13 +64,14 @@ function encoder ($, pretty) {
   }
 
   function encodeObject (obj) {
-    if (obj.identityName) {
+    if (obj.hasOwnProperty('identityName')) {
       return obj.identityName
     }
 
     var code = '(@'
-    if (obj.typeIdentifier) {
-      code += obj.typeIdentifier + '>'
+    var pt = Object.getPrototypeOf(obj)
+    if (pt.hasOwnProperty('identityName') && typeof pt.identityName === 'string') {
+      code += pt.identityName + ' >'
     }
 
     var keys = Object.getOwnPropertyNames(obj)
@@ -63,7 +85,7 @@ function encoder ($, pretty) {
       if (key.startsWith('$') || key.startsWith('__')) {
         continue
       }
-      code += (i === 0 ? '' : '\n' + indent) + key + ': '
+      code += (code.length < 3 ? '' : '\n' + getIndent()) + key + ': '
       code += encodeValue(obj[key])
     }
     decreaseIndent()
@@ -72,42 +94,44 @@ function encoder ($, pretty) {
 
   function encodeNativeFunction (func) {
     // encode anonymous function to null.
-    return func.identityName || func.name || null
+    return func.hasOwnProperty('identityName') ? func.identityName : 'null'
   }
 
   function encodeSuglyFunction (func) {
-    if (func.identityName) {
+    if (func.hasOwnProperty('identityName')) {
       return func.identityName
     }
 
-    var code = '(='
+    var code = '(= '
     var enclosing = func.$enclosing
-    if (enclosing && typeof enclosing === 'object') {
+    if (enclosing) {
       var obj = encodeObject(enclosing)
       if (obj.length > 4) { // not an empty onject.
-        code += ' ' + obj + ' > '
-      } else {
-        // enclosing an empty object, a null is equivilant here.
-        code += ' () > '
+        code += obj + ' > '
       }
     }
-    code += '('
 
+    code += '('
     var params = func.$params
-    for (var i = 0; i < params.length; i++) {
+    var i = 0
+    for (; i < params.length; i++) {
+      if (i > 0) {
+        code += ' '
+      }
       var p = params[i]
       if (p[1] === null) {
-        code += $Symbol.keyFor(p[0]) + ' '
+        code += $Symbol.keyFor(p[0])
       } else {
-        code += '(' + $Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ') '
+        code += '(' + $Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ')'
       }
     }
+
     if (!func.$fixedArgs) {
-      code += '*'
+      code += i > 0 ? ' *' : '*'
     }
     code += ')'
 
-    code += encodeProgram(func.$body)
+    code += encodeProgram(func.$body, true)
     return code + ')'
   }
 
@@ -143,7 +167,7 @@ function encoder ($, pretty) {
         return encodeSymbol(value)
       case 'object':
         if (value === null) {
-          return null
+          return 'null'
         }
         return $Symbol.is(value) ? encodeSymbol(value) : encodeObject(value)
       case 'function':
@@ -153,14 +177,33 @@ function encoder ($, pretty) {
     }
   }
 
-  function encodeProgram (clauses) {
+  function encodeProgram (clauses, inFunc) {
     var code = ''
-    increaseIndent()
+    if (inFunc) {
+      increaseIndent()
+    }
     for (var i = 0; i < clauses.length; i++) {
       var c = clauses[i]
-      code += (Array.isArray(c) ? '\n' + indent : ' ') + encodeClause(c)
+      if (Array.isArray(c) && i > 0 && !code.endsWith('>')) {
+        code += '\n'
+        if (inFunc) {
+          code += getIndent()
+        }
+      } else if (inFunc || i > 0) {
+        code += ' '
+      }
+      c = encodeClause(c)
+      var j = c.length
+      for (; j > 0; j--) {
+        if (c.charAt(j - 1) !== ')') {
+          break
+        }
+      }
+      code += j < c.length - 1 ? c.substring(0, j + 1) + '.' : c
     }
-    decreaseIndent()
+    if (inFunc) {
+      decreaseIndent()
+    }
     return code
   }
 
@@ -180,48 +223,86 @@ function encoder ($, pretty) {
     }
 
     // subject
-    var code = '(' + encodeClause(clause[0]) + ' '
+    var c0 = clause[0]
+    var beginNewLine = c0 === SymbolContext || c0 === SymbolFor ? 2 : 1
+    var code = '(' + encodeClause(c0)
 
     // predicate & objects
+    increaseIndent()
     for (var i = 1; i < clause.length; i++) {
-      code += encodeClause(clause[i]) + ' '
+      var c = clause[i]
+      if (i === 1) {
+        if (c0 === SymbolContext) {
+          code += encodeClause(c)
+        } else {
+          code += ' ' + encodeClause(c)
+        }
+      } else {
+        code += (Array.isArray(c) && i > beginNewLine && !code.endsWith('>') ? '\n' + getIndent() : ' ') + encodeClause(c)
+      }
     }
+    decreaseIndent()
     return code + ')'
   }
 
   // encode a piece of program(clauses): [[]]
   function encode (clauses) {
-    return Array.isArray(clauses) ? encodeProgram(clauses) : '()'
+    return Array.isArray(clauses) ? encodeProgram(clauses, false) : '()'
   }
 
   // export functions
   encode.identityName = '($"encode")'
 
   exportTo(encode, 'string', function (str) {
+    if (typeof str === 'undefined' || str === null) {
+      return 'null' // null is always possible.
+    }
     return typeof str !== 'string' ? '""' : encodeString(str)
   })
 
   exportTo(encode, 'symbol', function (sym) {
+    if (typeof sym === 'undefined' || sym === null) {
+      return 'null' // null is always possible.
+    }
     return encodeSymbol(sym)
   })
 
   exportTo(encode, 'number', function (num) {
+    if (typeof num === 'undefined' || num === null) {
+      return 'null' // null is always possible.
+    }
     return typeof num !== 'number' ? 'NaN' : encodeNumber(num)
   })
 
   exportTo(encode, 'bool', function (bool) {
+    if (typeof bool === 'undefined' || bool === null) {
+      return 'null' // null is always possible.
+    }
     return typeof bool !== 'boolean' ? 'false' : encodeBool(bool)
   })
 
   exportTo(encode, 'date', function (date) {
+    if (typeof date === 'undefined' || date === null) {
+      return 'null' // null is always possible.
+    }
     return date instanceof Date ? encodeDate(date) : '(date 0)'
   })
 
   exportTo(encode, 'object', function (obj) {
-    if (typeof obj !== 'object' || $Symbol.is(obj)) {
-      return '(@>)' // empty object
+    if (typeof obj === 'undefined' || obj === null) {
+      return 'null' // null is always possible.
     }
-    return obj === null ? 'null' : encodeObject(obj)
+    if (typeof obj !== 'object' || $Symbol.is(obj)) {
+      return '(@>)' // empty object for non-object
+    }
+    // array and date are valid objects.
+    if (Array.isArray(obj)) {
+      return encodeArray(obj)
+    }
+    if (obj instanceof Date) {
+      return encodeDate(obj)
+    }
+    return encodeObject(obj)
   })
 
   exportTo(encode, 'function', function (func) {
@@ -229,6 +310,9 @@ function encoder ($, pretty) {
   })
 
   exportTo(encode, 'array', function (arr) {
+    if (typeof arr === 'undefined' || arr === null) {
+      return 'null' // null is always possible.
+    }
     return Array.isArray(arr) ? encodeArray(arr) : '(@)'
   })
 

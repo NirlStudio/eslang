@@ -296,7 +296,7 @@ function initializeSpace ($) {
   exportTo($, 'Json', copyJSObject('Json', JS.JSON))
 }
 
-module.exports = function (/* options */) {
+module.exports = function (output) {
   var $ = Object.create(null)
   $.identityName = '$'
 
@@ -320,8 +320,8 @@ module.exports = function (/* options */) {
   // default encode function
   exportTo($, 'encode', require('./encoder')($, true))
 
-  // customized console object. depending on $.encode
-  exportTo($, 'console', require('./console')($))
+  // default output function. depending on $.encode
+  exportTo($, 'print', require('./print')($, output))
 
   // this is only used by runtime itself or its assembler
   $.$export = function (name, obj) {
@@ -332,11 +332,8 @@ module.exports = function (/* options */) {
   // Since $load is expected to return a piece of code, it should always
   // return a piece of code.
   var load = exportTo($, 'load', function $load (source, cb) {
-    const code = '(console error "An implementation of $load should be assembled to sugly.")' +
-      '(@statusCode: 600 ' +
-        'statusDescription: "No $load function").'
-
-    return typeof cb === 'function' ? cb(code) : code
+    $.print.warn('An implementation of $load should be assembled to sugly.')
+    return typeof cb === 'function' ? cb('()') : '()'
   })
   exportTo(load, 'normalize', function $load$normalize (source) {
     return source

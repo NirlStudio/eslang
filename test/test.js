@@ -126,7 +126,7 @@ define('Sugly Bootstrapping', function () {
   define('global functions ', function () {
     var functions = ['bool', 'string', 'stringOfChars', 'symbol', 'number',
                      'object', 'date', 'array', 'range', 'iterate',
-                     'compile', 'encoder', 'encode',
+                     'compile', 'encoder', 'encode', 'print',
                      'function', 'lambda', 'call',
                      'eval', 'beval', 'exec', 'run', 'require']
     for (var i = 0; i < functions.length; i++) {
@@ -143,7 +143,7 @@ define('Sugly Bootstrapping', function () {
   define('global objects ', function () {
     var objects = ['(Symbol "for")', '(Number "parseInt")', '(Date "now")',
                    '(Bit "and")', '(Uri "encode")', '(Math "random")',
-                   '(Json "parse")', '(console "log")']
+                   '(Json "parse")']
     for (var i = 0; i < objects.length; i++) {
       (function (o) {
         should('have ' + o, function () {

@@ -88,26 +88,6 @@ module.exports = function ($) {
     stack[stack.length - 1].push(t.value)
   }
 
-  // Since $compile is expected to return a piece program, it should always
-  // return a piece of program.
-  function tokenError (t) {
-    // symbols
-    const object = Symbol.for('@')
-    const as = Symbol.for(':')
-    const mod = Symbol.for('module')
-    const code = Symbol.for('statusCode')
-    const desc = Symbol.for('statusDescription')
-    const error = Symbol.for('error')
-    // program
-    return [
-      [object, mod, as, [object,
-        code, as, 400,
-        desc, as, 'Invalid token.',
-        error, as, JSON.stringify(t)]
-      ]
-    ]
-  }
-
   return function compile (code, src/*, options */) {
     var nextToken = tokenizer($, code, src)
     var t = nextToken()
@@ -115,7 +95,12 @@ module.exports = function ($) {
     while (t) {
       switch (t.type) {
         case 'error':
-          return tokenError(t)
+          // only try to describe the on-site problem.
+          $.print.warn({
+            from: '$/sugly/compiler',
+            message: 'compiling cancelled for the last tokenizer error.'
+          })
+          return [[]]
 
         case 'punctuation':
           pushPunctuation(t)

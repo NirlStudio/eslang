@@ -1,8 +1,8 @@
 'use strict'
 
-// Assemble a Sugly space to be used for testing purpose
-var load = require('./loader-fs')()
-var $ = require('./sugly')(load)
+// load Sugly runtime with local filesystem loader
+var loader = require('./loader-fs')
+var $ = require('./sugly')(loader)
 
 // to explicitly trigger a failure from Sugly code.
 $.$export('fails', function (message) {

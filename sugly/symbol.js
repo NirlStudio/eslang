@@ -3,7 +3,7 @@
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
 var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
-function Symbol$constructor (key) {
+function Symbol$ (key) {
   Object.defineProperty(this, '$key', {
     enumerable: false,
     configurable: false,
@@ -40,7 +40,7 @@ function useNativeSymbol () {
 }
 
 var sharedSymbols = Object.create(null)
-var nothing = sharedSymbols[''] = new Symbol$constructor('')
+var nothing = sharedSymbols[''] = new Symbol$('')
 
 function usePolyfillSymbol () {
   return {
@@ -56,15 +56,15 @@ function usePolyfillSymbol () {
       if (sharedSymbols[key]) {
         return sharedSymbols[key]
       }
-      return (sharedSymbols[key] = new Symbol$constructor(key))
+      return (sharedSymbols[key] = new Symbol$(key))
     },
 
     keyFor: function Symbol$keyFor (sym) {
-      return sym instanceof Symbol$constructor ? sym.$key : ''
+      return sym instanceof Symbol$ ? sym.$key : ''
     },
 
     is: function Symbol$is (sym) {
-      return sym instanceof Symbol$constructor
+      return sym instanceof Symbol$
     }
   }
 }
