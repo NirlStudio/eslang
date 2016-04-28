@@ -210,7 +210,7 @@ define('Sugly Bootstrapping - Done!', function () {
     if (failed) {
       assert(false, 'further testing cancelled for failures in bootstrapping stage.')
     } else {
-      $.run('test/test.s')
+      $.run('test/run.s')
     }
   })
 })
