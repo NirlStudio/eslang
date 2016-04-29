@@ -57,6 +57,8 @@
   "flow"
   "pipe"
   "premise"
+
+  "operator"
 ).
 
 ($ ($run-"test")

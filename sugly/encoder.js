@@ -193,13 +193,18 @@ function encoder ($, pretty) {
         code += ' '
       }
       c = encodeClause(c)
-      var j = c.length
-      for (; j > 0; j--) {
-        if (c.charAt(j - 1) !== ')') {
-          break
+      if (inFunc) {
+        code += c
+      } else {
+        // try to simplify ending parentheses
+        var j = c.length
+        for (; j > 0; j--) {
+          if (c.charAt(j - 1) !== ')') {
+            break
+          }
         }
+        code += j < c.length - 1 ? c.substring(0, j + 1) + '.' : c
       }
-      code += j < c.length - 1 ? c.substring(0, j + 1) + '.' : c
     }
     if (inFunc) {
       decreaseIndent()

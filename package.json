@@ -5,12 +5,12 @@
   "author": "Leevi@Nirl Studio, V-Lab.",
   "license": "GPL-3.0",
   "repository": "nirlstudio/sugly-lang",
-
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
-    "chai": "^3.5.0"
+    "chai": "^3.5.0",
+    "colors": "^1.1.2"
   }
 }

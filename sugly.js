@@ -52,12 +52,20 @@ function resolve ($, sym) {
       return false
   }
 
-  if (typeof $ !== 'object' && typeof $ !== 'function') {
-    return null
-  }
-
   var value = $[key]
-  return typeof value !== 'undefined' ? value : null
+  switch (typeof $) {
+    case 'boolean':
+      return typeof value !== 'undefined' ? value : Boolean.prototype[key]
+
+    case 'number':
+      return typeof value !== 'undefined' ? value : Number.prototype[key]
+
+    case 'string':
+      return typeof value !== 'undefined' ? value : String.prototype[key]
+
+    default:
+      return typeof value !== 'undefined' ? value : null
+  }
 }
 
 function set (subject, sym, value) {
@@ -236,6 +244,26 @@ $operators['`'] = function ($, clause) {
 // a more readable version of `
 $operators['quote'] = $operators['`']
 
+function assign ($, sym, value) {
+  var key = symbolKeyFor(sym)
+  if (Object.prototype.hasOwnProperty.call($, key)) {
+    $[key] = value
+    return value
+  }
+
+  var module = $
+  while (module && module.spaceIdentifier && module.spaceIdentifier !== $.moduleSpaceIdentifier) {
+    module = Object.getPrototypeOf(module)
+  }
+
+  if (Object.prototype.hasOwnProperty.call(module, key)) {
+    module[key] = value
+  } else {
+    $[key] = value
+  }
+  return value
+}
+
 // (let var value) or (let (var value) ...)
 $operators['let'] = function $let ($, clause) {
   var length = clause.length
@@ -246,7 +274,7 @@ $operators['let'] = function $let ($, clause) {
   var c1 = clause[1]
   // (let symbol value)
   if (isSymbol(c1)) {
-    return set($, c1, length < 3 ? null : seval(clause[2], $))
+    return assign($, c1, length < 3 ? null : seval(clause[2], $))
   } else if (!Array.isArray(c1)) {
     return null
   }
@@ -258,7 +286,7 @@ $operators['let'] = function $let ($, clause) {
     if (Array.isArray(pair) && pair.length > 1) {
       var p0 = pair[0]
       if (isSymbol(p0)) {
-        last = set($, p0, seval(pair[1], $))
+        last = assign($, p0, seval(pair[1], $))
         continue
       }
     }
@@ -592,7 +620,7 @@ $operators['typeof'] = function ($, clause) {
       case 'date':
         return value instanceof Date // Would frame-boundary be a problem?
       default:
-        return typeof value === 'object' && value.typeIdentifier === expected
+        return typeof value === 'object' && value !== null && value.typeIdentifier === expected
     }
   }
   if (expected && expected.isPrototypeOf && expected.isPrototypeOf(value)) {
@@ -953,59 +981,74 @@ $operators['?'] = function ($, clause) {
 }
 $operators['premise'] = $operators['?']
 
-function populateOperatorCtx (operands, ctx) {
+function populateOperatorCtx (ctx, operands) {
   var oprdc = operands.length
-  ctx.OPRDC = oprdc
+  ctx['%C'] = oprdc
+  ctx['%V'] = operands
   for (var i = 0; i < 10; i++) {
-    ctx['OPRD' + i] = i < oprdc ? operands[i] : null
+    ctx['%' + i] = i < oprdc ? operands[i] : null
   }
 }
 
 // app defined operator: (operator name clause ...)
+// in the same space, an operator can only be defined once.
 $operators['operator'] = function ($, impl) {
   if ($.moduleSpaceIdentifier !== $.spaceIdentifier) {
     return null // operator can only be defined in module scope
   }
 
-  // copy operators directory to current module
-  if (!$.hasOwnProperty('$operators')) {
-    $.$operators = Object.assign({}, $.$operators)
-  }
-
   var length = impl.length
   if (length < 2) {
-    return null
+    return null // a name is required
   }
 
   var name = impl[1]
   if (!isSymbol(name)) {
-    return null
+    return null // the name must be a symbol.
   }
 
-  var statements = impl.slice(1)
-  $.$operators[symbolKeyFor(name)] = function $OPR (ctx, clause) {
-    var oprds = clause.slice(1)
-    var oprStack = ctx.$OprStack
+  var key = symbolKeyFor(name)
+  var existed = $.$operators.hasOwnProperty(key)
+  if (length < 3) {
+    // without operator body, querying for if an operator is existed.
+    return existed
+  }
 
+  // trying to define a new operator.
+  if (existed) {
+    // trying to override an existed operator
+    if (Object.prototype.hasOwnProperty.call($, '$operators')) {
+      return true // cannot re-create an operator in the same space.
+    }
+    // create a local operator table.
+    $.$operators = Object.assign({}, $.$operators)
+  }
+
+  var statements = impl.slice(2)
+  $.$operators[key] = function $OPR (ctx, clause) {
+    var oprds = []
+    for (var i = 1; i < clause.length; i++) {
+      oprds.push(seval(clause[i], ctx))
+    }
+
+    var oprStack = ctx.$OprStack
     oprStack.push(oprds)
-    populateOperatorCtx(oprds, ctx)
+    populateOperatorCtx(ctx, oprds)
     var value = null
     try {
-      for (var i = 0; i < statements.length; i++) {
-        value = seval(statements[i], ctx)
+      for (var j = 0; j < statements.length; j++) {
+        value = seval(statements[j], ctx)
       }
+      oprStack.pop()
+      populateOperatorCtx(ctx, oprStack.length > 1 ? oprStack[oprStack.length - 1] : [])
       return value
     } catch (signal) {
       oprStack.pop()
-      if (oprStack.length > 1) {
-        populateOperatorCtx(ctx, oprStack[oprStack.length - 1])
-      }
+      populateOperatorCtx(ctx, oprStack.length > 1 ? oprStack[oprStack.length - 1] : [])
       throw signal
     }
-    oprStack.pop()
-    return value
   }
-  return null
+  return true
 }
 
 function concat ($, str, clause) {
@@ -1015,9 +1058,6 @@ function concat ($, str, clause) {
     if (typeof value === 'string') {
       str += value
     } else {
-      if (str.length > 0) {
-        str += ' '
-      }
       str += $.encode.value(value)
     }
   }
@@ -1132,7 +1172,7 @@ $operators['+='] = function ($, clause) {
     return base // for other types
   }
   // try to assign value back for primal types
-  return isSymbol(sym) ? set($, sym, base) : base
+  return isSymbol(sym) ? assign($, sym, base) : base
 }
 
 function subtract ($, clause) {
@@ -1158,7 +1198,7 @@ $operators['-='] = function ($, clause) {
   var result = subtract($, clause)
   var sym = clause[1]
   if (isSymbol(sym)) {
-    set($, sym, result)
+    assign($, sym, result)
   }
   return result
 }
@@ -1188,7 +1228,7 @@ $operators['*='] = function ($, clause) {
   var result = multiply($, clause)
   var sym = clause[1]
   if (isSymbol(sym)) {
-    set($, sym, result)
+    assign($, sym, result)
   }
   return result
 }
@@ -1218,7 +1258,7 @@ $operators['/='] = function ($, clause) {
   var result = divide($, clause)
   var sym = clause[1]
   if (isSymbol(sym)) {
-    set($, sym, result)
+    assign($, sym, result)
   }
   return result
 }
@@ -1237,7 +1277,7 @@ $operators['++'] = function ($, clause) {
     } else {
       value = 1
     }
-    set($, sym, value)
+    assign($, sym, value)
     return value
   }
 
@@ -1261,7 +1301,7 @@ $operators['--'] = function ($, clause) {
     } else {
       value = -1
     }
-    set($, sym, value)
+    assign($, sym, value)
     return value
   }
 
@@ -1692,6 +1732,7 @@ function $createSpaceIn ($) {
     if (sealing) {
       // overridding parent.export
       space.$export('export', $exportTo(space))
+      space.$operators = Object.assign({}, space.$operators)
     }
     space.$loops = [] // new loop stack
     return space
@@ -1738,10 +1779,17 @@ function $execIn ($) {
   var createModuleSpace = $.createModuleSpace
 
   return function $exec (code, source, space) {
-    var program = compile(code, source || '?')
     var result
     try {
-      result = beval(space || createModuleSpace(), program)
+      if (typeof code === 'string') {
+        var program = compile(code, source || '?')
+        result = beval(space || createModuleSpace(), program)
+      } else if (typeof code === 'function') {
+        var args = arguments.length < 2 ? [] : Array.prototype.slice.call(arguments, 1)
+        result = code.apply(null, args)
+      } else {
+        return null // unrecognized code type
+      }
     } catch (signal) {
       if (signal instanceof SuglySignal &&
          (signal.type === 'return' || signal.type === 'exit')) {
@@ -1759,6 +1807,13 @@ function $runIn ($) {
   var exec = $.$exec
 
   return function $run (source, space) {
+    if (typeof source !== 'string') {
+      return null
+    }
+
+    if (!source.endsWith('.s')) {
+      source += '.s'
+    }
     space = verifySpace(space)
     return exec(load(source), load.normalize(source), space)
   }
@@ -1783,10 +1838,17 @@ function $requireIn ($) {
   var createModuleSpace = $.createModuleSpace
 
   return function $require (source, type) {
+    if (typeof source !== 'string') {
+      return null
+    }
+
     if (type === 'js') {
       return importJSModule($, source)
     }
 
+    if (!source.endsWith('.s')) {
+      source += '.s'
+    }
     var uri = load.normalize(source)
     if (modules.hasOwnProperty(uri)) {
       return modules[uri]
@@ -1860,15 +1922,17 @@ function populate ($) {
   // execute a block of code in a child space.
   // mark source as untrusted.
   $.$export('exec', function (code, source, space) {
-    if (typeof code !== 'string') {
-      return null
+    if (typeof code === 'string') {
+      if (typeof source !== 'string') {
+        source = ''
+      }
+      space = verifySpace(space)
+      return $.$exec(code, '?' + (source || ''), space)
     }
-
-    if (typeof source !== 'string') {
-      source = ''
+    if (typeof code === 'function') {
+      return $.$exec.apply($, arguments)
     }
-    space = verifySpace(space)
-    return $.$exec(code, '?' + (source || ''), space)
+    return null
   })
 
   // load and execute a block of code in a child space.

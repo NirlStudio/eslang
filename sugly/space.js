@@ -289,6 +289,21 @@ function initializeSpace ($) {
 
   exportTo($, 'range', require('./range'))
   exportTo($, 'iterate', require('./iterate'))
+  exportTo($, 'isEmpty', function (obj) { // TODO - to be refined.
+    if (typeof obj === 'undefined' || obj === null) {
+      return true
+    }
+    if (typeof obj.length === 'number') {
+      return obj.length < 1
+    }
+    if (typeof obj.size === 'number') {
+      return obj.size < 1
+    }
+    if (typeof obj === 'object') {
+      return Object.getOwnPropertyNames(obj).length < 1
+    }
+    return obj === 0 || obj === false
+  })
 
   exportTo($, 'Bit', exportBitwiseOperators())
   exportTo($, 'Uri', exportUriFunctions())
