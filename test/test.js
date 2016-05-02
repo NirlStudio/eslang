@@ -170,9 +170,9 @@ function checkSugly ($) {
   checkFunctions($, '[Sugly / function] ', [
     'bool', 'string', 'symbol', 'object', 'function', 'lambda', 'date', 'array',
     'range', 'iterate', 'isEmpty', 'isNotEmpty',
-    'compile', 'encoder', 'encode', 'print', '$export', 'load',
-    'call', 'eval', 'beval', 'export', 'createSpace', 'createModuleSpace',
-    '$exec', 'exec', 'run', 'require'
+    'compile', 'encoder', 'encode', 'print',
+    '$export', '$load', '$createSpace', '$createModuleSpace',
+    'call', 'eval', 'beval', 'export', '$exec', 'exec', 'run', 'require'
   ])
 
   checkObjects($, '[Sugly / object] ', [

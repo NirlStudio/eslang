@@ -22,13 +22,12 @@
   ),
 
   ($should "$export" "export an object to global space" (= ()
-      ($exec "($export \"_obj\" (@ name: \"obj\")."),
-      (assert "object" (`(typeof _obj),
-      (assert "obj" (`(_obj "name")
+      ($require "spec/space-mod"),
+      (assert "object" (`(typeof _exported),
+      (assert "obj" (`(_exported "name")
   ),
 
   ($should "$export" "not export an object in sealed space" (= ()
-      (let space ($createModuleSpace null true),
-      ($exec "($export \"_sealed\" (@ name: \"obj\")." "" space),
+      ($exec "($export \"_sealed\" (@ name: \"obj\")."),
       (assert null (` _sealed),
 ).

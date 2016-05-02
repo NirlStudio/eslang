@@ -361,7 +361,7 @@ module.exports = function (output) {
     $.print.warn('An implementation of $load should be assembled to sugly.')
     return typeof cb === 'function' ? cb('()') : '()'
   })
-  exportTo(load, 'normalize', function $load$normalize (source) {
+  exportTo(load, 'resolve', function $load$resolve (source) {
     return source
   })
 

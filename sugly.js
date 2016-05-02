@@ -1586,7 +1586,7 @@ function formatParameters (params) {
 }
 
 function $functionIn ($) {
-  var createSpace = $.createSpace
+  var createSpace = $.$createSpace
 
   // body must be a list of clauses
   return function $function (params, body) {
@@ -1631,7 +1631,7 @@ function $functionIn ($) {
 }
 
 function createClosure ($, enclosing, params, fixedArgs, body) {
-  var createSpace = $.createSpace
+  var createSpace = $.$createSpace
 
   function $C () {
     var args = Array.prototype.slice.apply(arguments)
@@ -1740,19 +1740,16 @@ function $createSpaceIn ($) {
 }
 
 function $createModuleSpaceIn ($) {
-  var createSpace = $.createSpace
+  var createSpace = $.$createSpace
 
-  return function $createModuleSpace (parent, sealing) {
-    if (parent) {
-      parent = verifySpace(parent)
-    }
-    var space = createSpace(parent || $, sealing)
+  return function $createModuleSpace (sealing) {
+    var space = createSpace($, sealing)
     space.moduleSpaceIdentifier = space.spaceIdentifier
 
     // isolate global/root space
-    space.$export('createSpace', function (parent, sealing) {
+    space.$export('$createSpace', function (parent, sealing) {
       parent = verifySpace(parent)
-      return $.createSpace(parent || space, sealing)
+      return createSpace(parent || space, sealing)
     })
 
     // isolate function & lambda to the most recent module
@@ -1776,14 +1773,15 @@ function verifySpace (space) {
 
 function $execIn ($) {
   var compile = $.compile
-  var createModuleSpace = $.createModuleSpace
+  var createModuleSpace = $.$createModuleSpace
 
-  return function $exec (code, source, space) {
+  return function $exec (code, source) {
     var result
     try {
       if (typeof code === 'string') {
-        var program = compile(code, source || '?')
-        result = beval(space || createModuleSpace(), program)
+        var program = compile(code, source)
+        var space = createModuleSpace(source.startsWith('?'))
+        result = beval(space, program)
       } else if (typeof code === 'function') {
         var args = arguments.length < 2 ? [] : Array.prototype.slice.call(arguments, 1)
         result = code.apply(null, args)
@@ -1803,19 +1801,19 @@ function $execIn ($) {
 }
 
 function $runIn ($) {
-  var load = $.load
+  var load = $.$load
   var exec = $.$exec
 
-  return function $run (source, space) {
+  return function $run (source) {
     if (typeof source !== 'string') {
       return null
     }
-
     if (!source.endsWith('.s')) {
       source += '.s'
     }
-    space = verifySpace(space)
-    return exec(load(source), load.normalize(source), space)
+
+    var uri = load.resolve(source)
+    return uri ? exec(load(uri), uri) : null
   }
 }
 
@@ -1832,10 +1830,9 @@ function importJSModule ($, name) {
 }
 
 function $requireIn ($) {
-  var load = $.load
+  var exec = $.$exec
+  var load = $.$load
   var modules = $.$modules
-  var run = $.run
-  var createModuleSpace = $.createModuleSpace
 
   return function $require (source, type) {
     if (typeof source !== 'string') {
@@ -1849,12 +1846,17 @@ function $requireIn ($) {
     if (!source.endsWith('.s')) {
       source += '.s'
     }
-    var uri = load.normalize(source)
+
+    var uri = load.resolve(source)
+    if (!uri) {
+      return null
+    }
+
     if (modules.hasOwnProperty(uri)) {
       return modules[uri]
     }
 
-    var result = run(source, createModuleSpace())
+    var result = exec(load(uri), uri)
     if (typeof result !== 'object' && typeof result !== 'function') {
       result = {
         value: result
@@ -1910,10 +1912,10 @@ function populate ($) {
   $.$export('export', $exportTo($))
 
   // create a child space from an optional parent one. - the inner version
-  $.$export('createSpace', $createSpaceIn($))
+  $.$export('$createSpace', $createSpaceIn($))
 
   // create a module space, new function/lambda namespace, from an optional parent one.
-  $.$export('createModuleSpace', $createModuleSpaceIn($))
+  $.$export('$createModuleSpace', $createModuleSpaceIn($))
 
   // inner execute function to support $.exec() and $.run()
   // depending on $.beval.
@@ -1921,13 +1923,12 @@ function populate ($) {
 
   // execute a block of code in a child space.
   // mark source as untrusted.
-  $.$export('exec', function (code, source, space) {
+  $.$export('exec', function (code, source) {
     if (typeof code === 'string') {
       if (typeof source !== 'string') {
         source = ''
       }
-      space = verifySpace(space)
-      return $.$exec(code, '?' + (source || ''), space)
+      return $.$exec(code, '?' + source)
     }
     if (typeof code === 'function') {
       return $.$exec.apply($, arguments)
@@ -1936,14 +1937,14 @@ function populate ($) {
   })
 
   // load and execute a block of code in a child space.
-  // depending on $.load() and $.$exec().
+  // depending on $.$load() and $.$exec().
   $.$export('run', $runIn($))
 
   // loaded module mappings.
   $.$modules = {}
 
   // load, execute a module and save its output.
-  // depending on $run().
+  // depending on $.$load() and $.$exec().
   $.$export('require', $requireIn($))
 
   // export singal type to application controller
@@ -1960,7 +1961,7 @@ module.exports = function (loader, output/*, more options */) {
 
   initializeSharedContext(space)
   if (typeof loader === 'function') {
-    space.$export('load', loader(space))
+    space.$export('$load', loader(space))
   }
   return populate(space)
 }
