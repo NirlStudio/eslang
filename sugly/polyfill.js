@@ -6,6 +6,25 @@ var forcePolyfill = false // ordinarily for testing purpose
 var records = []
 
 /* functions are ported from MDN */
+if (forcePolyfill || typeof Object.create !== 'function') {
+  records.push('Object.create')
+
+  JS.Object.create = (function () {
+    var Temp = function () {}
+    return function (prototype) {
+      if (prototype === null) {
+        prototype = {}
+      } else if (prototype !== Object(prototype)) {
+        return null
+      }
+      Temp.prototype = prototype
+      var result = new Temp()
+      Temp.prototype = null
+      return result
+    }
+  })()
+}
+
 if (forcePolyfill || typeof JS.Object.assign !== 'function') {
   records.push('Object.assign')
 

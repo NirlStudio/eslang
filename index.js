@@ -1,14 +1,19 @@
 'use strict'
 
 // load Sugly runtime with local filesystem loader
-var loader = require('./loader-fs')
+var loader = require('./lib/loader-fs')
 var $ = require('./sugly')(loader)
 
-function test (args) {
-  var runTest = $.require('test/test')
-  var loadTest = $.run('test/load')
-  loadTest(args.length > 0 ? args[0] : '')
-  /* var report =*/ runTest()
+function runTest (args) {
+  var checkPrerequisites = require('./test/test')
+  if (!checkPrerequisites($)) {
+    return
+  }
+
+  var test = $.require('test/test')
+  var load = $.run('test/load')
+  load(args.length > 0 ? args[0] : '')
+  /* var report =*/ test()
 }
 
 function runAsApp () {
@@ -18,7 +23,7 @@ function runAsApp () {
   } else {
     var command = proc.argv[2]
     if (command === 'test') {
-      return test(proc.argv.slice(3))
+      return runTest(proc.argv.slice(3))
     }
 
     for (var index = 2; index < proc.argv.length; index++) {
@@ -30,11 +35,11 @@ function runAsApp () {
   }
 }
 
-// export assembled Sugly runtime.
-module.exports = $
-
 // running as an application
-if (require.main === module) {
+if (require.main !== module) {
+  // export assembled Sugly runtime.
+  module.exports = $
+} else {
   try {
     runAsApp()
   } catch (signal) {

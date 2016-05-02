@@ -1,4 +1,4 @@
-(let colors ($require "colors/safe" "js").
+(let colors ($require "./lib/colors" "js").
 
 (let cases (@).
 (let current null).
@@ -104,6 +104,8 @@
 
 (= (*)
   (for module in argv ($run (+ module ".s"),
+
+  (print code "  Start to run sugly test suite ...\n")
   (let t1 ((date) getTime),
   (for case in cases ($execute case),
   (let t2 ((date) getTime),
@@ -117,6 +119,9 @@
     (for failure in failures
       ($print-f failure)
     ), else do-nothing
+  ),
+  (if (colors is-missing)
+    (print code "\n  P.S. To prettify output, please run 'npm install'.\n")
   ),
   (@ summary: summary failures: failures)
 ).

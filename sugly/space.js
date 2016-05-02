@@ -128,6 +128,27 @@ function exportDate () {
   return $Date
 }
 
+function exportArray () {
+  var $Array = {}
+  $Array.identityName = '($"Array")'
+
+  exportTo($Array, 'of', function Array$of () {
+    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
+    var result = []
+    for (var i = 0; i < args.length; i++) {
+      var item = args[i]
+      if (Array.isArray(item)) {
+        result.push.apply(result, item)
+      } else {
+        result.push(item)
+      }
+    }
+    return result
+  })
+
+  return $Array
+}
+
 function exportBitwiseOperators () {
   var Bit = {}
   Bit.identityName = '($"Bit")'
@@ -269,22 +290,9 @@ function initializeSpace ($) {
     return new (Date.bind.apply(Date, args))
   })
 
-  exportTo($, 'Array', {}) // reserve array
+  exportTo($, 'Array', exportArray())
   exportTo($, 'array', function $array () {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
-  })
-  exportTo($, 'arrayOf', function $arrayOf () {
-    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
-    var result = []
-    for (var i = 0; i < args.length; i++) {
-      var item = args[i]
-      if (Array.isArray(item)) {
-        result.push.apply(result, item)
-      } else {
-        result.push(item)
-      }
-    }
-    return result
   })
 
   exportTo($, 'range', require('./range'))
@@ -304,6 +312,9 @@ function initializeSpace ($) {
     }
     return obj === 0 || obj === false
   })
+  exportTo($, 'isNotEmpty', function (obj) {
+    return !$.isEmpty(obj)
+  })
 
   exportTo($, 'Bit', exportBitwiseOperators())
   exportTo($, 'Uri', exportUriFunctions())
@@ -316,7 +327,7 @@ module.exports = function (output) {
   $.identityName = '$'
 
   // meta information
-  var sugly = exportTo($, 'sugly', {})
+  var sugly = exportTo($, 'Sugly', {})
   exportTo(sugly, 'runtime', 'js')
   exportTo(sugly, 'version', '0.0.1')
   exportTo(sugly, 'isDebugging', true)
