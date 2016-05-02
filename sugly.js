@@ -1860,7 +1860,7 @@ function $requireIn ($) {
         value: result
       }
     }
-    if (!result.timestamp) {
+    if (result && !result.timestamp) {
       result.timestamp = Date.now()
     }
 

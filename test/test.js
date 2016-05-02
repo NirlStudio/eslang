@@ -1,17 +1,6 @@
 'use strict'
 
-// load Sugly testing space
-var C
-try {
-  C = require('../lib/colors')
-} catch (err) {
-  C = {
-    red: function (str) { return str },
-    gray: function (str) { return str },
-    green: function (str) { return str }
-  }
-}
-
+var C = require('../lib/colors')
 var JS, failing, passing
 
 function failed (feature) {
