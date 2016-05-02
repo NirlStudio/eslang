@@ -1,38 +1,38 @@
 ($define "invalid forms" (= ()
   ($should "Missing/invalid parameters" "return null" (= ()
-    (assert equal null (= ),
-    (assert equal null (= ""),
-    (assert equal null (= null),
-    (assert equal null (= true),
+    (assert null (` (= ),
+    (assert null (` (= ""),
+    (assert null (` (= null),
+    (assert null (` (= true),
 
-    (assert equal null (= x > ),
-    (assert equal null (= x > ""),
-    (assert equal null (= x > null),
-    (assert equal null (= x > true),
+    (assert null (` (= x > ),
+    (assert null (` (= x > ""),
+    (assert null (` (= x > null),
+    (assert null (` (= x > true),
 
-    (assert equal null (=> ),
-    (assert equal null (=> ""),
-    (assert equal null (=> null),
-    (assert equal null (=> true),
+    (assert null (` (=> ),
+    (assert null (` (=> ""),
+    (assert null (` (=> null),
+    (assert null (` (=> true),
 
-    (assert equal null ($call (=> x > ),
-    (assert equal null ($call (=> x > ""),
-    (assert equal null ($call (=> x > null),
-    (assert equal null ($call (=> x > true),
+    (assert null (` ($call (=> x > ),
+    (assert null (` ($call (=> x > ""),
+    (assert null (` ($call (=> x > null),
+    (assert null (` ($call (=> x > true),
   ),
 
   ($should "Missing body" "return null" (= ()
-    (assert equal null (= x ),
+    (assert null (` (= x ),
 
-    (assert equal null (= x > y),
+    (assert null (` (= x > y),
 
-    (assert equal null (=> x ),
-    (assert equal null ($call (=> x > x),
+    (assert null (` (=> x ),
+    (assert null (` ($call (=> x > x),
   ),
 ).
 
 (let assert-exec (=> (code value) > ()
-  (assert equal value ($exec code)
+  (assert value (` ($exec code)
 ).
 
 ($define "function" (= ()
@@ -204,19 +204,19 @@
   ($should "execute a function with a subject and arguments from an array" (= ()
     (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
     (let r ($call f),
-    (assert equal null (r s))
-    (assert equal 0 (r argc))
+    (assert null (` (r s),
+    (assert 0 (` (r argc),
 
     (let s (object))
     (let args (@ 1 2))
     (let r ($call f s args),
-    (assert equal true (is s (r s)),
-    (assert equal 2 (r argc))
-    (assert equal 1 ((r argv):0),
-    (assert equal 2 (-> r argv (:1),
+    (assert (` (is s (r s),
+    (assert 2 (` (r argc),
+    (assert 1 (` ((r argv):0),
+    (assert 2 (` (-> r argv (:1),
 ).
 
 ($define "Function object" (= ()
   ($should "be reserved" (= ()
-    (assert equal "object" (typeof ($Function)))
+    (assert "object" (` (typeof ($Function),
 ).

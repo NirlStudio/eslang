@@ -3,13 +3,13 @@
 
 (let program ($compile code).
 (print code "\n#---- code compiled ----")
-(print program program).
+($print program).
 
 (let code ($encode program).
 (print code "\n#---- program decompiled ----" code)
 
 (let program ($compile code).
 (print code "\n#---- code compiled again ----")
-(print program program).
+($print program).
 
 ($beval program) # run it!

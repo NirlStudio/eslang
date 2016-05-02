@@ -18,18 +18,36 @@
 # testing cases
 ($define "operator: ->" (= ()
   ($should "work correctly" (= ()
-    (assert equal 100 (-> obj3 "obj2" "obj1" "prop") "failed to read property",
-    (assert equal 11 (-> obj3 "obj2" "obj1" (add 10 1)) "failed to invoke method",
+    (assert 100
+      (` (-> obj3 "obj2" "obj1" "prop"),
+      "failed to read property"
+    ),
+    (assert 11
+      (` (-> obj3 "obj2" "obj1" (add 10 1))
+      "failed to invoke method"
+    ),
 ).
 
 ($define "keyword: flow" (= ()
   ($should "work correctly" (= ()
-    (assert equal 100 (flow obj3 "obj2" "obj1" "prop") "failed to read property",
-    (assert equal 11 (flow obj3 "obj2" "obj1" (add 10 1)) "failed to invoke method",
+    (assert 100
+      (` (flow obj3 "obj2" "obj1" "prop")
+      "failed to read property"
+    ),
+    (assert 11
+      (` (flow obj3 "obj2" "obj1" (add 10 1),
+      "failed to invoke method"
+    ),
 ).
 
 ($define "flow evaluation" (= ()
   ($should "work correctly" (= ()
-    (assert equal 100 (-> ($getObj3) "obj2" "obj1" "prop") "failed to read property",
-    (assert equal 11 (-> ($getObj3) (getObj) (getObj) (add 10 1)) "failed to invoke method",
+    (assert 100
+      (` (-> ($getObj3) "obj2" "obj1" "prop"),
+      "failed to read property"
+    ),
+    (assert 11
+      (` (-> ($getObj3) (getObj) (getObj) (add 10 1))
+      "failed to invoke method"
+    ),
 ).

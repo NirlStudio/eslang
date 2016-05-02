@@ -20,48 +20,9 @@
 
 ($ ($run-"spec")
   # run all specification.
-  "eval"
-  "space"
 
-  "bool"
-  "string"
-  "symbol"
-  "number"
-
-  "date"
-  "array"
-  "iterate"
-
-  "encode"
-
-  "object"
-  "function"
-
-  "is"
-  "typeof"
-  "mixin"
-
-  "if"
-  "while"
-  "for"
-  "for-in"
-
-  "bitwise"
-  "logical"
-  "arithmetic"
-  "concat"
-
-  "equivalence"
-  "ordering"
-
-  "flow"
-  "pipe"
-  "premise"
-
-  "operator"
 ).
 
 ($ ($run-"test")
   # run extra test cases.
-  # "compile"
 ).

@@ -7,7 +7,7 @@
   "repository": "nirlstudio/sugly-lang",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node . test"
   },
   "dependencies": {
     "chai": "^3.5.0",

@@ -5,18 +5,18 @@
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 3)
-    (assert equal i 2)
-    (assert equal result 4)
+    (assert 3 (` counter),
+    (assert 2 (` i),
+    (assert 4 (` result),
 
     (let counter 0)
     (let result (for i in -3
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 3)
-    (assert equal i -2)
-    (assert equal result -4)
+    (assert 3 (` counter),
+    (assert -2  (` i),
+    (assert -4 (` result),
 
     (let counter 0)
     (let x 3)
@@ -24,18 +24,18 @@
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 3)
-    (assert equal i 2)
-    (assert equal result 4)
+    (assert 3 (` counter),
+    (assert 2 (` i),
+    (assert 4 (` result),
 
     (let counter 0)
     (let result (for i in (+ 2 1)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 3)
-    (assert equal i 2)
-    (assert equal result 4)
+    (assert 3 (` counter),
+    (assert 2 (` i),
+    (assert 4 (` result),
 ).
 
 ($define "(for value in ($range x y)" (= ()
@@ -45,18 +45,18 @@
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 2)
-    (assert equal i 2)
-    (assert equal result 4)
+    (assert 2 (` counter),
+    (assert 2 (` i),
+    (assert 4 (` result),
 
     (let counter 0)
     (let result (for i in ($range -1 -3)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 2)
-    (assert equal i -2)
-    (assert equal result -4)
+    (assert 2 (` counter),
+    (assert -2 (` i),
+    (assert -4 (` result),
 ).
 
 ($define "(for value in ($range x y s)" (= ()
@@ -66,18 +66,18 @@
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 2)
-    (assert equal i 3)
-    (assert equal result 6)
+    (assert 2 (` counter),
+    (assert 3 (` i),
+    (assert 6 (` result),
 
     (let counter 0)
     (let result (for i in ($range -1 -4 -2)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 2)
-    (assert equal i -3)
-    (assert equal result -6)
+    (assert 2 (` counter),
+    (assert -3 (` i),
+    (assert -6 (` result),
 ).
 
 ($define "(for value in array)" (= ()
@@ -88,58 +88,58 @@
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 0)
-    (assert equal i -1)
-    (assert equal result null)
+    (assert 0 (` counter),
+    (assert -1 (` i),
+    (assert null (` result),
 
     (let counter 0)
     (let result (for i in (@ 2 4 6)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 3)
-    (assert equal i 6)
-    (assert equal result 12)
+    (assert 3 (` counter),
+    (assert 6 (` i),
+    (assert 12 (` result),
 
     (let counter 0)
     (let result (for (k v) in (@ 2 4 6)
       (++ counter)
       (* v 2)
     ),
-    (assert equal counter 3)
-    (assert equal k 2)
-    (assert equal v 6)
-    (assert equal result 12)
+    (assert 3 (` counter),
+    (assert 2 (` k),
+    (assert 6 (` v),
+    (assert 12 (` result),
 ).
 
 ($define "(for value in object)" (= ()
-  ($should "iterate all values in the object" (= ()
+  ($should "iterate all properties in the object" (= ()
     (let counter 0)
     (let i -1)
     (let result (for i in (@>)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 0)
-    (assert equal i -1)
-    (assert equal result null)
+    (assert 0 (` counter),
+    (assert -1 (` i),
+    (assert null (` result),
 
     (let counter 0)
     (let result (for i in (@ p1: 1 p2: 2)
       (++ counter)
       (* i 2)
     ),
-    (assert equal counter 2)
-    (assert equal i 2)
-    (assert equal result 4)
+    (assert 2 (` counter)
+    (assert 2 (` i)
+    (assert 4 (` result)
 
     (let counter 0)
     (let result (for (k v) in (@ p1: 1 p2: 2)
       (++ counter)
       (* v 2)
     ),
-    (assert equal counter 2)
-    (assert equal k "p2")
-    (assert equal v 2)
-    (assert equal result 4)
+    (assert 2 (` counter),
+    (assert "p2" (` k),
+    (assert 2 (` v),
+    (assert 4 (` result),
 ).

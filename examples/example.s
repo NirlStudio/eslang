@@ -1,15 +1,15 @@
 # this is a piece of comment
 (print code "# ")
-($print (+ "Hello" " world!").
-($print (+ 100 10 1).
-($print (- 100 10 1))
-($print (* 100 10 1))
-($print (/ 100 10 1))
+(print value (+ "Hello" " world!").
+(print value (+ 100 10 1).
+(print value (- 100 10 1))
+(print value (* 100 10 1))
+(print value (/ 100 10 1))
 
 ($"log100" (` Math log 100).
-($print (log100).
+(print value (log100).
 
-($print (+ ""
+(print value (+ ""
   (log100) " is a great number"
 ).
 
@@ -18,25 +18,25 @@
 (obj "code" 43)
 
 ($"msg" "message")
-($print (obj:msg "Hello world!").
-($print (obj "message"))
+(print value (obj:msg "Hello world!").
+(print value (obj "message"))
 
 (print code "# obj.code: " (obj "code").
-($print msg)
-($print (obj "message").
-($print (obj:msg).
+(print value msg)
+(print value (obj "message").
+(print value (obj:msg).
 (print (` log) "obj.message: " (obj:msg).
 
-($print "---------" function)
+(print value "---------" function)
 ($"add" (= (x y) (+ x y 10).
-($print ($add 3 2).
+(print value ($add 3 2).
 
 ($"add" ($function (`(x y)) (`( (+ x y 10)).
-($print ($add 3 2).
+(print value ($add 3 2).
 
 ($"add" (= (x y)
   (+ x y 100).
-($print ($add 1 2).
+(print value ($add 1 2).
 
 ($"sumWithBase" ($function (`base) (`(
   ($"ctx" ($object),
@@ -44,40 +44,40 @@
   ($lambda ctx (`(x y)) (`( (+ base x y).
 
 ($"sum" ($sumWithBase 100).
-($print ($sum 10 1).
+(print value ($sum 10 1).
 
 ($"sumWithBase" (=> base > (x y)
   (+ base x y).
 
-($print sumWithBase)
+(print value sumWithBase)
 ($"sum" ($sumWithBase 100).
 
-($print sum)
-($print ($sum 10 2).
+(print value sum)
+(print value ($sum 10 2).
 
 
 ($"sumWithBase" (= base
   (= base > (x y)
     (+ base x y).
 ($"sum" ($sumWithBase 1000).
-($print ($sum 10 1).
+(print value ($sum 10 1).
 
 
 ($"sumWithBase" (= base
   (= (base) > (x y)
     (+ base x y).
 ($"sum" ($sumWithBase 10000).
-($print ($sum 10 1).
+(print value ($sum 10 1).
 
 
 (let sumWithBase (= base
   (= (@ base: (* base 2)) > (x y)
     (+ base x y).
 ($"sum" ($sumWithBase 10000).
-($print ($sum 10 1).
+(print value ($sum 10 1).
 
 
-($print (if "" 1 2))
+(print value (if "" 1 2))
 
 ($"counter" 10)
 (while (-- counter)
@@ -102,19 +102,19 @@
 
 (print code "#sum" ($sum 100 100 100).
 
-($print (let (a 12) (b 18).
+(print value (let (a 12) (b 18).
 
 (let obj (@ "a": 12 b: 13).
-($print (obj"b").
+(print value (obj"b").
  #" 12312312
 
-($print (typeof ($require "chai" "js").
+(print value (typeof ($require "chai" "js").
 
 (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
 (let s (object))
 (let args (@ 1 2))
 (let r ($call f s args),
-($print (-> r "argv" (:1)),
+(print value (-> r "argv" (:1)),
 
 (exit -1 2)
 (return 0)

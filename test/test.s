@@ -26,21 +26,23 @@
     action: action
 ).
 
-(operator assert # (expr) or (expected expr)
+(operator assert # (expr) or (expected expr) or (expected expr note)
   (if %1
-    (let (expected %0) (expr %1),
+    (let (%expected %0) (%expr %1),
   else
-    (let (expected true) (expr %0),
+    (let (%expected true) (%expr %0),
   ),
-  (++ assertStep)
-  (let real ($eval expr),
-  (if (!= expected real)
+  (let %note %2)
+  (++ %assertStep)
+  (let %real ($eval %expr),
+  (if (!= %expected %real)
     (exit (@
       typeIdentifier: "assert-failure"
-      step: assertStep
-      expected: expected
-      real: real
-      expr: expr),
+      step: %assertStep
+      expected: %expected
+      real: %real
+      expr: %expr
+      note: %note),
   ),
 ).
 
@@ -87,22 +89,29 @@
 ).
 
 (let print-f (= f
-  (print code (+ "  " (f:0) ") " ((f:1) join "/") " " (f:2),
+  (print code (+ "  " (f:0) ") [" ((f:1) join " / ") "] " (f:2),
   (let r (f:3),
   (print code (+
     (colors red (+ "     step-" (r step) " is expecting "),
-    (colors green (colors underline (r "expected"),
-    (colors red (+ " instead of " (colors underline (r "real"),
+    (colors green (colors underline (encode value (r "expected"),
+    (colors red (+ " instead of " (colors underline (encode value (r "real"),
   ),
   (print code (colors gray (+ "     when asserting "
-    (colors underline (encode clause (r "expr"), "\n"
+    (colors underline (encode clause (r "expr"),
+    (if (r "note") (+ ", " (r "note")) ''
+    "\n"
 ).
 
 (= (*)
   (for module in argv ($run (+ module ".s"),
+  (let t1 ((date) getTime),
   (for case in cases ($execute case),
+  (let t2 ((date) getTime),
 
-  (print code (colors green (+ "\n  passing: " passing),
+  (print code (+
+    (colors green (+ "\n  passing: " passing),
+    (colors gray (+ " (" (- t2 t1) "ms)"),
+  ),
   (if (> failing 0)
     (print code (colors red (+ "  failing: " failing "\n"),
     (for failure in failures

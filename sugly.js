@@ -1040,11 +1040,11 @@ $operators['operator'] = function ($, impl) {
         value = seval(statements[j], ctx)
       }
       oprStack.pop()
-      populateOperatorCtx(ctx, oprStack.length > 1 ? oprStack[oprStack.length - 1] : [])
+      populateOperatorCtx(ctx, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
       return value
     } catch (signal) {
       oprStack.pop()
-      populateOperatorCtx(ctx, oprStack.length > 1 ? oprStack[oprStack.length - 1] : [])
+      populateOperatorCtx(ctx, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
       throw signal
     }
   }

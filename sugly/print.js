@@ -55,9 +55,9 @@ module.exports = function ($, output) {
   var print = printer($)
   var printCode = codePrinter(output)
 
-  // encode and print one or more values to standard output.
-  function $print () {
-    return print.apply(output.log, arguments)
+  // print a piece of program which is a set of clauses
+  function $print (clauses) {
+    return printCode($.encode, clauses)
   }
   $print.identityName = '($"print")'
 
@@ -71,13 +71,13 @@ module.exports = function ($, output) {
     }
     return printCode(null, values.join(''))
   })
+  // encode and print one or more values to standard output.
+  exportTo($print, 'value', function () {
+    return print.apply(output.log, arguments)
+  })
   // encode and print an clause to standard output.
   exportTo($print, 'clause', function (clause) {
     return printCode($.encode.clause, clause)
-  })
-  // print a piece of program which is a set of clauses
-  exportTo($print, 'program', function (clauses) {
-    return printCode($.encode, clauses)
   })
 
   // encode arguments and print it as some diagnostic information to standard error.

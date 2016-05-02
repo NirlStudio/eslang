@@ -1,42 +1,42 @@
 ($define "function form" (= ()
   ($should "return false for false, zero and null" (= ()
-    (assert equal false ($bool ))
-    (assert equal false ($bool false))
-    (assert equal false ($bool 0))
-    (assert equal false ($bool null))
+    (assert false (` ($bool ))
+    (assert false (` ($bool false))
+    (assert false (` ($bool 0))
+    (assert false (` ($bool null))
   ),
   ($should "return true for any other values" (= ()
-    (assert equal true ($bool true),
-    (assert equal true ($bool 1),
-    (assert equal true ($bool -1),
-    (assert equal true ($bool ""),
-    (assert equal true ($bool "0"),
-    (assert equal true ($bool "false"),
-    (assert equal true ($bool (@),
-    (assert equal true ($bool (object),
+    (assert true (` ($bool true),
+    (assert true (` ($bool 1),
+    (assert true (` ($bool -1),
+    (assert true (` ($bool ""),
+    (assert true (` ($bool "0"),
+    (assert true (` ($bool "false"),
+    (assert true (` ($bool (@),
+    (assert true (` ($bool (object),
   ),
 ).
 
 ($define "operator form" (= ()
   ($should "return false for false, zero and null" (= ()
-    (assert equal false (bool ))
-    (assert equal false (bool false))
-    (assert equal false (bool 0))
-    (assert equal false (bool null))
+    (assert false (` (bool ))
+    (assert false (` (bool false))
+    (assert false (` (bool 0))
+    (assert false (` (bool null))
   ),
   ($should "return true for any other values" (= ()
-    (assert equal true (bool true),
-    (assert equal true (bool 1),
-    (assert equal true (bool -1),
-    (assert equal true (bool ""),
-    (assert equal true (bool "0"),
-    (assert equal true (bool "false"),
-    (assert equal true (bool (@),
-    (assert equal true (bool (object),
+    (assert true (` (bool true),
+    (assert true (` (bool 1),
+    (assert true (` (bool -1),
+    (assert true (` (bool ""),
+    (assert true (` (bool "0"),
+    (assert true (` (bool "false"),
+    (assert true (` (bool (@),
+    (assert true (` (bool (object),
   ),
 ).
 
 ($define "Bool object" (= ()
   ($should "be reserved" (= ()
-    (assert equal "object" (typeof ($Bool)))
+    (assert "object" (` (typeof ($Bool)))
 ).

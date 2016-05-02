@@ -1,5 +1,5 @@
 (let assert-exec (=> (code value) > ()
-  (assert equal value ($exec code).
+  (assert value (` ($exec code).
 
 ($define "test condition" (= ()
   (let code "(if 0 true false)")

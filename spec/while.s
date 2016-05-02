@@ -5,9 +5,9 @@
     (let result (while (> i 0)
       (++ counter)(-- i)
     ),
-    (assert equal counter 10)
-    (assert equal i 0)
-    (assert equal result 0)
+    (assert 10 (` counter),
+    (assert 0 (` i),
+    (assert 0 (` result),
 
     (let counter 0)
     (let i 10)
@@ -16,9 +16,9 @@
       (let j 0)
       (while (< j 100) (++ j),
     ),
-    (assert equal counter 10)
-    (assert equal i 0)
-    (assert equal result 100)
+    (assert 10 (` counter),
+    (assert 0 (` i),
+    (assert 100 (` result),
 ).
 
 ($define "continue" (= ()
@@ -31,9 +31,9 @@
       (continue 99)
       (++ counter)
     ),
-    (assert equal counter 0)
-    (assert equal i 0)
-    (assert equal result 99)
+    (assert 0 (` counter),
+    (assert 0  (` i),
+    (assert 99  (` result),
 ).
 
 ($define "break" (= ()
@@ -45,7 +45,7 @@
       (if (< i 5) (break (* i i),
       (++ counter)
     ),
-    (assert equal counter 5)
-    (assert equal i 4)
-    (assert equal result 16)
+    (assert 5 (` counter),
+    (assert 4 (` i),
+    (assert 16 (` result),
 ).

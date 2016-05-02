@@ -18,15 +18,15 @@
 # testing cases
 ($define "operator: |" (= ()
   ($should "work correctly" (= ()
-    (assert equal 9 (| 3 ($step1 ),
+    (assert 9 (` (| 3 ($step1 ),
 ).
 
 ($define "keyword: pipe" (= ()
   ($should "work correctly" (= ()
-    (assert equal 9 (pipe 3 ($step1 ),
+    (assert 9 (` (pipe 3 ($step1 ),
 ).
 
-($define "array expanding" (= ()
+($define "data pipeline" (= ()
   ($should "work correctly" (= ()
-    (assert equal 45 (pipe ($step1 3) ($step2 ) ($step3 ),
+    (assert 45 (` (pipe ($step1 3) ($step2 ) ($step3 ),
 ).
