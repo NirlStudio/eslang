@@ -22,7 +22,7 @@
   ),
 
   ($should "$export" "export an object to global space" (= ()
-      ($require "spec/space-mod"),
+      ($require "space-mod"),
       (assert "object" (`(typeof _exported),
       (assert "obj" (`(_exported "name")
   ),

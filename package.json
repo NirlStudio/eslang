@@ -8,7 +8,7 @@
   "description": "A conceptual implementation of Sugly programming language.",
   "scripts": {
     "check": "node test/test.js",
-    "test": "node . test"
+    "test": "node . self-test"
   },
   "dependencies": {
     "colors": "^1.1.2"

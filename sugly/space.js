@@ -357,12 +357,18 @@ module.exports = function (output) {
   // placeholder function of $load.
   // Since $load is expected to return a piece of code, it should always
   // return a piece of code.
-  var load = exportTo($, 'load', function $load (source, cb) {
-    $.print.warn('An implementation of $load should be assembled to sugly.')
+  var load = exportTo($, 'load', function $load (file, cb) {
+    $.print.warn({
+      from: '$/sugly/space',
+      message: 'An implementation of $load should be assembled to sugly.'
+    })
     return typeof cb === 'function' ? cb('()') : '()'
   })
   exportTo(load, 'resolve', function $load$resolve (source) {
-    return source
+    return ''
+  })
+  exportTo(load, 'dir', function $load$dir (file) {
+    return ''
   })
 
   return $

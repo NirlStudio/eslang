@@ -1742,9 +1742,12 @@ function $createSpaceIn ($) {
 function $createModuleSpaceIn ($) {
   var createSpace = $.$createSpace
 
-  return function $createModuleSpace (sealing) {
+  return function $createModuleSpace (sealing, dir) {
     var space = createSpace($, sealing)
     space.moduleSpaceIdentifier = space.spaceIdentifier
+    if (dir && dir !== space.$dir) {
+      space.$dir = dir // save base dir if it is changing for this space.
+    }
 
     // isolate global/root space
     space.$export('$createSpace', function (parent, sealing) {
@@ -1755,6 +1758,10 @@ function $createModuleSpaceIn ($) {
     // isolate function & lambda to the most recent module
     space.$export('function', $functionIn(space))
     space.$export('lambda', $lambdaIn(space))
+
+    // resolving will base on the directory of current space
+    space.$export('exec', $execIn(space))
+    space.$export('require', $requireIn(space))
 
     space.$OprStack = []
     return space
@@ -1771,16 +1778,16 @@ function verifySpace (space) {
   return space
 }
 
-function $execIn ($) {
+function $innerExecIn ($) {
   var compile = $.compile
   var createModuleSpace = $.$createModuleSpace
 
-  return function $exec (code, source) {
+  return function $innerExec (code, source, dir) {
     var result
     try {
       if (typeof code === 'string') {
         var program = compile(code, source)
-        var space = createModuleSpace(source.startsWith('?'))
+        var space = createModuleSpace(source.startsWith('?'), dir)
         result = beval(space, program)
       } else if (typeof code === 'function') {
         var args = arguments.length < 2 ? [] : Array.prototype.slice.call(arguments, 1)
@@ -1800,6 +1807,24 @@ function $execIn ($) {
   }
 }
 
+function $execIn ($) {
+  var dir = $.$dir
+  var exec = $.$exec
+
+  return function $exec (code, source) {
+    if (typeof code === 'string') {
+      if (typeof source !== 'string') {
+        source = ''
+      }
+      return exec(code, '?' + source, dir)
+    }
+    if (typeof code === 'function') {
+      return exec.apply($, arguments)
+    }
+    return null
+  }
+}
+
 function $runIn ($) {
   var load = $.$load
   var exec = $.$exec
@@ -1812,8 +1837,13 @@ function $runIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve(source)
-    return uri ? exec(load(uri), uri) : null
+    var uri = load.resolve(null, source)
+    if (!uri) {
+      return null
+    }
+
+    var path = load.dir(uri)
+    return exec(load(uri), uri, path)
   }
 }
 
@@ -1830,6 +1860,7 @@ function importJSModule ($, name) {
 }
 
 function $requireIn ($) {
+  var dir = $.$dir
   var exec = $.$exec
   var load = $.$load
   var modules = $.$modules
@@ -1847,7 +1878,7 @@ function $requireIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve(source)
+    var uri = load.resolve(dir, source)
     if (!uri) {
       return null
     }
@@ -1856,7 +1887,8 @@ function $requireIn ($) {
       return modules[uri]
     }
 
-    var result = exec(load(uri), uri)
+    var path = load.dir(uri)
+    var result = exec(load(uri), uri, path)
     if (typeof result !== 'object' && typeof result !== 'function') {
       result = {
         value: result
@@ -1917,24 +1949,16 @@ function populate ($) {
   // create a module space, new function/lambda namespace, from an optional parent one.
   $.$export('$createModuleSpace', $createModuleSpaceIn($))
 
-  // inner execute function to support $.exec() and $.run()
+  // inner execute function to support $.exec(), $.run() and $.require()
   // depending on $.beval.
-  $.$exec = $execIn($)
+  $.$exec = $innerExecIn($)
 
-  // execute a block of code in a child space.
+  // export runtime location
+  $.$dir = __dirname
+
+  // execute a block of code in a module space.
   // mark source as untrusted.
-  $.$export('exec', function (code, source) {
-    if (typeof code === 'string') {
-      if (typeof source !== 'string') {
-        source = ''
-      }
-      return $.$exec(code, '?' + source)
-    }
-    if (typeof code === 'function') {
-      return $.$exec.apply($, arguments)
-    }
-    return null
-  })
+  $.$export('exec', $execIn($))
 
   // load and execute a block of code in a child space.
   // depending on $.$load() and $.$exec().
