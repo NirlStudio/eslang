@@ -1,8 +1,11 @@
 {
   "name": "sugly",
   "main": "index.js",
-  "version": "0.1.0",
-  "author": "Leevi@Nirl Studio, V-Lab.",
+  "version": "0.1.1",
+  "author": {
+    "email": "leevi@nirlstudio.com",
+    "name": "Leevi"
+  },
   "license": "GPL-3.0",
   "repository": "nirlstudio/sugly-lang",
   "description": "A conceptual implementation of Sugly programming language.",
@@ -10,6 +13,9 @@
     "check": "node test/test.js",
     "test": "node . self-test"
   },
+  "bin": {
+    "sugly" : "./bin/sugly"
+  }
   "dependencies": {
     "colors": "^1.1.2"
   }
