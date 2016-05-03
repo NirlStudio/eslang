@@ -1,7 +1,7 @@
 {
   "name": "sugly",
   "main": "index.js",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "author": "Leevi@Nirl Studio, V-Lab.",
   "license": "GPL-3.0",
   "repository": "nirlstudio/sugly-lang",
