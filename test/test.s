@@ -103,8 +103,13 @@
 ).
 
 (= (*)
-  (for module in argv ($run (+ module ".s"),
+  (for module in argv
+    (let load ($run module),
+    (if (typeof load "function") ($load),
+  ),
 
+  (if (< (cases length) 1) (exit),
+  
   (print code "  Start to run sugly test suite ...\n")
   (let t1 ((date) getTime),
   (for case in cases ($execute case),

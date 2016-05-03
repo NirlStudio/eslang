@@ -1,1 +1,3 @@
-# TODO - a note app?
+(= (*)
+  (print code "note is called")
+).

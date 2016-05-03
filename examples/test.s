@@ -1,5 +1,3 @@
-(let test ($require "test/test.s").
-
 ($define "feature1" (= ()
   ($define "sub-feature-1.1" (= ()
     ($should "do something (1.1)" (= ()
@@ -21,6 +19,3 @@
       (assert 0 (` (+ 1 1))
   ),
 ).
-
-(let report ($test).
-() # surpress report
