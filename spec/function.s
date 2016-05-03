@@ -207,8 +207,8 @@
     (assert null (` (r s),
     (assert 0 (` (r argc),
 
-    (let s (object))
-    (let args (@ 1 2))
+    (let s (object),
+    (let args (@ 1 2),
     (let r ($call f s args),
     (assert (` (is s (r s),
     (assert 2 (` (r argc),

@@ -4,10 +4,10 @@
     (let s1 (@ p1: 100),
     (let s2 (@ p2: 200),
 
-    (let obj (+))
+    (let obj (+),
     (assert 0 (` obj),
 
-    (let obj (+ s1))
+    (let obj (+ s1),
     (assert false (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -15,7 +15,7 @@
     (assert 100 (` (iter value),
     (assert false (` (iter next),
 
-    (let obj (+ s1 s2))
+    (let obj (+ s1 s2),
     (assert false (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -31,10 +31,10 @@
     (let s1 (@ p1: 100),
     (let s2 (@ p2: 200),
 
-    (let obj (combine))
+    (let obj (combine),
     (assert null (` obj),
 
-    (let obj (combine s1))
+    (let obj (combine s1),
     (assert false (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -42,7 +42,7 @@
     (assert 100 (` (iter value),
     (assert false (` (iter next),
 
-    (let obj (combine s1 s2))
+    (let obj (combine s1 s2),
     (assert false (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -61,10 +61,10 @@
     (let s1 (@ p1: 100),
     (let s2 (@ p2: 200),
 
-    (let obj (+=))
+    (let obj (+=),
     (assert 0 (` obj),
 
-    (let obj (+= s1))
+    (let obj (+= s1),
     (assert (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -72,7 +72,7 @@
     (assert 100 (` (iter value),
     (assert false (` (iter next),
 
-    (let obj (+= s1 s2))
+    (let obj (+= s1 s2),
     (assert (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
@@ -88,7 +88,7 @@
     (let s1 (@ p1: 100),
     (let s2 (@ p2: 200),
 
-    (let obj (mixin))
+    (let obj (mixin),
     (assert null (` obj),
 
     (let obj (mixin s1),
@@ -99,7 +99,7 @@
     (assert 100 (` (iter value),
     (assert false (` (iter next),
 
-    (let obj (mixin s1 s2))
+    (let obj (mixin s1 s2),
     (assert (` (is s1 obj),
     (let iter ($iterate obj),
     (assert (` (iter next),

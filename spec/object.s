@@ -1,16 +1,16 @@
 ($define "function form" (=()
   ($should "return a new object with a type and properties from other objects" (= ()
-    (let obj ($object))
+    (let obj ($object),
     (assert "object" (` (typeof obj),
     (assert false (` (($iterate obj) next),
 
-    (let t ($object))
-    (let obj ($object t))
+    (let t ($object),
+    (let obj ($object t),
     (assert "object" (` (typeof obj),
     (assert (` (typeof obj t),
     (assert false (` (($iterate obj) next),
 
-    (let t ($object))
+    (let t ($object),
     (let obj ($object t (@ p: 2),
     (assert "object" (` (typeof obj),
     (assert (` (typeof obj t),
@@ -23,7 +23,7 @@
 
 ($define "operator form - (object p:v)" (=()
   ($should "return an object with customized properties" (= ()
-    (let obj (object))
+    (let obj (object),
     (assert "object" (` (typeof obj),
     (assert false (` (($iterate obj) next),
 
@@ -51,17 +51,17 @@
 
 ($define "operator form - (@ type > p:v ...)" (=()
   ($should "return a new object with a type and customized properties" (= ()
-    (let obj (@>))
+    (let obj (@>),
     (assert "object" (` (typeof obj),
     (assert false (` (($iterate obj) next),
 
-    (let t ($object))
-    (let obj (@ t >))
+    (let t ($object),
+    (let obj (@ t >),
     (assert "object" (` (typeof obj),
     (assert (` (typeof obj t),
     (assert false (` (($iterate obj) next),
 
-    (let t ($object))
+    (let t ($object),
     (let obj (@ t > p: 2),
     (assert "object" (` (typeof obj),
     (assert (` (typeof obj t),
@@ -95,5 +95,5 @@
 
 ($define "Object object" (= ()
   ($should "be reserved" (= ()
-    (assert "object" (` (typeof ($Object)))
+    (assert "object" (` (typeof ($Object),
 ).

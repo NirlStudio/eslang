@@ -10,15 +10,15 @@
     (assert "null" (` (encode string null),
     (assert "\"\"" (` (encode string false),
     (assert "\"\"" (` (encode string 12),
-    (assert "\"\"" (` (encode string (date 1234)),
-    (assert "\"\"" (` (encode string (` sym)),
-    (assert "\"\"" (` (encode string (@)),
-    (assert "\"\"" (` (encode string (object)),
+    (assert "\"\"" (` (encode string (date 1234),
+    (assert "\"\"" (` (encode string (` sym),
+    (assert "\"\"" (` (encode string (@),
+    (assert "\"\"" (` (encode string (object),
     (assert "\"\"" (` (encode string (= x x),
   ),
 
   ($should "a symbol" "be encoded to its key" (= ()
-    (assert "(` sym)" (` (encode value (` sym)),
+    (assert "(` sym)" (` (encode value (` sym),
 
     (assert "null" (` (encode symbol),
     (assert "null" (` (encode symbol null),
@@ -27,8 +27,8 @@
     (assert "" (` (encode symbol (date 1234),
     (assert "" (` (encode symbol ""),
     (assert "" (` (encode symbol "abc"),
-    (assert "" (` (encode symbol (@)),
-    (assert "" (` (encode symbol (object)),
+    (assert "" (` (encode symbol (@),
+    (assert "" (` (encode symbol (object),
     (assert "" (` (encode symbol (= x x),
   ),
 
@@ -44,8 +44,8 @@
     (assert "NaN" (` (encode number (date 1234),
     (assert "NaN" (` (encode number ""),
     (assert "NaN" (` (encode number "abc"),
-    (assert "NaN" (` (encode number (@)),
-    (assert "NaN" (` (encode number (object)),
+    (assert "NaN" (` (encode number (@),
+    (assert "NaN" (` (encode number (object),
     (assert "NaN" (` (encode number (= x x),
   ),
 
@@ -59,40 +59,40 @@
     (assert "false" (` (encode bool (date 1234),
     (assert "false" (` (encode bool ""),
     (assert "false" (` (encode bool "abc"),
-    (assert "false" (` (encode bool (@)),
-    (assert "false" (` (encode bool (object)),
+    (assert "false" (` (encode bool (@),
+    (assert "false" (` (encode bool (object),
     (assert "false" (` (encode bool (= x x),
   ),
 
   ($should "a date" "be encoded to (date xxx)" (= ()
-    (assert "(date 1024)" (` (encode value (date 1024)),
+    (assert "(date 1024)" (` (encode value (date 1024),
 
     (assert "null" (` (encode date),
     (assert "null" (` (encode date null),
     (assert "(date 0)" (` (encode date false),
     (assert "(date 0)" (` (encode date 12),
     (assert "(date 0)" (` (encode date ""),
-    (assert "(date 0)" (` (encode date (` sym)),
+    (assert "(date 0)" (` (encode date (` sym),
     (assert "(date 0)" (` (encode date (@),
     (assert "(date 0)" (` (encode date (object),
     (assert "(date 0)" (` (encode date (= x x),
   ),
 
   ($should "an object" "be encoded to its identityName or an expression" (= ()
-    (let obj (object))
+    (let obj (object),
     (assert "(@>)" (` (encode value obj),
 
-    (let obj (@ p : 1 ))
+    (let obj (@ p : 1 ),
     (assert "(@p: 1)" (` (encode value obj),
 
-    (let pt (@ identityName : "type" ))
-    (let obj (@ pt >))
+    (let pt (@ identityName : "type" ),
+    (let obj (@ pt >),
     (assert "(@type >)" (` (encode value obj),
 
-    (let obj (@ pt > p : 1 ))
+    (let obj (@ pt > p : 1 ),
     (assert "(@type >\n  p: 1)" (` (encode value obj),
 
-    (let obj (@ identityName : "special-object" ))
+    (let obj (@ identityName : "special-object" ),
     (assert "special-object" (` (encode value obj),
 
     (assert "(date 1234)" (` (encode object (date 1234),
@@ -103,7 +103,7 @@
     (assert "(@>)" (` (encode object false),
     (assert "(@>)" (` (encode object 12),
     (assert "(@>)" (` (encode object ""),
-    (assert "(@>)" (` (encode object (` sym)),
+    (assert "(@>)" (` (encode object (` sym),
     (assert "(@>)" (` (encode object (object),
     (assert "(@>)" (` (encode object (= x x),
   ),
@@ -119,7 +119,7 @@
     (assert "(@)" (` (encode array 12),
     (assert "(@)" (` (encode array (date 1234),
     (assert "(@)" (` (encode array ""),
-    (assert "(@)" (` (encode array (` sym)),
+    (assert "(@)" (` (encode array (` sym),
     (assert "(@)" (` (encode array (object),
     (assert "(@)" (` (encode array (= x x),
   ),
@@ -136,7 +136,7 @@
     (assert "null" (` (encode function 12),
     (assert "null" (` (encode function (date 1234),
     (assert "null" (` (encode function ""),
-    (assert "null" (` (encode function (` sym)),
+    (assert "null" (` (encode function (` sym),
     (assert "null" (` (encode function (object),
     (assert "null" (` (encode function (@),
   ),
@@ -144,10 +144,10 @@
 
 ($define "(encode clause expr)" (= ()
   ($should "a symbol" "be encoded to its key" (= ()
-    (assert "sym" (` (encode clause (` sym)),
+    (assert "sym" (` (encode clause (` sym),
   ),
   ($should "an array" "be encoded to a clause" (= ()
-    (assert "(+ x y)" (` (encode clause (` (+ x y))),
+    (assert "(+ x y)" (` (encode clause (` (+ x y),
   ),
 
   ($should "other types" "be encoded by its value" (= ()
@@ -157,10 +157,10 @@
     (assert "true" (` (encode clause true),
     (assert "false" (` (encode clause false),
     (assert "12" (` (encode clause 12),
-    (assert "(date 1234)" (` (encode clause (date 1234)),
+    (assert "(date 1234)" (` (encode clause (date 1234),
     (assert "\"\"" (` (encode clause ""),
     (assert "\"abc\"" (` (encode clause "abc"),
-    (assert "(@p: 1)" (` (encode clause (@ p: 1)),
+    (assert "(@p: 1)" (` (encode clause (@ p: 1),
   ),
 ).
 
@@ -178,9 +178,9 @@
     (assert "()" (` ($encode 12),
     (assert "()" (` ($encode ""),
     (assert "()" (` ($encode "abc"),
-    (assert "()" (` ($encode (` sym)),
-    (assert "()" (` ($encode (date 1234)),
-    (assert "()" (` ($encode (@ p: 1)),
-    (assert "()" (` ($encode (= x x)),
+    (assert "()" (` ($encode (` sym),
+    (assert "()" (` ($encode (date 1234),
+    (assert "()" (` ($encode (@ p: 1),
+    (assert "()" (` ($encode (= x x),
   ),
 ).

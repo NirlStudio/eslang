@@ -1,9 +1,9 @@
 ($define "function form" (= ()
   ($should "return false for false, zero and null" (= ()
-    (assert false (` ($bool ))
-    (assert false (` ($bool false))
-    (assert false (` ($bool 0))
-    (assert false (` ($bool null))
+    (assert false (` ($bool ),
+    (assert false (` ($bool false),
+    (assert false (` ($bool 0),
+    (assert false (` ($bool null),
   ),
   ($should "return true for any other values" (= ()
     (assert true (` ($bool true),
@@ -19,10 +19,10 @@
 
 ($define "operator form" (= ()
   ($should "return false for false, zero and null" (= ()
-    (assert false (` (bool ))
-    (assert false (` (bool false))
-    (assert false (` (bool 0))
-    (assert false (` (bool null))
+    (assert false (` (bool ),
+    (assert false (` (bool false),
+    (assert false (` (bool 0),
+    (assert false (` (bool null),
   ),
   ($should "return true for any other values" (= ()
     (assert true (` (bool true),
@@ -38,5 +38,5 @@
 
 ($define "Bool object" (= ()
   ($should "be reserved" (= ()
-    (assert "object" (` (typeof ($Bool)))
+    (assert "object" (` (typeof ($Bool),
 ).

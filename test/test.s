@@ -27,7 +27,7 @@
 ).
 
 (operator assert # (expr) or (expected expr) or (expected expr note)
-  (if %1
+  (if (> %C 1)
     (let (%expected %0) (%expr %1),
   else
     (let (%expected true) (%expr %0),
@@ -46,10 +46,10 @@
   ),
 ).
 
-(let summary (@))
-(let failures (@))
+(let summary (@).
+(let failures (@).
 
-(let path (@))
+(let path (@).
 (let indent "  ")
 
 (let passing 0)
@@ -69,11 +69,12 @@
 
 (let execute (= (case)
   (print code indent (case:0),
-  (path push (case:0))
+  (path push (case:0),
   (+= indent "  ")
 
-  (for i in ($range 1 (case length))
-    (let item (case:i))
+  (for i
+    in ($range 1 (case length),
+    (let item (case:i),
     (if (typeof item "array")
       ($execute item)
     else
@@ -98,7 +99,7 @@
   ),
   (print code (colors gray (+ "     when asserting "
     (colors underline (encode clause (r "expr"),
-    (if (r "note") (+ ", " (r "note")) ''
+    (if (r note) (+ ", " (r note),
     "\n"
 ).
 
@@ -109,7 +110,7 @@
   ),
 
   (if (< (cases length) 1) (exit),
-  
+
   (print code "  Start to run sugly test suite ...\n")
   (let t1 ((date) getTime),
   (for case in cases ($execute case),

@@ -38,8 +38,8 @@
     (let v1 -1)
     (let v2 -1)
     (assert (` (is v1 v2),
-    (let v1 (number Infinity))
-    (let v2 (number Infinity))
+    (let v1 (number Infinity),
+    (let v2 (number Infinity),
     (assert (` (is v1 v2),
 
     (let v1 "")

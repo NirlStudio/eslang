@@ -31,7 +31,7 @@
 
     (assert 1 (` (- 1 ""),
     (assert 1 (` (- 1 "1"),
-    (assert 1 (` (- 1 (@)),
+    (assert 1 (` (- 1 (@),
 ).
 
 (let mVar2 20)
@@ -55,7 +55,7 @@
 
     (assert 0 (` (* 1 ""),
     (assert 0 (` (* 1 "1"),
-    (assert 0 (` (* 1 (@)),
+    (assert 0 (` (* 1 (@),
 ).
 
 (let mVar3 20)
@@ -80,7 +80,7 @@
 
     (assert true (` (Number isNaN (/ 1 ""),
     (assert true (` (Number isNaN (/ 1 "1"),
-    (assert true (` (Number isNaN (/ 1 (@)),
+    (assert true (` (Number isNaN (/ 1 (@),
 ).
 
 (let mVar4 20)
@@ -101,7 +101,7 @@
             and assign it to the first arugment if it's a symbol" (= ()
     (assert 1 (` (++),
     (assert 1 (` (++ ""),
-    (assert 1 (` (++ (@)),
+    (assert 1 (` (++ (@),
 
     (let num 1)
     (assert 2 (` (++ num),
@@ -117,7 +117,7 @@
             and assign it to the first arugment if it's a symbol" (= ()
     (assert -1 (` (--),
     (assert -1 (` (-- ""),
-    (assert -1 (` (-- (@)),
+    (assert -1 (` (-- (@),
 
     (let num 1)
     (assert 0 (` (-- num),

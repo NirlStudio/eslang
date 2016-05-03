@@ -34,7 +34,7 @@
     (assert f ($eval f)
   ),
   ($to "itself, include object" (= ()
-    (let obj (@ p:0))
+    (let obj (@ p:0),
     (assert obj ($eval obj)
   ),
 ).

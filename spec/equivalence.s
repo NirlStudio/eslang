@@ -2,7 +2,7 @@
   ($should "return false for different types" (= ()
     (assert false (` (== 1),
     (assert false (` (== 1 ""),
-    (assert false (` (== "" (date 100)),
+    (assert false (` (== "" (date 100),
     (assert false (` (== (date 100) (` name),
     (assert false (` (== (` name) (@),
     (assert false (` (== (@) (object ),
@@ -55,7 +55,7 @@
   ($should "return true for different types" (= ()
     (assert (` (!= 1),
     (assert (` (!= 1 ""),
-    (assert (` (!= "" (date 100)),
+    (assert (` (!= "" (date 100),
     (assert (` (!= (date 100) (` name),
     (assert (` (!= (` name) (@),
     (assert (` (!= (@) (object ),

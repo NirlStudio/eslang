@@ -1,7 +1,7 @@
 # this will be a global operator
 (let r1 (operator opr1 (+ %0 %1),
-(let r11 (operator opr1))
-(let r12 (operator opr2))
+(let r11 (operator opr1),
+(let r12 (operator opr2),
 
 # re-declaration will happen in module scope.
 (let r2 (operator opr1 (- %0 %1),

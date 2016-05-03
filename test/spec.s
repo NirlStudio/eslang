@@ -8,8 +8,8 @@
 ).
 
 (= (*)
-  (let scope (if argc argv features))
+  (let scope (if argc argv features),
   (for name in scope
     ($define name (= name > ()
-      ($run (+ "spec/" name)),
+      ($run (+ "spec/" name),
 ).

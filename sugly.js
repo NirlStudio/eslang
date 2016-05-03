@@ -1500,6 +1500,10 @@ $operators['&&'] = function ($, clause) {
   }
 
   var base = seval(clause[1], $)
+  if (base === false || base === null || base === 0) {
+    return base
+  }
+
   for (var i = 2; i < length; i++) {
     var value = seval(clause[i], $)
     if (value === false || value === null || value === 0) {

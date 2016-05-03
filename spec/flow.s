@@ -23,7 +23,7 @@
       "failed to read property"
     ),
     (assert 11
-      (` (-> obj3 "obj2" "obj1" (add 10 1))
+      (` (-> obj3 "obj2" "obj1" (add 10 1),
       "failed to invoke method"
     ),
 ).
@@ -47,7 +47,7 @@
       "failed to read property"
     ),
     (assert 11
-      (` (-> ($getObj3) (getObj) (getObj) (add 10 1))
+      (` (-> ($getObj3) (getObj) (getObj) (add 10 1),
       "failed to invoke method"
     ),
 ).
