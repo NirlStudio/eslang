@@ -9,8 +9,8 @@ Run from source code:
   5, Use "bin/sugly some-sugly-file[.s]" to run a piece of program.  
 
 Run from npm:
-  1, "npm install -g sugly"
-  2, "sugly self-test"
-  3, "sugly some-sugly-file[.s]"
+  1, "npm install -g sugly"<br>
+  2, "sugly self-test"<br>
+  3, "sugly some-sugly-file[.s]"<br>
 
 Enjoy the sugliness.
