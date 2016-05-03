@@ -15,7 +15,7 @@
   },
   "bin": {
     "sugly" : "./bin/sugly"
-  }
+  },
   "dependencies": {
     "colors": "^1.1.2"
   }
