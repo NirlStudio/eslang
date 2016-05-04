@@ -9,7 +9,7 @@
     (let v (arr:i),
     ((if (>= v mid) right left) push v),
   ),
-  (($quick left) concat (@mid) ($quick right),
+  (($self left) concat (@mid) ($self right),
 ).
 
 ($quick data)

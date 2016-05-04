@@ -3,11 +3,11 @@
 (let cases (@).
 (let current null).
 
-($export "define" (= (feature define)
+($export "define" (= (feature define-it)
    (let pre current)
    (let current (let spec (@ feature),
    ((|| pre cases) push spec),
-   ($ define)
+   ($ define-it)
    (let current pre)
    (return spec)
 ).
@@ -27,22 +27,19 @@
 ).
 
 (operator assert # (expr) or (expected expr) or (expected expr note)
-  (if (> %C 1)
-    (let (%expected %0) (%expr %1),
-  else
-    (let (%expected true) (%expr %0),
+  (if (< %C 2)
+    (let (%1 %0) (%0 true),
   ),
-  (let %note %2)
-  (++ %assertStep)
-  (let %real ($eval %expr),
-  (if (!= %expected %real)
+  (++ %assert-step)
+  (let %9 ($eval %1),
+  (if (!= %0 %9)
     (exit (@
       typeIdentifier: "assert-failure"
-      step: %assertStep
-      expected: %expected
-      real: %real
-      expr: %expr
-      note: %note),
+      step: %assert-step
+      expected: %0
+      expr: %1
+      note: %2
+      real: %9),
   ),
 ).
 

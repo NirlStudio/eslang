@@ -1606,6 +1606,7 @@ function $functionIn ($) {
       // new namespace
       var ns = createSpace($)
       ns[':'] = this
+      ns['self'] = $F
       if (!fixedArgs) {
         ns['argc'] = args.length
         ns['argv'] = args
@@ -1642,6 +1643,7 @@ function createClosure ($, enclosing, params, fixedArgs, body) {
     // new namespace
     var ns = createSpace($)
     ns[':'] = this
+    ns['self'] = $C
     Object.assign(ns, enclosing)
 
     // variant arguments
