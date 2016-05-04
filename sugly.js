@@ -1767,6 +1767,7 @@ function $createModuleSpaceIn ($) {
 
     // resolving will base on the directory of current space
     space.$export('exec', $execIn(space))
+    space.$export('run', $runIn(space))
     space.$export('require', $requireIn(space))
 
     space.$OprStack = []
@@ -1832,6 +1833,7 @@ function $execIn ($) {
 }
 
 function $runIn ($) {
+  var dir = $.$dir
   var load = $.$load
   var exec = $.$exec
 
@@ -1843,7 +1845,7 @@ function $runIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve(null, source)
+    var uri = load.resolve([null, dir], source)
     if (!uri) {
       return null
     }
@@ -1884,7 +1886,7 @@ function $requireIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve(dir, source)
+    var uri = load.resolve([dir, null], source)
     if (!uri) {
       return null
     }
