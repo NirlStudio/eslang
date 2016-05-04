@@ -587,8 +587,8 @@ $operators['typeof'] = function ($, clause) {
     }
     // app defined type identifier
     if (typeof value === 'object') {
-      if (value.typeIdentifier) {
-        return value.typeIdentifier
+      if (value.typeId) {
+        return value.typeId
       } else if (isSymbol(value)) {
         return 'symbol' // polyfill symbol
       }
@@ -620,7 +620,7 @@ $operators['typeof'] = function ($, clause) {
       case 'date':
         return value instanceof Date // Would frame-boundary be a problem?
       default:
-        return typeof value === 'object' && value !== null && value.typeIdentifier === expected
+        return typeof value === 'object' && value !== null && value.typeId === expected
     }
   }
   if (expected && expected.isPrototypeOf && expected.isPrototypeOf(value)) {

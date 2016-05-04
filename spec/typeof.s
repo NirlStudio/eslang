@@ -41,8 +41,8 @@
     (assert "array" (` (typeof (@ 0)),
     (assert "array" (` (typeof (@ 1 2 3)),
   ),
-  ($should "(typeof typed-object)" "be its typeIdentifier property" (= ()
-    (let obj (@ typeIdentifier: "user-type"))
+  ($should "(typeof typed-object)" "be its typeId property" (= ()
+    (let obj (@ typeId: "user-type"))
     (assert "user-type" (` (typeof obj),
   ),
 ).
@@ -110,8 +110,8 @@
     (assert (` (typeof (@ 0) "object"),
     (assert (` (typeof (@ 1 2 3) "object"),
   ),
-  ($should "(typeof typed-object typeIdentifier)" "be true" (= ()
-    (let obj (@ typeIdentifier: "user-type"))
+  ($should "(typeof typed-object typeId)" "be true" (= ()
+    (let obj (@ typeId: "user-type"),
     (assert (` (typeof obj "user-type"),
   ),
 ).

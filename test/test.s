@@ -34,7 +34,7 @@
   (let %9 ($eval %1),
   (if (!= %0 %9)
     (exit (@
-      typeIdentifier: "assert-failure"
+      typeId: "assert-failure"
       step: %assert-step
       expected: %0
       expr: %1
