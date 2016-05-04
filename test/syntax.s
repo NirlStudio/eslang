@@ -3,6 +3,8 @@
 ###############################################################################
 
 # keywords & opertors
+(quote a)
+(quote `)
 (quote quote -quote quote-"quote")
 (let let "let")
 
