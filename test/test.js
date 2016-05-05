@@ -171,7 +171,8 @@ function checkSugly ($) {
     'bool', 'string', 'symbol', 'object', 'date', 'array', 'range', 'iterate',
     'isEmpty', 'isNotEmpty', 'compile', 'encoder', 'encode', 'print',
     '$export', '$load', '$createSpace', '$createModuleSpace', '$exec',
-    'function', 'lambda', 'eval', 'export', 'exec', 'call', 'run', 'import', 'require'
+    'call', 'export', 'function', 'lambda', 'eval',
+    'load', 'exec', 'run', 'import', 'require'
   ])
 
   checkObjects($, '[Sugly / object] ', [

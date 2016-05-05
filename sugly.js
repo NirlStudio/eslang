@@ -1766,6 +1766,7 @@ function $createModuleSpaceIn ($) {
     space.$export('eval', $evalIn(space))
 
     // resolving will base on the directory of current space
+    space.$export('load', $loadIn(space))
     space.$export('exec', $execIn(space))
     space.$export('run', $runIn(space))
     space.$export('import', $importIn(space))
@@ -1790,16 +1791,18 @@ function $innerExecIn ($) {
   var compile = $.compile
   var createModuleSpace = $.$createModuleSpace
 
-  return function $innerExec (code, source, dir) {
+  return function $innerExec (program, source, dir) {
     var result
+    if (typeof program === 'string') {
+      program = compile(program, source)
+    }
     try {
-      if (typeof code === 'string') {
-        var program = compile(code, source)
+      if (Array.isArray(program)) {
         var space = createModuleSpace(source.startsWith('?'), dir)
         result = beval(space, program)
-      } else if (typeof code === 'function') {
+      } else if (typeof program === 'function') {
         var args = arguments.length < 2 ? [] : Array.prototype.slice.call(arguments, 1)
-        result = code.apply(null, args)
+        result = program.apply(null, args)
       } else {
         return null // unrecognized code type
       }
@@ -1822,18 +1825,34 @@ function $evalIn ($) {
   }
 }
 
+function $loadIn ($) {
+  var dirs = [$.$dir]
+  var load = $.$load
+
+  return function $load (source) {
+    if (typeof source !== 'string') {
+      return null
+    }
+    if (!source.endsWith('.s')) {
+      source += '.s'
+    }
+    var uri = load.resolve(dirs, source)
+    return uri ? load(uri) : null
+  }
+}
+
 function $execIn ($) {
   var dir = $.$dir
   var exec = $.$exec
 
-  return function $exec (code, source) {
-    if (typeof code === 'string') {
+  return function $exec (program, source) {
+    if (typeof program === 'string' || Array.isArray(program)) {
       if (typeof source !== 'string') {
         source = ''
       }
-      return exec(code, '?' + source, dir)
+      return exec(program, '?' + source, dir)
     }
-    if (typeof code === 'function') {
+    if (typeof program === 'function') {
       return exec.apply($, arguments)
     }
     return null
@@ -1983,6 +2002,9 @@ function populate ($) {
 
   // evaluate a symbol or a clause, or return the value itself.
   $.$export('eval', $evalIn($))
+
+  // load a file basing on current space's directory
+  $.$export('load', $loadIn($))
 
   // execute a block of code in a module space.
   // mark source as untrusted.
