@@ -96,7 +96,7 @@
   ),
   (print code (C gray (+ "     when asserting "
     (C underline (encode clause (r "expr"),
-    (if (r note) (+ ", " (r note),
+    (if ($isEmpty (r note)) "" (+ ", " (r note),
     "\n"
 ).
 
