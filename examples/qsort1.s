@@ -1,4 +1,4 @@
-(let data ($run "sort-data").
+(let data ($import "sort-data").
 (print warn data)
 
 (let swap (= (x y)
@@ -32,5 +32,5 @@
   ($quick (+ left 1) end)
 ).
 
-  ($quick 0 (- (data length) 1).
-  (exit data)
+($quick 0 (- (data length) 1).
+(exit data)

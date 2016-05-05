@@ -1732,13 +1732,16 @@ global.spaceCounter = 0
 
 function $createSpaceIn ($) {
   return function $createSpace (parent, sealing) {
-    var space = Object.create(parent || $)
+    var space = Object.create(parent)
     $.$spaceCounter += 1
     space.spaceIdentifier = 'space-' + $.$spaceCounter
     if (sealing) {
       // overridding parent.export
       space.$export('export', $exportTo(space))
+      // isolate operators
       space.$operators = Object.assign({}, space.$operators)
+      // separate modules
+      space.$modules = {}
     }
     space.$loops = [] // new loop stack
     return space
@@ -1755,19 +1758,17 @@ function $createModuleSpaceIn ($) {
       space.$dir = dir // save base dir if it is changing for this space.
     }
 
-    // isolate global/root space
-    space.$export('$createSpace', function (parent, sealing) {
-      parent = verifySpace(parent)
-      return createSpace(parent || space, sealing)
-    })
-
     // isolate function & lambda to the most recent module
     space.$export('function', $functionIn(space))
     space.$export('lambda', $lambdaIn(space))
 
+    // isolate eval space to the most recent module
+    space.$export('eval', $evalIn(space))
+
     // resolving will base on the directory of current space
     space.$export('exec', $execIn(space))
     space.$export('run', $runIn(space))
+    space.$export('import', $importIn(space))
     space.$export('require', $requireIn(space))
 
     space.$OprStack = []
@@ -1814,6 +1815,13 @@ function $innerExecIn ($) {
   }
 }
 
+function $evalIn ($) {
+  return function $eval (expr) {
+    var ns = verifySpace(this)
+    return seval(expr, ns || $)
+  }
+}
+
 function $execIn ($) {
   var dir = $.$dir
   var exec = $.$exec
@@ -1833,7 +1841,7 @@ function $execIn ($) {
 }
 
 function $runIn ($) {
-  var dir = $.$dir
+  var dirs = [null, $.$dir]
   var load = $.$load
   var exec = $.$exec
 
@@ -1845,7 +1853,30 @@ function $runIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve([null, dir], source)
+    var uri = load.resolve(dirs, source)
+    if (!uri) {
+      return null
+    }
+
+    var path = load.dir(uri)
+    return exec(load(uri), uri, path)
+  }
+}
+
+function $importIn ($) {
+  var dirs = [$.$dir]
+  var load = $.$load
+  var exec = $.$exec
+
+  return function $import (source) {
+    if (typeof source !== 'string') {
+      return null
+    }
+    if (!source.endsWith('.s')) {
+      source += '.s'
+    }
+
+    var uri = load.resolve(dirs, source)
     if (!uri) {
       return null
     }
@@ -1868,7 +1899,7 @@ function importJSModule ($, name) {
 }
 
 function $requireIn ($) {
-  var dir = $.$dir
+  var dirs = [$.$dir]
   var exec = $.$exec
   var load = $.$load
   var modules = $.$modules
@@ -1886,7 +1917,7 @@ function $requireIn ($) {
       source += '.s'
     }
 
-    var uri = load.resolve([dir, null], source)
+    var uri = load.resolve(dirs, source)
     if (!uri) {
       return null
     }
@@ -1914,10 +1945,17 @@ function $requireIn ($) {
 function populate ($) {
   $.$operators = Object.assign({}, $operators)
 
-  // global function & lambda generator.
-  $.$export('function', $functionIn($))
-  $.$export('lambda', $lambdaIn($))
+  // create a child space from an optional parent one. - the inner version
+  $.$export('$createSpace', $createSpaceIn($))
 
+  // create a module space, new function/lambda namespace, from an optional parent one.
+  $.$export('$createModuleSpace', $createModuleSpaceIn($))
+
+  // inner execute function to support $.exec(), $.run() and $.require()
+  // depending on $.beval.
+  $.$exec = $innerExecIn($)
+
+  // call a function with arguments in an array.
   $.$export('call', function (func, subject, args) {
     if (typeof func !== 'function') {
       return null
@@ -1936,33 +1974,15 @@ function populate ($) {
     }
   })
 
-  // evaluate a symbol or a clause, or return the value itself.
-  $.$export('eval', function (expr, space) {
-    space = verifySpace(space)
-    return seval(expr, space || this)
-  })
-
-  // evaluate a series of clauses.
-  $.$export('beval', function (clauses, space) {
-    space = verifySpace(space)
-    return Array.isArray(clauses) ? beval(space || this, clauses) : null
-  })
-
   // allow to export to root space.
   $.$export('export', $exportTo($))
 
-  // create a child space from an optional parent one. - the inner version
-  $.$export('$createSpace', $createSpaceIn($))
+  // global function & lambda generator.
+  $.$export('function', $functionIn($))
+  $.$export('lambda', $lambdaIn($))
 
-  // create a module space, new function/lambda namespace, from an optional parent one.
-  $.$export('$createModuleSpace', $createModuleSpaceIn($))
-
-  // inner execute function to support $.exec(), $.run() and $.require()
-  // depending on $.beval.
-  $.$exec = $innerExecIn($)
-
-  // export runtime location
-  $.$dir = __dirname
+  // evaluate a symbol or a clause, or return the value itself.
+  $.$export('eval', $evalIn($))
 
   // execute a block of code in a module space.
   // mark source as untrusted.
@@ -1971,27 +1991,32 @@ function populate ($) {
   // load and execute a block of code in a child space.
   // depending on $.$load() and $.$exec().
   $.$export('run', $runIn($))
-
-  // loaded module mappings.
-  $.$modules = {}
+  $.$export('import', $importIn($))
 
   // load, execute a module and save its output.
   // depending on $.$load() and $.$exec().
   $.$export('require', $requireIn($))
-
-  // export singal type to application controller
-  $.$SuglySignal = SuglySignal
 
   return $
 }
 
 module.exports = function (loader, output/*, more options */) {
   var space = makeSpace(output)
+  initializeSharedContext(space)
+
   space.$spaceCounter = 0
   space.spaceIdentifier = 'space-0'
   space.moduleSpaceIdentifier = space.spaceIdentifier
 
-  initializeSharedContext(space)
+  // export runtime location
+  space.$dir = __dirname
+
+  // loaded module mappings.
+  space.$modules = {}
+
+  // export singal type to application controller
+  space.$SuglySignal = SuglySignal
+
   if (typeof loader === 'function') {
     space.$export('$load', loader(space))
   }

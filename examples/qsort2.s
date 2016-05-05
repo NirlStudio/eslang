@@ -1,4 +1,4 @@
-(let data ($run "sort-data").
+(let data ($import "sort-data").
 (print warn data)
 
 (let quick (= (arr)
