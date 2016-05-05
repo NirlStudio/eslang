@@ -5,12 +5,12 @@ var JS, failing, passing
 
 function failed (feature) {
   failing.push(feature)
-  console.log(C.red('      [FAILED] ' + feature))
+  console.log('    ' + C.failed + C.red('[FAILED] ' + feature))
 }
 
 function passed (feature) {
   passing += 1
-  console.log(C.green('    \u2713 ') + C.gray('[PASSED] ' + feature))
+  console.log('    ' + C.passed + C.gray('[PASSED] ' + feature))
 }
 
 function assert (feature, expected) {

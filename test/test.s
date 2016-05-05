@@ -1,4 +1,4 @@
-(let colors ($require "./lib/colors" "js").
+(let C ($require "./lib/colors" "js").
 
 (let cases (@).
 (let current null).
@@ -52,14 +52,14 @@
 (let passing 0)
 (let succeeded (= behaviour
   (++ passing)
-  (print code indent (colors green "\u2713 ") (colors gray behaviour),
+  (print code indent (C passed) (C gray behaviour),
   (summary push (@ (path slice 0) true behaviour),
 ).
 
 (let failing 0)
 (let failed (= (behaviour failure)
   (++ failing)
-  (print code indent (colors red (+ "(" failing ") " behaviour),
+  (print code indent (C failed) (C red (+ "(" failing ") " behaviour),
   (summary push (@ (path slice 0) false behaviour),
   (failures push (@ failing (path slice 0) behaviour failure ),
 ).
@@ -90,12 +90,12 @@
   (print code (+ "  " (f:0) ") [" ((f:1) join " / ") "] " (f:2),
   (let r (f:3),
   (print code (+
-    (colors red (+ "     step-" (r step) " is expecting "),
-    (colors green (colors underline (encode value (r "expected"),
-    (colors red (+ " instead of " (colors underline (encode value (r "real"),
+    (C red (+ "     step-" (r step) " is expecting "),
+    (C green (C underline (encode value (r "expected"),
+    (C red (+ " instead of " (C underline (encode value (r "real"),
   ),
-  (print code (colors gray (+ "     when asserting "
-    (colors underline (encode clause (r "expr"),
+  (print code (C gray (+ "     when asserting "
+    (C underline (encode clause (r "expr"),
     (if (r note) (+ ", " (r note),
     "\n"
 ).
@@ -114,16 +114,16 @@
   (let t2 ((date) getTime),
 
   (print code (+
-    (colors green (+ "\n  passing: " passing),
-    (colors gray (+ " (" (- t2 t1) "ms)"),
+    (C green (+ "\n  passing: " passing),
+    (C gray (+ " (" (- t2 t1) "ms)"),
   ),
   (if (> failing 0)
-    (print code (colors red (+ "  failing: " failing "\n"),
+    (print code (C red (+ "  failing: " failing "\n"),
     (for failure in failures
       ($print-f failure)
     ), else do-nothing
   ),
-  (if (colors is-missing)
+  (if (C is-missing)
     (print code "\n  P.S. To prettify output, please run 'npm install'.\n")
   ),
   (@ summary: summary failures: failures)
