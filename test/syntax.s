@@ -3,6 +3,9 @@
 ###############################################################################
 
 # keywords & opertors
+(quote)
+(quote(a))
+(quote (a))
 (quote a)
 (quote `)
 (quote =>)
@@ -43,8 +46,9 @@
 (then then "then")
 (next next "next")
 
-(operator operator "operator")
-(operator export operator "operator")
+(operator operator "operator" operator)
+(operator export operator "operator" operator)
+(operator   export operator "operator" operator)
 
 (concat concat "concate")
 (combine combine "combine")
