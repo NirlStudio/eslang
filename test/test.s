@@ -26,7 +26,7 @@
     action: action
 ).
 
-(operator assert # (expr) or (expected expr) or (expected expr note)
+(operator export assert # (expr) or (expected expr) or (expected expr note)
   (if (< %C 2)
     (let (%1 %0) (%0 true),
   ),

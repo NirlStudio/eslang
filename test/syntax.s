@@ -44,6 +44,7 @@
 (next next "next")
 
 (operator operator "operator")
+(operator export operator "operator")
 
 (concat concat "concate")
 (combine combine "combine")
@@ -118,8 +119,6 @@
 ($string string)(string string)
 ($symbol symbol)(symbol symbol)
 ($object object)(object object)
-($function function)(function function)
-($lambda lambda)(lambda lambda)
 ($date date)(date date)
 ($array array)(array array)
 
@@ -134,13 +133,19 @@
 ($encode encode)(encode encode)
 ($print print)(print print)
 
-($eval eval)(eval eval)
-($beval beval)(beval beval)
+($call call)(call call)
 ($export export)(export export)
 
-($call call)(call call)
+($function function)(function function)
+($lambda lambda)(lambda lambda)
+
+($eval eval)(eval eval)
+($load load)(load load)
+($beval beval)(beval beval) # get removed
+
 ($exec exec)(exec exec)
 ($run run)(run run)
+($import import)(import import)
 ($require require)(require require)
 
 # from sugly test

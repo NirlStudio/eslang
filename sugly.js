@@ -6,7 +6,7 @@ var warn
 var symbolFor, symbolKeyFor, isSymbol
 var SymbolContext, SymbolQuote, SymbolIndexer, SymbolAssign, SymbolDerive,
   SymbolLambdaShort, SymbolObject, SymbolLambda, SymbolLike, SymbolElse,
-  SymbolIn, SymbolThen, SymbolNext, SymbolRepeat
+  SymbolIn, SymbolThen, SymbolNext, SymbolRepeat, SymbolExport
 
 function initializeSharedContext ($) {
   if (warn) {
@@ -36,6 +36,7 @@ function initializeSharedContext ($) {
   SymbolNext = symbolFor('next')
 
   SymbolRepeat = symbolFor('*')
+  SymbolExport = symbolFor('export')
 }
 
 function resolve ($, sym) {
@@ -994,12 +995,12 @@ function populateOperatorCtx (ctx, operands) {
 // in the same space, an operator can only be defined once.
 $operators['operator'] = function ($, impl) {
   if ($.moduleSpaceIdentifier !== $.spaceIdentifier) {
-    return null // operator can only be defined in module scope
+    return null // operator can only be declared in module scope
   }
 
   var length = impl.length
-  if (length < 2) {
-    return null // a name is required
+  if (length < 3) {
+    return null // an operator name & body are required
   }
 
   var name = impl[1]
@@ -1007,24 +1008,39 @@ $operators['operator'] = function ($, impl) {
     return null // the name must be a symbol.
   }
 
+  var exporting, offset
+  if (name === SymbolExport) {
+    if (length < 4) {
+      return null // require name & body
+    }
+    name = impl[2]
+    if (!isSymbol(name)) {
+      return null
+    }
+    exporting = true
+    offset = 3
+  } else {
+    exporting = false
+    offset = 2
+  }
+
   var key = symbolKeyFor(name)
   var existed = $.$operators.hasOwnProperty(key)
-  if (length < 3) {
-    // without operator body, querying for if an operator is existed.
-    return existed
-  }
-
-  // trying to define a new operator.
-  if (existed) {
-    // trying to override an existed operator
-    if (Object.prototype.hasOwnProperty.call($, '$operators')) {
-      return true // cannot re-create an operator in the same space.
+  if (exporting) {
+    if (existed) {
+      return false
     }
-    // create a local operator table.
-    $.$operators = Object.assign({}, $.$operators)
+  } else {
+    // trying to define a new operator.
+    if (!Object.prototype.hasOwnProperty.call($, '$operators')) {
+      // create a local operator table.
+      $.$operators = Object.assign({}, $.$operators)
+    } else if (existed) {
+      return false // cannot re-create an operator in the same space.
+    }
   }
 
-  var statements = impl.slice(2)
+  var statements = impl.slice(offset)
   $.$operators[key] = function $OPR (ctx, clause) {
     var oprds = []
     for (var i = 1; i < clause.length; i++) {

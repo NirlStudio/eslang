@@ -1,35 +1,37 @@
 # this will be a global operator
-(let r1 (operator opr1 (+ %0 %1),
-(let r11 (operator opr1),
-(let r12 (operator opr2),
+(let r1 (operator export opr1 (+ %0 %1),
 
 # re-declaration will happen in module scope.
 (let r2 (operator opr1 (- %0 %1),
 
-# further re-declaration will be just ignored.
+# further re-declaration will return false.
 (let r21 (operator opr1 (* %0 %1),
 
 (let r3 (operator),
 (let r4 (operator 123),
+(let r5 (operator export),
+(let r6 (operator export 1234),
+(let r7 (operator export oprx),
+(let r8 (operator export oprx ()),
 
 ($define "declaration" (= ()
   ($should "operator" "only be defined in module space" (= ()
     (assert (` (r1),
     (assert null (` (operator oprx (),
   ),
-  ($should "(operator opr-name)" "return if an operator with the given name does exist." (= ()
-    (assert (` (r11),
-    (assert false (` (r12),
-  ),
   ($should "re-declaration" "only happen once in a module" (= ()
     (assert (` (r2),
-    (assert (` (r21),
+    (assert false (` (r21),
     (assert 9 (` (opr1 10 1),
   ),
-  ($should "declaration without a valid operator name" "return null" (= ()
+  ($should "declaration without a valid format" "return null" (= ()
     # invalid delcaration
     (assert null (` (r3),
     (assert null (` (r4),
+    (assert null (` (r5),
+    (assert null (` (r6),
+    (assert null (` (r7),
+    (assert (` (r8),
   ),
 ).
 
