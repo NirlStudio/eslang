@@ -48,16 +48,16 @@
 
 ($define "arrayOf" (=()
   ($should "return an array with expanded arguments" (= ()
-    (let a1 (Array of ),
+    (let a1 (Array concat ),
     (assert 0 (`(a1 length),
 
-    (let a1 (Array of 2 4 6),
+    (let a1 (Array concat 2 4 6),
     (assert 3 (`(a1 length),
     (assert 2 (`(a1:0),
     (assert 4 (`(a1:1),
     (assert 6 (`(a1:2),
 
-    (let a1 (Array of 2 4 (@ 6 8 10) 12 (@ 14 16),
+    (let a1 (Array concat 2 4 (@ 6 8 10) 12 (@ 14 16),
     (assert 8 (`(a1 length),
     (assert 2 (`(a1:0),
     (assert 6 (`(a1:2),

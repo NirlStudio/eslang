@@ -49,7 +49,7 @@ function copyJSObject (name, jsObject) {
 }
 
 function exportSymbol () {
-  var $Symbol = require('./symbol')()
+  var $Symbol = require('./generic/symbol')()
   $Symbol.identityName = 'Symbol'
 
   $Symbol.is.identityName = '(Symbol "is")'
@@ -132,7 +132,7 @@ function exportArray () {
   var $Array = {}
   $Array.identityName = '($"Array")'
 
-  exportTo($Array, 'of', function Array$of () {
+  exportTo($Array, 'concat', function Array$concat () {
     var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
     var result = []
     for (var i = 0; i < args.length; i++) {
@@ -311,8 +311,8 @@ function initializeSpace ($) {
     return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
   })
 
-  exportTo($, 'range', require('./range'))
-  exportTo($, 'iterate', require('./iterate'))
+  exportTo($, 'range', require('./generic/range'))
+  exportTo($, 'iterate', require('./generic/iterate'))
   exportTo($, 'is-empty', $is_empty)
   exportTo($, 'not-empty', function (obj) {
     return !$is_empty(obj)

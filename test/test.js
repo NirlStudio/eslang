@@ -70,14 +70,15 @@ function checkSystem () {
 
 function checkObject () {
   console.log('\n  - Object')
-  assert('Object.create')
   assert('Object.assign')
+  assert('Object.create')
+  assert('Object.is')
 }
 
 function checkString () {
   console.log('\n  - String')
-  assert('String.prototype.startsWith')
   assert('String.prototype.endsWith')
+  assert('String.prototype.startsWith')
 }
 
 function checkArray () {

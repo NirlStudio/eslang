@@ -6,5 +6,5 @@
 ).
 
 ($ f1 123)
-($print mVar)
-($print fVar)
+(print value mVar)
+(print value fVar)

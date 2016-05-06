@@ -10,8 +10,9 @@
   "repository": "nirlstudio/sugly-lang",
   "description": "A conceptual implementation of Sugly programming language.",
   "scripts": {
+    "test": "node . self-test",
     "check": "node test/test.js",
-    "test": "node . self-test"
+    "assert": "node . test examples/test"
   },
   "bin": {
     "sugly" : "./bin/sugly"

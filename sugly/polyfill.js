@@ -6,26 +6,7 @@ var forcePolyfill = false // ordinarily for testing purpose
 var records = []
 
 /* functions are ported from MDN */
-if (forcePolyfill || typeof Object.create !== 'function') {
-  records.push('Object.create')
-
-  JS.Object.create = (function () {
-    var Temp = function () {}
-    return function (prototype) {
-      if (prototype === null) {
-        prototype = {}
-      } else if (prototype !== Object(prototype)) {
-        return null
-      }
-      Temp.prototype = prototype
-      var result = new Temp()
-      Temp.prototype = null
-      return result
-    }
-  })()
-}
-
-if (forcePolyfill || typeof JS.Object.assign !== 'function') {
+if (forcePolyfill || typeof Object.assign !== 'function') {
   records.push('Object.assign')
 
   JS.Object.assign = function (target) {
@@ -47,7 +28,41 @@ if (forcePolyfill || typeof JS.Object.assign !== 'function') {
   }
 }
 
-if (forcePolyfill || typeof JS.String.prototype.startsWith !== 'function') {
+if (forcePolyfill || typeof Object.create !== 'function') {
+  records.push('Object.create')
+
+  JS.Object.create = (function () {
+    var Temp = function () {}
+    return function (prototype) {
+      if (prototype === null) {
+        prototype = {}
+      } else if (prototype !== Object(prototype)) {
+        return null
+      }
+      Temp.prototype = prototype
+      var result = new Temp()
+      Temp.prototype = null
+      return result
+    }
+  })()
+}
+
+if (forcePolyfill || typeof Object.is !== 'function') {
+  records.push('Object.is')
+
+  JS.Object.is = function (x, y) {
+    // SameValue algorithm
+    if (x === y) { // Steps 1-5, 7-10
+      // Steps 6.b-6.e: +0 != -0
+      return x !== 0 || 1 / x === 1 / y
+    } else {
+      // Step 6.a: NaN == NaN
+      return x !== x && y !== y
+    }
+  }
+}
+
+if (forcePolyfill || typeof String.prototype.startsWith !== 'function') {
   records.push('String.prototype.startsWith')
 
   JS.String.prototype.startsWith = function (searchString, position) {
@@ -56,7 +71,7 @@ if (forcePolyfill || typeof JS.String.prototype.startsWith !== 'function') {
   }
 }
 
-if (forcePolyfill || typeof JS.String.prototype.endsWith !== 'function') {
+if (forcePolyfill || typeof String.prototype.endsWith !== 'function') {
   records.push('String.prototype.endsWith')
 
   JS.String.prototype.endsWith = function (searchString, position) {
