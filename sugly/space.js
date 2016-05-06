@@ -1,6 +1,7 @@
 'use strict'
 
 require('./polyfill')
+var $export = require('./export')
 
 var JS = global || window
 
@@ -110,10 +111,13 @@ function exportDate () {
   var $Date = {}
   $Date.identityName = '($"Date")'
 
+  // transitional solution
+  JS.Date.prototype.time = Date.prototype.getTime
+
   exportTo($Date, 'now', function Date$now () {
     return new Date()
   })
-  exportTo($Date, 'getTime', Date.now ? function Date$time () {
+  exportTo($Date, 'time', Date.now ? function Date$time () {
     return Date.now()
   } : function Date$time () {
     return new Date().getTime()
@@ -325,8 +329,7 @@ function initializeSpace ($) {
 }
 
 module.exports = function (output) {
-  var $ = Object.create(null)
-  $.identityName = '$'
+  var $ = $export.copy('$')
 
   // meta information
   var sugly = exportTo($, 'Sugly', {})

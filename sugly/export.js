@@ -1,7 +1,14 @@
 'use strict'
 
 function exportTo (container, name, obj) {
-  if (typeof obj === 'object' || typeof obj === 'function') {
+  if (!obj) {
+    obj = Object.create(null)
+    obj.$has = Object.prototype.hasOwnProperty
+  } else if (!name) {
+    name = obj.identityName
+  }
+
+  if (!obj.identityName && (typeof obj === 'object' || typeof obj === 'function')) {
     var parent = container.identityName
     if (parent === '$') {
       obj.identityName = name
@@ -18,7 +25,7 @@ function exportTo (container, name, obj) {
 
 function wrapFunction (container, name, owner, func) {
   exportTo(container, name, function () {
-    return func.apply(owner, arguments)
+    return func.apply(owner || this, arguments)
   })
 }
 
@@ -35,6 +42,7 @@ function mapAll (obj) {
 function copyObject (name, src, mapping, target) {
   if (!src) {
     src = Object.create(null)
+    src.$has = Object.prototype.hasOwnProperty
     src.identityName = name
     return src
   }

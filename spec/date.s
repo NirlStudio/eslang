@@ -72,9 +72,9 @@
   ($should "(Date now)" "return current time" (= ()
     (assert (` (<= (Date now) (Date now),
   ),
-  ($should "(Date getTime)" "return the timestamp of current time" (= ()
-    (assert (` (<= (Date getTime) ((Date now) getTime),
-    (assert (` (<= ((Date now) getTime) (Date getTime),
+  ($should "(Date time)" "return the timestamp of current time" (= ()
+    (assert (` (<= (Date time) ((Date now) time),
+    (assert (` (<= ((Date now) time) (Date time),
   ),
   ($should "(Date parse )"  "return the date by parsing the string" (= ()
     (let epoch (Date parse "1 January, 1970, 00:00:00 UTC"),

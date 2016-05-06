@@ -4,7 +4,6 @@ var $export = require('../export')
 var dump = $export.dump(Array)
 
 var $inst = {}
-Object.assign($inst, dump.props)
 Object.assign($inst, dump.methods)
 
 function isType () {
@@ -30,33 +29,47 @@ function create () {
   }
 }
 
+function isSame () {
+  return function Array$is_same (another) {
+    return Object.is(this, another)
+  }
+}
+
+function equals ($, is_same) {
+  return function Array$equals (another) {
+    if (is_same.call(this, another)) {
+      return true
+    }
+    if (!Array.isArray(this) || !Array.isArray(another) || this.length !== another.length) {
+      return false
+    }
+    var length = this.length
+    for (var i = 0; i < length; i++) {
+      var value = this[i]
+      var eq = $.$resolve(value, 'equals')
+      if (typeof eq !== 'function' || !eq.call(value, another[i])) {
+        return false
+      }
+    }
+    return true
+  }
+}
+
 function toCode ($) {
-  return function Array$to_code (value, pretty) {
-    return $.encode.array(value)
+  return function Array$to_code (pretty) {
+    return $.encode.array(this)
   }
 }
 
-function toString ($) {
-  return function Array$to_string (value, format) {
-    return $.encode.array(value)
+function toClause ($) {
+  return function Array$to_clause (pretty) {
+    return $.encode.clause(this)
   }
 }
 
-function codeAsClause ($) {
-  return function Array$code_as_clause (value, pretty) {
-    return $.encode.clause(value)
-  }
-}
-
-function codeAsProgram ($) {
-  return function Array$code_as_program (value, pretty) {
-    return $.encode(value)
-  }
-}
-
-function isInstance () {
-  return function Array$is_instance (value) {
-    return Object.is(this, value)
+function toProgram ($) {
+  return function Array$to_program (pretty) {
+    return $.encode(this)
   }
 }
 
@@ -66,26 +79,38 @@ function concat () {
   }
 }
 
+function ofType () {
+  return function Array$of (type, length, value) {
+    // TODO - to be implemented
+    return []
+  }
+}
+
+function fromSource () {
+  return function Array$from (source, mapFunc, thisArg) {
+    // TODO - to be implemented
+    return []
+  }
+}
+
 module.exports = function ($) {
-  var $Array = $export.copy('Array')
+  var type = $export($, 'Array')
+  $export(type, 'is', isType())
+  $export(type, 'create', create())
 
-  $Array.create = create()
-  $Array.concat = concat()
-  $Array.of = function (type/*, items */) {
-    // TODO - typed array
-    return []
-  }
-  $Array.from = function (src, mapFunc, thisArg) {
-    // TODO - iterable to array
-    return []
-  }
+  $export(type, 'concat', concat())
+  $export(type, 'of', ofType())
+  $export(type, 'from', fromSource())
 
-  $Array.$ = $export.copy('$', $inst)
-  $Array.$['to-code'] = toCode($)
-  $Array.$['to-string'] = toString($)
+  var pt = $export(type, null, $export.copy('$', $inst))
+  var is_same = $export(pt, 'is', isSame())
+  $export(pt, 'equals', equals($, is_same))
 
-  $Array.$['to-clause'] = toClause($)
-  $Array.$['to-program'] = toProgram($)
+  $export(pt, 'to-code', toCode($))
+  $export(pt, 'to-string', toCode($))
 
-  return $Array
+  $export(pt, 'to-clause', toClause($))
+  $export(pt, 'to-program', toProgram($))
+
+  return type
 }

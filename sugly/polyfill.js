@@ -93,6 +93,16 @@ if (forcePolyfill || typeof Array.isArray !== 'function') {
   }
 }
 
+if (forcePolyfill || typeof Number.isInteger !== 'function') {
+  records.push('Number.isInteger')
+
+  JS.Number.isInteger = function (value) {
+    return typeof value === 'number' &&
+      isFinite(value) &&
+      Math.floor(value) === value
+  }
+}
+
 module.exports = {
   functions: records
 }
