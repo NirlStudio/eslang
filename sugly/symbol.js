@@ -12,7 +12,7 @@ function Symbol$ (key) {
   })
 }
 
-function Symbol$isKey (key) {
+function Symbol$is_key (key) {
   return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
 }
 
@@ -21,15 +21,15 @@ function useNativeSymbol () {
 
   return {
     Nothing: nothing,
-    isKey: Symbol$isKey,
+    'is-key': Symbol$is_key,
     // to be used by tokenizer
     $InvalidSymbol: InvalidSymbol,
 
     for: function Symbol$for (key) {
-      return Symbol$isKey(key) ? Symbol.for(key) : nothing
+      return Symbol$is_key(key) ? Symbol.for(key) : nothing
     },
 
-    keyFor: function Symbol$keyFor (sym) {
+    'key-for': function Symbol$key_for (sym) {
       return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
     },
 
@@ -45,12 +45,12 @@ var nothing = sharedSymbols[''] = new Symbol$('')
 function usePolyfillSymbol () {
   return {
     Nothing: nothing,
-    isKey: Symbol$isKey,
+    'is-key': Symbol$is_key,
     // to be used by tokenizer
     $InvalidSymbol: InvalidSymbol,
 
     for: function Symbol$for (key) {
-      if (!Symbol$isKey(key)) {
+      if (!Symbol$is_key(key)) {
         return nothing
       }
       if (sharedSymbols[key]) {
@@ -59,7 +59,7 @@ function usePolyfillSymbol () {
       return (sharedSymbols[key] = new Symbol$(key))
     },
 
-    keyFor: function Symbol$keyFor (sym) {
+    'key-for': function Symbol$key_for (sym) {
       return sym instanceof Symbol$ ? sym.$key : ''
     },
 

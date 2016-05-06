@@ -14,7 +14,7 @@ function initializeSharedContext ($) {
   }
   warn = $.print.warn
   symbolFor = $.Symbol.for
-  symbolKeyFor = $.Symbol.keyFor
+  symbolKeyFor = $.Symbol['key-for']
   isSymbol = $.Symbol.is
 
   SymbolContext = symbolFor('$')

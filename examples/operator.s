@@ -1,5 +1,5 @@
 (operator add1
-  ($print %0)($print %1)($print %2)
+  (print code %0 " " %1 " " %2)
   (++ counter)
   (+ %0 %1).
 

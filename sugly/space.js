@@ -50,19 +50,19 @@ function copyJSObject (name, jsObject) {
 
 function exportSymbol () {
   var $Symbol = require('./symbol')()
-  $Symbol.identityName = '($"Symbol")'
+  $Symbol.identityName = 'Symbol'
 
-  $Symbol.for.identityName = '(Symbol "for")'
-  $Symbol.keyFor.identityName = '(Symbol "keyFor")'
-  $Symbol.isKey.identityName = '(Symbol "isKey")'
   $Symbol.is.identityName = '(Symbol "is")'
+  $Symbol.for.identityName = '(Symbol "for")'
+  $Symbol['key-for'].identityName = '(Symbol "key-for")'
+  $Symbol['is-key'].identityName = '(Symbol "is-key")'
 
   return $Symbol
 }
 
 function exportNumber () {
   var $Number = {}
-  $Number.identityName = '($"Number")'
+  $Number.identityName = 'Number'
 
   $Number.NaN = JS.NaN
   $Number.Infinity = JS.Infinity
@@ -76,30 +76,30 @@ function exportNumber () {
   $Number.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
   $Number.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
 
-  exportTo($Number, 'isFinite', function Number$isFinite (value) {
+  exportTo($Number, 'is-finite', function Number$is_finite (value) {
     return typeof value === 'number' ? JS.isFinite(value) : false
   })
-  exportTo($Number, 'isNaN', function Number$isNaN (value) {
+  exportTo($Number, 'not-number', function Number$not_number (value) {
     return typeof value === 'number' ? JS.isNaN(value) : true
   })
 
-  exportTo($Number, 'isInteger', Number.isInteger ? function Number$isInteger (value) {
+  exportTo($Number, 'is-int', Number.isInteger ? function Number$is_int (value) {
     return Number.isInteger(value)
-  } : function Number$isInteger (value) {
+  } : function Number$is_int (value) {
     return typeof value === 'number' &&
       isFinite(value) &&
       Math.floor(value) === value
   })
-  exportTo($Number, 'isSafeInteger', Number.isSafeInteger ? function Number$isSafeInteger (value) {
+  exportTo($Number, 'safe-int', Number.isSafeInteger ? function Number$safe_int (value) {
     return Number.isSafeInteger(value)
-  } : function Number$isSafeInteger (value) {
+  } : function Number$safe_int (value) {
     return $Number.isInteger(value) && Math.abs(value) <= $Number.MAX_SAFE_INTEGER
   })
 
-  exportTo($Number, 'parseFloat', function Number$parseFloat (value) {
+  exportTo($Number, 'parse', function Number$parse (value) {
     return typeof value === 'undefined' || value === null ? 0 : JS.parseFloat(value)
   })
-  exportTo($Number, 'parseInt', function Number$parseInt (value, radix) {
+  exportTo($Number, 'parse-int', function Number$parse_int (value, radix) {
     return typeof value === 'undefined' || value === null ? 0 : JS.parseInt(value, radix)
   })
 
@@ -226,6 +226,22 @@ function exportUriFunctions () {
   return Uri
 }
 
+function $is_empty (obj) { // TODO - to be refined.
+  if (typeof obj === 'undefined' || obj === null) {
+    return true
+  }
+  if (typeof obj.length === 'number') {
+    return obj.length < 1
+  }
+  if (typeof obj.size === 'number') {
+    return obj.size < 1
+  }
+  if (typeof obj === 'object') {
+    return Object.getOwnPropertyNames(obj).length < 1
+  }
+  return obj === 0 || obj === false
+}
+
 function initializeSpace ($) {
   exportTo($, 'Bool', {}) // reserve Bool
   exportTo($, 'bool', function $bool (value) {
@@ -297,23 +313,9 @@ function initializeSpace ($) {
 
   exportTo($, 'range', require('./range'))
   exportTo($, 'iterate', require('./iterate'))
-  exportTo($, 'isEmpty', function (obj) { // TODO - to be refined.
-    if (typeof obj === 'undefined' || obj === null) {
-      return true
-    }
-    if (typeof obj.length === 'number') {
-      return obj.length < 1
-    }
-    if (typeof obj.size === 'number') {
-      return obj.size < 1
-    }
-    if (typeof obj === 'object') {
-      return Object.getOwnPropertyNames(obj).length < 1
-    }
-    return obj === 0 || obj === false
-  })
-  exportTo($, 'isNotEmpty', function (obj) {
-    return !$.isEmpty(obj)
+  exportTo($, 'is-empty', $is_empty)
+  exportTo($, 'not-empty', function (obj) {
+    return !$is_empty(obj)
   })
 
   exportTo($, 'Bit', exportBitwiseOperators())

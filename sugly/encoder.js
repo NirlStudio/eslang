@@ -9,6 +9,8 @@ function exportTo (container, name, obj) {
 
 function encoder ($, pretty) {
   var $Symbol = $.Symbol
+  var symbolIs = $Symbol.is
+  var symbolKeyFor = $Symbol['key-for']
   var SymbolContext = $Symbol.for('$')
   var SymbolFor = $Symbol.for('for')
 
@@ -47,7 +49,7 @@ function encoder ($, pretty) {
   }
 
   function encodeSymbol (sym) {
-    var key = $Symbol.keyFor(sym)
+    var key = symbolKeyFor(sym)
     return key.length > 0 ? '(` ' + key + ')' : ''
   }
 
@@ -120,9 +122,9 @@ function encoder ($, pretty) {
       }
       var p = params[i]
       if (p[1] === null) {
-        code += $Symbol.keyFor(p[0])
+        code += symbolKeyFor(p[0])
       } else {
-        code += '(' + $Symbol.keyFor(p[0]) + ' ' + encodeValue(p[1]) + ')'
+        code += '(' + symbolKeyFor(p[0]) + ' ' + encodeValue(p[1]) + ')'
       }
     }
 
@@ -169,7 +171,7 @@ function encoder ($, pretty) {
         if (value === null) {
           return 'null'
         }
-        return $Symbol.is(value) ? encodeSymbol(value) : encodeObject(value)
+        return symbolIs(value) ? encodeSymbol(value) : encodeObject(value)
       case 'function':
         return encodeFunction(value)
       default:
@@ -215,8 +217,8 @@ function encoder ($, pretty) {
   // value, symbol or clause
   function encodeClause (clause) {
     if (!Array.isArray(clause)) {
-      if ($Symbol.is(clause)) {
-        return $Symbol.keyFor(clause)
+      if (symbolIs(clause)) {
+        return symbolKeyFor(clause)
       } else {
         return encodeValue(clause)
       }
@@ -297,7 +299,7 @@ function encoder ($, pretty) {
     if (typeof obj === 'undefined' || obj === null) {
       return 'null' // null is always possible.
     }
-    if (typeof obj !== 'object' || $Symbol.is(obj)) {
+    if (typeof obj !== 'object' || symbolIs(obj)) {
       return '(@>)' // empty object for non-object
     }
     // array and date are valid objects.

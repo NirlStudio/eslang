@@ -74,13 +74,13 @@
   ($should "return the quotient of dividing the first argument by other arguments" (= ()
     (assert 0 (` (/),
     (assert 1 (` (/ 1),
-    (assert false (` (Number isFinite (/ 1 0),
+    (assert false (` (Number is-finite (/ 1 0),
     (assert 2 (` (/ 4 2),
     (assert 3 (` (/ 18 2 3),
 
-    (assert true (` (Number isNaN (/ 1 ""),
-    (assert true (` (Number isNaN (/ 1 "1"),
-    (assert true (` (Number isNaN (/ 1 (@),
+    (assert true (` (Number not-number (/ 1 ""),
+    (assert true (` (Number not-number (/ 1 "1"),
+    (assert true (` (Number not-number (/ 1 (@),
 ).
 
 (let mVar4 20)

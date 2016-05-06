@@ -129,8 +129,8 @@
 ($range range)(range range)
 ($iterate iterate)(iterate iterate)
 
-($isEmpty isEmpty)(isEmpty isEmpty)
-($isNotEmpty isNotEmpty)(isNotEmpty isNotEmpty)
+($is-empty is-empty)(is-empty is-empty)
+($not-empty not-empty)(not-empty not-empty)
 
 ($compile compile)(compile compile)
 ($encoder encoder)(encoder encoder)

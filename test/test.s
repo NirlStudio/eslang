@@ -18,7 +18,7 @@
     (let do subject)
     (let subject "")
   ),
-  (if (!($isEmpty subject))
+  (if (!($is-empty subject))
     (+= subject " ")
   ),
   (current push (@
