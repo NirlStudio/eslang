@@ -32,11 +32,12 @@
   ),
 ).
 
-($define "stringOfChars" (=()
+($define "string of chars" (=()
   ($should "return the string of characters" (= ()
-    (assert "" (` ($stringOfChars)
-    (assert "A" (` ($stringOfChars 65)
-    (assert "AB" (` ($stringOfChars 65 66)
+    (assert "" (` (String of-chars),
+    (assert "A" (` (String of-chars 65),
+    (assert "AB" (` (String of-chars 65 66),
+    (assert "ABC" (` (String of-chars 65 66 67),
 ).
 
 ($define "String object" (= ()

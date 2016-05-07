@@ -53,8 +53,10 @@ function copyObject (name, src, mapping, target) {
 
   if (!target) {
     target = Object.create(null)
+    src.$has = Object.prototype.hasOwnProperty
     target.identityName = name
   }
+
   var keys = Object.getOwnPropertyNames(mapping)
   for (var i in keys) {
     var key = keys[i]

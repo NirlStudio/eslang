@@ -3,31 +3,31 @@
   ($should "exist with its members" (= ()
     (assert "object" (` (typeof ($Symbol),
     (assert "symbol" (` (typeof (Symbol Nothing),
-    (assert "function" (` (typeof (Symbol "for"),
-    (assert "function" (` (typeof (Symbol "key-for"),
+    (assert "function" (` (typeof (Symbol "value-of"),
+    (assert "function" (` (typeof (Symbol "key-of"),
     (assert "function" (` (typeof (Symbol "is-key"),
     (assert "function" (` (typeof (Symbol "is"),
   ),
-  ($should "(Symbol for)" "create an symbol for a key" (= ()
-    (assert (Symbol Nothing) (` (Symbol for),
-    (assert (Symbol Nothing) (` (Symbol for null),
-    (assert (Symbol Nothing) (` (Symbol for 3),
-    (assert (Symbol Nothing) (` (Symbol for (@),
-    (assert (Symbol Nothing) (` (Symbol for (object),
-    (assert (Symbol Nothing) (` (Symbol for (= x x),
-    (assert (Symbol Nothing) (` (Symbol for ""),
-    (assert (` sym) (` (Symbol for "sym"),
+  ($should "(Symbol value-of )" "create an symbol for a key" (= ()
+    (assert (Symbol Nothing) (` (Symbol value-of),
+    (assert (Symbol Nothing) (` (Symbol value-of null),
+    (assert (Symbol Nothing) (` (Symbol value-of 3),
+    (assert (Symbol Nothing) (` (Symbol value-of (@),
+    (assert (Symbol Nothing) (` (Symbol value-of (object),
+    (assert (Symbol Nothing) (` (Symbol value-of (= x x),
+    (assert (Symbol Nothing) (` (Symbol value-of ""),
+    (assert (` sym) (` (Symbol value-of "sym"),
   ),
-  ($should "(Symbol key-for)" "retrieve the key for a symbol" (= ()
-    (assert "" (` (Symbol key-for),
-    (assert "" (` (Symbol key-for null),
-    (assert "" (` (Symbol key-for 3),
-    (assert "" (` (Symbol key-for (@),
-    (assert "" (` (Symbol key-for (object),
-    (assert "" (` (Symbol key-for (= x x),
-    (assert "" (` (Symbol key-for "symbol"),
-    (assert "" (` (Symbol key-for (Symbol Nothing),
-    (assert "sym" (` (Symbol key-for (` sym),
+  ($should "(Symbol key-of)" "retrieve the key of a symbol" (= ()
+    (assert "" (` (Symbol key-of),
+    (assert "" (` (Symbol key-of null),
+    (assert "" (` (Symbol key-of 3),
+    (assert "" (` (Symbol key-of (@),
+    (assert "" (` (Symbol key-of (object),
+    (assert "" (` (Symbol key-of (= x x),
+    (assert "" (` (Symbol key-of "symbol"),
+    (assert "" (` (Symbol key-of (Symbol Nothing),
+    (assert "sym" (` (Symbol key-of (` sym),
   ),
   ($should "(Symbol is-key)" "return true for a valid symbol key." (= ()
     (assert true (` (Symbol is-key "$"),
@@ -73,7 +73,7 @@
 
 ($define "function form" (=()
   ($should "return the symbol value of a string" (= ()
-    (assert "sym" (` (Symbol key-for ($symbol "sym"),
+    (assert "sym" (` (Symbol key-of ($symbol "sym"),
     (assert (` $) (` ($symbol "$"),
     (assert (` `) (` ($symbol "`"),
     (assert (` @) (` ($symbol "@"),
@@ -100,7 +100,7 @@
 
 ($define "operator form" (=()
   ($should "return the symbol value of a string" (= ()
-    (assert "sym" (` (Symbol key-for (symbol "sym"),
+    (assert "sym" (` (Symbol key-of (symbol "sym"),
     (assert (` $) (` (symbol "$"),
     (assert (` `) (` (symbol "`"),
     (assert (` @) (` (symbol "@"),

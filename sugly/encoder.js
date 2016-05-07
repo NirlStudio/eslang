@@ -10,9 +10,11 @@ function exportTo (container, name, obj) {
 function encoder ($, pretty) {
   var $Symbol = $.Symbol
   var symbolIs = $Symbol.is
-  var symbolKeyFor = $Symbol['key-for']
-  var SymbolContext = $Symbol.for('$')
-  var SymbolFor = $Symbol.for('for')
+  var symbolValueOf = $Symbol['value-of']
+  var symbolKeyOf = $Symbol['key-of']
+
+  var SymbolContext = symbolValueOf('$')
+  var SymbolFor = symbolValueOf('for')
 
   var indentStack = []
   var indentValue = ''
@@ -49,7 +51,7 @@ function encoder ($, pretty) {
   }
 
   function encodeSymbol (sym) {
-    var key = symbolKeyFor(sym)
+    var key = symbolKeyOf(sym)
     return key.length > 0 ? '(` ' + key + ')' : ''
   }
 
@@ -122,9 +124,9 @@ function encoder ($, pretty) {
       }
       var p = params[i]
       if (p[1] === null) {
-        code += symbolKeyFor(p[0])
+        code += symbolKeyOf(p[0])
       } else {
-        code += '(' + symbolKeyFor(p[0]) + ' ' + encodeValue(p[1]) + ')'
+        code += '(' + symbolKeyOf(p[0]) + ' ' + encodeValue(p[1]) + ')'
       }
     }
 
@@ -218,7 +220,7 @@ function encoder ($, pretty) {
   function encodeClause (clause) {
     if (!Array.isArray(clause)) {
       if (symbolIs(clause)) {
-        return symbolKeyFor(clause)
+        return symbolKeyOf(clause)
       } else {
         return encodeValue(clause)
       }

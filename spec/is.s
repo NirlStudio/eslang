@@ -3,8 +3,8 @@
     (assert (` (is),
     (assert (` (is null),
     (assert (` (is null null),
-    (assert (` (is (Number NaN) (Number NaN),
-    (assert false (` (== (Number NaN) (Number NaN),
+    (assert (` (is NaN NaN),
+    (assert false (` (== NaN NaN),
 
     (let obj1 (@p:1),
     (let obj2(@p:1),
@@ -59,7 +59,7 @@
     (assert false (` (is like),
     (assert false (` (is like null),
     (assert (` (is null like null),
-    (assert (` (is (Number NaN) like (Number NaN),
+    (assert (` (is NaN like NaN),
 
     (assert (` (is true like true),
     (assert (` (is false like false),

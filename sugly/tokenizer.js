@@ -10,7 +10,7 @@ var keywords = {
 
 function tokenizer ($, lines, source) {
   var InvalidSymbol = $.Symbol.$InvalidSymbol
-  var symbolFor = $.Symbol.for
+  var symbolValueOf = $.Symbol['value-of']
   var warn = $.print.warn
 
   var lineNo = 0
@@ -134,7 +134,7 @@ function tokenizer ($, lines, source) {
     if (RegexNumber.test(s)) {
       return finalizeToken(token, Number.parseFloat(s), 'value')
     }
-    return finalizeToken(token, symbolFor(s))
+    return finalizeToken(token, symbolValueOf(s))
   }
 
   return function nextToken () {
@@ -171,7 +171,7 @@ function tokenizer ($, lines, source) {
       case '@':
       case ':':
         // single character symbols.
-        return finalizeToken(createToken('symbol'), symbolFor(c))
+        return finalizeToken(createToken('symbol'), symbolValueOf(c))
 
       case "'": // reserved as a punctuation.
         return nextToken()

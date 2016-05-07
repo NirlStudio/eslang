@@ -103,7 +103,7 @@
 
     (assert false (` (Number is-int (Number MIN_VALUE),
     (assert false (` (Number is-int (Number Infinity),
-    (assert false (` (Number is-int (Number NaN),
+    (assert false (` (Number is-int NaN),
 
     (assert false (` (Number is-int),
     (assert false (` (Number is-int null),
@@ -128,7 +128,7 @@
     (assert false (` (Number safe-int (Number MAX_VALUE),
     (assert false (` (Number safe-int (Number MIN_VALUE),
     (assert false (` (Number safe-int (Number Infinity),
-    (assert false (` (Number safe-int (Number NaN),
+    (assert false (` (Number safe-int NaN),
 
     (assert false (` (Number safe-int),
     (assert false (` (Number safe-int null),

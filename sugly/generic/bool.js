@@ -14,16 +14,21 @@ function valueOf () {
   }
 }
 
-function isSame (value_of) {
+function isSame () {
   return function Bool$is_same (value) {
-    var left = typeof this === 'boolean' ? this : value_of(this)
-    return left === (typeof value === 'boolean' ? value : value_of(value))
+    return typeof this === 'boolean' ? this === value : false
   }
 }
 
-function toCode (value_of) {
+function equals () {
+  return function Bool$equals (value) {
+    return typeof this === 'boolean' ? this === value : false
+  }
+}
+
+function toCode () {
   return function Bool$to_code () {
-    return typeof this === 'boolean' ? this.toString() : value_of(this).toString()
+    return typeof this === 'boolean' ? this.toString() : 'false'
   }
 }
 
@@ -75,11 +80,11 @@ module.exports = function ($) {
   var not = $export(type, 'not', boolNot(value_of))
 
   var pt = $export(type, null, $export.copy('$'))
-  $export(pt, 'is', isSame(value_of))
-  $export(pt, 'equals', isSame(value_of))
+  $export(pt, 'is', isSame())
+  $export(pt, 'equals', equals())
 
-  $export(pt, 'to-code', toCode(value_of))
-  $export(pt, 'to-string', toCode(value_of))
+  $export(pt, 'to-code', toCode())
+  $export(pt, 'to-string', toCode())
 
   $export(pt, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))

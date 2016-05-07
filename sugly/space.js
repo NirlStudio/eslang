@@ -49,21 +49,12 @@ function copyJSObject (name, jsObject) {
   return copied
 }
 
-function exportSymbol () {
-  var $Symbol = require('./generic/symbol')()
-  $Symbol.identityName = 'Symbol'
-
-  $Symbol.is.identityName = '(Symbol "is")'
-  $Symbol.for.identityName = '(Symbol "for")'
-  $Symbol['key-for'].identityName = '(Symbol "key-for")'
-  $Symbol['is-key'].identityName = '(Symbol "is-key")'
-
-  return $Symbol
-}
-
-function exportNumber () {
+function exportNumber ($) {
   var $Number = {}
   $Number.identityName = 'Number'
+
+  $.NaN = NaN
+  $.Infinity = Infinity
 
   $Number.NaN = JS.NaN
   $Number.Infinity = JS.Infinity
@@ -247,13 +238,20 @@ function $is_empty (obj) { // TODO - to be refined.
 }
 
 function initializeSpace ($) {
+  exportTo($, 'Symbol', require('./generic/symbol')($))
+  exportTo($, 'symbol', $.Symbol['value-of'])
+
   exportTo($, 'Bool', {}) // reserve Bool
   exportTo($, 'bool', function $bool (value) {
     return typeof value !== 'undefined' && value !== false && value !== null && value !== 0
   })
 
-  exportTo($, 'String', {}) // reserve String
-  exportTo($, 'string', function $string () {
+  exportTo($, 'String', {
+    'of-chars': function $string_of_chars () {
+      return String.fromCharCode.apply(String, arguments)
+    }
+  }) // reserve String
+  exportTo($, 'string', function $string (input) {
     var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
     var str = ''
     for (var i = 0; i < args.length; i++) {
@@ -266,16 +264,8 @@ function initializeSpace ($) {
     }
     return str
   })
-  exportTo($, 'stringOfChars', function $stringOfChars () {
-    return String.fromCharCode.apply(String, arguments)
-  })
 
-  exportTo($, 'Symbol', exportSymbol())
-  exportTo($, 'symbol', function $symbol (key) {
-    return $.Symbol.for(key)
-  })
-
-  exportTo($, 'Number', exportNumber())
+  exportTo($, 'Number', exportNumber($))
   exportTo($, 'number', function $number (value) {
     if (typeof value === 'string') {
       return parseFloat(value)
@@ -346,10 +336,10 @@ module.exports = function (output) {
   })
 
   // encode function factory
-  exportTo($, 'encoder', require('./encoder'))
+  var encoder = exportTo($, 'encoder', require('./encoder'))
 
   // default encode function
-  exportTo($, 'encode', require('./encoder')($, true))
+  exportTo($, 'encode', encoder($, true))
 
   // default output function. depending on $.encode
   exportTo($, 'print', require('./print')($, output))

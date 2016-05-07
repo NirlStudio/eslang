@@ -64,7 +64,7 @@
     (assert (` (typeof 1 "number"),
     (assert (` (typeof 0 "number"),
     (assert (` (typeof -1 "number"),
-    (assert (` (typeof (Number NaN) "number"),
+    (assert (` (typeof NaN "number"),
     (assert (` (typeof (number Infinity) "number"),
     (assert false (` (typeof null "number"),
     (assert false (` (typeof false "number"),

@@ -3,7 +3,7 @@
 var makeSpace = require('./sugly/space')
 
 var warn
-var symbolFor, symbolKeyFor, isSymbol
+var symbolValueOf, symbolKeyOf, isSymbol
 var SymbolContext, SymbolQuote, SymbolIndexer, SymbolAssign, SymbolDerive,
   SymbolLambdaShort, SymbolObject, SymbolLambda, SymbolLike, SymbolElse,
   SymbolIn, SymbolThen, SymbolNext, SymbolRepeat, SymbolExport
@@ -13,34 +13,34 @@ function initializeSharedContext ($) {
     return
   }
   warn = $.print.warn
-  symbolFor = $.Symbol.for
-  symbolKeyFor = $.Symbol['key-for']
+  symbolValueOf = $.Symbol['value-of']
+  symbolKeyOf = $.Symbol['key-of']
   isSymbol = $.Symbol.is
 
-  SymbolContext = symbolFor('$')
-  SymbolQuote = symbolFor('`')
-  SymbolIndexer = symbolFor(':')
+  SymbolContext = symbolValueOf('$')
+  SymbolQuote = symbolValueOf('`')
+  SymbolIndexer = symbolValueOf(':')
 
-  SymbolAssign = symbolFor('<')
-  SymbolDerive = symbolFor('>')
+  SymbolAssign = symbolValueOf('<')
+  SymbolDerive = symbolValueOf('>')
   SymbolLambdaShort = SymbolDerive
-  SymbolObject = symbolFor('@')
+  SymbolObject = symbolValueOf('@')
 
-  SymbolLambda = symbolFor('=>')
+  SymbolLambda = symbolValueOf('=>')
 
-  SymbolLike = symbolFor('like')
-  SymbolElse = symbolFor('else')
-  SymbolIn = symbolFor('in')
+  SymbolLike = symbolValueOf('like')
+  SymbolElse = symbolValueOf('else')
+  SymbolIn = symbolValueOf('in')
 
-  SymbolThen = symbolFor('then')
-  SymbolNext = symbolFor('next')
+  SymbolThen = symbolValueOf('then')
+  SymbolNext = symbolValueOf('next')
 
-  SymbolRepeat = symbolFor('*')
-  SymbolExport = symbolFor('export')
+  SymbolRepeat = symbolValueOf('*')
+  SymbolExport = symbolValueOf('export')
 }
 
 function resolve ($, sym) {
-  var key = symbolKeyFor(sym)
+  var key = symbolKeyOf(sym)
   switch (key) {
     case '$':
       return $ // $ is always the current space.
@@ -74,7 +74,7 @@ function set (subject, sym, value) {
     return null
   }
 
-  var key = symbolKeyFor(sym)
+  var key = symbolKeyOf(sym)
   if (!key.startsWith('$') && !key.startsWith('__')) {
     subject[key] = value
   }
@@ -87,7 +87,7 @@ function getter (subject, key) {
   }
 
   if (isSymbol(key)) {
-    key = symbolKeyFor(key)
+    key = symbolKeyOf(key)
   }
 
   var value = subject[key]
@@ -108,7 +108,7 @@ function indexer (key, value) {
 
   // setting property
   if (typeof key === 'string') {
-    return set(this, symbolFor(key), value)
+    return set(this, symbolValueOf(key), value)
   }
   if (isSymbol(key)) {
     return set(this, key, value)
@@ -147,7 +147,7 @@ function seval (clause, $) {
   var subject = clause[0]
   // intercept subject
   if (isSymbol(subject)) {
-    var key = symbolKeyFor(subject)
+    var key = symbolKeyOf(subject)
     if ($.$operators.hasOwnProperty(key)) {
       return $.$operators[key]($, clause)
     }
@@ -178,7 +178,7 @@ function seval (clause, $) {
   var func
   switch (typeof predicate) {
     case 'string': // an immediate string indicating get/set command.
-      var sym = symbolFor(predicate)
+      var sym = symbolValueOf(predicate)
       return length > 2 ? set(subject, sym, seval(clause[2], $)) : resolve(subject, sym)
 
     case 'symbol': // native symbol
@@ -246,7 +246,7 @@ $operators['`'] = function ($, clause) {
 $operators['quote'] = $operators['`']
 
 function assign ($, sym, value) {
-  var key = symbolKeyFor(sym)
+  var key = symbolKeyOf(sym)
   if (Object.prototype.hasOwnProperty.call($, key)) {
     $[key] = value
     return value
@@ -304,7 +304,7 @@ function objectCreate ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = symbolFor(key)
+      key = symbolValueOf(key)
     } else if (!isSymbol(key)) {
       break
     }
@@ -328,7 +328,7 @@ function objectAssign ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = symbolFor(key)
+      key = symbolValueOf(key)
     } else if (!isSymbol(key)) {
       break
     }
@@ -359,7 +359,7 @@ function objectDerive ($, clause) {
   while (i < length && clause[i] === SymbolIndexer) {
     var key = clause[i - 1]
     if (typeof key === 'string') {
-      key = symbolFor(key)
+      key = symbolValueOf(key)
     } else if (!isSymbol(key)) {
       break
     }
@@ -1024,7 +1024,7 @@ $operators['operator'] = function ($, impl) {
     offset = 2
   }
 
-  var key = symbolKeyFor(name)
+  var key = symbolKeyOf(name)
   var existed = $.$operators.hasOwnProperty(key)
   if (exporting) {
     if (existed) {
@@ -1736,7 +1736,7 @@ function $lambdaIn ($) {
 function $exportTo ($) {
   return function $export (key, value) {
     if (typeof key === 'string') {
-      key = symbolFor(key)
+      key = symbolValueOf(key)
     } else if (!isSymbol(key)) {
       return null
     }

@@ -20,7 +20,7 @@ function create () {
 
 function isSame () {
   return function Date$is_same (another) {
-    return Object.is(this, another)
+    return this instanceof Date ? this === another : false
   }
 }
 

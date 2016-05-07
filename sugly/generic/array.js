@@ -31,7 +31,7 @@ function create () {
 
 function isSame () {
   return function Array$is_same (another) {
-    return Object.is(this, another)
+    return Array.isArray(this) ? this === another : false
   }
 }
 
