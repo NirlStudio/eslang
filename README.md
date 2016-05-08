@@ -3,9 +3,15 @@ sugly-lang
 A simple &amp; ugly programming language
 
 ```sugly
-(print code "Hello, world!")
+"Hello, world!" # value ouput
 
 ```
+or
+```sugly
+(print code "Hello, world!")
+() #reset module output
+```
+
 Run from npm
 ------------
 - Install the package

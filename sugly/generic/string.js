@@ -1,10 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(String)
-
-var $inst = {}
-Object.assign($inst, dump.methods)
 
 function isType () {
   return function String$is_type (value) {
@@ -13,16 +9,16 @@ function isType () {
 }
 
 function valueOf ($) {
-  return function String$value_of (input) {
+  return function String$value_of () {
     var length = arguments.length
     var result = ''
     for (var i = 0; i < length; i++) {
-      var arg = arguments[0]
+      var arg = arguments[i]
       if (typeof arg === 'string') {
         result += arg
         continue
       }
-      if (result.length > 0) {
+      if (result.length > 0 && !result.endsWith(' ')) {
         result += ' '
       }
       var to_str = $.$resolve(arg, 'to-string')
@@ -52,6 +48,7 @@ function toCode ($) {
 
 function toString () {
   return function String$to_string () {
+    console.log('is string?', typeof this === 'string')
     return typeof this === 'string' ? this : ''
   }
 }
@@ -59,12 +56,35 @@ function toString () {
 module.exports = function ($) {
   var type = $export($, 'String')
   $export(type, 'is', isType())
-  $export(type, 'code-of', codeOf())
+  $export(type, 'code-of', codeOf($))
 
-  var value_of = $export(type, 'value-of', valueOf())
+  var value_of = $export(type, 'value-of', valueOf($))
   $export.wrap(type, 'of-chars', String, String.fromCharCode)
 
-  var pt = $export(type, null, $export.copy('$', $inst))
+  var pt = $export(type, null, $export.copy('$', String.prototype, {
+    /* CH/FF/IE/OP/SF */
+    'charAt': 'char-at',
+    'charCodeAt': 'chat-code-at',
+    'indexOf': 'index-of',
+    'lastIndexOf': 'last-index-of',
+    'localeCompare': 'locale-compare',
+    'match': 'match',
+    'replace': 'replace',
+    'search': 'search',
+    'slice': 'slice',
+    'split': 'split',
+    'substr': 'substring',
+    'substring': 'substring-in',
+    'toLocaleLowerCase': 'to-locale-lower',
+    'toLocaleUpperCase': 'to-locale-upper',
+    'toLowerCase': 'to-lower',
+    'toUpperCase': 'to-upper',
+
+    /* polyfilled */
+    'trim': 'trim',
+    'endsWith': 'ends-with',
+    'startsWith': 'starts-with'
+  }))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', isSame())
 

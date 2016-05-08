@@ -46,7 +46,7 @@
     (assert 6 (`(a1:2),
 ).
 
-($define "arrayOf" (=()
+($define "(Array concat ...)" (=()
   ($should "return an array with expanded arguments" (= ()
     (let a1 (Array concat ),
     (assert 0 (`(a1 length),
@@ -63,6 +63,24 @@
     (assert 6 (`(a1:2),
     (assert 12 (`(a1:5),
     (assert 16 (`(a1:7),
+).
+
+($define "(Array comparison ...)" (=()
+  ($should "return whether two arrays have equivalent values." (= ()
+    (let a1 (@),
+    (let a2 (@),
+    (assert false (` (a1 is a2),
+    (assert (` (a1 equals a2),
+
+    (let a1 (@1),
+    (let a2 (@1),
+    (assert false (` (a1 is a2),
+    (assert (` (a1 equals a2),
+
+    (let a1 (@1 2 "" false),
+    (let a2 (@1 2 "" false),
+    (assert false (` (a1 is a2),
+    (assert (` (a1 equals a2),
 ).
 
 ($define "Array object" (= ()

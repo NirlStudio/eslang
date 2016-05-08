@@ -83,7 +83,7 @@
   ),
 
   (path pop)
-  (let indent (indent substring 0 (- (indent "length") 2),
+  (-= indent 2),
 ).
 
 (let print-f (= f
@@ -96,7 +96,7 @@
   ),
   (print code (C gray (+ "     when asserting "
     (C underline (encode clause (r "expr"),
-    (if ($isEmpty (r note)) "" (+ ", " (r note),
+    (if ($is-empty (r note)) "" (+ ", " (r note),
     "\n"
 ).
 
@@ -109,9 +109,9 @@
   (if (< (cases length) 1) (exit),
 
   (print code "  Start to run sugly test suite ...\n")
-  (let t1 ((date) getTime),
+  (let t1 (Date time),
   (for case in cases ($execute case),
-  (let t2 ((date) getTime),
+  (let t2 (Date time),
 
   (print code (+
     (C green (+ "\n  passing: " passing),

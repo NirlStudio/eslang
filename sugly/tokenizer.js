@@ -5,7 +5,9 @@ var RegexNumber = /^-?\d+\.?\d*$/
 var keywords = {
   'null': null,
   'true': true,
-  'false': false
+  'false': false,
+  'NaN': NaN,
+  'Infinity': Infinity
 }
 
 function tokenizer ($, lines, source) {
@@ -128,7 +130,7 @@ function tokenizer ($, lines, source) {
       n = nextChar()
     }
 
-    if (keywords[s]) {
+    if (typeof keywords[s] !== 'undefined') {
       return finalizeToken(token, keywords[s], 'value')
     }
     if (RegexNumber.test(s)) {

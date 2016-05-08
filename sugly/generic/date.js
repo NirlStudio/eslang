@@ -1,10 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(Date)
-
-var $inst = {}
-Object.assign($inst, dump.methods)
 
 function isType () {
   return function Date$is (value) {
@@ -42,15 +38,9 @@ function toCode ($) {
   }
 }
 
-function toString ($) {
-  return function Date$to_string (format) {
-    return this instanceof Date ? this.toString() : ''
-  }
-}
-
 function now () {
   return function Date$now () {
-    return Date()
+    return new Date()
   }
 }
 
@@ -62,8 +52,11 @@ function time () {
 
 function ofFields () {
   return function Date$of (year, month) {
+    var args
     if (typeof month !== 'undefined') {
-      return new (Date.bind.apply(null, arguments))
+      args = [null]
+      args.push.apply(args, arguments)
+      return new (Date.bind.apply(Date, args))
     }
 
     month = 0
@@ -72,7 +65,7 @@ function ofFields () {
     }
 
     var extra = Array.prototype.slice.call(arguments, 2)
-    var args = Array.prototype.concat.apply([year, month], extra)
+    args = Array.prototype.concat.apply([null, year, month], extra)
     return new (Date.bind.apply(null, args))
   }
 }
@@ -101,14 +94,65 @@ module.exports = function ($) {
   $export(type, 'utc', utc())
   $export(type, 'parse', parse())
 
-  var pt = $export(type, null, $export.copy('$', $inst))
-  $export.wrap(pt, 'time', null, $inst.getTime)
+  var pt = $export(type, null, $export.copy('$', Date.prototype, {
+    /* Chrome, IE, Firefox */
+    'getDate': 'get-day',
+    'getDay': 'get-week-day',
+    'getFullYear': 'get-year',
+    'getHours': 'get-hours',
+    'getMilliseconds': 'get-milliseconds',
+    'getMinutes': 'get-minutes',
+    'getMonth': 'get-month',
+    'getSeconds': 'get-seconds',
+
+    'getTime': 'time',
+    'getTimezoneOffset': 'get-timezone-offset',
+
+    'getUTCDate': 'get-utc-day',
+    'getUTCDay': 'get-utc-week-day',
+    'getUTCFullYear': 'get-utc-year',
+    'getUTCHours': 'get-utc-hours',
+    'getUTCMilliseconds': 'get-utc-milliseconds',
+    'getUTCMinutes': 'get-utc-minutes',
+    'getUTCMonth': 'get-utc-month',
+    'getUTCSeconds': 'get-utc-seconds',
+
+    'setDate': 'set-day',
+    'setFullYear': 'set-year',
+    'setHours': 'set-hours',
+    'setMilliseconds': 'set-milliseconds',
+    'setMinutes': 'set-minutes',
+    'setMonth': 'set-month',
+    'setSeconds': 'set-seconds',
+
+    'setTime': 'set-time',
+
+    'setUTCDate': 'set-utc-day',
+    'setUTCFullYear': 'set-utc-year',
+    'setUTCHours': 'set-utc-hours',
+    'setUTCMilliseconds': 'set-utc-milliseconds',
+    'setUTCMinutes': 'set-utc-minutes',
+    'setUTCMonth': 'set-utc-month',
+    'setUTCSeconds': 'set-utc-seconds',
+
+    'toDateString': 'to-date-string',
+    'toISOString': 'to-iso-string', // IE9
+    'toJSON': 'to-json',
+
+    'toLocaleDateString': 'to-locale-date-string', // [options *]
+    'toLocaleString': 'to-locale-string', // [options *]
+    'toLocaleTimeString': 'to-locale-time-string', // [options *]
+
+    'toString': 'to-string',
+    'toTimeString': 'to-time-string',
+    'toUTCString': 'to-utc-string'
+
+  }))
 
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode($))
-  $export(pt, 'to-string', toString($))
 
   return type
 }

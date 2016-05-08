@@ -1,13 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(Object)
-
-var $type = {}
-Object.assign($type, dump.utils)
-
-var $inst = {}
-Object.assign($inst, dump.methods)
 
 function isType ($) {
   var isSymbol = $.Symbol.is
@@ -57,11 +50,22 @@ function toCode ($) {
 }
 
 module.exports = function ($) {
-  var type = $export($, null, $export.copy('Object', type))
-  $export(type, 'is', isType())
+  var type = $export($, null, $export.copy('Object', Object, {
+    /* CH5/FF4/IE9/OP12/SF5 */
+    'getPrototypeOf': 'prototype-of',
+    'getOwnPropertyNames': 'property-names-of',
+    'keys': 'keys-of'
+  }))
+  $export(type, 'is', isType($))
   $export(type, 'create', create())
 
-  var pt = $export(type, null, $export.copy('$', $inst))
+  var pt = $export(type, null, $export.copy('$', Object.prototype, {
+    /* CH/FF/IE/OP/SF */
+    'hasOwnProperty': 'owns-property',
+    'isPrototypeOf': 'is-prototype-of',
+    'propertyIsEnumerable': 'has-enumerable-property'
+
+  }))
   $export(pt, 'is', isSame($))
   $export(pt, 'equals', equals($))
 

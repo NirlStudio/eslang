@@ -3,6 +3,6 @@
 var $export = require('../export')
 
 module.exports = function ($) {
-  var type = $export($, 'Int', $.Number)
+  var type = $export($, 'Float', $.Number)
   return type
 }

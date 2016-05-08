@@ -1,10 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(Array)
-
-var $inst = {}
-Object.assign($inst, dump.methods)
 
 function isType () {
   return function Array$is_type (value) {
@@ -102,7 +98,30 @@ module.exports = function ($) {
   $export(type, 'of', ofType())
   $export(type, 'from', fromSource())
 
-  var pt = $export(type, null, $export.copy('$', $inst))
+  var pt = $export(type, null, $export.copy('$', Array.prototype, {
+    /* Chrome, IE, Firefox */
+    'slice': 'slice',
+    /* IE5.5 */
+    'concat': 'concat',
+    'join': 'join',
+    'pop': 'pop',
+    'push': 'push',
+    'reverse': 'reverse',
+    'shift': 'shift',
+    'sort': 'sort',
+    'splice': 'splice',
+    'unshift': 'unshift',
+    /* IE9 */
+    'every': 'every',
+    'filter': 'filter',
+    'forEach': 'for-each',
+    'indexOf': 'index-of',
+    'lastIndexOf': 'last-index-of',
+    'map': 'map',
+    'reduce': 'reduce',
+    'reduceRight': 'reduce-right',
+    'some': 'some'
+  }))
   var is_same = $export(pt, 'is', isSame())
   $export(pt, 'equals', equals($, is_same))
 

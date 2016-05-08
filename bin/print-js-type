@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var proc = require('process')
+var $export = require('../sugly/export')
+
+var mapping = {
+  'bool': Boolean,
+  'num': Number,
+  'str': String,
+  'sym': Symbol,
+  'func': Function,
+  'obj': Object,
+  'date': Date,
+  'arr': Array,
+  'set': Set,
+  'map': Map
+}
+
+var key = proc.argv.length > 2 ? proc.argv[2] : 'obj'
+$export.print(mapping[key] || global[key] || Object)

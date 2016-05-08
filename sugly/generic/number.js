@@ -1,14 +1,29 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(Number)
-
-var $inst = {}
-Object.assign($inst, dump.methods)
 
 function isType () {
   return function Number$is_type (value) {
     return typeof value === 'number'
+  }
+}
+
+function measureObject (obj) {
+  var keys = ['length', 'size', 'count']
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i]
+    try {
+      var value = obj[key]
+      if (typeof value === 'function') {
+        value = value()
+      }
+      if (typeof value === 'number') {
+        return value
+      }
+    } catch (err) {}
+  }
+  if (typeof value === 'undefined') {
+    return NaN
   }
 }
 
@@ -30,18 +45,9 @@ function valueOf () {
       return input.getTime()
     }
     if (typeof input === 'object') {
-      var num = input.length || input.size
-      if (typeof num === 'number') {
-        return num
-      }
-      if (input.count && typeof input.count === 'function') {
-        num = input.count()
-        if (typeof num === 'number') {
-          return num
-        }
-      }
+      return measureObject(input)
     }
-    return 0
+    return NaN
   }
 }
 
@@ -126,12 +132,17 @@ module.exports = function ($) {
     return typeof value === 'undefined' || value === null ? 0 : parseInt(value, radix)
   })
 
-  var pt = $export(type, null, $export.copy('$', $inst))
+  var pt = $export(type, null, $export.copy('$', Number.prototype, {
+    'toExponential': 'to-exponential',
+    'toFixed': 'to-fixed',
+    'toLocaleString': 'to-locale-string',
+    'toPrecision': 'to-precision',
+    'toString': 'to-string'
+  }))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode())
-  $export(pt, 'to-string', toCode())
 
   $export(pt, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))

@@ -159,8 +159,7 @@ function checkSugly ($) {
   checkOperators($, '[Sugly / operator] ', [
     '`', 'quote', 'let', '@', 'object', 'array',
     '=', 'function', 'closure', '=>', 'lambda', 'return', 'exit', 'halt',
-    'is', 'typeof', '', 'null', 'true', 'false',
-    'bool', 'number', 'string', 'symbol', 'date',
+    'is', 'typeof', 'bool', 'number', 'string', 'symbol', 'date',
     'if', 'for', 'while', 'break', 'continue',
     '->', 'flow', '|', 'pipe', '?', 'premise', 'operator',
     'concat', 'combine', 'mixin', '+', '+=',

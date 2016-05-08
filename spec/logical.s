@@ -1,5 +1,6 @@
 ($define "Logical AND: &&" (= ()
   ($should "return the first FALSE value (0, false or null) or the last value in arguments." (= ()
+    (assert null (` (&& ),
     (assert nullx (` (&& ),
     (assert false (` (&& false),
     (assert false (` (&& false true),
@@ -13,6 +14,7 @@
 ($define "Logical OR: ||" (= ()
   ($should "return the first TRUE value (not a 0, false or null) or the last value in arguments." (= ()
     (assert null (` (||),
+    (assert nullxx (` (||),
     (assert (` (|| true),
     (assert false (` (|| false),
     (assert (` (|| true false),

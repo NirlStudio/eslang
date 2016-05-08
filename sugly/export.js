@@ -3,7 +3,6 @@
 function exportTo (container, name, obj) {
   if (!obj) {
     obj = Object.create(null)
-    obj.$has = Object.prototype.hasOwnProperty
   } else if (!name) {
     name = obj.identityName
   }
@@ -24,9 +23,15 @@ function exportTo (container, name, obj) {
 }
 
 function wrapFunction (container, name, owner, func) {
-  exportTo(container, name, function () {
-    return func.apply(owner || this, arguments)
-  })
+  if (arguments.length < 4) {
+    exportTo(container, name, function () {
+      return owner.apply(this, arguments)
+    })
+  } else {
+    exportTo(container, name, function () {
+      return func.apply(owner, arguments)
+    })
+  }
 }
 
 function mapAll (obj) {
@@ -42,7 +47,6 @@ function mapAll (obj) {
 function copyObject (name, src, mapping, target) {
   if (!src) {
     src = Object.create(null)
-    src.$has = Object.prototype.hasOwnProperty
     src.identityName = name
     return src
   }
@@ -53,18 +57,22 @@ function copyObject (name, src, mapping, target) {
 
   if (!target) {
     target = Object.create(null)
-    src.$has = Object.prototype.hasOwnProperty
     target.identityName = name
   }
 
   var keys = Object.getOwnPropertyNames(mapping)
+  var isPrototype = typeof src.constructor === 'function'
   for (var i in keys) {
     var key = keys[i]
     var value = src[key]
     if (typeof value === 'undefined') {
       console.warn(name, 'missing required member:', key)
     } else if (typeof value === 'function') {
-      wrapFunction(target, mapping[key], src, value)
+      if (isPrototype) {
+        wrapFunction(target, mapping[key], value)
+      } else {
+        wrapFunction(target, mapping[key], src, value)
+      }
     } else {
       target[mapping[key]] = value
     }
@@ -72,54 +80,44 @@ function copyObject (name, src, mapping, target) {
   return target
 }
 
-var reserved = Object.create(null)
-reserved.name = true
-reserved.length = true
-reserved.arguments = true
-reserved.caller = true
-reserved.prototype = true
-
-var ptReserved = Object.create(null)
-ptReserved.arguments = true
-ptReserved.caller = true
-ptReserved.toString = true
-ptReserved.constructor = true
-
-function dumpObject (obj) {
+function _dumpType (type) {
   var i, k, v
 
-  var utils = {}
-  var constants = {}
-  var keys = Object.getOwnPropertyNames(obj)
+  var utils = Object.create(null)
+  var constants = Object.create(null)
+  var keys = Object.getOwnPropertyNames(type)
   for (i in keys) {
     k = keys[i]
-    if (reserved[k]) {
-      continue
-    }
-
-    v = obj[k]
+    v = type[k]
     if (typeof v === 'function') {
-      utils[k] = v
+      utils[k] = v.toString()
     } else {
-      constants[k] = v
+      constants[k] = typeof v
     }
   }
 
-  var methods = {}
-  var props = {}
-  var pt = obj.prototype
+  var pt = type.prototype
+  if (!pt) {
+    return {
+      props: constants,
+      methods: utils
+    }
+  }
+
+  var methods = Object.create(null)
+  var props = Object.create(null)
+  var inst = new (pt.constructor)()
   keys = Object.getOwnPropertyNames(pt)
   for (i in keys) {
     k = keys[i]
-    if (ptReserved[k]) {
-      continue
+    v = type[i]
+    if (typeof v === 'undefined') {
+      v = inst[k]
     }
-
-    v = pt[k]
     if (typeof v === 'function') {
-      methods[k] = v
+      methods[k] = v.toString()
     } else {
-      props[k] = v
+      props[k] = typeof v
     }
   }
 
@@ -133,12 +131,11 @@ function dumpObject (obj) {
 
 function printObject (obj) {
   console.log('---- dumping', obj, '----')
-  console.log(dumpObject(obj))
+  console.log(_dumpType(obj))
 }
 
 exportTo.wrap = wrapFunction
 exportTo.copy = copyObject
-exportTo.dump = dumpObject
 exportTo.print = printObject
 
 module.exports = exportTo

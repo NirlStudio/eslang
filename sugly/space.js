@@ -5,150 +5,11 @@ var $export = require('./export')
 
 var JS = global || window
 
-function exportTo (container, name, obj) {
-  if (typeof obj === 'object' || typeof obj === 'function') {
-    if (!obj.identityName) {
-      var owner = container.identityName
-      obj.identityName = '(' + owner + ' "' + name + '")'
-    }
-  }
-
-  container[name] = obj
-  return obj
-}
-
-function exportJSFunction (container, name, func) {
-  if (!func) {
-    func = JS[name]
-  }
-  exportTo(container, name, function () {
-    return func.apply(null, arguments)
-  })
-}
-
-function exportFunction (container, name, owner, func) {
-  exportTo(container, name, function () {
-    return func.apply(owner, arguments)
-  })
-}
-
-function copyJSObject (name, jsObject) {
-  var copied = {}
-  copied.identityName = '($"' + name + '")'
-
-  var keys = Object.getOwnPropertyNames(jsObject)
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
-    var prop = jsObject[key]
-    if (typeof prop === 'function') {
-      exportFunction(copied, key, jsObject, prop)
-    } else {
-      copied[key] = prop
-    }
-  }
-  return copied
-}
-
-function exportNumber ($) {
-  var $Number = {}
-  $Number.identityName = 'Number'
-
-  $.NaN = NaN
-  $.Infinity = Infinity
-
-  $Number.NaN = JS.NaN
-  $Number.Infinity = JS.Infinity
-
-  $Number.MAX_VALUE = Number.MAX_VALUE
-  $Number.MIN_VALUE = Number.MIN_VALUE
-
-  $Number.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || (Math.pow(2, 53) - 1)
-  $Number.MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -(Math.pow(2, 53) - 1)
-
-  $Number.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
-  $Number.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
-
-  exportTo($Number, 'is-finite', function Number$is_finite (value) {
-    return typeof value === 'number' ? JS.isFinite(value) : false
-  })
-  exportTo($Number, 'not-number', function Number$not_number (value) {
-    return typeof value === 'number' ? JS.isNaN(value) : true
-  })
-
-  exportTo($Number, 'is-int', Number.isInteger ? function Number$is_int (value) {
-    return Number.isInteger(value)
-  } : function Number$is_int (value) {
-    return typeof value === 'number' &&
-      isFinite(value) &&
-      Math.floor(value) === value
-  })
-  exportTo($Number, 'safe-int', Number.isSafeInteger ? function Number$safe_int (value) {
-    return Number.isSafeInteger(value)
-  } : function Number$safe_int (value) {
-    return $Number.isInteger(value) && Math.abs(value) <= $Number.MAX_SAFE_INTEGER
-  })
-
-  exportTo($Number, 'parse', function Number$parse (value) {
-    return typeof value === 'undefined' || value === null ? 0 : JS.parseFloat(value)
-  })
-  exportTo($Number, 'parse-int', function Number$parse_int (value, radix) {
-    return typeof value === 'undefined' || value === null ? 0 : JS.parseInt(value, radix)
-  })
-
-  return $Number
-}
-
-function exportDate () {
-  var $Date = {}
-  $Date.identityName = '($"Date")'
-
-  // transitional solution
-  JS.Date.prototype.time = Date.prototype.getTime
-
-  exportTo($Date, 'now', function Date$now () {
-    return new Date()
-  })
-  exportTo($Date, 'time', Date.now ? function Date$time () {
-    return Date.now()
-  } : function Date$time () {
-    return new Date().getTime()
-  })
-  exportTo($Date, 'parse', function Date$parse (value) {
-    return typeof value !== 'string' ? new Date(0) : new Date(value)
-  })
-  exportTo($Date, 'utc', function Date$utc () {
-    return new Date(Date.UTC.apply(Date, arguments))
-  })
-
-  return $Date
-}
-
-function exportArray () {
-  var $Array = {}
-  $Array.identityName = '($"Array")'
-
-  exportTo($Array, 'concat', function Array$concat () {
-    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
-    var result = []
-    for (var i = 0; i < args.length; i++) {
-      var item = args[i]
-      if (Array.isArray(item)) {
-        result.push.apply(result, item)
-      } else {
-        result.push(item)
-      }
-    }
-    return result
-  })
-
-  return $Array
-}
-
 function exportBitwiseOperators () {
   var Bit = {}
   Bit.identityName = '($"Bit")'
 
-  exportTo(Bit, 'and', function Bit$and (left, right) {
+  $export(Bit, 'and', function Bit$and (left, right) {
     if (!Number.isInteger(left)) {
       left = 0
     }
@@ -158,7 +19,7 @@ function exportBitwiseOperators () {
     return left & right
   })
 
-  exportTo(Bit, 'or', function Bit$or (left, right) {
+  $export(Bit, 'or', function Bit$or (left, right) {
     if (!Number.isInteger(left)) {
       left = 0
     }
@@ -168,7 +29,7 @@ function exportBitwiseOperators () {
     return left | right
   })
 
-  exportTo(Bit, 'xor', function Bit$xor (left, right) {
+  $export(Bit, 'xor', function Bit$xor (left, right) {
     if (!Number.isInteger(left)) {
       left = 0
     }
@@ -178,28 +39,28 @@ function exportBitwiseOperators () {
     return left ^ right
   })
 
-  exportTo(Bit, 'not', function Bit$not (bits) {
+  $export(Bit, 'not', function Bit$not (bits) {
     if (!Number.isInteger(bits)) {
       bits = 0
     }
     return ~bits
   })
 
-  exportTo(Bit, 'lshift', function Bit$lshift (bits, offset) {
+  $export(Bit, 'lshift', function Bit$lshift (bits, offset) {
     if (!Number.isInteger(bits)) {
       bits = 0
     }
     return bits << offset
   })
 
-  exportTo(Bit, 'rshift', function Bit$lshift (bits, offset) {
+  $export(Bit, 'rshift', function Bit$lshift (bits, offset) {
     if (!Number.isInteger(bits)) {
       bits = 0
     }
     return bits >> offset
   })
 
-  exportTo(Bit, 'zrshift', function Bit$lshift (bits, offset) {
+  $export(Bit, 'zrshift', function Bit$lshift (bits, offset) {
     if (!Number.isInteger(bits)) {
       bits = 0
     }
@@ -213,10 +74,10 @@ function exportUriFunctions () {
   var Uri = {}
   Uri.identityName = '($"Uri")'
 
-  exportJSFunction(Uri, 'encode', JS.encodeURI)
-  exportJSFunction(Uri, 'encodeComponent', JS.encodeURIComponent)
-  exportJSFunction(Uri, 'decode', JS.decodeURI)
-  exportJSFunction(Uri, 'decodeComponent', JS.decodeURIComponent)
+  $export.wrap(Uri, 'encode', JS, JS.encodeURI)
+  $export.wrap(Uri, 'encodeComponent', JS, JS.encodeURIComponent)
+  $export.wrap(Uri, 'decode', JS, JS.decodeURI)
+  $export.wrap(Uri, 'decodeComponent', JS, JS.decodeURIComponent)
 
   return Uri
 }
@@ -238,131 +99,104 @@ function $is_empty (obj) { // TODO - to be refined.
 }
 
 function initializeSpace ($) {
-  exportTo($, 'Symbol', require('./generic/symbol')($))
-  exportTo($, 'symbol', $.Symbol['value-of'])
+  $[''] = null
+  $.null = null
+  $.true = true
+  $.false = false
+  $.NaN = NaN
+  $.Infinity = Infinity
 
-  exportTo($, 'Bool', {}) // reserve Bool
-  exportTo($, 'bool', function $bool (value) {
-    return typeof value !== 'undefined' && value !== false && value !== null && value !== 0
-  })
+  require('./generic/symbol')($)
+  $export($, 'symbol', $.Symbol['value-of'])
 
-  exportTo($, 'String', {
-    'of-chars': function $string_of_chars () {
-      return String.fromCharCode.apply(String, arguments)
-    }
-  }) // reserve String
-  exportTo($, 'string', function $string (input) {
-    var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
-    var str = ''
-    for (var i = 0; i < args.length; i++) {
-      var value = args[i]
-      if (typeof value === 'string') {
-        str += value
-      } else {
-        str += (str.length > 0 ? ' ' : '') + $.encode.value(value)
-      }
-    }
-    return str
-  })
+  require('./generic/bool')($)
+  $export($, 'bool', $.Bool['value-of'])
 
-  exportTo($, 'Number', exportNumber($))
-  exportTo($, 'number', function $number (value) {
-    if (typeof value === 'string') {
-      return parseFloat(value)
-    }
-    if (typeof value === 'number') {
-      return value
-    }
-    return typeof value === 'undefined' || value === null ? 0 : NaN
-  })
+  require('./generic/number')($)
+  $export($, 'number', $.Number['value-of'])
 
-  exportTo($, 'Object', {}) // reserve Object
-  exportTo($, 'object', function $object (prototype) {
-    if (typeof prototype !== 'object' || prototype === null) {
-      prototype = Object.prototype
-    }
+  require('./generic/int')($)
+  $export($, 'int', $.Int['value-of'])
 
-    var obj = Object.create(prototype)
-    if (arguments.length > 1) {
-      var args = [obj]
-      args.push.apply(args, Array.prototype.slice.call(arguments, 1))
-      Object.assign.apply(Object, args)
-    }
-    return obj
-  })
+  require('./generic/float')($)
+  $export($, 'float', $.Float['value-of'])
 
-  exportTo($, 'Function', {}) // reserve Function
+  require('./generic/string')($)
+  $export($, 'string', $.String['value-of'])
 
-  exportTo($, 'Date', exportDate())
-  exportTo($, 'date', function $date () {
-    var args = [null]
-    args.push.apply(args, arguments)
-    return new (Date.bind.apply(Date, args))
-  })
+  require('./generic/object')($)
+  $export($, 'object', $.Object['create'])
 
-  exportTo($, 'Array', exportArray())
-  exportTo($, 'array', function $array () {
-    return arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments)
-  })
+  require('./generic/function')($)
+  $export($, 'function', $.Function['create'])
 
-  exportTo($, 'range', require('./generic/range'))
-  exportTo($, 'iterate', require('./generic/iterate'))
-  exportTo($, 'is-empty', $is_empty)
-  exportTo($, 'not-empty', function (obj) {
+  require('./generic/date')($)
+  $export($, 'date', $.Date['create'])
+
+  require('./generic/array')($)
+  $export($, 'array', $.Array['create'])
+
+  require('./resolve')($)
+
+  $export($, 'range', require('./generic/range'))
+  $export($, 'iterate', require('./generic/iterate'))
+  $export($, 'is-empty', $is_empty)
+  $export($, 'not-empty', function (obj) {
     return !$is_empty(obj)
   })
 
-  exportTo($, 'Bit', exportBitwiseOperators())
-  exportTo($, 'Uri', exportUriFunctions())
-  exportTo($, 'Math', copyJSObject('Math', JS.Math))
-  exportTo($, 'Json', copyJSObject('Json', JS.JSON))
+  $export($, 'Bit', exportBitwiseOperators())
+  $export($, 'Uri', exportUriFunctions())
+  require('./math')($)
+  require('./json')($)
 }
 
 module.exports = function (output) {
   var $ = $export.copy('$')
+  $.$isSpace = Object.prototype.isPrototypeOf
 
   // meta information
-  var sugly = exportTo($, 'Sugly', {})
-  exportTo(sugly, 'runtime', 'js')
-  exportTo(sugly, 'version', '0.0.1')
-  exportTo(sugly, 'isDebugging', true)
+  var sugly = $export($, 'Sugly', {})
+  $export(sugly, 'runtime', 'js')
+  $export(sugly, 'version', '0.0.1')
+  $export(sugly, 'isDebugging', true)
 
   // import objects from JS environment
   initializeSpace($)
 
   // compile a piece of code to program/clauses: [[]].
-  exportTo($, 'compile', function (code, src) {
+  $export($, 'compile', function (code, src) {
     return require('./compiler')($)(code, src)
   })
 
   // encode function factory
-  var encoder = exportTo($, 'encoder', require('./encoder'))
+  var encoder = $export($, 'encoder', require('./encoder'))
 
   // default encode function
-  exportTo($, 'encode', encoder($, true))
+  $export($, 'encode', encoder($, true))
 
   // default output function. depending on $.encode
-  exportTo($, 'print', require('./print')($, output))
+  $export($, 'print', require('./print')($, output))
 
   // this is only used by runtime itself or its assembler
   $.$export = function (name, obj) {
-    exportTo(this, name, obj)
+    $export(this, name, obj)
   }
 
   // placeholder function of $load.
   // Since $load is expected to return a piece of code, it should always
   // return a piece of code.
-  var load = exportTo($, 'load', function $load (file, cb) {
+  var load = $export($, 'load', function $load (file, cb) {
     $.print.warn({
       from: '$/sugly/space',
       message: 'An implementation of $load should be assembled to sugly.'
     })
     return typeof cb === 'function' ? cb('()') : '()'
   })
-  exportTo(load, 'resolve', function $load$resolve (source) {
+  $export(load, 'resolve', function $load$resolve (source) {
     return ''
   })
-  exportTo(load, 'dir', function $load$dir (file) {
+  $export(load, 'dir', function $load$dir (file) {
     return ''
   })
 

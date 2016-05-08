@@ -10,17 +10,28 @@
     (assert 1.5 (` ($number "1.5"),
     (assert -1.5 (` ($number "-1.5"),
 
+    (assert 0 (` ($number false),
+    (assert 1 (` ($number true),
+
+    (assert 123 (` ($number (date 123)),
+
+    (assert 0 (` ($number (@),
+    (assert 3 (` ($number (@ 1 2 3),
+
+    (assert 128 (` ($number (@ length: 128),
+    (assert 128 (` ($number (@ size: 128),
+    (assert 128 (` ($number (@ count: (= () 128),
+
     (assert (` (Number not-number ($number ""),
     (assert (` (Number not-number ($number "a"),
-    (assert (` (Number not-number ($number (@),
     (assert (` (Number not-number ($number (object),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` ($number 1),
     (assert 1.5 (` ($number 1.5),
 
-    (assert (` (Number not-number ($number (Number "NaN"),
-    (assert false (` (Number is-finite ($number (Number "Infinity"),
+    (assert (` (Number not-number ($number NaN),
+    (assert false (` (Number is-finite ($number Infinity),
   ),
 ).
 
@@ -36,19 +47,28 @@
     (assert 1.5 (` (number "1.5"),
     (assert -1.5 (` (number "-1.5"),
 
-    (assert (` (Number not-number (number false),
-    (assert (` (Number not-number (number true),
+    (assert 0 (` (number false),
+    (assert 1 (` (number true),
+
+    (assert 123 (` (number (date 123)),
+
+    (assert 0 (` (number (@),
+    (assert 3 (` (number (@ 1 2 3),
+
+    (assert 128 (` (number (@ length: 128),
+    (assert 128 (` (number (@ size: 128),
+    (assert 128 (` (number (@ count: (= () 128),
+
     (assert (` (Number not-number (number ""),
     (assert (` (Number not-number (number "a"),
-    (assert (` (Number not-number (number (@),
     (assert (` (Number not-number (number (object),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` (number 1),
     (assert 1.5 (` (number 1.5),
 
-    (assert (` (Number not-number (number (Number "NaN"),
-    (assert false (` (Number is-finite (number (Number "Infinity"),
+    (assert (` (Number not-number (number NaN),
+    (assert false (` (Number is-finite (number Infinity),
   ),
 ).
 
@@ -62,7 +82,7 @@
     (assert (` (Number is-finite (Number MAX_SAFE_INTEGER),
     (assert (` (Number is-finite (Number MIN_SAFE_INTEGER),
 
-    (assert false (` (Number is-finite (Number "Infinity"),
+    (assert false (` (Number is-finite Infinity),
     (assert false (` (Number is-finite (Number "POSITIVE_INFINITY"),
     (assert false (` (Number is-finite (Number "NEGATIVE_INFINITY"),
 
@@ -76,7 +96,7 @@
     (assert false (` (Number is-finite (object),
   ),
   ($should "(Number not-number )" "return true for NaN or non-number values" (= ()
-    (assert (` (Number not-number (Number "NaN"),
+    (assert (` (Number not-number NaN),
     (assert false (` (Number not-number 1),
     (assert false (` (Number not-number 0),
     (assert false (` (Number not-number (Number MAX_VALUE),

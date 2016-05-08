@@ -1,15 +1,10 @@
 'use strict'
 
 var $export = require('../export')
-var dump = $export.dump(Function)
 
-var $inst = {}
-Object.assign($inst, dump.methods)
-
-function isType ($) {
-  var isSymbol = $.Symbol.is
+function isType () {
   return function Function$is_type (value) {
-    return typeof value === 'object' && value !== null && !isSymbol(value)
+    return typeof value === 'function'
   }
 }
 
@@ -42,16 +37,25 @@ function toCode ($) {
   }
 }
 
+function toString () {
+  return function Function$to_string () {
+    return '[Function ' + (this.identityName || this.Name || '(anonymous)') + ']'
+  }
+}
+
 module.exports = function ($) {
   var type = $export($, null, $export.copy('Function', type))
   $export(type, 'is', isType())
   $export(type, 'create', create())
 
-  var pt = $export(type, null, $export.copy('$', $inst))
+  var pt = $export(type, null, $export.copy('$', Function.prototype, {
+    'apply': 'apply',
+    'call': 'call'
+  }))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode($))
-  $export(pt, 'to-string', toCode($)) // TODO - to provide a more readable version?
+  $export(pt, 'to-string', toString($))
   return type
 }

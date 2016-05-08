@@ -20,12 +20,6 @@ function isSame () {
   }
 }
 
-function equals () {
-  return function Bool$equals (value) {
-    return typeof this === 'boolean' ? this === value : false
-  }
-}
-
 function toCode () {
   return function Bool$to_code () {
     return typeof this === 'boolean' ? this.toString() : 'false'
@@ -81,7 +75,7 @@ module.exports = function ($) {
 
   var pt = $export(type, null, $export.copy('$'))
   $export(pt, 'is', isSame())
-  $export(pt, 'equals', equals())
+  $export(pt, 'equals', isSame())
 
   $export(pt, 'to-code', toCode())
   $export(pt, 'to-string', toCode())
@@ -93,6 +87,16 @@ module.exports = function ($) {
     return or.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
   $export(pt, 'not', function () {
+    return !not(this)
+  })
+
+  $export(pt, '&&', function () {
+    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, '||', function () {
+    return or.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, '!', function () {
     return !not(this)
   })
 

@@ -18,7 +18,7 @@ function useNativeSymbol () {
   return {
     // to be used by tokenizer
     $InvalidSymbol: InvalidSymbol,
-    $Symbol: Symbol,
+    $Constructor: null,
     Nothing: nothing,
     is_key: is_key,
 
@@ -78,7 +78,7 @@ function usePolyfillSymbol () {
   return {
     // to be used by tokenizer
     $InvalidSymbol: InvalidSymbol,
-    $Symbol: Symbol$,
+    $Constructor: Symbol$,
     Nothing: nothing,
     is_key: is_key,
 
@@ -159,7 +159,8 @@ module.exports = function ($) {
 
   var type = $export($, 'Symbol')
   type.$InvalidSymbol = impl.$InvalidSymbol
-  type.$Symbol = impl.$Symbol
+  type.$Constructor = impl.$Constructor
+
   type.Nothing = impl.Nothing
   $export(type, 'is-key', impl.is_key)
 

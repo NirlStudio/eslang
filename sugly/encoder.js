@@ -68,7 +68,7 @@ function encoder ($, pretty) {
   }
 
   function encodeObject (obj) {
-    if (obj.hasOwnProperty('identityName')) {
+    if (Object.prototype.hasOwnProperty.call(obj, 'identityName')) {
       return obj.identityName
     }
 

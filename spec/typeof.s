@@ -11,8 +11,8 @@
     (assert "number" (` (typeof 1),
     (assert "number" (` (typeof 0),
     (assert "number" (` (typeof -1),
-    (assert "number" (` (typeof (Number NaN)),
-    (assert "number" (` (typeof (Number Infinity)),
+    (assert "number" (` (typeof NaN),
+    (assert "number" (` (typeof Infinity),
   ),
   ($should "(typeof string)" "be 'string'" (= ()
     (assert "string" (` (typeof ""),

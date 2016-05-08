@@ -113,7 +113,10 @@
 (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
 (let s (object))
 (let args (@ 1 2))
-(let r ($call f s args),
+(let r (f apply s args),
+(print value (-> r "argv" (:1)),
+
+(let r (f call s 3 4),
 (print value (-> r "argv" (:1)),
 
 (exit -1 2)

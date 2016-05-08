@@ -84,6 +84,13 @@ if (forcePolyfill || typeof String.prototype.endsWith !== 'function') {
     return lastIndex !== -1 && lastIndex === position
   }
 }
+if (forcePolyfill || typeof String.prototype.trim !== 'function') {
+  records.push('String.prototype.trim')
+
+  JS.String.prototype.trim = function () {
+    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '')
+  }
+}
 
 if (forcePolyfill || typeof Array.isArray !== 'function') {
   records.push('Array.isArray')
