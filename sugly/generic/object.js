@@ -59,13 +59,14 @@ module.exports = function ($) {
   $export(type, 'is', isType($))
   $export(type, 'create', create())
 
-  var pt = $export(type, null, $export.copy('$', Object.prototype, {
+  var pt = Object.create($.Null.$)
+  $export(type, null, $export.copy('$', Object.prototype, { // TODO - looper
     /* CH/FF/IE/OP/SF */
     'hasOwnProperty': 'owns-property',
     'isPrototypeOf': 'is-prototype-of',
     'propertyIsEnumerable': 'has-enumerable-property'
 
-  }))
+  }, pt))
   $export(pt, 'is', isSame($))
   $export(pt, 'equals', equals($))
 

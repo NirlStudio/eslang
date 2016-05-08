@@ -22,9 +22,11 @@
     (assert 128 (` ($number (@ size: 128),
     (assert 128 (` ($number (@ count: (= () 128),
 
+    (assert 0 (` ($number (object),
+
     (assert (` (Number is-not ($number ""),
     (assert (` (Number is-not ($number "a"),
-    (assert (` (Number is-not ($number (object),
+    (assert (` (Number is-not ($number (= x x),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` ($number 1),
@@ -59,9 +61,11 @@
     (assert 128 (` (number (@ size: 128),
     (assert 128 (` (number (@ count: (= () 128),
 
+    (assert 1 (` (number (object p:1),
+    
     (assert (` (Number is-not (number ""),
     (assert (` (Number is-not (number "a"),
-    (assert (` (Number is-not (number (object),
+    (assert (` (Number is-not ($number (= x x),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` (number 1),

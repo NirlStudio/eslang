@@ -9,8 +9,8 @@ function isType () {
 }
 
 function create () {
-  return function Function$create (prototype) {
-    // to be assembled with the implementation of core eval function
+  return function Function$create (params, body) {
+    // This function only exists as a placeholder.
     return function () { return null }
   }
 }
@@ -48,10 +48,11 @@ module.exports = function ($) {
   $export(type, 'is', isType())
   $export(type, 'create', create())
 
-  var pt = $export(type, null, $export.copy('$', Function.prototype, {
+  var pt = Object.create($.Null.$)
+  $export(type, null, $export.copy('$', Function.prototype, {
     'apply': 'apply',
     'call': 'call'
-  }))
+  }, pt))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 

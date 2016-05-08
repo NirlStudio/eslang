@@ -61,7 +61,8 @@ module.exports = function ($) {
   var value_of = $export(type, 'value-of', valueOf($))
   $export.wrap(type, 'of-chars', String, String.fromCharCode)
 
-  var pt = $export(type, null, $export.copy('$', String.prototype, {
+  var pt = Object.create($.Null.$)
+  $export(type, null, $export.copy('$', String.prototype, {
     /* CH/FF/IE/OP/SF */
     'charAt': 'char-at',
     'charCodeAt': 'chat-code-at',
@@ -84,7 +85,7 @@ module.exports = function ($) {
     'trim': 'trim',
     'endsWith': 'ends-with',
     'startsWith': 'starts-with'
-  }))
+  }, pt))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', isSame())
 

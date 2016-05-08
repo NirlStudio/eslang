@@ -5,41 +5,30 @@ var $export = require('./export')
 
 var JS = global || window
 
-function exportUriFunctions () {
-  var Uri = {}
-  Uri.identityName = '($"Uri")'
+function createSpace () {
+  var $ = $export.copy('$')
+  $.$isSpace = Object.prototype.isPrototypeOf
 
-  $export.wrap(Uri, 'encode', JS, JS.encodeURI)
-  $export.wrap(Uri, 'encodeComponent', JS, JS.encodeURIComponent)
-  $export.wrap(Uri, 'decode', JS, JS.decodeURI)
-  $export.wrap(Uri, 'decodeComponent', JS, JS.decodeURIComponent)
-
-  return Uri
+  // meta information
+  var sugly = $export($, 'Sugly', {})
+  $export(sugly, 'runtime', 'js')
+  $export(sugly, 'version', '0.0.1')
+  $export(sugly, 'debugging', true)
+  return $
 }
 
-function $is_empty (obj) { // TODO - to be refined.
-  if (typeof obj === 'undefined' || obj === null) {
-    return true
-  }
-  if (typeof obj.length === 'number') {
-    return obj.length < 1
-  }
-  if (typeof obj.size === 'number') {
-    return obj.size < 1
-  }
-  if (typeof obj === 'object') {
-    return Object.getOwnPropertyNames(obj).length < 1
-  }
-  return obj === 0 || obj === false
-}
-
-function initializeSpace ($) {
+function exportConstants ($) {
   $[''] = null
   $.null = null
   $.true = true
   $.false = false
   $.NaN = NaN
   $.Infinity = Infinity
+}
+
+function initializeSpace ($) {
+  // Hello, world.
+  require('./generic/null')($)
 
   require('./generic/symbol')($)
   $export($, 'symbol', $.Symbol['value-of'])
@@ -75,27 +64,19 @@ function initializeSpace ($) {
 
   $export($, 'range', require('./generic/range'))
   $export($, 'iterate', require('./generic/iterate'))
-  $export($, 'is-empty', $is_empty)
-  $export($, 'not-empty', function (obj) {
-    return !$is_empty(obj)
-  })
 
-  $export($, 'Uri', exportUriFunctions())
-  require('./math')($)
-  require('./json')($)
+  require('./uri')($, JS)
+  require('./math')($, JS)
+  require('./json')($, JS)
 }
 
 module.exports = function (output) {
-  var $ = $export.copy('$')
-  $.$isSpace = Object.prototype.isPrototypeOf
+  var $ = createSpace()
 
-  // meta information
-  var sugly = $export($, 'Sugly', {})
-  $export(sugly, 'runtime', 'js')
-  $export(sugly, 'version', '0.0.1')
-  $export(sugly, 'isDebugging', true)
+  // export global constant values.
+  exportConstants($)
 
-  // import objects from JS environment
+  // create generic type system
   initializeSpace($)
 
   // compile a piece of code to program/clauses: [[]].
@@ -117,22 +98,7 @@ module.exports = function (output) {
     $export(this, name, obj)
   }
 
-  // placeholder function of $load.
-  // Since $load is expected to return a piece of code, it should always
-  // return a piece of code.
-  var load = $export($, 'load', function $load (file, cb) {
-    $.print.warn({
-      from: '$/sugly/space',
-      message: 'An implementation of $load should be assembled to sugly.'
-    })
-    return typeof cb === 'function' ? cb('()') : '()'
-  })
-  $export(load, 'resolve', function $load$resolve (source) {
-    return ''
-  })
-  $export(load, 'dir', function $load$dir (file) {
-    return ''
-  })
-
+  // a placeholder loader
+  require('./load')($)
   return $
 }

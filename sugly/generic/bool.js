@@ -73,7 +73,8 @@ module.exports = function ($) {
   var or = $export(type, 'or', boolOr(value_of))
   var not = $export(type, 'not', boolNot(value_of))
 
-  var pt = $export(type, null, $export.copy('$'))
+  var pt = Object.create($.Null.$)
+  $export(type, '$', pt)
   $export(pt, 'is', isSame())
   $export(pt, 'equals', isSame())
 

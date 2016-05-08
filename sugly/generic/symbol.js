@@ -168,7 +168,8 @@ module.exports = function ($) {
   $export(type, 'value-of', impl.valueOf())
   $export(type, 'key-of', impl.keyOf())
 
-  var pt = $export(type, null, $export.copy('$'))
+  var pt = Object.create($.Null.$)
+  $export(type, '$', pt)
   $export(pt, 'is', impl.isSame())
   $export(pt, 'equals', impl.isSame())
   $export(pt, 'to-code', impl.toCode())

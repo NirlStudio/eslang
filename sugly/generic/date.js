@@ -94,7 +94,8 @@ module.exports = function ($) {
   $export(type, 'utc', utc())
   $export(type, 'parse', parse())
 
-  var pt = $export(type, null, $export.copy('$', Date.prototype, {
+  var pt = Object.create($.Object.$)
+  $export(type, null, $export.copy('$', Date.prototype, {
     /* Chrome, IE, Firefox */
     'getDate': 'get-day',
     'getDay': 'get-week-day',
@@ -147,7 +148,7 @@ module.exports = function ($) {
     'toTimeString': 'to-time-string',
     'toUTCString': 'to-utc-string'
 
-  }))
+  }, pt))
 
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())

@@ -9,8 +9,8 @@ function exportTo (container, name, obj) {
 
   if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
       (typeof obj === 'object' || typeof obj === 'function')) {
-    var parent = container.identityName
-    if (parent === '$' || name === '$') {
+    var parent = container.identityName || '$'
+    if (parent.startsWith('$') || name.startsWith('$')) {
       obj.identityName = name
     } else if (typeof obj === 'object') {
       obj.identityName = '(' + parent + ' ' + name + ')'
@@ -58,6 +58,8 @@ function copyObject (name, src, mapping, target) {
 
   if (!target) {
     target = Object.create(null)
+    target.identityName = name
+  } else if (!target.identityName) {
     target.identityName = name
   }
 

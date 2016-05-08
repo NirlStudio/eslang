@@ -70,7 +70,7 @@ function tokenizer ($, lines, source) {
 
     var line = lines[lineNo]
     while (index < line.length) {
-      let c = line[index]
+      var c = line[index]
       index += 1
       if (c === '"') {
         str += '"'; break
@@ -157,7 +157,7 @@ function tokenizer ($, lines, source) {
         return finalizeToken(createToken('punctuation'), c)
 
       case ')':
-        let n = nextChar()
+        var n = nextChar()
         if (n === ',') {
           current = null
           return finalizeToken(createToken('punctuation'), c + n)

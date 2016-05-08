@@ -18,7 +18,7 @@
     (let do subject)
     (let subject "")
   ),
-  (if (!($is-empty subject))
+  (if (subject not-empty)
     (+= subject " ")
   ),
   (current push (@
@@ -96,7 +96,7 @@
   ),
   (print code (C gray (+ "     when asserting "
     (C underline (encode clause (r "expr"),
-    (if ($is-empty (r note)) "" (+ ", " (r note),
+    (if ((r note) is-empty) "" (+ ", " (r note),
     "\n"
 ).
 

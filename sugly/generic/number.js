@@ -1,29 +1,11 @@
 'use strict'
 
 var $export = require('../export')
+var measure = require('./measure')
 
 function isType () {
   return function Number$is_type (value) {
     return typeof value === 'number'
-  }
-}
-
-function measureObject (obj) {
-  var keys = ['length', 'size', 'count']
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i]
-    try {
-      var value = obj[key]
-      if (typeof value === 'function') {
-        value = value()
-      }
-      if (typeof value === 'number') {
-        return value
-      }
-    } catch (err) {}
-  }
-  if (typeof value === 'undefined') {
-    return NaN
   }
 }
 
@@ -44,10 +26,7 @@ function valueOf () {
     if (input instanceof Date) {
       return input.getTime()
     }
-    if (typeof input === 'object') {
-      return measureObject(input)
-    }
-    return NaN
+    return measure(input)
   }
 }
 
@@ -72,16 +51,68 @@ function toCode () {
 function numberAnd (value_of) {
   return function Number$and () {
     var length = arguments.length
+    var result = 0
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
       if (typeof arg !== 'number') {
         arg = value_of(arg)
       }
-      if (!arg) {
-        return false
-      }
+      result += arg
     }
-    return true
+    return result
+  }
+}
+
+function numberSubtract (value_of) {
+  return function Number$substract () {
+    var length = arguments.length
+    if (length < 1) {
+      return 0
+    }
+    var arg = arguments[0]
+    var result = typeof arg === 'number' ? arg : value_of(arg)
+    for (var i = 1; i < length; i++) {
+      arg = arguments[i]
+      if (typeof arg !== 'number') {
+        arg = value_of(arg)
+      }
+      result -= arg
+    }
+    return result
+  }
+}
+
+function numberTimes (value_of) {
+  return function Number$times () {
+    var length = arguments.length
+    var result = 1
+    for (var i = 0; i < length; i++) {
+      var arg = arguments[i]
+      if (typeof arg !== 'number') {
+        arg = value_of(arg)
+      }
+      result *= arg
+    }
+    return result
+  }
+}
+
+function numberDivide (value_of) {
+  return function Number$divide () {
+    var length = arguments.length
+    if (length < 1) {
+      return 0
+    }
+    var arg = arguments[0]
+    var result = typeof arg === 'number' ? arg : value_of(arg)
+    for (var i = 1; i < length; i++) {
+      arg = arguments[i]
+      if (typeof arg !== 'number') {
+        arg = value_of(arg)
+      }
+      result /= arg
+    }
+    return result
   }
 }
 
@@ -107,14 +138,18 @@ module.exports = function ($) {
   })
 
   var and = $export(type, 'and', numberAnd(value_of))
+  var sub = $export(type, 'subtract', numberSubtract(value_of))
+  var times = $export(type, 'times', numberTimes(value_of))
+  var divide = $export(type, 'divide', numberDivide(value_of))
 
-  var pt = $export(type, null, $export.copy('$', Number.prototype, {
+  var pt = Object.create($.Null.$)
+  $export(type, null, $export.copy('$', Number.prototype, {
     'toExponential': 'to-exponential',
     'toFixed': 'to-fixed',
     'toLocaleString': 'to-locale-string',
     'toPrecision': 'to-precision',
     'toString': 'to-string'
-  }))
+  }, pt))
   $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
@@ -122,6 +157,28 @@ module.exports = function ($) {
 
   $export(pt, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, 'subtract', function () {
+    return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, 'times', function () {
+    return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, 'divide', function () {
+    return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+
+  $export(pt, '+', function () {
+    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, '-', function () {
+    return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, '*', function () {
+    return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  })
+  $export(pt, '/', function () {
+    return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
   return type

@@ -98,7 +98,8 @@ module.exports = function ($) {
   $export(type, 'of', ofType())
   $export(type, 'from', fromSource())
 
-  var pt = $export(type, null, $export.copy('$', Array.prototype, {
+  var pt = Object.create($.Object.$)
+  $export(type, null, $export.copy('$', Array.prototype, {
     /* Chrome, IE, Firefox */
     'slice': 'slice',
     /* IE5.5 */
@@ -121,7 +122,7 @@ module.exports = function ($) {
     'reduce': 'reduce',
     'reduceRight': 'reduce-right',
     'some': 'some'
-  }))
+  }, pt))
   var is_same = $export(pt, 'is', isSame())
   $export(pt, 'equals', equals($, is_same))
 
