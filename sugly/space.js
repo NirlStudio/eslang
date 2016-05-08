@@ -60,6 +60,8 @@ function initializeSpace ($) {
   require('./generic/array')($)
   $export($, 'array', $.Array['create'])
 
+  require('./generic/signal')($)
+
   require('./resolve')($)
   require('./assign')($)
 

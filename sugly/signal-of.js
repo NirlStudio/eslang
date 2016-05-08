@@ -1,17 +1,11 @@
 'use strict'
 
-module.exports = function signal ($) {
+module.exports = function signal_of ($) {
   var seval = $.$eval
-
-  function $Signal (type, value) {
-    this.type = type
-    this.value = value
-  }
-
-  $.$Signal = $Signal
+  var $Signal = $.$Signal
 
   $.$createSignalOf = function createSignalOf (type) {
-    return function createSignal ($, clause) {
+    return function signalOf ($, clause) {
       var length = clause.length
       var result = null
       if (length > 1) {

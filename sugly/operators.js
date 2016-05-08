@@ -2,6 +2,7 @@
 
 module.exports = function operators ($) {
   // export all operators
+  $.$operators = {}
   require('./operators/quote')($)
   require('./operators/let')($)
   require('./operators/object')($)

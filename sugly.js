@@ -3,7 +3,7 @@
 module.exports = function suglizer (loader, output/*, more options */) {
   var makeSpace = require('./sugly/space')
 
-  var warn
+  var warn, SuglySignal
   var symbolValueOf, symbolKeyOf, isSymbol
   var SymbolContext, SymbolQuote, SymbolIndexer, SymbolAssign, SymbolDerive,
     SymbolLambdaShort, SymbolObject, SymbolLambda, SymbolLike, SymbolElse,
@@ -14,6 +14,8 @@ module.exports = function suglizer (loader, output/*, more options */) {
       return
     }
     warn = $.print.warn
+    SuglySignal = $.$Signal
+
     symbolValueOf = $.Symbol['value-of']
     symbolKeyOf = $.Symbol['key-of']
     isSymbol = $.Symbol.is
@@ -97,11 +99,6 @@ module.exports = function suglizer (loader, output/*, more options */) {
       })
       return null
     }
-  }
-
-  function SuglySignal (type, value) {
-    this.type = type
-    this.value = value
   }
 
   function seval (clause, $) {
@@ -1944,12 +1941,12 @@ module.exports = function suglizer (loader, output/*, more options */) {
   }
 
   function populate ($) {
+    $.$set = set
     $.$eval = seval
     $.$beval = beval
 
-    require('./sugly/signal')($)
-
-    $.$operators = Object.assign({}, $operators)
+    require('./sugly/signal-of')($)
+    require('./sugly/operators')($)
 
     // create a child space from an optional parent one. - the inner version
     $.$export('$createSpace', $createSpaceIn($))
