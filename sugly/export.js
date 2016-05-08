@@ -7,9 +7,10 @@ function exportTo (container, name, obj) {
     name = obj.identityName
   }
 
-  if (!obj.identityName && (typeof obj === 'object' || typeof obj === 'function')) {
+  if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
+      (typeof obj === 'object' || typeof obj === 'function')) {
     var parent = container.identityName
-    if (parent === '$') {
+    if (parent === '$' || name === '$') {
       obj.identityName = name
     } else if (typeof obj === 'object') {
       obj.identityName = '(' + parent + ' ' + name + ')'

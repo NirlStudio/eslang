@@ -78,9 +78,9 @@
     (assert 2 (` (/ 4 2),
     (assert 3 (` (/ 18 2 3),
 
-    (assert true (` (Number not-number (/ 1 ""),
-    (assert true (` (Number not-number (/ 1 "1"),
-    (assert true (` (Number not-number (/ 1 (@),
+    (assert true (` (Number is-not (/ 1 ""),
+    (assert true (` (Number is-not (/ 1 "1"),
+    (assert true (` (Number is-not (/ 1 (@),
 ).
 
 (let mVar4 20)

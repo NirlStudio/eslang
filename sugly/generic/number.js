@@ -88,49 +88,25 @@ function numberAnd (value_of) {
 module.exports = function ($) {
   var type = $export($, 'Number')
   $export(type, 'is', isType())
-
-  // TODO - to be interpreted in tokenizer?
-  $.NaN = NaN
-  $.Infinity = Infinity
+  var value_of = $export(type, 'value-of', valueOf())
 
   type.MAX_VALUE = Number.MAX_VALUE
   type.MIN_VALUE = Number.MIN_VALUE
 
-  type.MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || (Math.pow(2, 53) - 1)
-  type.MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -(Math.pow(2, 53) - 1)
-
   type.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
   type.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
 
-  var value_of = $export(type, 'value-of', valueOf())
-  var and = $export(type, 'and', numberAnd(value_of))
-
+  $export(type, 'is-not', function Number$is_not (value) {
+    return typeof value === 'number' ? isNaN(value) : true
+  })
   $export(type, 'is-finite', function Number$is_finite (value) {
     return typeof value === 'number' ? isFinite(value) : false
   })
-  $export(type, 'not-number', function Number$not_number (value) {
-    return typeof value === 'number' ? isNaN(value) : true
-  })
-
-  $export(type, 'is-int', Number.isInteger ? function Number$is_int (value) {
-    return Number.isInteger(value)
-  } : function Number$is_int (value) {
-    return typeof value === 'number' &&
-      isFinite(value) &&
-      Math.floor(value) === value
-  })
-  $export(type, 'safe-int', Number.isSafeInteger ? function Number$safe_int (value) {
-    return Number.isSafeInteger(value)
-  } : function Number$safe_int (value) {
-    return type.isInteger(value) && Math.abs(value) <= type.MAX_SAFE_INTEGER
-  })
-
   $export(type, 'parse', function Number$parse (value) {
     return typeof value === 'undefined' || value === null ? 0 : parseFloat(value)
   })
-  $export(type, 'parse-int', function Number$parse_int (value, radix) {
-    return typeof value === 'undefined' || value === null ? 0 : parseInt(value, radix)
-  })
+
+  var and = $export(type, 'and', numberAnd(value_of))
 
   var pt = $export(type, null, $export.copy('$', Number.prototype, {
     'toExponential': 'to-exponential',

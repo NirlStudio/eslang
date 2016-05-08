@@ -5,71 +5,6 @@ var $export = require('./export')
 
 var JS = global || window
 
-function exportBitwiseOperators () {
-  var Bit = {}
-  Bit.identityName = '($"Bit")'
-
-  $export(Bit, 'and', function Bit$and (left, right) {
-    if (!Number.isInteger(left)) {
-      left = 0
-    }
-    if (!Number.isInteger(right)) {
-      right = 0
-    }
-    return left & right
-  })
-
-  $export(Bit, 'or', function Bit$or (left, right) {
-    if (!Number.isInteger(left)) {
-      left = 0
-    }
-    if (!Number.isInteger(right)) {
-      right = 0
-    }
-    return left | right
-  })
-
-  $export(Bit, 'xor', function Bit$xor (left, right) {
-    if (!Number.isInteger(left)) {
-      left = 0
-    }
-    if (!Number.isInteger(right)) {
-      right = 0
-    }
-    return left ^ right
-  })
-
-  $export(Bit, 'not', function Bit$not (bits) {
-    if (!Number.isInteger(bits)) {
-      bits = 0
-    }
-    return ~bits
-  })
-
-  $export(Bit, 'lshift', function Bit$lshift (bits, offset) {
-    if (!Number.isInteger(bits)) {
-      bits = 0
-    }
-    return bits << offset
-  })
-
-  $export(Bit, 'rshift', function Bit$lshift (bits, offset) {
-    if (!Number.isInteger(bits)) {
-      bits = 0
-    }
-    return bits >> offset
-  })
-
-  $export(Bit, 'zrshift', function Bit$lshift (bits, offset) {
-    if (!Number.isInteger(bits)) {
-      bits = 0
-    }
-    return bits >>> offset
-  })
-
-  return Bit
-}
-
 function exportUriFunctions () {
   var Uri = {}
   Uri.identityName = '($"Uri")'
@@ -145,7 +80,6 @@ function initializeSpace ($) {
     return !$is_empty(obj)
   })
 
-  $export($, 'Bit', exportBitwiseOperators())
   $export($, 'Uri', exportUriFunctions())
   require('./math')($)
   require('./json')($)

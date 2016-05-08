@@ -176,8 +176,8 @@ function checkSugly ($) {
   ])
 
   checkObjects($, '[Sugly / object] ', [
-    'Bool', 'Number', 'String', 'Symbol', 'Object', 'Function', 'Date', 'Array',
-    'Bit', 'Uri', 'Math', 'Json', 'Sugly'
+    'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Object', 'Function',
+    'Date', 'Array', 'Uri', 'Math', 'Json', 'Sugly'
   ])
 }
 
