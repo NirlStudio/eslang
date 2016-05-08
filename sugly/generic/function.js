@@ -49,7 +49,7 @@ module.exports = function ($) {
   $export(type, 'create', create())
 
   var pt = Object.create($.Null.$)
-  $export(type, null, $export.copy('$', Function.prototype, {
+  $export(type, null, $export.copy('$', Function.prototype, { // TODO - looper
     'apply': 'apply',
     'call': 'call'
   }, pt))

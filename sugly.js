@@ -1944,6 +1944,11 @@ module.exports = function suglizer (loader, output/*, more options */) {
   }
 
   function populate ($) {
+    $.$eval = seval
+    $.$beval = beval
+
+    require('./sugly/signal')($)
+
     $.$operators = Object.assign({}, $operators)
 
     // create a child space from an optional parent one. - the inner version

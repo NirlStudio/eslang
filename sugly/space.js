@@ -61,6 +61,7 @@ function initializeSpace ($) {
   $export($, 'array', $.Array['create'])
 
   require('./resolve')($)
+  require('./assign')($)
 
   $export($, 'range', require('./generic/range'))
   $export($, 'iterate', require('./generic/iterate'))
