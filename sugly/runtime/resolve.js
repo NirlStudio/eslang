@@ -1,5 +1,4 @@
 'use strict'
-var $export = require('./export')
 
 module.exports = function ($) {
   var $Symbol = $.Symbol
@@ -16,7 +15,7 @@ module.exports = function ($) {
   var $date = $.Date.$
   var $array = $.Array.$
 
-  return $export($, '$resolve', function $resolve (subject, sym) {
+  $.$resolve = function $resolve (subject, sym) {
     if (typeof subject === 'undefined') {
       subject = null
     }
@@ -80,5 +79,5 @@ module.exports = function ($) {
     }
 
     return typeof value === 'undefined' ? null : value
-  })
+  }
 }

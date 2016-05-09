@@ -60,17 +60,16 @@ function initializeSpace ($) {
   require('./generic/array')($)
   $export($, 'array', $.Array['create'])
 
-  require('./generic/signal')($)
-
-  require('./resolve')($)
-  require('./assign')($)
-
   $export($, 'range', require('./generic/range'))
   $export($, 'iterate', require('./generic/iterate'))
 
-  require('./uri')($, JS)
-  require('./math')($, JS)
-  require('./json')($, JS)
+  require('./runtime/signal')($)
+  require('./runtime/resolve')($)
+  require('./runtime/assign')($)
+
+  require('./lib/math')($, JS)
+  require('./lib/uri')($, JS)
+  require('./lib/json')($, JS)
 }
 
 module.exports = function (output) {
@@ -82,19 +81,18 @@ module.exports = function (output) {
   // create generic type system
   initializeSpace($)
 
-  // compile a piece of code to program/clauses: [[]].
-  $export($, 'compile', function (code, src) {
-    return require('./compiler')($)(code, src)
-  })
-
   // encode function factory
-  var encoder = $export($, 'encoder', require('./encoder'))
-
+  var encoder = require('./lib/encoder')($, JS)
   // default encode function
   $export($, 'encode', encoder($, true))
 
   // default output function. depending on $.encode
-  $export($, 'print', require('./print')($, output))
+  require('./lib/print')($, JS, output)
+
+  // compile a piece of code to program/clauses: [[]].
+  $export($, 'compile', function (code, src) {
+    return require('./compiler')($)(code, src)
+  })
 
   // this is only used by runtime itself or its assembler
   $.$export = function (name, obj) {

@@ -1,11 +1,9 @@
 'use strict'
 
-var $export = require('./export')
-
 module.exports = function assign ($) {
   var symbolKeyOf = $.Symbol['key-of']
 
-  return $export($, '$assign', function $assign ($, sym, value) {
+  $.$assign = function $assign ($, sym, value) {
     var key = symbolKeyOf(sym) // TODO - optimizer
     if (Object.prototype.hasOwnProperty.call($, key)) {
       $[key] = value
@@ -23,5 +21,5 @@ module.exports = function assign ($) {
       $[key] = value
     }
     return value
-  })
+  }
 }

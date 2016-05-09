@@ -603,7 +603,7 @@ module.exports = function suglizer (loader, output/*, more options */) {
     $.$eval = seval
     $.$beval = beval
 
-    require('./sugly/signal-of')($)
+    require('./sugly/runtime/signal-of')($)
     require('./sugly/operators')($)
 
     // create a child space from an optional parent one. - the inner version

@@ -1,6 +1,6 @@
 'use strict'
 
-var $export = require('./export')
+var $export = require('../export')
 
 module.exports = function ($, JS) {
   var uri = $export($, null, $export.copy('Uri', JS, {

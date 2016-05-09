@@ -1,14 +1,6 @@
 'use strict'
 
-var JS = global || window
-
-function exportTo (container, name, obj) {
-  var owner = container.identityName
-  obj.identityName = '(' + owner + ' "' + name + '")'
-
-  container[name] = obj
-  return obj
-}
+var $export = require('../export')
 
 function printer ($) {
   return function print () {
@@ -43,7 +35,7 @@ function codePrinter (output) {
   }
 }
 
-module.exports = function ($, output) {
+module.exports = function ($, JS, output) {
   if (!output) {
     output = JS.console || {
       log: null,
@@ -56,13 +48,12 @@ module.exports = function ($, output) {
   var printCode = codePrinter(output)
 
   // print a piece of program which is a set of clauses
-  function $print (clauses) {
+  var $print = $export($, 'print', function $print (clauses) {
     return printCode($.encode, clauses)
-  }
-  $print.identityName = '($"print")'
+  })
 
   // print text literally
-  exportTo($print, 'code', function () {
+  $export($print, 'code', function () {
     var args = Array.prototype.slice.apply(arguments)
     var values = []
     for (var i = 0; i < args.length; i++) {
@@ -72,21 +63,21 @@ module.exports = function ($, output) {
     return printCode(null, values.join(''))
   })
   // encode and print one or more values to standard output.
-  exportTo($print, 'value', function () {
+  $export($print, 'value', function () {
     return print.apply(output.log, arguments)
   })
   // encode and print an clause to standard output.
-  exportTo($print, 'clause', function (clause) {
+  $export($print, 'clause', function (clause) {
     return printCode($.encode.clause, clause)
   })
 
   // encode arguments and print it as some diagnostic information to standard error.
-  exportTo($print, 'info', function () {
+  $export($print, 'info', function () {
     return print.apply(output.info, arguments)
   })
 
   // encode arguments and print it as an issue record to standard error.
-  exportTo($print, 'warn', function () {
+  $export($print, 'warn', function () {
     return print.apply(output.warn, arguments)
   })
 
