@@ -2,8 +2,8 @@
 
 var $export = require('../export')
 
-function isType () {
-  return function Array$is_type (value) {
+function isTypeOf () {
+  return function Array$is_type_of (value) {
     return Array.isArray(value)
   }
 }
@@ -25,15 +25,9 @@ function create () {
   }
 }
 
-function isSame () {
-  return function Array$is_same (another) {
-    return Array.isArray(this) ? this === another : false
-  }
-}
-
-function equals ($, is_same) {
+function equals ($) {
   return function Array$equals (another) {
-    if (is_same.call(this, another)) {
+    if (Object.is(this, another)) {
       return true
     }
     if (!Array.isArray(this) || !Array.isArray(another) || this.length !== another.length) {
@@ -91,7 +85,7 @@ function fromSource () {
 
 module.exports = function ($) {
   var type = $export($, 'Array')
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
   $export(type, 'concat', concat())
@@ -123,8 +117,7 @@ module.exports = function ($) {
     'reduceRight': 'reduce-right',
     'some': 'some'
   }, pt))
-  var is_same = $export(pt, 'is', isSame())
-  $export(pt, 'equals', equals($, is_same))
+  $export(pt, 'equals', equals($))
 
   $export(pt, 'to-code', toCode($))
   $export(pt, 'to-string', toCode($))

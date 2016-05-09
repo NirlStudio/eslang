@@ -7,7 +7,7 @@ module.exports = function seval ($) {
 
   var symbolValueOf = $.Symbol['value-of']
   var symbolKeyOf = $.Symbol['key-of']
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   var SymbolContext = symbolValueOf('$')
   var SymbolIndexer = symbolValueOf(':')

@@ -4,7 +4,7 @@ module.exports = function operators$general ($) {
   var $operators = $.$operators
   var seval = $.$eval
   var assign = $.$assign
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   function concat ($, str, clause) {
     var length = clause.length

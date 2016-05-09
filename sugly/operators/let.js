@@ -4,7 +4,7 @@ module.exports = function operators$let ($) {
   var $operators = $.$operators
   var assign = $.$assign
   var seval = $.$eval
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   // (let var value) or (let (var value) ...)
   $operators['let'] = function $let ($, clause) {

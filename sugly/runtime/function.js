@@ -6,7 +6,7 @@ module.exports = function sfunction ($) {
   var Signal = $.$Signal
 
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
   var SymbolLambdaShort = symbolValueOf('>')
   var SymbolRepeat = symbolValueOf('*')
 

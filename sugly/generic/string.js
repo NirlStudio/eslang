@@ -2,8 +2,8 @@
 
 var $export = require('../export')
 
-function isType () {
-  return function String$is_type (value) {
+function isTypeOf () {
+  return function String$is_type_of (value) {
     return typeof value === 'string'
   }
 }
@@ -34,12 +34,6 @@ function codeOf ($) {
   }
 }
 
-function isSame () {
-  return function String$is_same (value) {
-    return typeof this === 'string' ? this === value : false
-  }
-}
-
 function toCode ($) {
   return function String$to_code () {
     return $.encode.string(this)
@@ -55,7 +49,7 @@ function toString () {
 
 module.exports = function ($) {
   var type = $export($, 'String')
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
   $export(type, 'code-of', codeOf($))
 
   var value_of = $export(type, 'value-of', valueOf($))
@@ -86,8 +80,6 @@ module.exports = function ($) {
     'endsWith': 'ends-with',
     'startsWith': 'starts-with'
   }, pt))
-  $export(pt, 'is', isSame())
-  $export(pt, 'equals', isSame())
 
   $export(pt, 'to-code', toCode($))
   $export(pt, 'to-string', toString())

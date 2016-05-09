@@ -54,20 +54,20 @@
     (assert false (` (Symbol is-key "s\tym"),
     (assert false (` (Symbol is-key "s ym"),
   ),
-  ($should "(Symbol is)" "return true for a symbol." (= ()
-    (assert true (` (Symbol is (Symbol Nothing),
-    (assert true (` (Symbol is (` sym),
+  ($should "(Symbol is-type-of)" "return true for a symbol." (= ()
+    (assert true (` (Symbol is-type-of (Symbol Nothing),
+    (assert true (` (Symbol is-type-of (` sym),
 
-    (assert false (` (Symbol is),
-    (assert false (` (Symbol is null),
-    (assert false (` (Symbol is true),
-    (assert false (` (Symbol is false),
-    (assert false (` (Symbol is 2),
-    (assert false (` (Symbol is ""),
-    (assert false (` (Symbol is "symbol"),
-    (assert false (` (Symbol is (@),
-    (assert false (` (Symbol is (object),
-    (assert false (` (Symbol is (= x x),
+    (assert false (` (Symbol is-type-of),
+    (assert false (` (Symbol is-type-of null),
+    (assert false (` (Symbol is-type-of true),
+    (assert false (` (Symbol is-type-of false),
+    (assert false (` (Symbol is-type-of 2),
+    (assert false (` (Symbol is-type-of ""),
+    (assert false (` (Symbol is-type-of "symbol"),
+    (assert false (` (Symbol is-type-of (@),
+    (assert false (` (Symbol is-type-of (object),
+    (assert false (` (Symbol is-type-of (= x x),
   ),
 ).
 

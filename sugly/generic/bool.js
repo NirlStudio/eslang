@@ -2,8 +2,8 @@
 
 var $export = require('../export')
 
-function isType () {
-  return function Bool$is_type (value) {
+function isTypeOf () {
+  return function Bool$is_type_of (value) {
     return typeof value === 'boolean'
   }
 }
@@ -11,12 +11,6 @@ function isType () {
 function valueOf () {
   return function Bool$value_of (input) {
     return typeof input !== 'undefined' && input !== null && input !== 0 && input !== false
-  }
-}
-
-function isSame () {
-  return function Bool$is_same (value) {
-    return typeof this === 'boolean' ? this === value : false
   }
 }
 
@@ -66,7 +60,7 @@ function boolNot (value_of) {
 
 module.exports = function ($) {
   var type = $export($, 'Bool')
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
 
   var value_of = $export(type, 'value-of', valueOf())
   var and = $export(type, 'and', boolAnd(value_of))
@@ -75,8 +69,6 @@ module.exports = function ($) {
 
   var pt = Object.create($.Null.$)
   $export(type, '$', pt)
-  $export(pt, 'is', isSame())
-  $export(pt, 'equals', isSame())
 
   $export(pt, 'to-code', toCode())
   $export(pt, 'to-string', toCode())

@@ -2,9 +2,9 @@
 
 var $export = require('../export')
 
-function isType ($) {
-  var isSymbol = $.Symbol.is
-  return function Object$is_type (value) {
+function isTypeOf ($) {
+  var isSymbol = $.Symbol['is-type-of']
+  return function Object$is_type_of (value) {
     return typeof value === 'object' && value !== null && !isSymbol(value)
   }
 }
@@ -25,15 +25,8 @@ function create () {
   }
 }
 
-function isSame ($) {
-  var isSymbol = $.Symbol.is
-  return function Object$is_same (another) {
-    return typeof this === 'object' && this !== null && !isSymbol(this) && this === another
-  }
-}
-
 function equals ($) {
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
   return function Object$equals (another) {
     if (typeof this !== 'object' || this === null || isSymbol(this)) {
       return false
@@ -56,7 +49,7 @@ module.exports = function ($) {
     'getOwnPropertyNames': 'property-names-of',
     'keys': 'keys-of'
   }))
-  $export(type, 'is', isType($))
+  $export(type, 'is-type-of', isTypeOf($))
   $export(type, 'create', create())
 
   var pt = Object.create($.Null.$)
@@ -67,7 +60,6 @@ module.exports = function ($) {
     'propertyIsEnumerable': 'has-enumerable-property'
 
   }, pt))
-  $export(pt, 'is', isSame($))
   $export(pt, 'equals', equals($))
 
   $export(pt, 'to-code', toCode($))

@@ -2,8 +2,8 @@
 
 var $export = require('../export')
 
-function isType () {
-  return function Date$is (value) {
+function isTypeOf () {
+  return function Date$is_type_of (value) {
     return value instanceof Date
   }
 }
@@ -14,15 +14,9 @@ function create () {
   }
 }
 
-function isSame () {
-  return function Date$is_same (another) {
-    return this instanceof Date ? this === another : false
-  }
-}
-
-function equals ($, is_same) {
+function equals ($) {
   return function Date$equals (another) {
-    if (is_same.call(this, another)) {
+    if (Object.is(this, another)) {
       return true
     }
     if (!(this instanceof Date) || !(another instanceof Date)) {
@@ -84,7 +78,7 @@ function parse () {
 
 module.exports = function ($) {
   var type = $export($, 'Date')
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
   $export(type, 'now', now())
@@ -150,9 +144,7 @@ module.exports = function ($) {
 
   }, pt))
 
-  $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
-
   $export(pt, 'to-code', toCode($))
 
   return type

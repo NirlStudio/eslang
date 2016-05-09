@@ -47,14 +47,14 @@
   ),
 ).
 
-($define "(Bool is x" (= ()
+($define "(Bool is-type-of x" (= ()
   ($should "test if a value is a bool value." (= ()
-    (assert (` (Bool is true),
-    (assert (` (Bool is false),
-    (assert false (` (Bool is 0),
-    (assert false (` (Bool is 1),
-    (assert false (` (Bool is null),
-    (assert false (` (Bool is ""),
+    (assert (` (Bool is-type-of true),
+    (assert (` (Bool is-type-of false),
+    (assert false (` (Bool is-type-of 0),
+    (assert false (` (Bool is-type-of 1),
+    (assert false (` (Bool is-type-of null),
+    (assert false (` (Bool is-type-of ""),
   ),
 ).
 
@@ -146,6 +146,9 @@
     (assert false (` (false is 0),
     (assert false (` (true is 1),
     (assert false (` (false is 1),
+
+    (assert (` (Bool is Bool),
+    (assert false (` (Bool is true),
   ),
 ).
 

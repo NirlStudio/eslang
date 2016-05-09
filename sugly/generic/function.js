@@ -2,8 +2,8 @@
 
 var $export = require('../export')
 
-function isType () {
-  return function Function$is_type (value) {
+function isTypeOf () {
+  return function Function$is_type_of (value) {
     return typeof value === 'function'
   }
 }
@@ -12,12 +12,6 @@ function create () {
   return function Function$create (params, body) {
     // This function only exists as a placeholder.
     return function () { return null }
-  }
-}
-
-function isSame () {
-  return function Function$is_same (another) {
-    return typeof this === 'function' && this === another
   }
 }
 
@@ -45,7 +39,7 @@ function toString () {
 
 module.exports = function ($) {
   var type = $export($, null, $export.copy('Function', type))
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
   var pt = Object.create($.Null.$)
@@ -53,7 +47,6 @@ module.exports = function ($) {
     'apply': 'apply',
     'call': 'call'
   }, pt))
-  $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode($))

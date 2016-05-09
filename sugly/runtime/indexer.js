@@ -5,7 +5,7 @@ module.exports = function indexer ($) {
 
   var symbolValueOf = $.Symbol['value-of']
   var symbolKeyOf = $.Symbol['key-of']
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   function getter (subject, key) {
     if (typeof subject !== 'object' && typeof subject !== 'function') {

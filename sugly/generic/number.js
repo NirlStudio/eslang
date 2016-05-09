@@ -3,8 +3,8 @@
 var $export = require('../export')
 var measure = require('./measure')
 
-function isType () {
-  return function Number$is_type (value) {
+function isTypeOf () {
+  return function Number$is_type_of (value) {
     return typeof value === 'number'
   }
 }
@@ -27,12 +27,6 @@ function valueOf () {
       return input.getTime()
     }
     return measure(input)
-  }
-}
-
-function isSame () {
-  return function Number$is_same (value) {
-    return typeof this === 'number' ? this === value || (isNaN(this) && isNaN(value)) : false
   }
 }
 
@@ -118,7 +112,7 @@ function numberDivide (value_of) {
 
 module.exports = function ($) {
   var type = $export($, 'Number')
-  $export(type, 'is', isType())
+  $export(type, 'is-type-of', isTypeOf())
   var value_of = $export(type, 'value-of', valueOf())
 
   type.MAX_VALUE = Number.MAX_VALUE
@@ -150,7 +144,6 @@ module.exports = function ($) {
     'toPrecision': 'to-precision',
     'toString': 'to-string'
   }, pt))
-  $export(pt, 'is', isSame())
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode())

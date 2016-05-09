@@ -5,7 +5,7 @@ var $export = require('../export')
 module.exports = function ($, JS) {
   return $export($, 'encoder', function encoder ($, pretty) {
     var $Symbol = $.Symbol
-    var symbolIs = $Symbol.is
+    var symbolIs = $Symbol['is-type-of']
     var symbolValueOf = $Symbol['value-of']
     var symbolKeyOf = $Symbol['key-of']
 

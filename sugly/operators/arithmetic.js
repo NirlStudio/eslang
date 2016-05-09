@@ -5,7 +5,7 @@ module.exports = function operators$arithmetic ($) {
   var seval = $.$eval
   var assign = $.$assign
   var resolve = $.$resolve
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   function multiply ($, clause) {
     var length = clause.length

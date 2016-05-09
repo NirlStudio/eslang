@@ -3,7 +3,7 @@
 module.exports = function space ($) {
   var set = $.$set
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   var $functionIn = $.$functionIn
   var $lambdaIn = $.$lambdaIn

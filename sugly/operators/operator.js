@@ -3,7 +3,7 @@
 module.exports = function operators$operator ($) {
   var $operators = $.$operators
   var seval = $.$eval
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
   var symbolKeyOf = $.Symbol['key-of']
   var symbolValueOf = $.Symbol['value-of']
   var SymbolExport = symbolValueOf('export')

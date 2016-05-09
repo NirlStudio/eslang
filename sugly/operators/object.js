@@ -5,7 +5,7 @@ module.exports = function operators$object ($) {
   var set = $.$set
   var seval = $.$eval
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol.is
+  var isSymbol = $.Symbol['is-type-of']
 
   var SymbolIndexer = symbolValueOf(':')
 

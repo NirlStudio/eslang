@@ -164,7 +164,7 @@ module.exports = function ($) {
   type.Nothing = impl.Nothing
   $export(type, 'is-key', impl.is_key)
 
-  $export(type, 'is', impl.is())
+  $export(type, 'is-type-of', impl.is())
   $export(type, 'value-of', impl.valueOf())
   $export(type, 'key-of', impl.keyOf())
 
