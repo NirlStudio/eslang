@@ -3,10 +3,8 @@
 module.exports = function suglizer (loader, output/*, more options */) {
   var makeSpace = require('./sugly/space')
 
-  var warn, SuglySignal
-  var symbolValueOf, symbolKeyOf, isSymbol
-  var SymbolContext, SymbolIndexer, SymbolDerive,
-    SymbolLambdaShort, SymbolRepeat
+  var warn, SuglySignal, set, seval, beval, $functionIn, $lambdaIn
+  var symbolValueOf, isSymbol
 
   function initializeSharedContext ($) {
     if (warn) {
@@ -14,343 +12,14 @@ module.exports = function suglizer (loader, output/*, more options */) {
     }
     warn = $.print.warn
     SuglySignal = $.$Signal
+    set = $.$set
+    seval = $.$eval
+    beval = $.$beval
+    $functionIn = $.$functionIn
+    $lambdaIn = $.$lambdaIn
 
     symbolValueOf = $.Symbol['value-of']
-    symbolKeyOf = $.Symbol['key-of']
     isSymbol = $.Symbol.is
-
-    SymbolContext = symbolValueOf('$')
-    SymbolIndexer = symbolValueOf(':')
-
-    SymbolDerive = symbolValueOf('>')
-    SymbolLambdaShort = SymbolDerive
-
-    SymbolRepeat = symbolValueOf('*')
-  }
-
-  function set (subject, sym, value) {
-    if (typeof subject !== 'object' && typeof subject !== 'function') {
-      return null
-    }
-
-    var key = symbolKeyOf(sym)
-    if (!key.startsWith('$') && !key.startsWith('__')) {
-      subject[key] = value
-    }
-    return value
-  }
-
-  function getter (subject, key) {
-    if (typeof subject !== 'object' && typeof subject !== 'function') {
-      return null
-    }
-
-    if (isSymbol(key)) {
-      key = symbolKeyOf(key)
-    }
-
-    var value = subject[key]
-    if (typeof value !== 'undefined') {
-      return value
-    }
-    return null
-  }
-
-  function indexer (key, value) {
-    if (key === null) {
-      return null
-    }
-    // getting value
-    if (typeof value === 'undefined') {
-      return getter(this, key)
-    }
-
-    // setting property
-    if (typeof key === 'string') {
-      return set(this, symbolValueOf(key), value)
-    }
-    if (isSymbol(key)) {
-      return set(this, key, value)
-    }
-
-    // general operation - TODO - type filtering?
-    try {
-      this[key] = value
-    } catch (err) {
-      warn({
-        from: '$/sugly',
-        message: 'Indexer/set error for ' + key,
-        value: value,
-        inner: err
-      })
-      return null
-    }
-  }
-
-  function seval (clause, $) {
-    if (!Array.isArray(clause)) {
-      // not a clause.
-      return isSymbol(clause) ? resolve($, clause) : clause
-    }
-    var length = clause.length
-    if (length < 1) {
-      return null // empty clause
-    }
-
-    var subject = clause[0]
-    // intercept subject
-    if (isSymbol(subject)) {
-      var key = symbolKeyOf(subject)
-      if ($.$operators.hasOwnProperty(key)) {
-        return $.$operators[key]($, clause)
-      }
-      if (subject === SymbolContext) {
-        subject = $ // shortcut
-      } else {
-        subject = resolve($, subject)
-      }
-    } else if (Array.isArray(subject)) {
-      subject = seval(subject, $)
-    }
-
-    if (subject === null) {
-      return null // short circuit - ignoring arguments
-    }
-
-    // with only subject, take the value of subject as another clause.
-    if (length < 2) {
-      return seval(subject, $)
-    }
-
-    // predicate exists.
-    var predicate = clause[1]
-    if (Array.isArray(predicate)) {
-      predicate = seval(predicate, $)
-    }
-
-    var func
-    switch (typeof predicate) {
-      case 'string': // an immediate string indicating get/set command.
-        var sym = symbolValueOf(predicate)
-        return length > 2 ? set(subject, sym, seval(clause[2], $)) : resolve(subject, sym)
-
-      case 'symbol': // native symbol
-        func = resolve(subject, predicate)
-        if (!func && predicate === SymbolIndexer) {
-          func = indexer // overridable indexer
-        } else if (typeof func !== 'function') {
-          return func
-        }
-        break
-
-      case 'function':
-        func = predicate
-        break
-
-      case 'object':
-        if (isSymbol(predicate)) { // polyfill symbol
-          func = resolve(subject, predicate)
-          if (!func && predicate === SymbolIndexer) {
-            func = indexer // overridable indexer
-          } else if (typeof func !== 'function') {
-            return func
-          }
-          break
-        }
-        return predicate // ordinary object
-
-      default:
-        // short circuit - other type of value type will be evaluated to itself.
-        return predicate
-    }
-
-    // evaluate arguments.
-    var max = func.$fixedArgs ? func.$params.length + 2 : length
-    if (max > length) {
-      max = length
-    }
-    var args = []
-    for (var i = 2; i < max; i++) {
-      args.push(seval(clause[i], $))
-    }
-
-    // execute the clause.
-    try {
-      var result = func.apply(subject, args)
-      return typeof result === 'undefined' ? null : result
-    } catch (signal) {
-      // TODO - filter native errors
-      throw signal
-    }
-  }
-
-  function beval ($, clauses) {
-    var result = null
-    for (var i = 0; i < clauses.length; i++) {
-      result = seval(clauses[i], $)
-    }
-    return result
-  }
-
-  // param or (param ...) or ((param value) ...)
-  function formatParameters (params) {
-    var formatted = [true] // eliminate unwanted arguments.
-    if (typeof params === 'undefined' || params === null) {
-      return formatted
-    }
-
-    if (isSymbol(params)) {
-      params = [params] // single parameter
-    } else if (!Array.isArray(params)) {
-      return formatted
-    }
-
-    for (var i = 0; i < params.length; i++) {
-      var p = params[i]
-      if (isSymbol(p)) {
-        if (p === SymbolRepeat) {
-          formatted[0] = false // variant arguments
-          break // the repeat indicator is always the last one
-        }
-        formatted.push([p, null])
-      } else if (Array.isArray(p)) {
-        if (p.length < 1) {
-          continue
-        }
-        var sym = p[0]
-        if (isSymbol(sym)) {
-          formatted.push([sym, p.length > 1 ? p[1] : null]) // no evaluation.
-        }
-      }
-    }
-    return formatted
-  }
-
-  function $functionIn ($) {
-    var createSpace = $.$createSpace
-
-    // body must be a list of clauses
-    return function $function (params, body) {
-      if (!Array.isArray(body) || body.length < 1) {
-        return null // no function body
-      }
-
-      params = formatParameters(params)
-      var fixedArgs = params.shift()
-
-      var f = function $F () {
-        var args = Array.prototype.slice.apply(arguments)
-        // new namespace
-        var ns = createSpace($)
-        ns[':'] = this
-        ns['self'] = $F
-        if (!fixedArgs) {
-          ns['argc'] = args.length
-          ns['argv'] = args
-        }
-
-        // binding arguments with default values
-        for (var i = 0; i < params.length; i++) {
-          var p = params[i]
-          set(ns, p[0], args.length > i ? args[i] : p[1])
-        }
-
-        try {
-          return beval(ns, body)
-        } catch (signal) {
-          if (signal instanceof SuglySignal && signal.type === 'return') {
-            return signal.value
-          }
-          throw signal
-        }
-      }
-
-      f.$fixedArgs = fixedArgs
-      f.$params = params
-      f.$body = body
-      return f
-    }
-  }
-
-  function createClosure ($, enclosing, params, fixedArgs, body) {
-    var createSpace = $.$createSpace
-
-    function $C () {
-      var args = Array.prototype.slice.apply(arguments)
-      // new namespace
-      var ns = createSpace($)
-      ns[':'] = this
-      ns['self'] = $C
-      Object.assign(ns, enclosing)
-
-      // variant arguments
-      if (!fixedArgs) {
-        ns['argc'] = args.length
-        ns['argv'] = args
-      }
-
-      // aguments or parameter default values can overrride enclosed values.
-      for (var i = 0; i < params.length; i++) {
-        var p = params[i]
-        set(ns, p[0], args.length > i ? args[i] : p[1])
-      }
-
-      try {
-        return beval(ns, body)
-      } catch (signal) {
-        if (signal instanceof SuglySignal && signal.type === 'return') {
-          return signal.value
-        }
-        throw signal
-      }
-    }
-
-    $C.$enclosing = enclosing
-    $C.$fixedArgs = fixedArgs
-    $C.$params = params
-    $C.$body = body
-    return $C
-  }
-
-  function createLambda ($, enclosing, params, body) {
-    function $L () {
-      var args = Array.prototype.slice.apply(arguments)
-
-      enclosing = Object.assign({}, enclosing)
-      for (var i = 0; i < params.length; i++) {
-        var p = params[i]
-        set(enclosing, p[0], args.length > i ? args[i] : p[1])
-      }
-
-      return $.lambda(enclosing, body[1], body.slice(2))
-    }
-
-    $L.$enclosing = enclosing
-    $L.$fixedArgs = true
-    $L.$params = params
-    $L.$body = body
-    return $L
-  }
-
-  function $lambdaIn ($) {
-    return function $lambda (enclosing, params, body) {
-      if (!Array.isArray(body) || body.length < 1) {
-        return null // no function body
-      }
-
-      if (typeof enclosing !== 'object' || enclosing === null) {
-        enclosing = {}
-      }
-
-      params = formatParameters(params)
-      var fixedArgs = params.shift()
-
-      if (body[0] === SymbolLambdaShort) {
-        return createLambda($, enclosing, params, body)
-      } else {
-        return createClosure($, enclosing, params, fixedArgs, body)
-      }
-    }
   }
 
   // generate an export function for $.
@@ -414,16 +83,6 @@ module.exports = function suglizer (loader, output/*, more options */) {
     }
   }
 
-  function verifySpace (space) {
-    if (!space || typeof space !== 'object') {
-      return null
-    }
-    if (!space.$operators || !space.$loops || !space.$OprStack) {
-      return null
-    }
-    return space
-  }
-
   function $innerExecIn ($) {
     var compile = $.compile
     var createModuleSpace = $.$createModuleSpace
@@ -457,8 +116,7 @@ module.exports = function suglizer (loader, output/*, more options */) {
 
   function $evalIn ($) {
     return function $eval (expr) {
-      var ns = verifySpace(this)
-      return seval(expr, ns || $)
+      return seval(expr, $.$isSpace(this) ? this : $)
     }
   }
 
@@ -599,10 +257,6 @@ module.exports = function suglizer (loader, output/*, more options */) {
   }
 
   function populate ($) {
-    $.$set = set
-    $.$eval = seval
-    $.$beval = beval
-
     require('./sugly/runtime/signal-of')($)
     require('./sugly/operators')($)
 
@@ -666,14 +320,6 @@ module.exports = function suglizer (loader, output/*, more options */) {
 
   // create sugly space
   var sugly = makeSpace(output)
-  var notTracing = true
-  var resolve = notTracing ? sugly.$resolve : function (subject, key) {
-    var result = sugly.$resolve(subject, key)
-    if (true) {
-      console.log('resolving', key, 'to', result, 'for', subject)
-    }
-    return result
-  }
   initializeSharedContext(sugly)
 
   sugly.$spaceCounter = 0
