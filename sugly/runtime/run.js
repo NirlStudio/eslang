@@ -10,7 +10,7 @@ module.exports = function run ($) {
   }
 
   $.$loadIn = function $loadIn ($) {
-    var dirs = [$.$dir]
+    var dir = $.$dir
     var load = $.$load
 
     return function $load (source) {
@@ -20,7 +20,7 @@ module.exports = function run ($) {
       if (!source.endsWith('.s')) {
         source += '.s'
       }
-      var uri = load.resolve(dirs, source)
+      var uri = load.resolve(source.startsWith('.') ? dir : [dir], source)
       return uri ? load(uri) : null
     }
   }
@@ -36,6 +36,7 @@ module.exports = function run ($) {
         }
         return exec(program, '?' + source, dir)
       }
+      // execute a function as module: to catch exit signal.
       if (typeof program === 'function') {
         return exec.apply($, arguments)
       }
@@ -44,7 +45,8 @@ module.exports = function run ($) {
   }
 
   $.$runIn = function $runIn ($) {
-    var dirs = [null, $.$dir]
+    var dir = $.$dir
+    var dirs = [null, dir]
     var load = $.$load
     var exec = $.$exec
 
@@ -56,30 +58,7 @@ module.exports = function run ($) {
         source += '.s'
       }
 
-      var uri = load.resolve(dirs, source)
-      if (!uri) {
-        return null
-      }
-
-      var path = load.dir(uri)
-      return exec(load(uri), uri, path)
-    }
-  }
-
-  $.$importIn = function $importIn ($) {
-    var dirs = [$.$dir]
-    var load = $.$load
-    var exec = $.$exec
-
-    return function $import (source) {
-      if (typeof source !== 'string') {
-        return null
-      }
-      if (!source.endsWith('.s')) {
-        source += '.s'
-      }
-
-      var uri = load.resolve(dirs, source)
+      var uri = load.resolve(source.startsWith('.') ? [] : dirs, source)
       if (!uri) {
         return null
       }
@@ -91,36 +70,55 @@ module.exports = function run ($) {
 
   function importJSModule ($, name) {
     try {
-      return require(name)
+      return name.startsWith('.') ? require($.$dir + '/' + name) : require(name)
     } catch (err) {
       $.print.warn({
-        form: '$/sugly',
+        form: '$/sugly/runtime/run:importJSModule',
         message: 'failed to load JS moudle: ' + name
       })
       return null
     }
   }
 
+  $.$importIn = function $importIn ($) {
+    var dir = $.$dir
+    var load = $.$load
+    var exec = $.$exec
+
+    return function $import (source, type) {
+      if (typeof source !== 'string') {
+        return null
+      }
+      if (type === 'js') {
+        return importJSModule($, source)
+      }
+      if (!source.endsWith('.s')) {
+        source += '.s'
+      }
+      var uri = load.resolve(source.startsWith('.') ? dir : [dir], source)
+      if (!uri) {
+        return null
+      }
+
+      var path = load.dir(uri)
+      return exec(load(uri), uri, path)
+    }
+  }
+
   $.$requireIn = function $requireIn ($) {
-    var dirs = [$.$dir]
+    var dir = $.$dir
     var exec = $.$exec
     var load = $.$load
     var modules = $.$modules
 
-    return function $require (source, type) {
+    return function $require (source) {
       if (typeof source !== 'string') {
         return null
       }
-
-      if (type === 'js') {
-        return importJSModule($, source)
-      }
-
       if (!source.endsWith('.s')) {
         source += '.s'
       }
-
-      var uri = load.resolve(dirs, source)
+      var uri = load.resolve(source.startsWith('.') ? dir : [dir], source)
       if (!uri) {
         return null
       }
@@ -131,12 +129,16 @@ module.exports = function run ($) {
 
       var path = load.dir(uri)
       var result = exec(load(uri), uri, path)
+      if (typeof result === 'undefined' || result === null) {
+        return null
+      }
+
       if (typeof result !== 'object' && typeof result !== 'function') {
         result = {
           value: result
         }
       }
-      if (result && !result.timestamp) {
+      if (!result.timestamp) {
         result.timestamp = Date.now()
       }
 

@@ -51,11 +51,11 @@ function checkSymbol () {
 }
 
 function checkPolyfill () {
-  var polyfill = require('../sugly/polyfill')
-  if (polyfill.functions.length > 0) {
+  var polyfill = require('../lib/polyfill')
+  if (polyfill.length > 0) {
     passed('Sugly is using polyfill functions:')
     var padding = '      - '
-    console.log(C.gray(padding + polyfill.functions.join('\n' + padding)))
+    console.log(C.gray(padding + polyfill.join('\n' + padding)))
   } else {
     passed('Sugly is not using any polyfill functions.')
   }
@@ -172,7 +172,7 @@ function checkSugly ($) {
     'compile', 'encoder', 'encode', 'print',
     '$Signal', '$resolve', '$assign', '$set', '$eval', '$beval', '$createSignalOf',
     '$export', '$load', '$createSpace', '$createModuleSpace', '$exec',
-    'call', 'export', 'function', 'lambda', 'eval',
+    'export', 'function', 'lambda', 'eval',
     'load', 'exec', 'run', 'import', 'require'
   ])
 

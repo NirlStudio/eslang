@@ -1,6 +1,5 @@
 'use strict'
 
-require('./polyfill')
 var $export = require('./export')
 
 var JS = global || window
@@ -12,7 +11,7 @@ function createSpace () {
   // meta information
   var sugly = $export($, 'Sugly', {})
   $export(sugly, 'runtime', 'js')
-  $export(sugly, 'version', '0.0.1')
+  $export(sugly, 'version', '0.1.0')
   $export(sugly, 'debugging', true)
   return $
 }
@@ -71,12 +70,15 @@ function initializeSpace ($) {
   require('./runtime/eval')($)
   require('./runtime/function')($)
 
+  require('./runtime/signal-of')($)
+  require('./operators')($)
+
   require('./lib/math')($, JS)
   require('./lib/uri')($, JS)
   require('./lib/json')($, JS)
 }
 
-module.exports = function (output) {
+module.exports = function start (output) {
   var $ = createSpace()
 
   // export global constant values.
@@ -84,6 +86,11 @@ module.exports = function (output) {
 
   // create generic type system
   initializeSpace($)
+
+  // compile a piece of code to program/clauses: [[]].
+  $export($, 'compile', function (code, src) {
+    return require('./compiler')($)(code, src)
+  })
 
   // encode function factory
   var encoder = require('./lib/encoder')($, JS)
@@ -93,17 +100,14 @@ module.exports = function (output) {
   // default output function. depending on $.encode
   require('./lib/print')($, JS, output)
 
-  // compile a piece of code to program/clauses: [[]].
-  $export($, 'compile', function (code, src) {
-    return require('./compiler')($)(code, src)
-  })
-
   // this is only used by runtime itself or its assembler
   $.$export = function (name, obj) {
     $export(this, name, obj)
   }
 
-  // a placeholder loader
-  require('./load')($)
+  require('./runtime/run')($)
+  require('./runtime/space')($)
+  require('./runtime/exec')($)
+
   return $
 }

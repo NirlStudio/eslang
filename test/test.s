@@ -1,4 +1,4 @@
-(let C ($require "./lib/colors" "js").
+(let C ($import "../lib/colors" "js").
 
 (let cases (@).
 (let current null).

@@ -15,10 +15,10 @@
     (assert null (` (=> null),
     (assert null (` (=> true),
 
-    (assert null (` ($call (=> x > ),
-    (assert null (` ($call (=> x > ""),
-    (assert null (` ($call (=> x > null),
-    (assert null (` ($call (=> x > true),
+    (assert null (` ((=> x > ) call),
+    (assert null (` ((=> x > "") call),
+    (assert null (` ((=> x > null) call),
+    (assert null (` ((=> x > true) call),
   ),
 
   ($should "Missing body" "return null" (= ()
@@ -27,7 +27,7 @@
     (assert null (` (= x > y),
 
     (assert null (` (=> x ),
-    (assert null (` ($call (=> x > x),
+    (assert null (` ((=> x > x) call),
   ),
 ).
 
@@ -200,16 +200,16 @@
   ),
 ).
 
-($define "($call func subject args)" (= ()
+($define "(func apply subject args)" (= ()
   ($should "execute a function with a subject and arguments from an array" (= ()
     (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
-    (let r ($call f),
+    (let r (f apply),
     (assert null (` (r s),
     (assert 0 (` (r argc),
 
     (let s (object),
     (let args (@ 1 2),
-    (let r ($call f s args),
+    (let r (f apply s args),
     (assert (` (is s (r s),
     (assert 2 (` (r argc),
     (assert 1 (` ((r argv):0),

@@ -108,7 +108,7 @@
 (print value (obj"b").
  #" 12312312
 
-(print value (typeof ($require "colors" "js").
+(print value (typeof ($import "colors" "js").
 
 (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
 (let s (object))
