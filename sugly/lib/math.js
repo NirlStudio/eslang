@@ -1,9 +1,11 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('../generic/module')
 
 module.exports = function ($, JS) {
-  var type = $export($, null, $export.copy('Math', JS.Math, {
+  var math = $module($, 'Math')
+  $export.copy(math, JS.Math, {
     /* basic */
     'E': 'E',
     'LN10': 'LN10',
@@ -40,6 +42,6 @@ module.exports = function ($, JS) {
     'cbrt': 'cbrt',
     'log2': 'log2',
     'log10': 'log10'
-  }))
-  return type
+  })
+  return math
 }

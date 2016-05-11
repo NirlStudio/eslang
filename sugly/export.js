@@ -1,12 +1,6 @@
 'use strict'
 
 function exportTo (container, name, obj) {
-  if (!obj) {
-    obj = Object.create(null)
-  } else if (!name) {
-    name = obj.identityName
-  }
-
   if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
       (typeof obj === 'object' || typeof obj === 'function')) {
     var parent = container.identityName || '$'
@@ -24,15 +18,15 @@ function exportTo (container, name, obj) {
 }
 
 function wrapFunction (container, name, owner, func) {
-  if (arguments.length < 4) {
-    exportTo(container, name, function () {
-      return owner.apply(this, arguments)
-    })
-  } else {
-    exportTo(container, name, function () {
-      return func.apply(owner, arguments)
-    })
-  }
+  exportTo(container, name, function () {
+    return func.apply(owner, arguments)
+  })
+}
+
+function wrapMethod (container, name, func) {
+  exportTo(container, name, function () {
+    return func.apply(this, arguments)
+  })
 }
 
 function mapAll (obj) {
@@ -45,22 +39,9 @@ function mapAll (obj) {
   return mapping
 }
 
-function copyObject (name, src, mapping, target) {
-  if (!src) {
-    src = Object.create(null)
-    src.identityName = name
-    return src
-  }
-
+function copyObject (target, src, mapping) {
   if (!mapping) {
     mapping = mapAll(src)
-  }
-
-  if (!target) {
-    target = Object.create(null)
-    target.identityName = name
-  } else if (!target.identityName) {
-    target.identityName = name
   }
 
   var keys = Object.getOwnPropertyNames(mapping)
@@ -69,10 +50,10 @@ function copyObject (name, src, mapping, target) {
     var key = keys[i]
     var value = src[key]
     if (typeof value === 'undefined') {
-      console.warn(name, 'missing required member:', key)
+      console.warn(src, 'missing required member:', key)
     } else if (typeof value === 'function') {
       if (isPrototype) {
-        wrapFunction(target, mapping[key], value)
+        wrapMethod(target, mapping[key], value)
       } else {
         wrapFunction(target, mapping[key], src, value)
       }
@@ -83,7 +64,7 @@ function copyObject (name, src, mapping, target) {
   return target
 }
 
-function _dumpType (type) {
+function dumpType (type) {
   var i, k, v
 
   var utils = Object.create(null)
@@ -134,10 +115,9 @@ function _dumpType (type) {
 
 function printObject (obj) {
   console.log('---- dumping', obj, '----')
-  console.log(_dumpType(obj))
+  console.log(dumpType(obj))
 }
 
-exportTo.wrap = wrapFunction
 exportTo.copy = copyObject
 exportTo.print = printObject
 

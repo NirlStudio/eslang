@@ -173,7 +173,7 @@ function checkSugly ($) {
     '$Signal', '$resolve', '$assign', '$set', '$eval', '$beval', '$createSignalOf',
     '$export', '$load', '$createSpace', '$createModuleSpace', '$exec',
     'export', 'function', 'lambda', 'eval',
-    'load', 'exec', 'run', 'import', 'require'
+    'load', 'exec', 'run', 'import', 'require', 'retire'
   ])
 
   checkObjects($, '[Sugly / object] ', [

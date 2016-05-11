@@ -1,11 +1,13 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('../generic/module')
 
 module.exports = function ($, JS) {
-  var json = $export($, null, $export.copy('Json', JS.JSON, {
+  var json = $module($, 'Json')
+  $export.copy(json, JS.JSON, {
     'stringify': 'of',
     'parse': 'parse'
-  }))
+  })
   return json
 }

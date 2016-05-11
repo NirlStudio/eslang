@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 function valueOf () {
   return function Int$value_of (input) {
@@ -18,11 +19,9 @@ function valueOf () {
 }
 
 module.exports = function ($) {
-  var type = Object.create($.Number)
-  $export($, 'Float', type)
+  var type = $module($, 'Float', $.Number)
   $export(type, 'value-of', valueOf())
 
-  var pt = Object.create($.Number.$)
-  $export(type, '$', pt)
+  type.$ = Object.create($.Number.$)
   return type
 }

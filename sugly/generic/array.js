@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 function isTypeOf () {
   return function Array$is_type_of (value) {
@@ -84,7 +85,7 @@ function fromSource () {
 }
 
 module.exports = function ($) {
-  var type = $export($, 'Array')
+  var type = $module($, 'Array')
   $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
@@ -92,8 +93,8 @@ module.exports = function ($) {
   $export(type, 'of', ofType())
   $export(type, 'from', fromSource())
 
-  var pt = Object.create($.Object.$)
-  $export(type, null, $export.copy('$', Array.prototype, {
+  var pt = type.$ = Object.create($.Object.$)
+  $export.copy(pt, Array.prototype, {
     /* Chrome, IE, Firefox */
     'slice': 'slice',
     /* IE5.5 */
@@ -116,7 +117,7 @@ module.exports = function ($) {
     'reduce': 'reduce',
     'reduceRight': 'reduce-right',
     'some': 'some'
-  }, pt))
+  })
   $export(pt, 'equals', equals($))
 
   $export(pt, 'to-code', toCode($))

@@ -2,6 +2,7 @@
 
 module.exports = function run ($) {
   var seval = $.$eval
+  var isSymbol = $.Symbol['is-type-of']
 
   $.$evalIn = function $evalIn ($) {
     return function $eval (expr) {
@@ -68,6 +69,34 @@ module.exports = function run ($) {
     }
   }
 
+  function modulize (mod, source, action) {
+    if (typeof mod === 'undefined' || mod === null) {
+      return null
+    }
+
+    if (isSymbol(mod)) {
+      mod = {value: mod}
+    } else if (typeof mod !== 'function' && typeof mod !== 'object') {
+      mod = {value: mod}
+    }
+
+    mod.sourceUri = source
+    if (!mod.timestamp) {
+      mod.timestamp = Date.now()
+    }
+
+    var code = '($' + action + ' ' + $.encode.string(source) + ')'
+    mod['to-code'] = function () {
+      return code
+    }
+
+    var str = '[module] ' + source
+    mod['to-string'] = function () {
+      return str
+    }
+    return mod
+  }
+
   function importJSModule ($, name) {
     try {
       return name.startsWith('.') ? require($.$dir + '/' + name) : require(name)
@@ -101,7 +130,7 @@ module.exports = function run ($) {
       }
 
       var path = load.dir(uri)
-      return exec(load(uri), uri, path)
+      return modulize(exec(load(uri), uri, path), 'import', uri)
     }
   }
 
@@ -128,22 +157,21 @@ module.exports = function run ($) {
       }
 
       var path = load.dir(uri)
-      var result = exec(load(uri), uri, path)
-      if (typeof result === 'undefined' || result === null) {
-        return null
+      var result = modulize(exec(load(uri), uri, path), 'require', uri)
+      if (result) {
+        modules[uri] = result
       }
-
-      if (typeof result !== 'object' && typeof result !== 'function') {
-        result = {
-          value: result
-        }
-      }
-      if (!result.timestamp) {
-        result.timestamp = Date.now()
-      }
-
-      modules[uri] = result
       return result
+    }
+  }
+
+  $.$retireIn = function $retireIn ($) {
+    var modules = $.$modules
+
+    return function $retire (mod) {
+      if (typeof mod.sourceUri === 'string') {
+        delete modules[mod.sourceUri]
+      }
     }
   }
 }

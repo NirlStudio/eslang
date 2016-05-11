@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 function isTypeOf () {
   return function Bool$is_type_of (value) {
@@ -59,7 +60,7 @@ function boolNot (value_of) {
 }
 
 module.exports = function ($) {
-  var type = $export($, 'Bool')
+  var type = $module($, 'Bool')
   $export(type, 'is-type-of', isTypeOf())
 
   var value_of = $export(type, 'value-of', valueOf())
@@ -67,9 +68,7 @@ module.exports = function ($) {
   var or = $export(type, 'or', boolOr(value_of))
   var not = $export(type, 'not', boolNot(value_of))
 
-  var pt = Object.create($.Null.$)
-  $export(type, '$', pt)
-
+  var pt = type.$ = Object.create($.Null.$)
   $export(pt, 'to-code', toCode())
   $export(pt, 'to-string', toCode())
 

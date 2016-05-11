@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
 var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
@@ -157,7 +158,7 @@ module.exports = function ($) {
   var native = typeof Symbol === 'function'
   var impl = native ? useNativeSymbol() : usePolyfillSymbol()
 
-  var type = $export($, 'Symbol')
+  var type = $module($, 'Symbol')
   type.$InvalidSymbol = impl.$InvalidSymbol
   type.$Constructor = impl.$Constructor
 
@@ -168,8 +169,7 @@ module.exports = function ($) {
   $export(type, 'value-of', impl.valueOf())
   $export(type, 'key-of', impl.keyOf())
 
-  var pt = Object.create($.Null.$)
-  $export(type, '$', pt)
+  var pt = type.$ = Object.create($.Null.$)
   $export(pt, 'is', impl.isSame())
   $export(pt, 'equals', impl.isSame())
   $export(pt, 'to-code', impl.toCode())

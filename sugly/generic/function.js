@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 function isTypeOf () {
   return function Function$is_type_of (value) {
@@ -38,15 +39,15 @@ function toString () {
 }
 
 module.exports = function ($) {
-  var type = $export($, null, $export.copy('Function', type))
+  var type = $module($, 'Function')
   $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
-  var pt = Object.create($.Null.$)
-  $export(type, null, $export.copy('$', Function.prototype, { // TODO - looper
+  var pt = type.$ = Object.create($.Null.$)
+  $export.copy(pt, Function.prototype, { // TODO - looper
     'apply': 'apply',
     'call': 'call'
-  }, pt))
+  })
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode($))

@@ -1,7 +1,7 @@
 'use strict'
 
 var $export = require('../export')
-var measure = require('./measure')
+var $module = require('./module')
 
 function isTypeOf () {
   return function Number$is_type_of (value) {
@@ -9,24 +9,12 @@ function isTypeOf () {
   }
 }
 
-function valueOf () {
+function valueOf ($) {
   return function Number$value_of (input) {
     if (typeof input === 'string') {
       return parseFloat(input)
     }
-    if (typeof input === 'undefined' || input === null) {
-      return 0
-    }
-    if (typeof input === 'number') {
-      return input
-    }
-    if (typeof input === 'boolean') {
-      return input ? 1 : 0
-    }
-    if (input instanceof Date) {
-      return input.getTime()
-    }
-    return measure(input)
+    return $.$measure(input)
   }
 }
 
@@ -111,9 +99,9 @@ function numberDivide (value_of) {
 }
 
 module.exports = function ($) {
-  var type = $export($, 'Number')
+  var type = $module($, 'Number')
   $export(type, 'is-type-of', isTypeOf())
-  var value_of = $export(type, 'value-of', valueOf())
+  var value_of = $export(type, 'value-of', valueOf($))
 
   type.MAX_VALUE = Number.MAX_VALUE
   type.MIN_VALUE = Number.MIN_VALUE
@@ -136,14 +124,14 @@ module.exports = function ($) {
   var times = $export(type, 'times', numberTimes(value_of))
   var divide = $export(type, 'divide', numberDivide(value_of))
 
-  var pt = Object.create($.Null.$)
-  $export(type, null, $export.copy('$', Number.prototype, {
+  var pt = type.$ = Object.create($.Null.$)
+  $export.copy(pt, Number.prototype, {
     'toExponential': 'to-exponential',
     'toFixed': 'to-fixed',
     'toLocaleString': 'to-locale-string',
     'toPrecision': 'to-precision',
     'toString': 'to-string'
-  }, pt))
+  })
   $export(pt, 'equals', equals())
 
   $export(pt, 'to-code', toCode())

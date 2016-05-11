@@ -14,6 +14,7 @@ module.exports = function space ($) {
   var $runIn = $.$runIn
   var $importIn = $.$importIn
   var $requireIn = $.$requireIn
+  var $retireIn = $.$retireIn
 
   $.$spaceCounter = 0
   $.spaceIdentifier = 'space-0'
@@ -59,6 +60,7 @@ module.exports = function space ($) {
     space.$export('run', $runIn(space))
     space.$export('import', $importIn(space))
     space.$export('require', $requireIn(space))
+    space.$export('retire', $retireIn(space))
   }
 
   // initiaize global space as a module.

@@ -1,6 +1,7 @@
 'use strict'
 
 var $export = require('../export')
+var $module = require('./module')
 
 function valueOf () {
   return function Int$value_of (input, radix) {
@@ -21,9 +22,7 @@ function valueOf () {
 }
 
 module.exports = function ($) {
-  var type = Object.create($.Number)
-  $export($, 'Int', type)
-
+  var type = $module($, 'Int', $.Number)
   $export(type, 'is', Number.isInteger ? function Int$is (value) {
     return Number.isInteger(value)
   } : function Number$is_int (value) {
@@ -50,9 +49,7 @@ module.exports = function ($) {
     return typeof value === 'undefined' || value === null ? 0 : parseInt(value, radix)
   })
 
-  var pt = Object.create($.Number.$)
-  $export(type, '$', pt)
-
+  var pt = type.$ = Object.create($.Number.$)
   $export(pt, '&', function Bit$and (value) {
     return this & value
   })

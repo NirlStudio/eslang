@@ -1,7 +1,7 @@
 'use strict'
 
 var $export = require('../export')
-var measure = require('./measure')
+var $module = require('./module')
 
 function isNull () {
   return function Null$is_null (value) {
@@ -28,14 +28,14 @@ function nullToCode () {
   }
 }
 
-function isEmpty () {
+function isEmpty ($) {
   return function null$is_empty () {
-    return typeof this === 'undefined' || this === null ? true : !measure(this)
+    return typeof this === 'undefined' || this === null ? true : !$.$measure(this)
   }
 }
 
 module.exports = function ($) {
-  var type = $export($, 'Null')
+  var type = $module($, 'Null')
   $export(type, 'is', isNull())
   $export(type, 'equals', isNull())
 
@@ -50,7 +50,7 @@ module.exports = function ($) {
   })
 
   // for all other values
-  var pt = $export(type, '$')
+  var pt = type.$ = Object.create(null)
   $export(pt, 'is', nullIsSame())
   $export(pt, 'equals', nullIsSame())
 
@@ -58,7 +58,7 @@ module.exports = function ($) {
   $export(pt, 'to-string', nullToCode())
 
   // a customized emptiness logic should override both is-empty & not-empty.
-  var is_empty = $export(pt, 'is-empty', isEmpty())
+  var is_empty = $export(pt, 'is-empty', isEmpty($))
   $export(pt, 'not-empty', function () {
     return !is_empty.call(this)
   })

@@ -1,11 +1,12 @@
 'use strict'
 
 var $export = require('./export')
+var $module = require('./generic/module')
 
 var JS = global || window
 
 function createSpace () {
-  var $ = $export.copy('$')
+  var $ = $module(null, '$')
   $.$isSpace = Object.prototype.isPrototypeOf
 
   // meta information
@@ -59,6 +60,7 @@ function initializeSpace ($) {
   require('./generic/array')($)
   $export($, 'array', $.Array['create'])
 
+  require('./generic/measure')($)
   $export($, 'range', require('./generic/range'))
   $export($, 'iterate', require('./generic/iterate'))
 
@@ -71,7 +73,7 @@ function initializeSpace ($) {
   require('./runtime/function')($)
 
   require('./runtime/signal-of')($)
-  require('./operators')($)
+  require('./operators/all')($)
 
   require('./lib/math')($, JS)
   require('./lib/uri')($, JS)
