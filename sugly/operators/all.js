@@ -4,7 +4,7 @@ module.exports = function operators ($) {
   // export all operators
   $.$operators = {}
   require('./quote')($)
-  require('./let')($)
+  require('./assignment')($)
   require('./object')($)
   require('./function')($)
   require('./type')($)

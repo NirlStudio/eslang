@@ -60,7 +60,7 @@ module.exports = function ($) {
     return this ^ value
   })
   $export(pt, '~', function Bit$not () {
-    return ~this // TODO - add global operator
+    return ~this
   })
   $export(pt, '<<', function Bit$lshift (offset) {
     return this << offset

@@ -1,17 +1,18 @@
 'use strict'
 
 module.exports = function set ($) {
-  var symbolKeyOf = $.Symbol['key-of']
-
   $.$set = function $set (subject, sym, value) {
-    if (typeof subject !== 'object' && typeof subject !== 'function') {
+    var key = typeof sym === 'symbol' ? Symbol.keyFor(sym) : sym.$key
+    if (key.startsWith('$') || key.startsWith('__')) {
       return null
     }
 
-    var key = symbolKeyOf(sym)
-    if (!key.startsWith('$') && !key.startsWith('__')) {
+    try {
       subject[key] = value
+      return value
+    } catch (err) {
+      console.warn('assignment: ', subject, key, value, err)
+      return null
     }
-    return value
   }
 }

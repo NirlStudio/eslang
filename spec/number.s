@@ -62,7 +62,7 @@
     (assert 128 (` (number (@ count: (= () 128),
 
     (assert 1 (` (number (object p:1),
-    (assert Infinity (` ($number (= x x),
+    (assert Infinity (` (number (= x x),
 
     (assert (` (Number is-not (number ""),
     (assert (` (Number is-not (number "a"),

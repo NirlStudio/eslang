@@ -1,24 +1,16 @@
 'use strict'
 
 module.exports = function assign ($) {
-  var symbolKeyOf = $.Symbol['key-of']
-
   $.$assign = function $assign ($, sym, value) {
-    var key = symbolKeyOf(sym) // TODO - optimizer
-    if (Object.prototype.hasOwnProperty.call($, key)) {
+    var key = typeof sym === 'symbol' ? Symbol.keyFor(sym) : sym.$key
+    if (key.startsWith('$') || key.startsWith('__')) {
+      return null
+    }
+
+    if (Object.prototype.hasOwnProperty.call($, key) || typeof $[key] === 'undefined') {
       $[key] = value
-      return value
-    }
-
-    var module = $
-    while (module && module.spaceIdentifier && module.spaceIdentifier !== $.moduleSpaceIdentifier) {
-      module = Object.getPrototypeOf(module)
-    }
-
-    if (Object.prototype.hasOwnProperty.call(module, key)) {
-      module[key] = value
     } else {
-      $[key] = value
+      Object.getPrototypeOf($)[key] = value
     }
     return value
   }

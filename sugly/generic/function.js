@@ -21,7 +21,7 @@ function equals () {
     if (typeof this !== 'function' || typeof another !== 'function') {
       return false
     }
-    // TODO - to compare parameters
+    // TODO - to compare parameters?
     return this === another
   }
 }
