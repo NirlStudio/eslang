@@ -123,6 +123,13 @@ module.exports = function ($) {
   $export(pt, 'to-code', toCode($))
   $export(pt, 'to-string', toCode($))
 
+  $export(pt, 'is-empty', function () {
+    return this.length > 0
+  })
+  $export(pt, 'not-empty', function () {
+    return this.length < 1
+  })
+
   $export(pt, 'to-clause', toClause($))
   $export(pt, 'to-program', toProgram($))
 

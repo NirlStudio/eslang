@@ -60,7 +60,6 @@ function initializeSpace ($) {
   require('./generic/array')($)
   $export($, 'array', $.Array['create'])
 
-  require('./generic/measure')($)
   $export($, 'range', require('./generic/range'))
   $export($, 'iterate', require('./generic/iterate'))
 

@@ -9,12 +9,22 @@ function isTypeOf () {
   }
 }
 
-function valueOf ($) {
+function valueOf () {
   return function Number$value_of (input) {
     if (typeof input === 'string') {
-      return parseFloat(input)
+      var num = parseFloat(input)
+      return isNaN(num) ? 0 : num
     }
-    return $.$measure(input)
+    if (typeof input === 'undefined' || input === null) {
+      return 0
+    }
+    if (typeof input === 'boolean') {
+      return input ? 1 : 0
+    }
+    if (input instanceof Date) {
+      return input.getTime()
+    }
+    return typeof input === 'number' ? input : 0
   }
 }
 
@@ -101,7 +111,7 @@ function numberDivide (value_of) {
 module.exports = function ($) {
   var type = $module($, 'Number')
   $export(type, 'is-type-of', isTypeOf())
-  var value_of = $export(type, 'value-of', valueOf($))
+  var value_of = $export(type, 'value-of', valueOf())
 
   type.MAX_VALUE = Number.MAX_VALUE
   type.MIN_VALUE = Number.MIN_VALUE
@@ -132,9 +142,16 @@ module.exports = function ($) {
     'toPrecision': 'to-precision',
     'toString': 'to-string'
   })
-  $export(pt, 'equals', equals())
 
+  $export(pt, 'equals', equals())
   $export(pt, 'to-code', toCode())
+
+  $export(pt, 'is-empty', function () {
+    return this === 0 || isNaN(this)
+  })
+  $export(pt, 'not-empty', function () {
+    return this !== 0 && !isNaN(this)
+  })
 
   $export(pt, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))

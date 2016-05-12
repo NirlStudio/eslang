@@ -148,5 +148,12 @@ module.exports = function ($) {
   $export(pt, 'equals', equals())
   $export(pt, 'to-code', toCode($))
 
+  $export(pt, 'is-empty', function () {
+    return this.getTime() === 0
+  })
+  $export(pt, 'not-empty', function () {
+    return this.getTime !== 0
+  })
+
   return type
 }

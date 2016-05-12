@@ -167,13 +167,20 @@ module.exports = function ($) {
 
   $export(type, 'is-type-of', impl.is())
   $export(type, 'value-of', impl.valueOf())
-  $export(type, 'key-of', impl.keyOf())
+  var key_of = $export(type, 'key-of', impl.keyOf())
 
   var pt = type.$ = Object.create($.Null.$)
   $export(pt, 'is', impl.isSame())
   $export(pt, 'equals', impl.isSame())
   $export(pt, 'to-code', impl.toCode())
   $export(pt, 'to-string', impl.toString())
+
+  $export(pt, 'is-empty', function () {
+    return key_of(this).length < 1
+  })
+  $export(pt, 'not-empty', function () {
+    return key_of(this).length > 0
+  })
 
   $export(pt, 'key', impl.toCode())
   return type

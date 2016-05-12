@@ -72,6 +72,13 @@ module.exports = function ($) {
   $export(pt, 'to-code', toCode())
   $export(pt, 'to-string', toCode())
 
+  $export(pt, 'is-empty', function () {
+    return this !== true
+  })
+  $export(pt, 'not-empty', function () {
+    return this === true
+  })
+
   $export(pt, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })

@@ -50,6 +50,13 @@ module.exports = function ($) {
   })
   $export(pt, 'equals', equals())
 
+  $export(pt, 'is-empty', function () {
+    return false
+  })
+  $export(pt, 'not-empty', function () {
+    return true
+  })
+
   $export(pt, 'to-code', toCode($))
   $export(pt, 'to-string', toString($))
   return type

@@ -16,17 +16,13 @@
     (assert 123 (` ($number (date 123)),
 
     (assert 0 (` ($number (@),
-    (assert 3 (` ($number (@ 1 2 3),
-
-    (assert 128 (` ($number (@ length: 128),
-    (assert 128 (` ($number (@ size: 128),
-    (assert 128 (` ($number (@ count: (= () 128),
+    (assert 0 (` ($number (@ 1 2 3),
 
     (assert 0 (` ($number (object),
-    (assert Infinity (` ($number (= x x),
+    (assert 0 (` ($number (= x x),
 
-    (assert (` (Number is-not ($number ""),
-    (assert (` (Number is-not ($number "a"),
+    (assert 0 (` ($number ""),
+    (assert 0 (` ($number "a"),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` ($number 1),
@@ -55,17 +51,13 @@
     (assert 123 (` (number (date 123)),
 
     (assert 0 (` (number (@),
-    (assert 3 (` (number (@ 1 2 3),
+    (assert 0 (` (number (@ 1 2 3),
 
-    (assert 128 (` (number (@ length: 128),
-    (assert 128 (` (number (@ size: 128),
-    (assert 128 (` (number (@ count: (= () 128),
+    (assert 0 (` (number (object p:1),
+    (assert 0 (` (number (= x x),
 
-    (assert 1 (` (number (object p:1),
-    (assert Infinity (` (number (= x x),
-
-    (assert (` (Number is-not (number ""),
-    (assert (` (Number is-not (number "a"),
+    (assert 0 (` (number ""),
+    (assert 0 (` (number "a"),
   ),
   ($should "return the original value of a number" (= ()
     (assert 1 (` (number 1),

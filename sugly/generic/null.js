@@ -28,12 +28,6 @@ function nullToCode () {
   }
 }
 
-function isEmpty ($) {
-  return function null$is_empty () {
-    return typeof this === 'undefined' || this === null ? true : !$.$measure(this)
-  }
-}
-
 module.exports = function ($) {
   var type = $module($, 'Null')
   $export(type, 'is', isNull())
@@ -57,10 +51,11 @@ module.exports = function ($) {
   $export(pt, 'to-code', nullToCode())
   $export(pt, 'to-string', nullToCode())
 
-  // a customized emptiness logic should override both is-empty & not-empty.
-  var is_empty = $export(pt, 'is-empty', isEmpty($))
+  $export(pt, 'is-empty', function () {
+    return true
+  })
   $export(pt, 'not-empty', function () {
-    return !is_empty.call(this)
+    return false
   })
 
   return type

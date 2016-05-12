@@ -66,5 +66,12 @@ module.exports = function ($) {
 
   $export(pt, 'to-code', toCode($))
   $export(pt, 'to-string', toCode($))
+
+  $export(pt, 'is-empty', function () {
+    return Object.getOwnPropertyNames(this).length > 0
+  })
+  $export(pt, 'not-empty', function () {
+    return Object.getOwnPropertyNames(this).length < 1
+  })
   return type
 }
