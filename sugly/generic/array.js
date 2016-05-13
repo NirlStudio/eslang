@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isTypeOf () {
   return function Array$is_type_of (value) {
@@ -84,8 +83,14 @@ function fromSource () {
   }
 }
 
+function arrayIndexer ($) {
+  return function array$indexer (index, value) {
+    return arguments.length > 1 ? (this[index] = value) : this[index]
+  }
+}
+
 module.exports = function ($) {
-  var type = $module($, 'Array')
+  var type = $.Array
   $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
@@ -93,8 +98,8 @@ module.exports = function ($) {
   $export(type, 'of', ofType())
   $export(type, 'from', fromSource())
 
-  var pt = type.$ = Object.create($.Object.$)
-  $export.copy(pt, Array.prototype, {
+  var class_ = type.class
+  $export.copy(class_, Array.prototype, {
     /* Chrome, IE, Firefox */
     'slice': 'slice',
     /* IE5.5 */
@@ -118,20 +123,26 @@ module.exports = function ($) {
     'reduceRight': 'reduce-right',
     'some': 'some'
   })
-  $export(pt, 'equals', equals($))
+  $export(class_, 'equals', equals($))
 
-  $export(pt, 'to-code', toCode($))
-  $export(pt, 'to-string', toCode($))
+  $export(class_, 'to-code', toCode($))
+  $export(class_, 'to-string', toCode($))
 
-  $export(pt, 'is-empty', function () {
-    return this.length > 0
-  })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'is-empty', function () {
     return this.length < 1
   })
+  $export(class_, 'not-empty', function () {
+    return this.length > 0
+  })
 
-  $export(pt, 'to-clause', toClause($))
-  $export(pt, 'to-program', toProgram($))
+  $export(class_, 'to-clause', toClause($))
+  $export(class_, 'to-program', toProgram($))
+
+  // override operations for a container.
+  // indexer: get/set value by offset
+  $export(class_, ':', arrayIndexer($))
+  // iterator: iterate all offset and values
+  require('./array-iterator')($)
 
   return type
 }

@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function valueOf () {
   return function Int$value_of (input, radix) {
@@ -22,7 +21,7 @@ function valueOf () {
 }
 
 module.exports = function ($) {
-  var type = $module($, 'Int', $.Number)
+  var type = $.Int
   $export(type, 'is', Number.isInteger ? function Int$is (value) {
     return Number.isInteger(value)
   } : function Number$is_int (value) {
@@ -49,26 +48,26 @@ module.exports = function ($) {
     return typeof value === 'undefined' || value === null ? 0 : parseInt(value, radix)
   })
 
-  var pt = type.$ = Object.create($.Number.$)
-  $export(pt, '&', function Bit$and (value) {
+  var class_ = type.class
+  $export(class_, '&', function Bit$and (value) {
     return this & value
   })
-  $export(pt, '|', function Bit$or (value) {
+  $export(class_, '|', function Bit$or (value) {
     return this | value
   })
-  $export(pt, '^', function Bit$xor (value) {
+  $export(class_, '^', function Bit$xor (value) {
     return this ^ value
   })
-  $export(pt, '~', function Bit$not () {
+  $export(class_, '~', function Bit$not () {
     return ~this
   })
-  $export(pt, '<<', function Bit$lshift (offset) {
+  $export(class_, '<<', function Bit$lshift (offset) {
     return this << offset
   })
-  $export(pt, '>>', function Bit$lshift (offset) {
+  $export(class_, '>>', function Bit$lshift (offset) {
     return this >> offset
   })
-  $export(pt, '>>>', function Bit$lshift (offset) {
+  $export(class_, '>>>', function Bit$lshift (offset) {
     return this >>> offset
   })
 

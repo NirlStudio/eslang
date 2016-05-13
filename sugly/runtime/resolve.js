@@ -5,15 +5,15 @@ module.exports = function ($) {
   var SymbolConstructor = $Symbol.$Constructor
 
   var $Null = $.Null
-  var $bool = $.Bool.$
-  var $int = $.Int.$
-  var $float = $.Float.$
-  var $string = $.String.$
-  var $symbol = $Symbol.$
-  var $object = $.Object.$
-  var $func = $.Function.$
-  var $date = $.Date.$
-  var $array = $.Array.$
+  var $bool = $.Bool.class
+  var $int = $.Int.class
+  var $float = $.Float.class
+  var $string = $.String.class
+  var $symbol = $Symbol.class
+  var $object = $.Object.class
+  var $func = $.Function.class
+  var $date = $.Date.class
+  var $array = $.Array.class
 
   $.$resolve = function $resolve (subject, sym) {
     if (typeof subject === 'undefined') {

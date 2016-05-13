@@ -1,11 +1,16 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isNull () {
   return function Null$is_null (value) {
     return typeof value === 'undefined' || value === null
+  }
+}
+
+function isTypeOf () {
+  return function Null$is_type_of (value) {
+    return true
   }
 }
 
@@ -21,6 +26,18 @@ function nullIsSame () {
   }
 }
 
+function nullIsTypeOf () {
+  return function null$is_type_of (value) {
+    return typeof this.class !== 'undefined' && Object.getPrototypeOf(value) === this.class
+  }
+}
+
+function nullIsInstanceOf () {
+  return function null$is_instance_of (type) {
+    return typeof type.class !== 'undefined' && Object.getPrototypeOf(this) === type.class
+  }
+}
+
 function nullToCode () {
   return function null$to_code () {
     // if code indeed goes here, this is not null, but we have to take this as null.
@@ -29,34 +46,74 @@ function nullToCode () {
 }
 
 module.exports = function ($) {
-  var type = $module($, 'Null')
-  $export(type, 'is', isNull())
-  $export(type, 'equals', isNull())
+  // Null is the type and incarnation *object* of null.
+  var Null = $.Null
 
-  $export(type, 'to-code', toCode())
-  $export(type, 'to-string', toCode())
+  // only null is null.
+  $export(Null, 'is', isNull())
 
-  $export(type, 'is-empty', function Null$is_empty () {
+  // only null equals null.
+  $export(Null, 'equals', isNull())
+
+  // Null is the type of null
+  $export(Null, 'get-type', function () {
+    return Null
+  })
+
+  // null is the type of everything, including itself.
+  $export(Null, 'is-type-of', isTypeOf())
+
+  // null is the instance of itself, no other entities can be.
+  $export(Null, 'is-instance-of', isNull())
+
+  // persistency
+  $export(Null, 'to-code', toCode())
+
+  // readable description
+  $export(Null, 'to-string', toCode())
+
+  // emptiness
+  $export(Null, 'is-empty', function Null$is_empty () {
     return true
   })
-  $export(type, 'not-empty', function Null$not_empty () {
+  $export(Null, 'not-empty', function Null$not_empty () {
     return false
   })
 
-  // for all other values
-  var pt = type.$ = Object.create(null)
-  $export(pt, 'is', nullIsSame())
-  $export(pt, 'equals', nullIsSame())
+  // Null is the original type of all other entities.
+  var class_ = Null.class
 
-  $export(pt, 'to-code', nullToCode())
-  $export(pt, 'to-string', nullToCode())
+  // the general identitiness
+  $export(class_, 'is', nullIsSame())
 
-  $export(pt, 'is-empty', function () {
+  // the general inheritence hierarchy
+  $export(class_, 'super', function () {
+    return null
+  })
+
+  // the general equivalence - placeholder
+  $export(class_, 'equals', nullIsSame())
+
+  // the general class_-relationship logic
+  $export(class_, 'get-type', function () {
+    return Object.getPrototypeOf(this) || Null
+  })
+  $export(class_, 'is-type-of', nullIsTypeOf())
+  $export(class_, 'is-instance-of', nullIsInstanceOf())
+
+  // the general persistency - placeholder
+  $export(class_, 'to-code', nullToCode())
+
+  // the general description - placeholder
+  $export(class_, 'to-string', nullToCode())
+
+  // the general emptiness logic - placeholder
+  $export(class_, 'is-empty', function () {
     return true
   })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'not-empty', function () {
     return false
   })
 
-  return type
+  return Null
 }

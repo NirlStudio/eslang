@@ -70,7 +70,8 @@ module.exports = function ($, JS) {
 
       var code = '(@'
       var pt = Object.getPrototypeOf(obj)
-      if (pt.hasOwnProperty('identityName') && typeof pt.identityName === 'string') {
+      if (Object.prototype.hasOwnProperty.call(pt, 'identityName') &&
+        typeof pt.identityName === 'string') {
         code += pt.identityName + ' >'
       }
 

@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isTypeOf () {
   return function Date$is_type_of (value) {
@@ -78,7 +77,7 @@ function parse () {
 }
 
 module.exports = function ($) {
-  var type = $module($, 'Date')
+  var type = $.Date
   $export(type, 'is-type-of', isTypeOf())
   $export(type, 'create', create())
 
@@ -89,8 +88,8 @@ module.exports = function ($) {
   $export(type, 'utc', utc())
   $export(type, 'parse', parse())
 
-  var pt = type.$ = Object.create($.Object.$)
-  $export.copy(pt, Date.prototype, {
+  var class_ = type.class
+  $export.copy(class_, Date.prototype, {
     /* Chrome, IE, Firefox */
     'getDate': 'get-day',
     'getDay': 'get-week-day',
@@ -145,13 +144,13 @@ module.exports = function ($) {
 
   })
 
-  $export(pt, 'equals', equals())
-  $export(pt, 'to-code', toCode($))
+  $export(class_, 'equals', equals())
+  $export(class_, 'to-code', toCode($))
 
-  $export(pt, 'is-empty', function () {
+  $export(class_, 'is-empty', function () {
     return this.getTime() === 0
   })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'not-empty', function () {
     return this.getTime !== 0
   })
 

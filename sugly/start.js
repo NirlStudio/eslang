@@ -28,6 +28,9 @@ function exportConstants ($) {
 
 function initializeSpace ($) {
   // Hello, world.
+  require('./generic/bootstrap')($)
+
+  // populating
   require('./generic/null')($)
 
   require('./generic/symbol')($)
@@ -60,8 +63,10 @@ function initializeSpace ($) {
   require('./generic/array')($)
   $export($, 'array', $.Array['create'])
 
-  $export($, 'range', require('./generic/range'))
-  $export($, 'iterate', require('./generic/iterate'))
+  require('./generic/range')($)
+  $export($, 'range', $.Range['create'])
+
+  require('./generic/iterate')($)
 
   require('./runtime/signal')($)
   require('./runtime/resolve')($)

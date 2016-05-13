@@ -1,23 +1,22 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isTypeOf () {
   return function Bool$is_type_of (value) {
-    return typeof value === 'boolean'
+    return value === true || value === false
   }
 }
 
 function valueOf () {
   return function Bool$value_of (input) {
-    return typeof input !== 'undefined' && input !== null && input !== 0 && input !== false
+    return typeof input !== 'undefined' && input !== null && input !== false && input !== 0
   }
 }
 
 function toCode () {
   return function Bool$to_code () {
-    return typeof this === 'boolean' ? this.toString() : 'false'
+    return this ? 'true' : 'false'
   }
 }
 
@@ -53,50 +52,58 @@ function boolOr (value_of) {
   }
 }
 
-function boolNot (value_of) {
-  return function Bool$not (value) {
-    return typeof value === 'boolean' ? !value : !value_of(value)
-  }
-}
-
 module.exports = function ($) {
-  var type = $module($, 'Bool')
+  // Bool is the type *object* of true and false.
+  var type = $.Bool
   $export(type, 'is-type-of', isTypeOf())
 
+  // evaluation & conversion logic
   var value_of = $export(type, 'value-of', valueOf())
+
+  // boolean logic operations
   var and = $export(type, 'and', boolAnd(value_of))
   var or = $export(type, 'or', boolOr(value_of))
-  var not = $export(type, 'not', boolNot(value_of))
-
-  var pt = type.$ = Object.create($.Null.$)
-  $export(pt, 'to-code', toCode())
-  $export(pt, 'to-string', toCode())
-
-  $export(pt, 'is-empty', function () {
-    return this !== true
-  })
-  $export(pt, 'not-empty', function () {
-    return this === true
+  $export(type, 'not', function (value) {
+    return typeof value === 'boolean' ? !value : !value_of(value)
   })
 
-  $export(pt, 'and', function () {
-    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  // the virtual class of boolean type
+  var class_ = type.class
+
+  // persistency & description
+  $export(class_, 'to-code', toCode())
+  $export(class_, 'to-string', toCode())
+
+  // emptiness
+  $export(class_, 'is-empty', function () {
+    return !this
   })
-  $export(pt, 'or', function () {
-    return or.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
-  })
-  $export(pt, 'not', function () {
-    return !not(this)
+  $export(class_, 'not-empty', function () {
+    return this
   })
 
-  $export(pt, '&&', function () {
-    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(class_, 'and', function (value) {
+    return this && (arguments.length > 1 ? and.apply(null, arguments)
+      : (typeof value === 'undefined' ? true : value_of(value)))
   })
-  $export(pt, '||', function () {
-    return or.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(class_, 'or', function (value) {
+    return this || (arguments.length > 1 ? or.apply(null, arguments)
+      : (typeof value === 'undefined' ? false : value_of(value)))
   })
-  $export(pt, '!', function () {
-    return !not(this)
+  $export(class_, 'not', function () {
+    return !this
+  })
+
+  $export(class_, '&&', function (value) {
+    return this && (arguments.length > 1 ? and.apply(null, arguments)
+      : (typeof value === 'undefined' ? true : value_of(value)))
+  })
+  $export(class_, '||', function (value) {
+    return this || (arguments.length > 1 ? or.apply(null, arguments)
+      : (typeof value === 'undefined' ? false : value_of(value)))
+  })
+  $export(class_, '!', function () {
+    return !this
   })
 
   return type

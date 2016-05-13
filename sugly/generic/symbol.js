@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
 var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
@@ -158,7 +157,7 @@ module.exports = function ($) {
   var native = typeof Symbol === 'function'
   var impl = native ? useNativeSymbol() : usePolyfillSymbol()
 
-  var type = $module($, 'Symbol')
+  var type = $.Symbol
   type.$InvalidSymbol = impl.$InvalidSymbol
   type.$Constructor = impl.$Constructor
 
@@ -169,19 +168,19 @@ module.exports = function ($) {
   $export(type, 'value-of', impl.valueOf())
   var key_of = $export(type, 'key-of', impl.keyOf())
 
-  var pt = type.$ = Object.create($.Null.$)
-  $export(pt, 'is', impl.isSame())
-  $export(pt, 'equals', impl.isSame())
-  $export(pt, 'to-code', impl.toCode())
-  $export(pt, 'to-string', impl.toString())
+  var class_ = type.class
+  $export(class_, 'is', impl.isSame())
+  $export(class_, 'equals', impl.isSame())
+  $export(class_, 'to-code', impl.toCode())
+  $export(class_, 'to-string', impl.toString())
 
-  $export(pt, 'is-empty', function () {
+  $export(class_, 'is-empty', function () {
     return key_of(this).length < 1
   })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'not-empty', function () {
     return key_of(this).length > 0
   })
 
-  $export(pt, 'key', impl.toCode())
+  $export(class_, 'key', impl.toCode())
   return type
 }

@@ -34,25 +34,17 @@
 ($define "property iterator" (= ()
   ($should "return an iterator to traverse all properties of an object or a function" ( =()
     (let obj (object),
-    (let iter ($iterate obj),
-    (assert false (` (iter next),
-
-    (let obj (= x x),
-    (let iter ($iterate obj),
-    (assert false (` (iter next),
-
-    (let obj (= base > x x),
-    (let iter ($iterate obj),
+    (let iter (obj iterate),
     (assert false (` (iter next),
 
     (let obj (@ p1: 1),
-    (let iter ($iterate obj),
+    (let iter (obj iterate),
     (assert (` (iter next),
     (assert "p1" (` (iter "key"),
     (assert 1 (` (iter "value"),
 
     (let obj (@ p1: 1 p2: 2),
-    (let iter ($iterate obj),
+    (let iter (obj iterate),
     (assert (` (iter next),
     (assert (` (iter next),
     (assert false (` (iter next),
@@ -61,18 +53,18 @@
 ($define "array iterator" (= ()
   ($should "return an iterator to traverse items in an array" ( =()
     (let arr (@),
-    (let iter ($iterate arr),
+    (let iter (arr iterate),
     (assert false (` (iter next),
 
     (let arr (@ "x"),
-    (let iter ($iterate arr),
+    (let iter (arr iterate),
     (assert (` (iter next),
     (assert 0 (` (iter "key"),
     (assert "x" (` (iter "value"),
     (assert false (` (iter next),
 
     (let arr (@ "x" "y"),
-    (let iter ($iterate arr),
+    (let iter (arr iterate),
     (assert (` (iter next),
     (assert 0 (` (iter "key"),
     (assert "x" (` (iter "value"),

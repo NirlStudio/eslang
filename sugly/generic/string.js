@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isTypeOf () {
   return function String$is_type_of (value) {
@@ -49,7 +48,7 @@ function toString () {
 }
 
 module.exports = function ($) {
-  var type = $module($, 'String')
+  var type = $.String
   $export.copy(type, String, {
     'fromCharCode': 'of-chars'
   })
@@ -58,8 +57,8 @@ module.exports = function ($) {
   $export(type, 'is-type-of', isTypeOf())
   $export(type, 'code-of', codeOf($))
 
-  var pt = type.$ = Object.create($.Null.$)
-  $export.copy(pt, String.prototype, {
+  var class_ = type.class
+  $export.copy(class_, String.prototype, {
     /* CH/FF/IE/OP/SF */
     'charAt': 'char-at',
     'charCodeAt': 'chat-code-at',
@@ -84,17 +83,17 @@ module.exports = function ($) {
     'startsWith': 'starts-with'
   })
 
-  $export(pt, 'to-code', toCode($))
-  $export(pt, 'to-string', toString())
+  $export(class_, 'to-code', toCode($))
+  $export(class_, 'to-string', toString())
 
-  $export(pt, 'is-empty', function () {
-    return this.length > 0
-  })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'is-empty', function () {
     return this.length < 1
   })
+  $export(class_, 'not-empty', function () {
+    return this.length > 0
+  })
 
-  $export(pt, 'concat', function () {
+  $export(class_, 'concat', function () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 

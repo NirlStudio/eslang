@@ -1,7 +1,6 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('./module')
 
 function isTypeOf () {
   return function Number$is_type_of (value) {
@@ -109,7 +108,7 @@ function numberDivide (value_of) {
 }
 
 module.exports = function ($) {
-  var type = $module($, 'Number')
+  var type = $.Number
   $export(type, 'is-type-of', isTypeOf())
   var value_of = $export(type, 'value-of', valueOf())
 
@@ -134,8 +133,8 @@ module.exports = function ($) {
   var times = $export(type, 'times', numberTimes(value_of))
   var divide = $export(type, 'divide', numberDivide(value_of))
 
-  var pt = type.$ = Object.create($.Null.$)
-  $export.copy(pt, Number.prototype, {
+  var class_ = type.class
+  $export.copy(class_, Number.prototype, {
     'toExponential': 'to-exponential',
     'toFixed': 'to-fixed',
     'toLocaleString': 'to-locale-string',
@@ -143,39 +142,39 @@ module.exports = function ($) {
     'toString': 'to-string'
   })
 
-  $export(pt, 'equals', equals())
-  $export(pt, 'to-code', toCode())
+  $export(class_, 'equals', equals())
+  $export(class_, 'to-code', toCode())
 
-  $export(pt, 'is-empty', function () {
+  $export(class_, 'is-empty', function () {
     return this === 0 || isNaN(this)
   })
-  $export(pt, 'not-empty', function () {
+  $export(class_, 'not-empty', function () {
     return this !== 0 && !isNaN(this)
   })
 
-  $export(pt, 'and', function () {
+  $export(class_, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, 'subtract', function () {
+  $export(class_, 'subtract', function () {
     return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, 'times', function () {
+  $export(class_, 'times', function () {
     return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, 'divide', function () {
+  $export(class_, 'divide', function () {
     return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
-  $export(pt, '+', function () {
+  $export(class_, '+', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, '-', function () {
+  $export(class_, '-', function () {
     return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, '*', function () {
+  $export(class_, '*', function () {
     return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(pt, '/', function () {
+  $export(class_, '/', function () {
     return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
