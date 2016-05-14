@@ -6,7 +6,6 @@ module.exports = function seval ($) {
   var indexer = $.$indexer
 
   var symbolValueOf = $.Symbol['value-of']
-  var symbolKeyOf = $.Symbol['key-of']
   var isSymbol = $.Symbol['is-type-of']
 
   var SymbolContext = symbolValueOf('$')
@@ -25,7 +24,7 @@ module.exports = function seval ($) {
     var subject = clause[0]
     // intercept subject
     if (isSymbol(subject)) {
-      var key = symbolKeyOf(subject)
+      var key = subject.key
       if ($.$operators.hasOwnProperty(key)) {
         return $.$operators[key]($, clause)
       }

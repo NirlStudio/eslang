@@ -4,7 +4,6 @@ module.exports = function operators$operator ($) {
   var $operators = $.$operators
   var seval = $.$eval
   var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
   var symbolValueOf = $.Symbol['value-of']
   var SymbolExport = symbolValueOf('export')
 
@@ -50,7 +49,7 @@ module.exports = function operators$operator ($) {
       offset = 2
     }
 
-    var key = symbolKeyOf(name)
+    var key = name.key
     var existed = $.$operators.hasOwnProperty(key)
     if (exporting) {
       if (existed) {

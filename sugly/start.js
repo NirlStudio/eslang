@@ -88,26 +88,33 @@ module.exports = function start (output) {
   // create generic type system
   initializeSpace($)
 
-  // compile a piece of code to program/clauses: [[]].
-  $export($, 'compile', function (code, src) {
-    return require('./compiler')($)(code, src)
-  })
-
   // encode function factory
   var encoder = require('./lib/encoder')($, JS)
   // default encode function
-  $export($, 'encode', encoder($, true))
+  $export($, 'encode', encoder(true))
 
   // default output function. depending on $.encode
   require('./lib/print')($, JS, output)
+
+  // prepare tokenizer & compiler
+  require('./tokenizer')($)
+  require('./compiler')($)
+
+  // compile a piece of code to program/clauses: [[]].
+  $export($, 'compile', function (code, src) {
+    return $.$compiler()(code, src)
+  })
 
   // this is only used by runtime itself or its assembler
   $.$export = function (name, obj) {
     $export(this, name, obj)
   }
 
+  // program executor generators
   require('./runtime/run')($)
+  // space/module manipulation functions.
   require('./runtime/space')($)
+  // real program executors
   require('./runtime/exec')($)
 
   return $

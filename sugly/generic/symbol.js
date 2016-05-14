@@ -5,65 +5,78 @@ var $export = require('../export')
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
 var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
-function isKey () {
-  return function Symbol$is_key (key) {
+function isValid () {
+  return function Symbol$is_valid (key) {
     return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
   }
 }
 
-function useNativeSymbol () {
-  var nothing = Symbol.for('')
-  var is_key = isKey()
-
-  return {
-    // to be used by tokenizer
-    $InvalidSymbol: InvalidSymbol,
-    $Constructor: null,
-    Nothing: nothing,
-    is_key: is_key,
-
-    is: function () {
-      return function Symbol$is (sym) {
-        return typeof sym === 'symbol'
-      }
-    },
-
-    valueOf: function () {
-      return function Symbol$value_of (key) {
-        return is_key(key) ? Symbol.for(key) : nothing
-      }
-    },
-
-    keyOf: function () {
-      return function Symbol$key_of (sym) {
-        return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
-      }
-    },
-
-    isSame: function () {
-      return function Symbol$is_same (sym) {
-        return typeof this === 'symbol' && typeof sym === 'symbol'
-          ? Symbol.keyFor(this) === Symbol.keyFor(sym) : 0
-      }
-    },
-
-    toCode: function () {
-      return function Symbol$to_code () {
-        return typeof this === 'symbol' ? Symbol.keyFor(this) : ''
-      }
-    },
-
-    toString: function () {
-      return function Symbol$to_string () {
-        return typeof this === 'symbol' ? '(` ' + Symbol.keyFor(this) + ')' : ''
-      }
-    }
+function isTypeOf ($) {
+  var constructor = $.$SymbolConstructor
+  return function Symbol$is_type_of (value) {
+    return value instanceof constructor
   }
 }
 
-function usePolyfillSymbol () {
-  function Symbol$ (key) {
-    Object.defineProperty(this, '$key', {
+function valueOf ($) {
+  var sharedSymbols = $.$SharedSymbols
+  var Symbol$ = $.$SymbolConstructor
+  var nothing = $.Symbol.Nothing
+  var is_valid = $.Symbol['is-valid']
+  return function Symbol$value_of (key) {
+    if (is_valid(key)) {
+      var sym = sharedSymbols[key]
+      return sym ? sym : (sharedSymbols[key] = new Symbol$(key))
+    }
+    return nothing
+  }
+}
+
+function keyOf ($) {
+  var Symbol$ = $.$SymbolConstructor
+  return function Symbol$key_of (sym) {
+    return sym instanceof Symbol$ ? sym.key : ''
+  }
+}
+
+function toCode ($) {
+  var Symbol$ = $.$SymbolConstructor
+  return function symbol$to_code () {
+    return this instanceof Symbol$ ? this.key : ''
+  }
+}
+
+function toString ($) {
+  var Symbol$ = $.$SymbolConstructor
+  return function symbol$to_string () {
+    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
+  }
+}
+
+function isSame ($) {
+  var Symbol$ = $.$SymbolConstructor
+  return function symbol$is (another) {
+    return this === another ||
+      (this instanceof Symbol$ && another instanceof Symbol$ && this.key === another.key)
+  }
+}
+
+function notSame ($) {
+  var Symbol$ = $.$SymbolConstructor
+  return function symbol$is_not (another) {
+    return this !== another &&
+      (!(this instanceof Symbol$) || !(another instanceof Symbol$) || this.key !== another.key)
+  }
+}
+
+module.exports = function ($) {
+  // common symbol repository
+  $.$InvalidSymbol = InvalidSymbol
+  var sharedSymbols = $.$SharedSymbols = Object.create(null)
+
+  // define a construcotr for symbol.
+  var Symbol$ = $.$SymbolConstructor = function Symbol$ (key) {
+    Object.defineProperty(this, 'key', {
       enumerable: false,
       configurable: false,
       writable: false,
@@ -71,114 +84,40 @@ function usePolyfillSymbol () {
     })
   }
 
-  var sharedSymbols = Object.create(null)
-  var nothing = sharedSymbols[''] = new Symbol$('')
-  var is_key = isKey()
-
-  return {
-    // to be used by tokenizer
-    $InvalidSymbol: InvalidSymbol,
-    $Constructor: Symbol$,
-    Nothing: nothing,
-    is_key: is_key,
-
-    is: function () {
-      return function Symbol$is (sym) {
-        return sym instanceof Symbol$ || typeof sym === 'symbol'
-      }
-    },
-
-    valueOf: function () {
-      return function Symbol$value_of (key) {
-        if (!is_key(key)) {
-          return nothing
-        }
-        if (sharedSymbols[key]) {
-          return sharedSymbols[key]
-        }
-        return (sharedSymbols[key] = new Symbol$(key))
-      }
-    },
-
-    keyOf: function () {
-      return function Symbol$key_of (sym) {
-        if (sym instanceof Symbol$) {
-          return sym.$key
-        }
-        return typeof sym === 'symbol' ? Symbol.keyFor(sym) : ''
-      }
-    },
-
-    isSame: function () {
-      return function Symbol$is_same (value) {
-        var thisKey
-        if (this instanceof Symbol$) {
-          thisKey = this.$key
-        } else if (typeof this === 'symbol') {
-          thisKey = Symbol.keyFor(this)
-        } else {
-          return
-        }
-
-        var valueKey
-        if (value instanceof Symbol$) {
-          valueKey = value.$key
-        } else if (typeof value === 'symbol') {
-          valueKey = Symbol.keyFor(value)
-        } else {
-          return
-        }
-
-        return thisKey === valueKey
-      }
-    },
-
-    toCode: function () {
-      return function Symbol$to_code () {
-        if (this instanceof Symbol$) {
-          return this.$key
-        }
-        return typeof this === 'symbol' ? Symbol.keyFor(this) : ''
-      }
-    },
-
-    toString: function () {
-      return function Symbol$to_string () {
-        if (this instanceof Symbol$) {
-          return '(` ' + this.$key + ')'
-        }
-        return typeof this === 'symbol' ? '(` ' + Symbol.keyFor(this) + ')' : ''
-      }
-    }
-  }
-}
-
-module.exports = function ($) {
-  var native = typeof Symbol === 'function'
-  var impl = native ? useNativeSymbol() : usePolyfillSymbol()
-
+  // Symbol is a value type derived from Null.
   var type = $.Symbol
-  type.$InvalidSymbol = impl.$InvalidSymbol
-  type.$Constructor = impl.$Constructor
+  var class_ = Symbol$.prototype = type.class
 
-  type.Nothing = impl.Nothing
-  $export(type, 'is-key', impl.is_key)
+  // const nothing object.
+  type.Nothing = sharedSymbols[''] = new Symbol$('')
 
-  $export(type, 'is-type-of', impl.is())
-  $export(type, 'value-of', impl.valueOf())
-  var key_of = $export(type, 'key-of', impl.keyOf())
+  // check whether a string is a valid symbol key.
+  $export(type, 'is-valid', isValid())
 
-  var class_ = type.class
-  $export(class_, 'is', impl.isSame())
-  $export(class_, 'equals', impl.isSame())
-  $export(class_, 'to-code', impl.toCode())
-  $export(class_, 'to-string', impl.toString())
+  // check if an entity is a symbol.
+  $export(type, 'is-type-of', isTypeOf($))
 
+  // a symbol can only be created from a valid symbol name (string).
+  $export(type, 'value-of', valueOf($))
+
+  // try to retrieve the key of a symbol.
+  $export(type, 'key-of', keyOf($))
+
+  // a symbol behaves as a value entity.
+  $export(class_, 'is', isSame($))
+  // the general equivalence - placeholder
+  $export(class_, 'equals', isSame($))
+
+  // persistency & description
+  $export(class_, 'to-code', toCode($))
+  $export(class_, 'to-string', toString($))
+
+  // emptiness: nothing symbol is taken as the empty value.
   $export(class_, 'is-empty', function () {
-    return key_of(this).length < 1
+    return this.key.length < 1
   })
   $export(class_, 'not-empty', function () {
-    return key_of(this).length > 0
+    return this.key.length > 0
   })
 
   // indexer: general & primary predicate, readonly.
@@ -190,5 +129,7 @@ module.exports = function ($) {
     return null
   })
 
-  $export(class_, 'key', impl.toCode())
+  // overide general equivalence operators, being consistent with equals
+  $export(class_, '==', isSame($))
+  $export(class_, '!=', notSame($))
 }

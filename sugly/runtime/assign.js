@@ -2,7 +2,7 @@
 
 module.exports = function assign ($) {
   $.$assign = function $assign ($, sym, value) {
-    var key = typeof sym === 'symbol' ? Symbol.keyFor(sym) : sym.$key
+    var key = sym.key
     if (key.startsWith('$') || key.startsWith('__')) {
       return null
     }

@@ -153,15 +153,6 @@ module.exports = function ($) {
     return this !== 0 && !isNaN(this)
   })
 
-  // indexer: general & primary predicate, readonly.
-  $export(class_, ':', function (name) {
-    if (typeof name === 'string') {
-      var value = class_[name]
-      return typeof value !== 'undefined' ? value : null
-    }
-    return null
-  })
-
   // support ordering logic - comparable
   $export(class_, 'compare', function (another) {
     var diff = this - another

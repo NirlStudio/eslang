@@ -4,7 +4,6 @@ module.exports = function indexer ($) {
   var set = $.$set
 
   var symbolValueOf = $.Symbol['value-of']
-  var symbolKeyOf = $.Symbol['key-of']
   var isSymbol = $.Symbol['is-type-of']
 
   function getter (subject, key) {
@@ -13,7 +12,7 @@ module.exports = function indexer ($) {
     }
 
     if (isSymbol(key)) {
-      key = symbolKeyOf(key)
+      key = key.key
     }
 
     var value = subject[key]

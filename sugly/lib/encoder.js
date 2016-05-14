@@ -3,15 +3,14 @@
 var $export = require('../export')
 
 module.exports = function ($, JS) {
-  return $export($, 'encoder', function encoder ($, pretty) {
-    var $Symbol = $.Symbol
-    var symbolIs = $Symbol['is-type-of']
-    var symbolValueOf = $Symbol['value-of']
-    var symbolKeyOf = $Symbol['key-of']
+  var $Symbol = $.Symbol
+  var SymbolConstructor = $.$SymbolConstructor
+  var symbolValueOf = $Symbol['value-of']
 
-    var SymbolContext = symbolValueOf('$')
-    var SymbolFor = symbolValueOf('for')
+  var SymbolContext = symbolValueOf('$')
+  var SymbolFor = symbolValueOf('for')
 
+  return $export($, 'encoder', function encoder (pretty) {
     var indentStack = []
     var indentValue = ''
     var indentTouched = true
@@ -47,7 +46,7 @@ module.exports = function ($, JS) {
     }
 
     function encodeSymbol (sym) {
-      var key = symbolKeyOf(sym)
+      var key = sym instanceof SymbolConstructor ? sym.key : ''
       return key.length > 0 ? '(` ' + key + ')' : ''
     }
 
@@ -121,9 +120,9 @@ module.exports = function ($, JS) {
         }
         var p = params[i]
         if (p[1] === null) {
-          code += symbolKeyOf(p[0])
+          code += p[0].key
         } else {
-          code += '(' + symbolKeyOf(p[0]) + ' ' + encodeValue(p[1]) + ')'
+          code += '(' + p[0].key + ' ' + encodeValue(p[1]) + ')'
         }
       }
 
@@ -164,13 +163,11 @@ module.exports = function ($, JS) {
           return encodeNumber(value)
         case 'string':
           return encodeString(value)
-        case 'symbol':
-          return encodeSymbol(value)
         case 'object':
           if (value === null) {
             return 'null'
           }
-          return symbolIs(value) ? encodeSymbol(value) : encodeObject(value)
+          return value instanceof SymbolConstructor ? encodeSymbol(value) : encodeObject(value)
         case 'function':
           return encodeFunction(value)
         default:
@@ -216,8 +213,8 @@ module.exports = function ($, JS) {
     // value, symbol or clause
     function encodeClause (clause) {
       if (!Array.isArray(clause)) {
-        if (symbolIs(clause)) {
-          return symbolKeyOf(clause)
+        if (clause instanceof SymbolConstructor) {
+          return clause.key
         } else {
           return encodeValue(clause)
         }
@@ -298,7 +295,7 @@ module.exports = function ($, JS) {
       if (typeof obj === 'undefined' || obj === null) {
         return 'null' // null is always possible.
       }
-      if (typeof obj !== 'object' || symbolIs(obj)) {
+      if (typeof obj !== 'object' || obj instanceof SymbolConstructor) {
         return '(@>)' // empty object for non-object
       }
       // array and date are valid objects.

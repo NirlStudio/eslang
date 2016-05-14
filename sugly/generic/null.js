@@ -86,13 +86,13 @@ module.exports = function ($) {
   // the general identitiness
   $export(class_, 'is', nullIsSame())
 
+  // the general equivalence - placeholder
+  $export(class_, 'equals', nullIsSame())
+
   // the general inheritence hierarchy
   $export(class_, 'super', function () {
     return null
   })
-
-  // the general equivalence - placeholder
-  $export(class_, 'equals', nullIsSame())
 
   // the general class_-relationship logic
   $export(class_, 'get-type', function () {

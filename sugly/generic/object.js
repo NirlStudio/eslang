@@ -98,8 +98,9 @@ function getFields () {
 }
 
 function hasField () {
+  var ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
   return function object$has_field (name) {
-    return typeof name !== 'string' ? null : Object.prototype.hasOwnProperty.call(this, name)
+    return typeof name !== 'string' ? null : ownsProperty(this, name)
   }
 }
 
