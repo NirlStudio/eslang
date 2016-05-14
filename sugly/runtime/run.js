@@ -2,7 +2,7 @@
 
 module.exports = function run ($) {
   var seval = $.$eval
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
   var isSpace = Object.prototype.isPrototypeOf.bind($)
 
   $.$evalIn = function $evalIn ($) {
@@ -75,7 +75,7 @@ module.exports = function run ($) {
       return null
     }
 
-    if (isSymbol(mod)) {
+    if (mod instanceof Symbol$) {
       mod = {value: mod}
     } else if (typeof mod !== 'function' && typeof mod !== 'object') {
       mod = {value: mod}

@@ -2,8 +2,7 @@
 
 module.exports = function space ($) {
   var set = $.$set
-  var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
+  var symbolIsValid = $.Symbol['is-valid']
 
   var $functionIn = $.$functionIn
   var $lambdaIn = $.$lambdaIn
@@ -23,9 +22,7 @@ module.exports = function space ($) {
   // generate an export function for $.
   function $exportTo ($) {
     return function $export (key, value) {
-      if (typeof key === 'string') {
-        key = symbolValueOf(key)
-      } else if (!isSymbol(key)) {
+      if (typeof key !== 'string' || !symbolIsValid(key)) {
         return null
       }
       return set($, key, typeof value === 'undefined' ? null : value)

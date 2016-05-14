@@ -3,7 +3,7 @@
 module.exports = function operators$let ($) {
   var $operators = $.$operators
   var seval = $.$eval
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
 
   function assignAs (local) {
     var assign = local ? $.$set : $.$assign
@@ -16,7 +16,7 @@ module.exports = function operators$let ($) {
 
       var c1 = clause[1]
       // (let symbol value)
-      if (isSymbol(c1)) {
+      if (c1 instanceof Symbol$) {
         return assign($, c1, length < 3 ? null : seval(clause[2], $))
       } else if (!Array.isArray(c1)) {
         return null
@@ -28,7 +28,7 @@ module.exports = function operators$let ($) {
         var pair = clause[i]
         if (Array.isArray(pair) && pair.length > 1) {
           var p0 = pair[0]
-          if (isSymbol(p0)) {
+          if (p0 instanceof Symbol$) {
             last = assign($, p0, seval(pair[1], $))
             continue
           }

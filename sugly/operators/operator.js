@@ -3,7 +3,7 @@
 module.exports = function operators$operator ($) {
   var $operators = $.$operators
   var seval = $.$eval
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
   var SymbolExport = symbolValueOf('export')
 
@@ -29,7 +29,7 @@ module.exports = function operators$operator ($) {
     }
 
     var name = impl[1]
-    if (!isSymbol(name)) {
+    if (!(name instanceof Symbol$)) {
       return null // the name must be a symbol.
     }
 
@@ -39,7 +39,7 @@ module.exports = function operators$operator ($) {
         return null // require name & body
       }
       name = impl[2]
-      if (!isSymbol(name)) {
+      if (!(name instanceof Symbol$)) {
         return null
       }
       exporting = true

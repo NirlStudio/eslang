@@ -4,7 +4,7 @@ module.exports = function operators$general ($) {
   var $operators = $.$operators
   var seval = $.$eval
   var assign = $.$assign
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
 
   function concat ($, str, clause) {
     var length = clause.length
@@ -127,7 +127,7 @@ module.exports = function operators$general ($) {
       return base // for other types
     }
     // try to assign value back for primal types
-    return isSymbol(sym) ? assign($, sym, base) : base
+    return sym instanceof Symbol$ ? assign($, sym, base) : base
   }
 
   function subtract ($, clause) {
@@ -162,7 +162,7 @@ module.exports = function operators$general ($) {
   $operators['-='] = function ($, clause) {
     var result = subtract($, clause)
     var sym = clause[1]
-    if (isSymbol(sym)) {
+    if (sym instanceof Symbol$) {
       assign($, sym, result)
     }
     return result

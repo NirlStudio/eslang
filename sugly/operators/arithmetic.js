@@ -5,7 +5,7 @@ module.exports = function operators$arithmetic ($) {
   var seval = $.$eval
   var assign = $.$assign
   var resolve = $.$resolve
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
 
   function multiply ($, clause) {
     var length = clause.length
@@ -31,7 +31,7 @@ module.exports = function operators$arithmetic ($) {
   $operators['*='] = function ($, clause) {
     var result = multiply($, clause)
     var sym = clause[1]
-    if (isSymbol(sym)) {
+    if (sym instanceof Symbol$) {
       assign($, sym, result)
     }
     return result
@@ -61,7 +61,7 @@ module.exports = function operators$arithmetic ($) {
   $operators['/='] = function ($, clause) {
     var result = divide($, clause)
     var sym = clause[1]
-    if (isSymbol(sym)) {
+    if (sym instanceof Symbol$) {
       assign($, sym, result)
     }
     return result
@@ -74,7 +74,7 @@ module.exports = function operators$arithmetic ($) {
     }
 
     var sym = clause[1]
-    if (isSymbol(sym)) {
+    if (sym instanceof Symbol$) {
       var value = resolve($, sym)
       if (typeof value === 'number') {
         value += 1
@@ -98,7 +98,7 @@ module.exports = function operators$arithmetic ($) {
     }
 
     var sym = clause[1]
-    if (isSymbol(sym)) {
+    if (sym instanceof Symbol$) {
       var value = resolve($, sym)
       if (typeof value === 'number') {
         value -= 1

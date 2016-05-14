@@ -3,7 +3,7 @@
 module.exports = function operators$type ($) {
   var $operators = $.$operators
   var seval = $.$eval
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
 
   var symbolValueOf = $.Symbol['value-of']
   var SymbolLike = symbolValueOf('like')
@@ -72,7 +72,7 @@ module.exports = function operators$type ($) {
       if (typeof value === 'object') {
         if (value.typeId) {
           return value.typeId
-        } else if (isSymbol(value)) {
+        } else if (value instanceof Symbol$) {
           return 'symbol' // polyfill symbol
         }
       }
@@ -92,7 +92,7 @@ module.exports = function operators$type ($) {
         case 'string':
           return typeof value === 'string'
         case 'symbol':
-          return isSymbol(value)
+          return value instanceof Symbol$
         case 'function':
           return typeof value === 'function'
         case 'object':

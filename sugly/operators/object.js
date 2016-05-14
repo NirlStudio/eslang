@@ -4,8 +4,8 @@ module.exports = function operators$object ($) {
   var $operators = $.$operators
   var set = $.$set
   var seval = $.$eval
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
 
   var SymbolIndexer = symbolValueOf(':')
 
@@ -21,7 +21,7 @@ module.exports = function operators$object ($) {
       var key = clause[i - 1]
       if (typeof key === 'string') {
         key = symbolValueOf(key)
-      } else if (!isSymbol(key)) {
+      } else if (!(key instanceof Symbol$)) {
         break
       }
 
@@ -45,7 +45,7 @@ module.exports = function operators$object ($) {
       var key = clause[i - 1]
       if (typeof key === 'string') {
         key = symbolValueOf(key)
-      } else if (!isSymbol(key)) {
+      } else if (!(key instanceof Symbol$)) {
         break
       }
 
@@ -76,7 +76,7 @@ module.exports = function operators$object ($) {
       var key = clause[i - 1]
       if (typeof key === 'string') {
         key = symbolValueOf(key)
-      } else if (!isSymbol(key)) {
+      } else if (!(key instanceof Symbol$)) {
         break
       }
 

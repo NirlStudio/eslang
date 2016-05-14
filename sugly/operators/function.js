@@ -7,8 +7,8 @@ module.exports = function operators$function ($) {
   var seval = $.$eval
   var createSignalOf = $.$createSignalOf
 
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
 
   var SymbolDerive = symbolValueOf('>')
   var SymbolLambdaShort = SymbolDerive
@@ -18,7 +18,7 @@ module.exports = function operators$function ($) {
   // symbols can be symbol or (symbol ...) or (@ prop: value ...)
   function lambdaCreate ($, symbols, params, body) {
     var enclosing = {}
-    if (isSymbol(symbols)) {
+    if (symbols instanceof Symbol$) {
       set(enclosing, symbols, resolve($, symbols))
       return $.lambda(enclosing, params, body)
     }
@@ -42,7 +42,7 @@ module.exports = function operators$function ($) {
       // it should be an symbol list: (sym ...)
       for (var i = 0; i < symbols.length; i++) {
         var s = symbols[i]
-        if (isSymbol(s)) {
+        if (s instanceof Symbol$) {
           set(enclosing, s, resolve($, s))
         }
       }

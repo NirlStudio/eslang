@@ -3,10 +3,10 @@
 var $export = require('../export')
 
 function isTypeOf ($) {
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
   return function Object$is_type_of (value) {
     // both native & managed objects.
-    return typeof value === 'object' && value !== null && !isSymbol(value)
+    return typeof value === 'object' && value !== null && !(value instanceof Symbol$)
   }
 }
 
@@ -34,10 +34,9 @@ function derive (objectClass) {
 }
 
 function equals ($) {
-  var isSymbol = $.Symbol['is-type-of']
   return function Object$equals (another) {
-    if (typeof this !== 'object' || this === null || isSymbol(this)) {
-      return false
+    if (this === another) {
+      return true
     }
     // TODO - to compare type & fields.
     return Object.is(this, another)

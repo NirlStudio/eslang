@@ -3,15 +3,15 @@
 module.exports = function indexer ($) {
   var set = $.$set
 
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
 
   function getter (subject, key) {
     if (typeof subject !== 'object' && typeof subject !== 'function') {
       return null
     }
 
-    if (isSymbol(key)) {
+    if (key instanceof Symbol$) {
       key = key.key
     }
 
@@ -35,7 +35,7 @@ module.exports = function indexer ($) {
     if (typeof key === 'string') {
       return set(this, symbolValueOf(key), value)
     }
-    if (isSymbol(key)) {
+    if (key instanceof Symbol$) {
       return set(this, key, value)
     }
 

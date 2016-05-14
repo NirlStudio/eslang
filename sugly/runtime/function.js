@@ -5,8 +5,8 @@ module.exports = function sfunction ($) {
   var beval = $.$beval
   var Signal = $.$Signal
 
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
   var SymbolLambdaShort = symbolValueOf('>')
   var SymbolRepeat = symbolValueOf('*')
 
@@ -17,7 +17,7 @@ module.exports = function sfunction ($) {
       return formatted
     }
 
-    if (isSymbol(params)) {
+    if (params instanceof Symbol$) {
       params = [params] // single parameter
     } else if (!Array.isArray(params)) {
       return formatted
@@ -25,7 +25,7 @@ module.exports = function sfunction ($) {
 
     for (var i = 0; i < params.length; i++) {
       var p = params[i]
-      if (isSymbol(p)) {
+      if (p instanceof Symbol$) {
         if (p === SymbolRepeat) {
           formatted[0] = false // variant arguments
           break // the repeat indicator is always the last one
@@ -36,7 +36,7 @@ module.exports = function sfunction ($) {
           continue
         }
         var sym = p[0]
-        if (isSymbol(sym)) {
+        if (sym instanceof Symbol$) {
           formatted.push([sym, p.length > 1 ? p[1] : null]) // no evaluation.
         }
       }

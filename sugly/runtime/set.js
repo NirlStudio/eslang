@@ -1,9 +1,8 @@
 'use strict'
 
 module.exports = function set ($) {
-
   $.$set = function $set (subject, sym, value) {
-    var key = sym.key
+    var key = typeof sym === 'string' ? sym : sym.key
     if (key.startsWith('$') || key.startsWith('__')) {
       return null
     }

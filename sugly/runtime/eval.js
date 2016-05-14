@@ -6,7 +6,7 @@ module.exports = function seval ($) {
   var indexer = $.$indexer
 
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
 
   var SymbolContext = symbolValueOf('$')
   var SymbolIndexer = symbolValueOf(':')
@@ -14,7 +14,7 @@ module.exports = function seval ($) {
   function $eval (clause, $) {
     if (!Array.isArray(clause)) {
       // not a clause.
-      return isSymbol(clause) ? resolve($, clause) : clause
+      return clause instanceof Symbol$ ? resolve($, clause) : clause
     }
     var length = clause.length
     if (length < 1) {
@@ -23,7 +23,7 @@ module.exports = function seval ($) {
 
     var subject = clause[0]
     // intercept subject
-    if (isSymbol(subject)) {
+    if (subject instanceof Symbol$) {
       var key = subject.key
       if ($.$operators.hasOwnProperty(key)) {
         return $.$operators[key]($, clause)
@@ -72,7 +72,7 @@ module.exports = function seval ($) {
         break
 
       case 'object':
-        if (isSymbol(predicate)) { // polyfill symbol
+        if (predicate instanceof Symbol$) { // polyfill symbol
           func = resolve(subject, predicate)
           if (!func && predicate === SymbolIndexer) {
             func = indexer // overridable indexer

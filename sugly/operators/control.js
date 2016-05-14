@@ -9,8 +9,8 @@ module.exports = function operators$control ($) {
   var Signal = $.$Signal
   var createSignalOf = $.$createSignalOf
 
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
-  var isSymbol = $.Symbol['is-type-of']
   var SymbolElse = symbolValueOf('else')
   var SymbolIn = symbolValueOf('in')
 
@@ -58,7 +58,7 @@ module.exports = function operators$control ($) {
 
   function loopTest ($, cond) {
     // loop test function returns a BREAK flag
-    if (isSymbol(cond)) {
+    if (cond instanceof Symbol$) {
       return function loopTestOfSymbol () {
         var value = resolve($, cond)
         return value === false || value === null || value === 0
@@ -123,20 +123,20 @@ module.exports = function operators$control ($) {
 
     var keySymbol, valueSymbol
     var fields = clause[1]
-    if (isSymbol(fields)) {
+    if (fields instanceof Symbol$) {
       keySymbol = null
       valueSymbol = fields
     } else if (Array.isArray(fields)) {
       if (fields.length > 1) {
         keySymbol = fields[0]
         valueSymbol = fields[1]
-        if (!isSymbol(keySymbol) || !isSymbol(valueSymbol)) {
+        if (!(keySymbol instanceof Symbol$) || !(valueSymbol instanceof Symbol$)) {
           return null // invalid fields expresion
         }
       } else if (fields.length > 0) {
         keySymbol = null
         valueSymbol = fields[0]
-        if (!isSymbol(valueSymbol)) {
+        if (!(valueSymbol instanceof Symbol$)) {
           return null // invalid fields expresion
         }
       } else {

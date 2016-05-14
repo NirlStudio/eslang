@@ -3,7 +3,7 @@
 module.exports = function operators$pattern ($) {
   var $operators = $.$operators
   var seval = $.$eval
-  var isSymbol = $.Symbol['is-type-of']
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $.Symbol['value-of']
 
   var SymbolContext = symbolValueOf('$')
@@ -23,7 +23,7 @@ module.exports = function operators$pattern ($) {
     var subject = seval(clause[1], $)
     for (var i = 2; subject !== null && i < length; i++) {
       var next = clause[i]
-      if (Array.isArray(subject) || isSymbol(subject)) {
+      if (Array.isArray(subject) || subject instanceof Symbol$) {
         subject = [SymbolQuote, subject]
       }
       var stmt = [subject]
@@ -52,7 +52,7 @@ module.exports = function operators$pattern ($) {
         // expand array to arguments
         for (var j = 0; j < output.length; j++) {
           var value = output[j]
-          if (Array.isArray(value) || isSymbol(value)) {
+          if (Array.isArray(value) || value instanceof Symbol$) {
             value = [SymbolQuote, value] // symbol to quote
           }
           stmt.push(value)
@@ -86,7 +86,7 @@ module.exports = function operators$pattern ($) {
         // expand array result
         for (var i = 0; i < output.length; i++) {
           var value = output[i]
-          if (Array.isArray(value) || isSymbol(value)) {
+          if (Array.isArray(value) || value instanceof Symbol$) {
             value = [SymbolQuote, value] // symbol to quote
           }
           stmt.push(value)

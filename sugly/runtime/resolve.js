@@ -2,7 +2,7 @@
 
 module.exports = function ($) {
   var $Symbol = $.Symbol
-  var SymbolConstructor = $.$SymbolConstructor
+  var Symbol$ = $.$SymbolConstructor
 
   var $Null = $.Null
   var $null = $.Null.class
@@ -42,7 +42,7 @@ module.exports = function ($) {
         value = $array[key]
       } else if (subject instanceof Date) {
         value = $date[key]
-      } else if (subject instanceof SymbolConstructor) {
+      } else if (subject instanceof Symbol$) {
         value = $symbol[key]
       } else if (subject === null) {
         value = $Null[key]

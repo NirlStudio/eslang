@@ -4,7 +4,7 @@ var $export = require('../export')
 
 module.exports = function ($, JS) {
   var $Symbol = $.Symbol
-  var SymbolConstructor = $.$SymbolConstructor
+  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $Symbol['value-of']
 
   var SymbolContext = symbolValueOf('$')
@@ -46,7 +46,7 @@ module.exports = function ($, JS) {
     }
 
     function encodeSymbol (sym) {
-      var key = sym instanceof SymbolConstructor ? sym.key : ''
+      var key = sym instanceof Symbol$ ? sym.key : ''
       return key.length > 0 ? '(` ' + key + ')' : ''
     }
 
@@ -167,7 +167,7 @@ module.exports = function ($, JS) {
           if (value === null) {
             return 'null'
           }
-          return value instanceof SymbolConstructor ? encodeSymbol(value) : encodeObject(value)
+          return value instanceof Symbol$ ? encodeSymbol(value) : encodeObject(value)
         case 'function':
           return encodeFunction(value)
         default:
@@ -213,7 +213,7 @@ module.exports = function ($, JS) {
     // value, symbol or clause
     function encodeClause (clause) {
       if (!Array.isArray(clause)) {
-        if (clause instanceof SymbolConstructor) {
+        if (clause instanceof Symbol$) {
           return clause.key
         } else {
           return encodeValue(clause)
@@ -295,7 +295,7 @@ module.exports = function ($, JS) {
       if (typeof obj === 'undefined' || obj === null) {
         return 'null' // null is always possible.
       }
-      if (typeof obj !== 'object' || obj instanceof SymbolConstructor) {
+      if (typeof obj !== 'object' || obj instanceof Symbol$) {
         return '(@>)' // empty object for non-object
       }
       // array and date are valid objects.
