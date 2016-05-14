@@ -60,7 +60,7 @@ module.exports = function ($) {
   // evaluation & conversion logic
   var value_of = $export(type, 'value-of', valueOf())
 
-  // boolean logic operations
+  // static boolean logic operations
   var and = $export(type, 'and', boolAnd(value_of))
   var or = $export(type, 'or', boolOr(value_of))
   $export(type, 'not', function (value) {
@@ -82,6 +82,16 @@ module.exports = function ($) {
     return this
   })
 
+  // indexer: general & primary predicate, readonly.
+  $export(class_, ':', function (name) {
+    if (typeof name === 'string') {
+      var value = class_[name]
+      return typeof value !== 'undefined' ? value : null
+    }
+    return null
+  })
+
+  // function form logical operations
   $export(class_, 'and', function (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
       : (typeof value === 'undefined' ? true : value_of(value)))
@@ -94,6 +104,7 @@ module.exports = function ($) {
     return !this
   })
 
+  // operator form logical operations
   $export(class_, '&&', function (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
       : (typeof value === 'undefined' ? true : value_of(value)))
@@ -105,6 +116,4 @@ module.exports = function ($) {
   $export(class_, '!', function () {
     return !this
   })
-
-  return type
 }

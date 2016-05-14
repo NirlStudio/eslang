@@ -1,10 +1,13 @@
 'use strict'
 
-module.exports = function ($) {
-  /* Genesis 1.2, Now the earth was formless and empty, ... */
+module.exports = function () {
+  /* In the beginning God created the heavens and the earth. */
   var classNull = Object.create(null)
 
-  /* ..., "Now there be light," ... */
+  /* Now the earth was formless and empty, */
+  var $ = Object.create(classNull)
+
+  /* "Now there be light," */
   var classBool = Object.create(classNull)
   var classNumber = Object.create(classNull)
   var classString = Object.create(classNull)
@@ -29,6 +32,7 @@ module.exports = function ($) {
   typeFunction.class = classFunction
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
+  $.identityName = '$'
   $.Null = typeNull
   $.Bool = typeBool
   $.Number = typeNumber
@@ -64,4 +68,6 @@ module.exports = function ($) {
   var typeIterator = $.Iterator = Object.create(typeInterface)
   var classIterator = typeIterator.class = Object.create(classInterface)
   classIterator.static = typeIterator
+
+  return $
 }

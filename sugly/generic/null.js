@@ -115,5 +115,33 @@ module.exports = function ($) {
     return false
   })
 
-  return Null
+  // indexer: general & primary predicate.
+  // readonly & to be overridden by all primary types.
+  $export(class_, ':', function (name) {
+    return typeof name === 'string' && typeof class_[name] !== 'undefined' ? class_[name] : null
+  })
+
+  // common logical predicates. Generally, not to be overridden.
+  // A-B test.
+  $export(class_, '?', function (a, b) {
+    if (typeof this === 'undefined' || this === null || this === 0 || this === false) {
+      a = b
+    }
+    return typeof a === 'undefined' ? null : a
+  })
+  // value fallback.
+  $export(class_, '??', function (alternative) {
+    if (typeof this !== 'undefined' && this !== null) {
+      return this
+    }
+    return typeof alternative === 'undefined' ? null : alternative
+  })
+
+  // support general equivalence operators, being consistent with equals
+  $export(class_, '==', function (another) {
+    return Object.is(this, another)
+  })
+  $export(class_, '!=', function (another) {
+    return !Object.is(this, another)
+  })
 }

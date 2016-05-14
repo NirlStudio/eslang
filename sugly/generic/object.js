@@ -91,46 +91,41 @@ function toCode ($) {
   }
 }
 
-function getField ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
+function getFields () {
+  return function object$get_fields () {
+    return Object.getOwnPropertyNames(this)
+  }
+}
+
+function hasField () {
+  return function object$has_field (name) {
+    return typeof name !== 'string' ? null : Object.prototype.hasOwnProperty.call(this, name)
+  }
+}
+
+function getField () {
   return function object$get_field (name) {
     if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
+      return null
     }
-    return typeof this[name] === 'undefined' ? null : this[name]
+    var value = this[name]
+    return typeof value === 'undefined' ? null : value
   }
 }
 
-function setField ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
+function setField () {
   return function object$set_field (name, value) {
     if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
+      return null
     }
-    return (this[name] = typeof value === 'undefined' ? null : value)
+    return (this[name] = (typeof value === 'undefined' ? null : value))
   }
 }
 
-function removeField ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
+function removeField () {
   return function object$remove_field (name) {
     if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
+      return null
     }
     var value
     if (Object.prototype.hasOwnProperty.call(this, name)) {
@@ -143,37 +138,10 @@ function removeField ($) {
   }
 }
 
-function getFields () {
-  return function object$get_fields () {
-    return Object.getOwnPropertyNames(this)
-  }
-}
-
-function hasField ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
-  return function object$has_field (name) {
-    if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
-    }
-    return Object.prototype.hasOwnProperty.call(this, name)
-  }
-}
-
-function hasProperty ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
+function hasProperty () {
   return function object$has_property (name) {
     if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
+      return null
     }
     return typeof this[name] !== 'undefined'
   }
@@ -247,22 +215,17 @@ function objectClone (objectClass) {
   }
 }
 
-function objectIndexer ($) {
-  var isSymbol = $.Symbol['is-type-of']
-  var symbolKeyOf = $.Symbol['key-of']
+function objectIndexer () {
   return function object$indexer (name, value) {
     if (typeof name !== 'string') {
-      if (isSymbol(name)) {
-        name = symbolKeyOf(name)
-      } else {
-        return null
-      }
+      return null
     }
     switch (arguments.length) {
       case 1:
-        return typeof this[name] === 'undefined' ? null : this[name]
+        value = this[name]
+        return typeof value === 'undefined' ? null : value
       case 2:
-        return (this[name] = value)
+        return (this[name] = (typeof value === 'undefined' ? null : value))
       default:
         return null
     }
@@ -307,19 +270,22 @@ module.exports = function ($) {
     return Object.getOwnPropertyNames(this).length < 1
   })
 
+  // indexer: override to implement setter.
+  $export(class_, ':', objectIndexer())
+
   // property & field (owned property) manipulation
-  // retrieve the value of a field
-  $export(class_, 'get-field', getField($))
-  // set the value of a field
-  $export(class_, 'set-field', setField($))
-  // remove a field from an object
-  $export(class_, 'remove-field', removeField($))
   // retrieve field names
   $export(class_, 'get-fields', getFields())
   // test the existence by a field name
-  $export(class_, 'has-field', hasField($))
+  $export(class_, 'has-field', hasField())
+  // retrieve the value of a field
+  $export(class_, 'get-field', getField())
+  // set the value of a field
+  $export(class_, 'set-field', setField())
+  // remove a field from an object
+  $export(class_, 'remove-field', removeField())
   // test a property (either owned or inherited) name
-  $export(class_, 'has-property', hasProperty($))
+  $export(class_, 'has-property', hasProperty())
   // generate a new object by comine this object and other objects.
   $export(class_, 'combine', combine(newObject))
   // shallowly copy fiels from other objects to this object.
@@ -335,14 +301,10 @@ module.exports = function ($) {
 
   // default operations for a container.
   // A general object is the container of all its fields
-  // indexer: get/set field value
-  $export(class_, ':', objectIndexer($))
   // iterator: iterate all field names and values
   require('./object-iterator')($)
 
   // support general operators
   $export(class_, '+', combine(newObject))
   $export(class_, '+=', mixin(class_))
-
-  return type
 }

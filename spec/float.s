@@ -11,11 +11,11 @@
     (assert -21 (` (Float value-of "-21"),
   ),
   ($should "return NaN for any other type of values" (= ()
-    (assert (` (Number is-not (Float value-of true),
-    (assert (` (Number is-not (Float value-of false),
-    (assert (` (Number is-not (Float value-of (` sym),
-    (assert (` (Number is-not (Float value-of (@),
-    (assert (` (Number is-not (Float value-of (object),
-    (assert (` (Number is-not (Float value-of (= () 1),
+    (assert 0 (` (Float value-of true),
+    (assert 0 (` (Float value-of false),
+    (assert 0 (` (Float value-of (` sym),
+    (assert 0 (` (Float value-of (@),
+    (assert 0 (` (Float value-of (object),
+    (assert 0 (` (Float value-of (= () 1),
   ),
 ).

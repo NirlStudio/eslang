@@ -3,10 +3,11 @@
 module.exports = function run ($) {
   var seval = $.$eval
   var isSymbol = $.Symbol['is-type-of']
+  var isSpace = Object.prototype.isPrototypeOf.bind($)
 
   $.$evalIn = function $evalIn ($) {
     return function $eval (expr) {
-      return seval(expr, $.$isSpace(this) ? this : $)
+      return seval(expr, isSpace(this) ? this : $)
     }
   }
 

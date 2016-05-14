@@ -181,6 +181,14 @@ module.exports = function ($) {
     return key_of(this).length > 0
   })
 
+  // indexer: general & primary predicate, readonly.
+  $export(class_, ':', function (name) {
+    if (typeof name === 'string') {
+      var value = class_[name]
+      return typeof value !== 'undefined' ? value : null
+    }
+    return null
+  })
+
   $export(class_, 'key', impl.toCode())
-  return type
 }

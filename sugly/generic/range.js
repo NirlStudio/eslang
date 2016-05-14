@@ -31,5 +31,4 @@ module.exports = function ($) {
   class_.step = 1
 
   require('./range-iterator')($)
-  return type
 }

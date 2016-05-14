@@ -27,12 +27,6 @@ function valueOf () {
   }
 }
 
-function equals () {
-  return function Number$equals (value) {
-    return typeof this === 'number' ? this === value : false
-  }
-}
-
 function toCode () {
   return function Number$to_code () {
     return typeof this === 'number' ? this.toString() : 'NaN'
@@ -142,9 +136,16 @@ module.exports = function ($) {
     'toString': 'to-string'
   })
 
-  $export(class_, 'equals', equals())
-  $export(class_, 'to-code', toCode())
+  // override to support NaN !== NaN
+  $export(class_, 'equals', function (value) {
+    return this === value
+  })
 
+  // persistency & describing
+  $export(class_, 'to-code', toCode())
+  $export(class_, 'to-string', toCode())
+
+  // O and NaN are defined as empty.
   $export(class_, 'is-empty', function () {
     return this === 0 || isNaN(this)
   })
@@ -152,6 +153,22 @@ module.exports = function ($) {
     return this !== 0 && !isNaN(this)
   })
 
+  // indexer: general & primary predicate, readonly.
+  $export(class_, ':', function (name) {
+    if (typeof name === 'string') {
+      var value = class_[name]
+      return typeof value !== 'undefined' ? value : null
+    }
+    return null
+  })
+
+  // support ordering logic - comparable
+  $export(class_, 'compare', function (another) {
+    var diff = this - another
+    return diff === 0 ? 0 : diff / Math.abs(diff)
+  })
+
+  // support basic arithmetic operations
   $export(class_, 'and', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
@@ -165,6 +182,12 @@ module.exports = function ($) {
     return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
+  // support common math operations
+  $export(class_, 'abs', function () {
+    return Math.abs(this)
+  })
+
+  // support arithmetic operators
   $export(class_, '+', function () {
     return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
@@ -178,5 +201,25 @@ module.exports = function ($) {
     return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
-  return type
+  // override equivalence operators - for NaN
+  $export(class_, '==', function (another) {
+    return this === another
+  })
+  $export(class_, '!=', function (another) {
+    return this !== another
+  })
+
+  // support ordering operators
+  $export(class_, '>', function (another) {
+    return this > another
+  })
+  $export(class_, '>=', function (another) {
+    return this >= another
+  })
+  $export(class_, '<', function (another) {
+    return this < another
+  })
+  $export(class_, '<=', function (another) {
+    return this <= another
+  })
 }

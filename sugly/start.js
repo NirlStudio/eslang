@@ -1,18 +1,16 @@
 'use strict'
 
-var $export = require('./export')
-var $module = require('./generic/module')
-
 var JS = global || window
+var $export = require('./export')
 
 function createSpace () {
-  var $ = $module(null, '$')
-  $.$isSpace = Object.prototype.isPrototypeOf
+  // Hello, world.
+  var $ = require('./generic/genesis')($)
 
   // meta information
   var sugly = $export($, 'Sugly', {})
   $export(sugly, 'runtime', 'js')
-  $export(sugly, 'version', '0.1.0')
+  $export(sugly, 'version', '0.2.0')
   $export(sugly, 'debugging', true)
   return $
 }
@@ -27,9 +25,6 @@ function exportConstants ($) {
 }
 
 function initializeSpace ($) {
-  // Hello, world.
-  require('./generic/bootstrap')($)
-
   // populating
   require('./generic/null')($)
 

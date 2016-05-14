@@ -1,6 +1,7 @@
 'use strict'
 
 module.exports = function ($) {
+  var isSpace = Object.prototype.isPrototypeOf.bind($)
   var $Symbol = $.Symbol
   var SymbolConstructor = $Symbol.$Constructor
 
@@ -14,6 +15,8 @@ module.exports = function ($) {
   var $func = $.Function.class
   var $date = $.Date.class
   var $array = $.Array.class
+
+  var isObject = Object.prototype.isPrototypeOf.bind($object)
 
   $.$resolve = function $resolve (subject, sym) {
     if (typeof subject === 'undefined') {
@@ -33,17 +36,17 @@ module.exports = function ($) {
     if (key.length < 1) {
       return null
     }
-    if (key.charAt(0) === '$') {
-      return subject
-    }
 
     var value
-    if ($.$isSpace(subject)) {
+    if ($ === subject || isSpace(subject)) {
+      if (key.charAt(0) === '$') {
+        return subject
+      }
       value = subject[key]
       return typeof value !== 'undefined' ? value : null
     }
 
-    if (Object.prototype.hasOwnProperty.call(subject, key)) {
+    if (Object.prototype.hasOwnProperty.call(subject, key) || isObject(subject)) {
       value = subject[key]
     } else if (subject === null) {
       value = $Null[key]

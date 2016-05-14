@@ -93,9 +93,39 @@ module.exports = function ($) {
     return this.length > 0
   })
 
+  // indexer: override, interpret number as offset, readonly.
+  $export(class_, ':', function (index) {
+    if (typeof index === 'string') {
+      var value = class_[index]
+      return typeof value !== 'undefined' ? value : null
+    }
+    // interpret a number a char offset
+    if (typeof index === 'number') {
+      return index >= 0 && index < this.length ? this.charAt(index) : ''
+    }
+    return null
+  })
+
   $export(class_, 'concat', function () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
 
-  return type
+  // support ordering logic - comparable
+  $export(class_, 'compare', function (another) {
+    return this === another ? 0 : (this > another ? 1 : -1)
+  })
+
+  // support ordering operators
+  $export(class_, '>', function (another) {
+    return this > another
+  })
+  $export(class_, '>=', function (another) {
+    return this >= another
+  })
+  $export(class_, '<', function (another) {
+    return this < another
+  })
+  $export(class_, '<=', function (another) {
+    return this <= another
+  })
 }
