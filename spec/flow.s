@@ -6,12 +6,12 @@
 (let obj2 (@
   name: "obj2"
   obj1: obj1
-  getObj: (= () (:"obj1")
+  getObj: (= () (this "obj1")
 ).
 (let obj3 (@
   name: "obj3"
   obj2: obj2
-  getObj: (= () (:"obj2")
+  getObj: (= () (this "obj2")
 ).
 (let getObj3 (= () obj3).
 

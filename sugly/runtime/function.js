@@ -60,7 +60,7 @@ module.exports = function sfunction ($) {
         var args = Array.prototype.slice.apply(arguments)
         // new namespace
         var ns = createSpace($)
-        ns[':'] = this
+        ns['this'] = this
         ns['self'] = $F
         if (!fixedArgs) {
           ns['argc'] = args.length
@@ -97,7 +97,7 @@ module.exports = function sfunction ($) {
       var args = Array.prototype.slice.apply(arguments)
       // new namespace
       var ns = createSpace($)
-      ns[':'] = this
+      ns['this'] = this
       ns['self'] = $C
       Object.assign(ns, enclosing)
 

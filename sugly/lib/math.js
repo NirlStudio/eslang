@@ -1,10 +1,9 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('../generic/module')
 
 module.exports = function ($, JS) {
-  var math = $module($, 'Math')
+  var math = $export($, 'Math', $.object())
   $export.copy(math, JS.Math, {
     /* basic */
     'E': 'E',

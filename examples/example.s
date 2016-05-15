@@ -79,17 +79,17 @@
 
 (print value (if "" 1 2))
 
-($"counter" 10)
+(let counter 10)
 (while (-- counter)
-  (if (== counter 8) (continue ),
+  (if (counter == 8) (continue ),
   (print code "# counter is" counter)
-  (if (== counter 4) (break ), # this is inline comment.
+  (if (counter == 4) (break ), # this is inline comment.
 ).
 
 ($"sum" (= (*)
   ($"i" -1)
   ($"result" 0)
-  (while (!= (++ i) argc)
+  (while ((++ i) != argc)
     (++ result (argv:i).
 
 (print code "# sum" ($sum 1 2 3 9 100 1 "fhfgh").
@@ -97,7 +97,7 @@
 (let sum (= (*)
   (let i 0)
   (let result 0)
-  (for (!= i argc) (++ i)
+  (for (i != argc) (++ i)
     (++ result (argv:i).
 
 (print code "#sum" ($sum 100 100 100).
@@ -110,7 +110,7 @@
 
 (print value (typeof ($import "colors" "js").
 
-(let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
+(let f (= (*) (@ s: ($ "this") argc: argc argv: argv),
 (let s (object))
 (let args (@ 1 2))
 (let r (f apply s args),

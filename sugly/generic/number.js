@@ -202,15 +202,15 @@ module.exports = function ($) {
 
   // support ordering operators
   $export(class_, '>', function (another) {
-    return this > another
+    return typeof another === 'number' ? this > another : false
   })
   $export(class_, '>=', function (another) {
-    return this >= another
+    return typeof another === 'number' ? this >= another : false
   })
   $export(class_, '<', function (another) {
-    return this < another
+    return typeof another === 'number' ? this < another : false
   })
   $export(class_, '<=', function (another) {
-    return this <= another
+    return typeof another === 'number' ? this <= another : false
   })
 }

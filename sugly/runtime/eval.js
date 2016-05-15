@@ -3,13 +3,7 @@
 module.exports = function seval ($) {
   var set = $.$set
   var resolve = $.$resolve
-  var indexer = $.$indexer
-
-  var symbolValueOf = $.Symbol['value-of']
   var Symbol$ = $.$SymbolConstructor
-
-  var SymbolContext = symbolValueOf('$')
-  var SymbolIndexer = symbolValueOf(':')
 
   function $eval (clause, $) {
     if (!Array.isArray(clause)) {
@@ -28,7 +22,7 @@ module.exports = function seval ($) {
       if ($.$operators.hasOwnProperty(key)) {
         return $.$operators[key]($, clause)
       }
-      if (subject === SymbolContext) {
+      if (key === '$') {
         subject = $ // shortcut
       } else {
         subject = resolve($, subject)
@@ -52,40 +46,26 @@ module.exports = function seval ($) {
       predicate = $eval(predicate, $)
     }
 
-    var func
-    switch (typeof predicate) {
-      case 'string': // an immediate string indicating get/set command.
-        var sym = symbolValueOf(predicate)
-        return length > 2 ? set(subject, sym, $eval(clause[2], $)) : resolve(subject, sym)
-
-      case 'symbol': // native symbol
-        func = resolve(subject, predicate)
-        if (!func && predicate === SymbolIndexer) {
-          func = indexer // overridable indexer
-        } else if (typeof func !== 'function') {
-          return func
-        }
-        break
-
-      case 'function':
-        func = predicate
-        break
-
-      case 'object':
-        if (predicate instanceof Symbol$) { // polyfill symbol
-          func = resolve(subject, predicate)
-          if (!func && predicate === SymbolIndexer) {
-            func = indexer // overridable indexer
-          } else if (typeof func !== 'function') {
-            return func
-          }
-          break
-        }
-        return predicate // ordinary object
-
-      default:
-        // short circuit - other type of value type will be evaluated to itself.
-        return predicate
+    var func, offset
+    if (predicate instanceof Symbol$) {
+      func = resolve(subject, predicate)
+      if (typeof func !== 'function') {
+        return func // interpret to getter if result is not a function.
+      }
+      offset = 2
+    } else if (typeof predicate === 'string') {
+      // a string as verb is indicating a getting/setting command.
+      func = resolve(subject, ':') // all object must be resolved to an indexer.
+      if (typeof func !== 'function') {
+        // only for space now
+        return length > 2 ? set(subject, predicate, $eval(clause[2], $)) : resolve(subject, predicate)
+      }
+      offset = 1
+    } else if (typeof predicate === 'function') {
+      func = predicate
+      offset = 2
+    } else {
+      return predicate
     }
 
     // evaluate arguments.
@@ -94,7 +74,7 @@ module.exports = function seval ($) {
       max = length
     }
     var args = []
-    for (var i = 2; i < max; i++) {
+    for (var i = offset; i < max; i++) {
       args.push($eval(clause[i], $))
     }
 

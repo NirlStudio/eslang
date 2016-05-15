@@ -14,7 +14,5 @@ module.exports = function operators ($) {
   require('./general')($)
   require('./arithmetic')($)
   require('./bitwise')($)
-  require('./equivalence')($)
-  require('./ordering')($)
   require('./logical')($)
 }

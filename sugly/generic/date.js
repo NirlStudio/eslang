@@ -245,48 +245,78 @@ module.exports = function ($) {
 
   // support general operators
   $export(class_, '+', function (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
     var time = this.getTime() + milliseconds
     return new Date(time)
   })
   $export(class_, '+=', function (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
     var time = this.getTime() + milliseconds
     this.setTime(time)
-    return time
+    return this
   })
   $export(class_, '-', function (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
     var time = this.getTime() - milliseconds
     return new Date(time)
   })
   $export(class_, '-=', function (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
     var time = this.getTime() - milliseconds
     this.setTime(time)
-    return time
+    return this
   })
 
   // override equivalence operators
   $export(class_, '==', function (another) {
+    if (!another instanceof Date) {
+      return false
+    }
     var time = this.getTime()
     return typeof time === 'number' && time === another.getTime()
   })
   $export(class_, '!=', function (another) {
+    if (!another instanceof Date) {
+      return true
+    }
     var time = this.getTime()
     return typeof time !== 'number' || time !== another.getTime()
   })
 
   // support ordering operators
   $export(class_, '>', function (another) {
+    if (!(another instanceof Date)) {
+      return false
+    }
     var time = this.getTime()
     return typeof time === 'number' && time > another.getTime()
   })
   $export(class_, '>=', function (another) {
+    if (!(another instanceof Date)) {
+      return false
+    }
     var time = this.getTime()
     return typeof time === 'number' && time >= another.getTime()
   })
   $export(class_, '<', function (another) {
+    if (!(another instanceof Date)) {
+      return false
+    }
     var time = this.getTime()
     return typeof time === 'number' && time < another.getTime()
   })
   $export(class_, '<=', function (another) {
+    if (!(another instanceof Date)) {
+      return false
+    }
     var time = this.getTime()
     return typeof time === 'number' && time <= another.getTime()
   })

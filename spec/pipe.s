@@ -3,7 +3,7 @@
 (let step2 (= (count)
   (let list (@),
   (let i 1)
-  (for (<= i count) (++ i)
+  (for (i <= count) (++ i)
     (list push i)
   ),
   (return count list)
@@ -11,7 +11,7 @@
 (let step3 (= (count list)
   (let sum 0)
   (-- count)
-  (for (>= count 0) (-- count)
+  (for (count >= 0) (-- count)
     (+= sum (list:count),
 ).
 

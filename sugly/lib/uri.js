@@ -1,10 +1,9 @@
 'use strict'
 
 var $export = require('../export')
-var $module = require('../generic/module')
 
 module.exports = function ($, JS) {
-  var uri = $module($, 'Uri')
+  var uri = $export($, 'Uri', $.object())
   $export.copy(uri, JS, {
     'encodeURI': 'encode',
     'encodeURIComponent': 'escape',

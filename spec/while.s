@@ -2,7 +2,7 @@
   ($should "keep looping until the condtion is evaluated to false." (= ()
     (let counter 0)
     (let i 10)
-    (let result (while (> i 0)
+    (let result (while (i > 0)
       (++ counter)(-- i)
     ),
     (assert 10 (` counter),
@@ -11,10 +11,10 @@
 
     (let counter 0)
     (let i 10)
-    (let result (while (> i 0)
+    (let result (while (i > 0)
       (++ counter)(-- i)
       (let j 0)
-      (while (< j 100) (++ j),
+      (while (j < 100) (++ j),
     ),
     (assert 10 (` counter),
     (assert 0 (` i),
@@ -26,7 +26,7 @@
             as result." (= ()
     (let counter 0)
     (let i 10)
-    (let result (while (> i 0)
+    (let result (while (i > 0)
       (-- i)
       (continue 99)
       (++ counter)
@@ -40,9 +40,9 @@
   ($should "stop looping and use the argument(s) as result." (= ()
     (let counter 0)
     (let i 10)
-    (let result (while (> i 0)
+    (let result (while (i > 0)
       (-- i)
-      (if (< i 5) (break (* i i),
+      (if (i < 5) (break (* i i),
       (++ counter)
     ),
     (assert 5 (` counter),

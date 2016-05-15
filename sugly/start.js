@@ -67,7 +67,6 @@ function initializeSpace ($) {
   require('./runtime/resolve')($)
   require('./runtime/assign')($)
   require('./runtime/set')($)
-  require('./runtime/indexer')($)
   require('./runtime/eval')($)
   require('./runtime/function')($)
 

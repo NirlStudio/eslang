@@ -206,7 +206,7 @@ $
 (print non-sugly-method var)
 
 # more examples
-(let var (== x 1).
+(let var (x == 1).
 (let func (=> x (+ x 1).
 (let func (=> (x y) (+ x 1).
 (let func (= x (+ x 1).

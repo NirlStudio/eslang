@@ -27,12 +27,12 @@
 ).
 
 (operator export assert # (expr) or (expected expr) or (expected expr note)
-  (if (< %C 2)
+  (if (%C < 2)
     (let (%1 %0) (%0 true),
   ),
   (++ %assert-step)
   (let %9 ($eval %1),
-  (if (!= %0 %9)
+  (if (%0 != %9)
     (exit (@
       typeId: "assert-failure"
       step: %assert-step
@@ -106,7 +106,7 @@
     (if (typeof load "function") ($load),
   ),
 
-  (if (< (cases length) 1) (exit),
+  (if ((cases length) < 1) (exit),
 
   (print code "  Start to run sugly test suite ...\n")
   (let t1 (Date time),
@@ -117,7 +117,7 @@
     (C green (+ "\n  passing: " passing),
     (C gray (+ " (" (- t2 t1) "ms)"),
   ),
-  (if (> failing 0)
+  (if (failing > 0)
     (print code (C red (+ "  failing: " failing "\n"),
     (for failure in failures
       ($print-f failure)

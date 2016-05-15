@@ -8,23 +8,23 @@
 ).
 
 (let quick (= (start end)
-  (if (>= start end) (return),
+  (if (start >= end) (return),
 
   (let mid (data:end),
   (let (left start) (right (- end 1),
-  (while (< left right)
+  (while (left < right)
     (while
-      (&& (< (data:left) mid) (< left right),
+      (&& ((data:left) < mid) (left < right),
       (++ left)
     ),
     (while
-      (&& (>= (data:right) mid) (< left right),
+      (&& ((data:right) >= mid) (left < right),
       (-- right 1)
     ),
     ($swap left right)
   ),
   (if
-    (>= (data:left) mid),
+    ((data:left) >= mid),
     ($swap left end)
     (++ left)
   ),

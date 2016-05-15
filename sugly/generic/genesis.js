@@ -1,11 +1,13 @@
 'use strict'
 
 module.exports = function () {
+
   /* In the beginning God created the heavens and the earth. */
+  var $ = Object.create(null)
   var classNull = Object.create(null)
 
   /* Now the earth was formless and empty, */
-  var $ = Object.create(classNull)
+  //var $ = Object.create(classNull)
 
   /* "Now there be light," */
   var classBool = Object.create(classNull)

@@ -4,7 +4,7 @@
     (assert (` (is null),
     (assert (` (is null null),
     (assert (` (is NaN NaN),
-    (assert false (` (== NaN NaN),
+    (assert false (` (NaN == NaN),
 
     (let obj1 (@p:1),
     (let obj2(@p:1),
