@@ -1,20 +1,19 @@
 'use strict'
 
-module.exports = function operators$control ($) {
-  var $operators = $.$operators
-  var set = $.$set
-  var seval = $.$eval
-  var beval = $.$beval
-  var resolve = $.$resolve
-  var Signal = $.$Signal
-  var createSignalOf = $.$createSignalOf
+module.exports = function operators$control ($void) {
+  var operators = $void.operators
+  var set = $void.set
+  var evaluate = $void.evaluate
+  var resolve = $void.resolve
+  var Signal = $void.Signal
+  var signalOf = $void.signalOf
+  var Symbol$ = $void.Symbol
 
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
+  var iterate = $void.$.iterate
+  var symbolValueOf = $void.$.Symbol['value-of']
   var SymbolElse = symbolValueOf('else')
-  var SymbolIn = symbolValueOf('in')
 
-  $operators['if'] = function ($, clause) {
+  operators['if'] = function ($, clause) {
     var length = clause.length
     if (length < 3) {
       return null // short circuit - the result will be null anyway.
@@ -26,7 +25,7 @@ module.exports = function operators$control ($) {
       return null // short circuit - the cond is required.
     }
 
-    var cond = seval(clause[1], $)
+    var cond = evaluate(clause[1], $)
     var tb, fb
     if (offset > 0) {
       tb = clause.slice(2, offset)
@@ -40,21 +39,26 @@ module.exports = function operators$control ($) {
     if (option.length < 1) {
       return null
     }
-    return option.length === 1 ? seval(option[0], $) : beval($, option)
+
+    var result
+    for (var i = 0; i < option.length; i++) {
+      result = evaluate(option[i], $)
+    }
+    return result
   }
 
   function createLoopSignal (type) {
-    var signal = createSignalOf(type)
+    var signal = signalOf(type)
     return function loopSignal ($, clause) {
-      if ($.$loops.length > 0) {
+      if ($.loops.length > 0) {
         signal($, clause)
       }
       return null // not in loop.
     }
   }
 
-  $operators['break'] = createLoopSignal('break')
-  $operators['continue'] = createLoopSignal('continue')
+  operators['break'] = createLoopSignal('break')
+  operators['continue'] = createLoopSignal('continue')
 
   function loopTest ($, cond) {
     // loop test function returns a BREAK flag
@@ -67,7 +71,7 @@ module.exports = function operators$control ($) {
 
     if (Array.isArray(cond)) {
       return function loopTestOfClause () {
-        var value = seval(cond, $)
+        var value = evaluate(cond, $)
         return value === false || value === null || value === 0
       }
     }
@@ -75,7 +79,7 @@ module.exports = function operators$control ($) {
     return cond === false || cond === null || cond === 0
   }
 
-  $operators['while'] = function ($, clause) {
+  operators['while'] = function ($, clause) {
     var length = clause.length
     if (length < 3) {
       return null // short circuit - no loop body
@@ -86,13 +90,16 @@ module.exports = function operators$control ($) {
 
     var body = clause.slice(2)
     var result = null
-    $.$loops.push(test)
+    $.loops.push(test)
     while (true) {
       try { // break/continue can be used in condition expression.
         if (dynamicTest ? test() : test) {
           break
         }
-        result = beval($, body)
+        length = body.length
+        for (var i = 0; i < length; i++) {
+          result = evaluate(body[i], $)
+        }
       } catch (signal) {
         if (signal instanceof Signal) {
           if (signal.type === 'continue') {
@@ -104,11 +111,11 @@ module.exports = function operators$control ($) {
             break
           }
         }
-        $.$loops.pop()
+        $.loops.pop()
         throw signal
       }
     }
-    $.$loops.pop()
+    $.loops.pop()
     return result
   }
 
@@ -146,22 +153,25 @@ module.exports = function operators$control ($) {
       return null // invalid field(s) expression
     }
 
-    var iterable = seval(clause[3], $)
-    var iterator = $.iterate(iterable)
+    var iterable = evaluate(clause[3], $)
+    var iterator = iterate(iterable)
     if (iterator === null || typeof iterator.next !== 'function') {
       return null // not an iterable object.
     }
 
     var body = clause.slice(4)
     var result = null
-    $.$loops.push(iterator)
+    $.loops.push(iterator)
     while (iterator.next()) {
       set($, valueSymbol, typeof iterator.value !== 'undefined' ? iterator.value : null)
       if (keySymbol) {
         set($, keySymbol, typeof iterator.key !== 'undefined' ? iterator.key : null)
       }
       try {
-        result = beval($, body)
+        length = body.length
+        for (var i = 0; i < length; i++) {
+          result = evaluate(body[i], $)
+        }
       } catch (signal) {
         if (signal instanceof Signal) {
           if (signal.type === 'continue') {
@@ -173,23 +183,23 @@ module.exports = function operators$control ($) {
             break
           }
         }
-        $.$loops.pop()
+        $.loops.pop()
         throw signal
       }
     }
-    $.$loops.pop()
+    $.loops.pop()
     return result
   }
 
   // (for condition incremental body)
-  $operators['for'] = function ($, clause) {
+  operators['for'] = function ($, clause) {
     var length = clause.length
     if (length < 4) {
       return null // short circuit - no loop body
     }
 
     var step = clause[2]
-    if (step === SymbolIn) {
+    if (step instanceof Symbol$ && step.key === 'in') {
       return forEach($, clause)
     }
     var runStep = Array.isArray(step)
@@ -199,22 +209,25 @@ module.exports = function operators$control ($) {
 
     var body = clause.slice(3)
     var result = null
-    $.$loops.push(test)
+    $.loops.push(test)
     while (true) {
       try { // break/continue can be used in condition expression.
         if (dynamicTest ? test() : test) {
           break
         }
-        result = beval($, body)
+        length = body.length
+        for (var i = 0; i < length; i++) {
+          result = evaluate(body[i], $)
+        }
         if (runStep) {
-          seval(step, $)
+          evaluate(step, $)
         }
       } catch (signal) {
         if (signal instanceof Signal) {
           if (signal.type === 'continue') {
             result = signal.value
             if (runStep) {
-              seval(step, $)
+              evaluate(step, $)
             }
             continue
           }
@@ -223,11 +236,11 @@ module.exports = function operators$control ($) {
             break
           }
         }
-        $.$loops.pop()
+        $.loops.pop()
         throw signal
       }
     }
-    $.$loops.pop()
+    $.loops.pop()
     return result
   }
 }

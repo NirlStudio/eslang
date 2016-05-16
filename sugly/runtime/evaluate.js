@@ -1,11 +1,11 @@
 'use strict'
 
-module.exports = function seval ($) {
-  var set = $.$set
-  var resolve = $.$resolve
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function evaluate ($void) {
+  var set = $void.set
+  var resolve = $void.resolve
+  var Symbol$ = $void.Symbol
 
-  function $eval (clause, $) {
+  $void.evaluate = function evaluate (clause, $) {
     if (!Array.isArray(clause)) {
       // not a clause.
       return clause instanceof Symbol$ ? resolve($, clause) : clause
@@ -19,8 +19,10 @@ module.exports = function seval ($) {
     // intercept subject
     if (subject instanceof Symbol$) {
       var key = subject.key
-      if ($.$operators.hasOwnProperty(key)) {
+      if ($.$operators && typeof $.$operators[key] !== 'undefined') {
         return $.$operators[key]($, clause)
+      } else if (typeof $void.operators[key] !== 'undefined') {
+        return $void.operators[key]($, clause)
       }
       if (key === '$') {
         subject = $ // shortcut
@@ -28,7 +30,7 @@ module.exports = function seval ($) {
         subject = resolve($, subject)
       }
     } else if (Array.isArray(subject)) {
-      subject = $eval(subject, $)
+      subject = evaluate(subject, $)
     }
 
     if (subject === null) {
@@ -37,13 +39,13 @@ module.exports = function seval ($) {
 
     // with only subject, take the value of subject as another clause.
     if (length < 2) {
-      return $eval(subject, $)
+      return evaluate(subject, $)
     }
 
     // predicate exists.
     var predicate = clause[1]
     if (Array.isArray(predicate)) {
-      predicate = $eval(predicate, $)
+      predicate = evaluate(predicate, $)
     }
 
     var func, offset
@@ -58,7 +60,7 @@ module.exports = function seval ($) {
       func = resolve(subject, ':') // all object must be resolved to an indexer.
       if (typeof func !== 'function') {
         // only for space now
-        return length > 2 ? set(subject, predicate, $eval(clause[2], $)) : resolve(subject, predicate)
+        return length > 2 ? set(subject, predicate, evaluate(clause[2], $)) : resolve(subject, predicate)
       }
       offset = 1
     } else if (typeof predicate === 'function') {
@@ -75,7 +77,7 @@ module.exports = function seval ($) {
     }
     var args = []
     for (var i = offset; i < max; i++) {
-      args.push($eval(clause[i], $))
+      args.push(evaluate(clause[i], $))
     }
 
     // execute the clause.
@@ -86,14 +88,5 @@ module.exports = function seval ($) {
       // TODO - filter native errors
       throw signal
     }
-  }
-
-  $.$eval = $eval
-  $.$beval = function $beval ($, clauses) {
-    var result = null
-    for (var i = 0; i < clauses.length; i++) {
-      result = $eval(clauses[i], $)
-    }
-    return result
   }
 }

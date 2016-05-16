@@ -1,15 +1,15 @@
 'use strict'
 
-module.exports = function operators$general ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var assign = $.$assign
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function operators$general ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+  var assign = $void.assign
+  var Symbol$ = $void.Symbol
 
   function concat ($, str, clause) {
     var length = clause.length
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (typeof value === 'string') {
         str += value
       } else {
@@ -19,18 +19,7 @@ module.exports = function operators$general ($) {
     return str
   }
 
-  $operators['concat'] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) { return '' }
-
-    var str = seval(clause[1], $)
-    if (typeof str !== 'string') {
-      str = $.encode.value(str)
-    }
-    return length > 2 ? concat($, str, clause) : str
-  }
-
-  function mixin ($, base, clause, target) {
+  function merge ($, base, clause, target) {
     var length = clause.length
     if (length < 2) {
       return null
@@ -46,35 +35,15 @@ module.exports = function operators$general ($) {
     }
 
     for (var i = 2; i < length; i++) {
-      Object.assign(target, seval(clause[i], $))
+      Object.assign(target, evaluate(clause[i], $))
     }
     return target
-  }
-
-  $operators['combine'] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) {
-      return null
-    }
-
-    var base = seval(clause[1], $)
-    return mixin($, base, clause, $.object())
-  }
-
-  $operators['mixin'] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) {
-      return null
-    }
-
-    var base = seval(clause[1], $)
-    return length > 2 ? mixin($, base, clause, null) : base
   }
 
   function sum ($, num, clause) {
     var length = clause.length
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (typeof value === 'number') {
         num += value
       }
@@ -82,15 +51,15 @@ module.exports = function operators$general ($) {
     return num
   }
 
-  $operators['+'] = function ($, clause) {
+  operators['+'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return 0
     }
 
-    var base = seval(clause[1], $)
+    var base = evaluate(clause[1], $)
     if (length === 2) {
-      return typeof base === 'object' ? mixin($, base, clause, $.object()) : base
+      return typeof base === 'object' ? merge($, base, clause, $.object()) : base
     }
 
     if (typeof base === 'number') {
@@ -100,19 +69,19 @@ module.exports = function operators$general ($) {
       return concat($, base, clause)
     }
     if (typeof base === 'object') {
-      return mixin($, base, clause, $.object()) // combination
+      return merge($, base, clause, $.object()) // combination
     }
     return base // return the first argument for other types
   }
 
-  $operators['+='] = function ($, clause) {
+  operators['+='] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return 0
     }
 
     var sym = clause[1]
-    var base = seval(sym, $)
+    var base = evaluate(sym, $)
     if (length === 2) {
       return base
     }
@@ -122,7 +91,7 @@ module.exports = function operators$general ($) {
     } else if (typeof base === 'string') {
       base = concat($, base, clause)
     } else if (typeof base === 'object') {
-      return mixin($, base, clause, null) // mixin
+      return merge($, base, clause, null) // mixin
     } else {
       return base // for other types
     }
@@ -134,12 +103,12 @@ module.exports = function operators$general ($) {
     var length = clause.length
     if (length < 2) { return 0 }
 
-    var result = seval(clause[1], $)
+    var result = evaluate(clause[1], $)
     if (typeof result !== 'number') {
       if (typeof result !== 'string' || length < 3) {
         return result
       }
-      var minuend = seval(clause[2], $)
+      var minuend = evaluate(clause[2], $)
       if (typeof minuend === 'string') {
         return result.split(minuend).join('')
       }
@@ -150,7 +119,7 @@ module.exports = function operators$general ($) {
     }
 
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (typeof value === 'number') {
         result -= value
       }
@@ -158,8 +127,8 @@ module.exports = function operators$general ($) {
     return result
   }
 
-  $operators['-'] = subtract
-  $operators['-='] = function ($, clause) {
+  operators['-'] = subtract
+  operators['-='] = function ($, clause) {
     var result = subtract($, clause)
     var sym = clause[1]
     if (sym instanceof Symbol$) {

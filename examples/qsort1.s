@@ -11,7 +11,7 @@
   (if (start >= end) (return),
 
   (let mid (data:end),
-  (let (left start) (right (- end 1),
+  (let (left start) (right (end - 1),
   (while (left < right)
     (while
       (&& ((data:left) < mid) (left < right),
@@ -28,9 +28,9 @@
     ($swap left end)
     (++ left)
   ),
-  ($quick start (- left 1),
+  ($quick start (left - 1),
   ($quick (+ left 1) end)
 ).
 
-($quick 0 (- (data length) 1).
+($quick 0 ((data length) - 1).
 (exit data)

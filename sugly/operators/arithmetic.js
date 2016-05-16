@@ -1,23 +1,23 @@
 'use strict'
 
-module.exports = function operators$arithmetic ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var assign = $.$assign
-  var resolve = $.$resolve
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function operators$arithmetic ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+  var assign = $void.assign
+  var resolve = $void.resolve
+  var Symbol$ = $void.Symbol
 
   function multiply ($, clause) {
     var length = clause.length
     if (length < 2) { return 0 }
 
-    var result = seval(clause[1], $)
+    var result = evaluate(clause[1], $)
     if (typeof result !== 'number') {
       return 0
     }
 
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (typeof value === 'number') {
         result *= value
       } else {
@@ -27,8 +27,7 @@ module.exports = function operators$arithmetic ($) {
     return result
   }
 
-  $operators['*'] = multiply
-  $operators['*='] = function ($, clause) {
+  operators['*='] = function ($, clause) {
     var result = multiply($, clause)
     var sym = clause[1]
     if (sym instanceof Symbol$) {
@@ -41,13 +40,13 @@ module.exports = function operators$arithmetic ($) {
     var length = clause.length
     if (length < 2) { return 0 }
 
-    var result = seval(clause[1], $)
+    var result = evaluate(clause[1], $)
     if (typeof result !== 'number') {
       return 0
     }
 
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (typeof value === 'number') {
         result /= value
       } else {
@@ -57,8 +56,7 @@ module.exports = function operators$arithmetic ($) {
     return result
   }
 
-  $operators['/'] = divide
-  $operators['/='] = function ($, clause) {
+  operators['/='] = function ($, clause) {
     var result = divide($, clause)
     var sym = clause[1]
     if (sym instanceof Symbol$) {
@@ -67,7 +65,7 @@ module.exports = function operators$arithmetic ($) {
     return result
   }
 
-  $operators['++'] = function ($, clause) {
+  operators['++'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return 1
@@ -86,12 +84,12 @@ module.exports = function operators$arithmetic ($) {
     }
 
     if (Array.isArray(sym)) {
-      sym = seval($, sym)
+      sym = evaluate($, sym)
     }
     return typeof sym === 'number' ? sym + 1 : 1
   }
 
-  $operators['--'] = function ($, clause) {
+  operators['--'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return -1
@@ -110,7 +108,7 @@ module.exports = function operators$arithmetic ($) {
     }
 
     if (Array.isArray(sym)) {
-      sym = seval($, sym)
+      sym = evaluate($, sym)
     }
     return typeof sym === 'number' ? sym - 1 : -1
   }

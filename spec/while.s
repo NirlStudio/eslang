@@ -42,7 +42,7 @@
     (let i 10)
     (let result (while (i > 0)
       (-- i)
-      (if (i < 5) (break (* i i),
+      (if (i < 5) (break (i * i),
       (++ counter)
     ),
     (assert 5 (` counter),

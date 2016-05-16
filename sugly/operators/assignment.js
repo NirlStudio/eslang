@@ -1,12 +1,12 @@
 'use strict'
 
-module.exports = function operators$let ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function operators$let ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+  var Symbol$ = $void.Symbol
 
   function assignAs (local) {
-    var assign = local ? $.$set : $.$assign
+    var assign = local ? $void.set : $void.assign
 
     return function $assigning ($, clause) {
       var length = clause.length
@@ -17,7 +17,7 @@ module.exports = function operators$let ($) {
       var c1 = clause[1]
       // (let symbol value)
       if (c1 instanceof Symbol$) {
-        return assign($, c1, length < 3 ? null : seval(clause[2], $))
+        return assign($, c1, length < 3 ? null : evaluate(clause[2], $))
       } else if (!Array.isArray(c1)) {
         return null
       }
@@ -29,7 +29,7 @@ module.exports = function operators$let ($) {
         if (Array.isArray(pair) && pair.length > 1) {
           var p0 = pair[0]
           if (p0 instanceof Symbol$) {
-            last = assign($, p0, seval(pair[1], $))
+            last = assign($, p0, evaluate(pair[1], $))
             continue
           }
         }
@@ -40,8 +40,8 @@ module.exports = function operators$let ($) {
   }
 
   // (var var-name value) or (var (var-name value) ...)
-  $operators['var'] = assignAs(true)
+  operators['var'] = assignAs(true)
 
   // (let var-name value) or (let (var-name value) ...)
-  $operators['let'] = assignAs(false)
+  operators['let'] = assignAs(false)
 }

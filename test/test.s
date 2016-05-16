@@ -75,7 +75,7 @@
     (if (typeof item "array")
       ($execute item)
     else
-      (let result ($exec (item "action"),
+      (let result ((item "action") exec),
       (if (typeof result "assert-failure")
         ($failed (item "behaviour") result)
       else
@@ -115,7 +115,7 @@
 
   (print code (+
     (C green (+ "\n  passing: " passing),
-    (C gray (+ " (" (- t2 t1) "ms)"),
+    (C gray (+ " (" (t2 - t1) "ms)"),
   ),
   (if (failing > 0)
     (print code (C red (+ "  failing: " failing "\n"),

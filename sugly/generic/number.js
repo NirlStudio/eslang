@@ -2,12 +2,6 @@
 
 var $export = require('../export')
 
-function isTypeOf () {
-  return function Number$is_type_of (value) {
-    return typeof value === 'number'
-  }
-}
-
 function valueOf () {
   return function Number$value_of (input) {
     if (typeof input === 'string') {
@@ -27,84 +21,57 @@ function valueOf () {
   }
 }
 
-function toCode () {
-  return function Number$to_code () {
-    return typeof this === 'number' ? this.toString() : 'NaN'
-  }
-}
-
 function numberAnd (value_of) {
-  return function Number$and () {
+  return function number$and () {
+    var result = typeof this === 'number' ? this : value_of(this)
     var length = arguments.length
-    var result = 0
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      if (typeof arg !== 'number') {
-        arg = value_of(arg)
-      }
-      result += arg
+      result += typeof arg === 'number' ? arg : value_of(arg)
     }
     return result
   }
 }
 
 function numberSubtract (value_of) {
-  return function Number$substract () {
+  return function number$substract () {
+    var result = typeof this === 'number' ? this : value_of(this)
     var length = arguments.length
-    if (length < 1) {
-      return 0
-    }
-    var arg = arguments[0]
-    var result = typeof arg === 'number' ? arg : value_of(arg)
-    for (var i = 1; i < length; i++) {
-      arg = arguments[i]
-      if (typeof arg !== 'number') {
-        arg = value_of(arg)
-      }
-      result -= arg
+    for (var i = 0; i < length; i++) {
+      var arg = arguments[i]
+      result -= typeof arg === 'number' ? arg : value_of(arg)
     }
     return result
   }
 }
 
 function numberTimes (value_of) {
-  return function Number$times () {
+  return function number$times () {
+    var result = typeof this === 'number' ? this : value_of(this)
     var length = arguments.length
-    var result = 1
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      if (typeof arg !== 'number') {
-        arg = value_of(arg)
-      }
-      result *= arg
+      result *= typeof arg === 'number' ? arg : value_of(arg)
     }
     return result
   }
 }
 
 function numberDivide (value_of) {
-  return function Number$divide () {
+  return function number$divide () {
+    var result = typeof this === 'number' ? this : value_of(this)
     var length = arguments.length
-    if (length < 1) {
-      return 0
-    }
-    var arg = arguments[0]
-    var result = typeof arg === 'number' ? arg : value_of(arg)
-    for (var i = 1; i < length; i++) {
-      arg = arguments[i]
-      if (typeof arg !== 'number') {
-        arg = value_of(arg)
-      }
-      result /= arg
+    for (var i = 0; i < length; i++) {
+      var arg = arguments[i]
+      result /= typeof arg === 'number' ? arg : value_of(arg)
     }
     return result
   }
 }
 
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.Number
-  $export(type, 'is-type-of', isTypeOf())
-  var value_of = $export(type, 'value-of', valueOf())
 
   type.MAX_VALUE = Number.MAX_VALUE
   type.MIN_VALUE = Number.MIN_VALUE
@@ -112,105 +79,139 @@ module.exports = function ($) {
   type.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
   type.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
 
-  $export(type, 'is-not', function Number$is_not (value) {
-    return typeof value === 'number' ? isNaN(value) : true
-  })
-  $export(type, 'is-finite', function Number$is_finite (value) {
-    return typeof value === 'number' ? isFinite(value) : false
-  })
+  // get a number value from the input
+  var value_of = $export(type, 'value-of', valueOf())
+
+  // parse a string to its number value.
   $export(type, 'parse', function Number$parse (value) {
     return typeof value === 'undefined' || value === null ? 0 : parseFloat(value)
   })
 
-  var and = $export(type, 'and', numberAnd(value_of))
-  var sub = $export(type, 'subtract', numberSubtract(value_of))
-  var times = $export(type, 'times', numberTimes(value_of))
-  var divide = $export(type, 'divide', numberDivide(value_of))
+  // define type attributes
+  $export(type, 'is-type', function Number$is_type () {
+    return true
+  })
+  $export(type, 'is-type-of', function Number$is_type_of (value) {
+    return typeof value === 'number'
+  })
+  $export(type, 'super', function Number$super () {
+    return null
+  })
+  $export(type, 'get-type', function Number$get_type () {
+    return $.Class
+  })
+  $export(type, 'is-instance', function Number$is_instance () {
+    return false
+  })
+  $export(type, 'is-instance-of', function Number$is_instance_of (type) {
+    return false
+  })
 
-  var class_ = type.class
-  $export.copy(class_, Number.prototype, {
+  var proto = type.proto
+  // test for special values of Nan and Infinity
+  $export(proto, 'is-valid', function number$is_valid () {
+    return typeof this === 'number' && !isNaN(this)
+  })
+  $export(proto, 'is-finite', function number$is_finite () {
+    return typeof this === 'number' && isFinite(this)
+  })
+
+  // TODO - remove unnecessary functions?
+  $export.copy(proto, Number.prototype, {
     'toExponential': 'to-exponential',
     'toFixed': 'to-fixed',
     'toLocaleString': 'to-locale-string',
-    'toPrecision': 'to-precision',
-    'toString': 'to-string'
+    'toPrecision': 'to-precision'
   })
 
-  // override to support NaN !== NaN
-  $export(class_, 'equals', function (value) {
-    return this === value
-  })
+  // support basic arithmetic operations
+  $export(proto, 'and', numberAnd(value_of))
+  $export(proto, 'subtract', numberSubtract(value_of))
+  $export(proto, 'times', numberTimes(value_of))
+  $export(proto, 'divide', numberDivide(value_of))
 
-  // persistency & describing
-  $export(class_, 'to-code', toCode())
-  $export(class_, 'to-string', toCode())
-
-  // O and NaN are defined as empty.
-  $export(class_, 'is-empty', function () {
-    return this === 0 || isNaN(this)
-  })
-  $export(class_, 'not-empty', function () {
-    return this !== 0 && !isNaN(this)
-  })
+  // support arithmetic operators
+  $export(proto, '+', numberAnd(value_of))
+  $export(proto, '-', numberSubtract(value_of))
+  $export(proto, '*', numberTimes(value_of))
+  $export(proto, '/', numberDivide(value_of))
 
   // support ordering logic - comparable
-  $export(class_, 'compare', function (another) {
+  $export(proto, 'compare', function number$compare (another) {
     var diff = this - another
     return diff === 0 ? 0 : diff / Math.abs(diff)
   })
 
-  // support basic arithmetic operations
-  $export(class_, 'and', function () {
-    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  // support ordering operators
+  $export(proto, '>', function number$gt (another) {
+    return typeof another === 'number' ? this > another : false
   })
-  $export(class_, 'subtract', function () {
-    return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, '>=', function number$ge (another) {
+    return typeof another === 'number' ? this >= another : false
   })
-  $export(class_, 'times', function () {
-    return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, '<', function number$lt (another) {
+    return typeof another === 'number' ? this < another : false
   })
-  $export(class_, 'divide', function () {
-    return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, '<=', function number$le (another) {
+    return typeof another === 'number' ? this <= another : false
   })
 
   // support common math operations
-  $export(class_, 'abs', function () {
+  $export(proto, 'abs', function number$abs () {
     return Math.abs(this)
   })
-
-  // support arithmetic operators
-  $export(class_, '+', function () {
-    return and.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, 'ceil', function number$ceil () {
+    return Math.ceil(this)
   })
-  $export(class_, '-', function () {
-    return sub.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, 'floor', function number$floor () {
+    return Math.floor(this)
   })
-  $export(class_, '*', function () {
-    return times.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
-  })
-  $export(class_, '/', function () {
-    return divide.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  $export(proto, 'round', function number$floor () {
+    return Math.round(this)
   })
 
-  // override equivalence operators - for NaN
-  $export(class_, '==', function (another) {
-    return this === another
+  // define static value attributes
+  $export(proto, 'is-type', function number$is_type () {
+    return false
   })
-  $export(class_, '!=', function (another) {
-    return this !== another
+  $export(proto, 'is-type-of', function number$is_type_of (value) {
+    return false
+  })
+  $export(proto, 'super', function number$super () {
+    return null
+  })
+  $export(proto, 'get-type', function number$get_type () {
+    return type
+  })
+  $export(proto, 'is-instance', function number$is_instance () {
+    return true
+  })
+  $export(proto, 'is-instance-of', function number$is_instance_of (number) {
+    return type === number
   })
 
-  // support ordering operators
-  $export(class_, '>', function (another) {
-    return typeof another === 'number' ? this > another : false
+  // persistency & describing
+  $export(proto, 'to-code', function number$to_code () {
+    return typeof this === 'number' ? this.toString() : 'NaN'
   })
-  $export(class_, '>=', function (another) {
-    return typeof another === 'number' ? this >= another : false
+  $export(proto, 'to-string', function number$to_string () {
+    return typeof this === 'number' ? this.toString() : 'NaN'
   })
-  $export(class_, '<', function (another) {
-    return typeof another === 'number' ? this < another : false
+
+  // O and NaN are defined as empty.
+  $export(proto, 'is-empty', function number$is_empty () {
+    return this === 0 || isNaN(this)
   })
-  $export(class_, '<=', function (another) {
-    return typeof another === 'number' ? this <= another : false
+  $export(proto, 'not-empty', function number$not_empty () {
+    return this !== 0 && !isNaN(this)
+  })
+
+  // override indexer to create range object.
+  $export(proto, ':', function number$indexer (name) {
+    if (typeof name === 'string') {
+      var value = proto[name]
+      return typeof value !== 'undefined' ? value : null
+    }
+    return null
   })
 }

@@ -2,19 +2,13 @@
 
 var $export = require('../export')
 
-module.exports = function iterate ($) {
-  var type = $.Iterator
-  type.abstract = true // abstract
+module.exports = function iterate ($void) {
+  var $ = $void.$
 
-  var class_ = type.class
-  class_.next = $.Function // required, it must be a function
-  class_.value = $.Null    // required, it can be any type
-  class_.key = null        // optional
-
-  // generate a global iterate method which will always generate an empty iterator.
-  $export($, 'iterate', function (target) {
+  // generate a global iterate method which will safely generate an iterator.
+  $export($, 'iterate', function iterate (target) {
     if (Array.isArray(target)) {
-      return $.Array.class.iterate.call(target)
+      return $.Array.proto.iterate.call(target)
     }
 
     if (typeof target === 'number') {
@@ -22,17 +16,11 @@ module.exports = function iterate ($) {
     }
 
     return typeof target === 'object' && typeof target.iterate === 'function'
-      ? target.iterate() : {
+      ? target.iterate() : $.Class.create({
         value: null,
         next: function () {
           return false
-        },
-        'is-empty': function () {
-          return true
-        },
-        'not-empty': function () {
-          return false
         }
-      }
+      })
   })
 }

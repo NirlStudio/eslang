@@ -2,151 +2,85 @@
 
 var $export = require('../export')
 
-function isTypeOf () {
-  return function Function$is_type_of (value) {
-    return typeof value === 'function'
-  }
-}
-
-function equals () {
-  return function Function$equals (another) {
-    if (typeof this !== 'function' || typeof another !== 'function') {
-      return false
-    }
-    if (this === another) {
-      return true
-    }
-    if (this.$fixedArgs !== another.$fixedArgs) {
-      return false
-    }
-    var thisArgs = this.$params
-    var otherArgs = another.$params
-    if (!thisArgs || !otherArgs || thisArgs.length !== otherArgs.length) {
-      return false
-    }
-    for (var i = 0; i < thisArgs.length; i++) {
-      // only compare names, ignoring default values.
-      if (thisArgs[i][0] !== otherArgs[i][0]) {
-        return false
-      }
-    }
-    return true
-  }
-}
-
-function toCode ($) {
-  return function Function$to_code () {
-    return $.encode.function(this)
-  }
-}
-
-function toString () {
-  return function Function$to_string () {
-    return '[Function ' + (this.identityName || this.Name || '(anonymous)') + ']'
-  }
-}
-
-function functionIndexer () {
-  return function function$indexer (index, value) {
-    if (typeof index !== 'string') {
-      // query parameter
-      if (typeof index === 'number' && this.$params && index >= 0 && index < this.$params.length) {
-        return [].concat(this.$params[index]) // copy & return parameter & its default value.
-      }
-      return null
-    }
-    // get/set a property
-    switch (arguments.length) {
-      case 1:
-        value = this[index]
-        return typeof value === 'undefined' ? null : value
-      case 2:
-        return (this[index] = (typeof value === 'undefined' ? null : value))
-      default:
-        return null
-    }
-  }
-}
-
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.Function
-  // function will not be taken as an object.
-  $export(type, 'is-type-of', isTypeOf())
 
-  var class_ = type.class
-  // the equivalence of functions are determined by their parameters.
-  $export(class_, 'equals', equals())
-
-  // persistency & describing
-  $export(class_, 'to-code', toCode($))
-  $export(class_, 'to-string', toString($))
-
-  // normal functions are always taken as a non-empty entity.
-  $export(class_, 'is-empty', function () {
+  // define static type attributes
+  $export(type, 'is-type', function Function$is_type () {
+    return true
+  })
+  $export(type, 'is-type-of', function Function$is_type_of (value) {
+    return typeof value === 'function'
+  })
+  $export(type, 'super', function Function$super () {
+    return null
+  })
+  $export(type, 'get-type', function Function$get_type () {
+    return $.Class
+  })
+  $export(type, 'is-instance', function Function$is_instance () {
     return false
   })
-  $export(class_, 'not-empty', function () {
-    return true
+  $export(type, 'is-instance-of', function Function$is_instance_of (type) {
+    return false
   })
 
-  // indexer: override to implement setter.
-  $export(class_, ':', functionIndexer($))
+  var proto = type.proto
 
   // dynamically invoke a function.
-  $export.copy(class_, Function.prototype, {
+  $export.copy(proto, Function.prototype, {
     'apply': 'apply',
     'call': 'call'
   })
 
-  // retrieve function meta information (readonly).
-  $export(class_, 'is-fixed-args', function () {
-    return this.$fixedArgs === true
+  // A function can have one or more sub-functions
+  $export(proto, 'is-fixed-args', function function$is_fixed_args () {
+    return typeof this.$fixedArgs === 'boolean' ? this.$fixedArgs : false
   })
-  $export(class_, 'get-parameters', function () {
-    var names = []
-    if (Array.isArray(this.$params)) {
-      for (var i = 0; i < this.$params.length; i++) {
-        names.push(this.$params[i][0])
-      }
-    }
-    return names
+  $export(proto, 'parameters', function function$parameters () {
+    return this.$params || []
+  })
+  $export(proto, 'body', function function$body () {
+    return this.$body || null
+  })
+  $export(proto, 'enclosing', function function$enclosing () {
+    return this.$enclosing || null
   })
 
-  // access function properties.
-  $export(class_, 'get-properties', function () {
-    var names = Object.getOwnPropertyNames(this)
-    var result = []
-    for (var i = 0; i < names.length; i++) {
-      var name = names[i]
-      if (!name.startsWith('$') && !name.startsWith('__') && name !== 'length') {
-        result.push(name)
-      }
-    }
-    return result
+  // define static value attributes
+  $export(proto, 'is-type', function function$is_type () {
+    return false
   })
-  $export(class_, 'has-property', function (name) {
-    return typeof this[name] !== 'undefined'
+  $export(proto, 'is-type-of', function function$is_type_of (value) {
+    return false
   })
-  $export(class_, 'get-property', function (name) {
-    return name.startsWith('$') ? null : this[name]
-  })
-  $export(class_, 'set-property', function (name, value) {
-    if (!name.startsWith('$') && !name.startsWith('__') && name !== 'length') {
-      return (this[name] = typeof value === 'undefined' ? null : value)
-    }
+  $export(proto, 'super', function function$super () {
     return null
   })
-  $export(class_, 'remove-property', function (name) {
-    if (name.startsWith('$') || name.startsWith('__') || name === 'length') {
+  $export(proto, 'get-type', function function$get_type () {
+    return type
+  })
+  $export(proto, 'is-instance', function function$is_instance () {
+    return true
+  })
+  $export(proto, 'is-instance-of', function function$is_instance_of (func) {
+    return type === func
+  })
+
+  // persistency & describing
+  $export(proto, 'to-code', function function$to_code () {
+    return $.encode.function(this)
+  })
+  $export(proto, 'to-string', function function$to_string () {
+    return '[Function ' + (this.identityName || this.Name || '(anonymous)') + ']'
+  })
+
+  // indexer: override to implement setter.
+  $export(proto, ':', function function$indexer (name) {
+    if (typeof name !== 'string') {
       return null
     }
-    var value
-    if (Object.prototype.hasOwnProperty.call(this, name)) {
-      value = this[name]
-      delete this[name]
-    } else {
-      value = null
-    }
-    return value
+    typeof proto[name] !== 'undefined' ? proto[name] : null
   })
 }

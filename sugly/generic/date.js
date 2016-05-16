@@ -2,48 +2,6 @@
 
 var $export = require('../export')
 
-function isTypeOf () {
-  return function Date$is_type_of (value) {
-    return value instanceof Date
-  }
-}
-
-function create () {
-  return function Date$create (time) {
-    return typeof time === 'number' ? new Date(time) : new Date()
-  }
-}
-
-function equals ($) {
-  return function Date$equals (another) {
-    if (Object.is(this, another)) {
-      return true
-    }
-    if (!(this instanceof Date) || !(another instanceof Date)) {
-      return false
-    }
-    return this.getTime() === another.getTime()
-  }
-}
-
-function toCode ($) {
-  return function Date$to_code () {
-    return $.encode.date(this)
-  }
-}
-
-function now () {
-  return function Date$now () {
-    return new Date()
-  }
-}
-
-function time () {
-  return function Date$time () {
-    return typeof Date.now === 'function' ? Date.now() : new Date().getTime()
-  }
-}
-
 function ofFields () {
   return function Date$of (year, month) {
     var args
@@ -64,20 +22,28 @@ function ofFields () {
   }
 }
 
-function utc () {
-  return function Date$utc () {
-    return new Date(Date.UTC.apply(Date.UTC, arguments))
+function equals () {
+  return function date$equals (another) {
+    if (!another instanceof Date) {
+      return false
+    }
+    var time = this.getTime()
+    return typeof time === 'number' && time === another.getTime()
   }
 }
 
-function parse () {
-  return function Date$parse (str) {
-    return new Date(typeof str === 'string' ? str : 0)
+function notEquals () {
+  return function date$not_equals (another) {
+    if (!another instanceof Date) {
+      return true
+    }
+    var time = this.getTime()
+    return typeof time !== 'number' || time !== another.getTime()
   }
 }
 
 function dateIndexer ($) {
-  var resolve = $.Object.class[':']
+  var resolve = $.Object.proto[':']
   return function date$indexer (index, value) {
     // forward to default object indexer
     if (typeof index !== 'number') {
@@ -143,47 +109,52 @@ function dateIndexer ($) {
   }
 }
 
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.Date
-  // Date type is a native type, but logically inherited from managed object.
-  $export(type, 'is-type-of', isTypeOf())
+
+  // prevent inheritance since it's really a native type.
+  type.finalized = true
 
   // create a date object from a timestamp value.
-  $export(type, 'create', create())
+  $export(type, 'create', function Date$create (time) {
+    return typeof time === 'number' ? new Date(time) : new Date(0)
+  })
 
-  // get current time as a data object.
-  $export(type, 'now', now())
+  // get current time as a date object.
+  $export(type, 'now', function Date$now () {
+    return new Date()
+  })
   // get current time as its timestamp value.
-  $export(type, 'time', time())
+  $export(type, 'time', function Date$time () {
+    return typeof Date.now === 'function' ? Date.now() : new Date().getTime()
+  })
 
   // compose a date object with values of its fields
   $export(type, 'of', ofFields())
   // compose a date object with utc values of its fields
-  $export(type, 'utc', utc())
+  $export(type, 'utc', function Date$utc () {
+    return new Date(Date.UTC.apply(Date.UTC, arguments))
+  })
 
   // parse a date/time string representation to a date object.
-  $export(type, 'parse', parse())
-
-  var class_ = type.class
-  $export(class_, 'equals', equals())
-
-  // persistency
-  $export(class_, 'to-code', toCode($))
-
-  // emptiness is defined to the 0 value of timestamp.
-  $export(class_, 'is-empty', function () {
-    return this.getTime() === 0
-  })
-  $export(class_, 'not-empty', function () {
-    return this.getTime() !== 0
+  $export(type, 'parse', function Date$parse (str) {
+    return new Date(typeof str === 'string' ? str : 0)
   })
 
-  // indexer: overridding, interpret number value as field offset.
-  $export(class_, ':', dateIndexer($))
+  // Date type is a native type, but logically inherited from managed object.
+  $export(type, 'is-type-of', function Date$is_type_of (value) {
+    return value instanceof Date
+  })
+  $export(type, 'super', function Date$super () {
+    return $.Class
+  })
 
   // date/time value manipulation.
+  var proto = type.proto
+
   // TODO - to be revised & remove some unnecessary functions.
-  $export.copy(class_, Date.prototype, {
+  $export.copy(proto, Date.prototype, {
     /* Chrome, IE, Firefox */
     'getDate': 'get-day',
     'getDay': 'get-week-day',
@@ -237,87 +208,123 @@ module.exports = function ($) {
     'toUTCString': 'to-utc-string'
   })
 
+  // override combine, merge and clone functions
+  $export(proto, 'combine', function date$combine (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() + milliseconds
+    return new Date(time)
+  })
+  $export(proto, 'merge', function date$merge (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() + milliseconds
+    this.setTime(time)
+    return this
+  })
+  $export(proto, 'clone', function date$clone () {
+    return new Date(this.getTime())
+  })
+
+  // support general operators
+  $export(proto, '+', function date$opr_combine (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() + milliseconds
+    return new Date(time)
+  })
+  $export(proto, '+=', function date$opr_merge (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() + milliseconds
+    this.setTime(time)
+    return this
+  })
+  $export(proto, '-', function date$opr_substract (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() - milliseconds
+    return new Date(time)
+  })
+  $export(proto, '-=', function date$opr_deduct (milliseconds) {
+    if (typeof milliseconds !== 'number') {
+      return this
+    }
+    var time = this.getTime() - milliseconds
+    this.setTime(time)
+    return this
+  })
+
   // support ordering logic - comparable
-  $export(class_, 'compare', function (another) {
+  $export(proto, 'compare', function date$compare (another) {
     var diff = this.getTime() - another.getTime()
     return diff === 0 ? 0 : diff / Math.abs(diff)
   })
 
-  // support general operators
-  $export(class_, '+', function (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() + milliseconds
-    return new Date(time)
-  })
-  $export(class_, '+=', function (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() + milliseconds
-    this.setTime(time)
-    return this
-  })
-  $export(class_, '-', function (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() - milliseconds
-    return new Date(time)
-  })
-  $export(class_, '-=', function (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() - milliseconds
-    this.setTime(time)
-    return this
-  })
-
-  // override equivalence operators
-  $export(class_, '==', function (another) {
-    if (!another instanceof Date) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time === another.getTime()
-  })
-  $export(class_, '!=', function (another) {
-    if (!another instanceof Date) {
-      return true
-    }
-    var time = this.getTime()
-    return typeof time !== 'number' || time !== another.getTime()
-  })
-
   // support ordering operators
-  $export(class_, '>', function (another) {
+  $export(proto, '>', function date$gt (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time > another.getTime()
   })
-  $export(class_, '>=', function (another) {
+  $export(proto, '>=', function date$ge (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time >= another.getTime()
   })
-  $export(class_, '<', function (another) {
+  $export(proto, '<', function date$lt (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time < another.getTime()
   })
-  $export(class_, '<=', function (another) {
+  $export(proto, '<=', function date$le (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time <= another.getTime()
   })
+
+  // override equivalence logic
+  $export(proto, 'equals', equals())
+  $export(proto, 'not-equals', notEquals())
+
+  // define a date object's type attributes
+  $export(proto, 'is-instance-of', function object$is_instance_of (type) {
+    return type === $.Class || type === $.Date
+  })
+  $export(proto, 'get-type', function object$get_type () {
+    return $.Date
+  })
+
+  // persistency
+  $export(proto, 'to-code', function date$to_code () {
+    return $.encode.date(this)
+  })
+
+  // emptiness is defined to the 0 value of timestamp.
+  $export(proto, 'is-empty', function date$is_empty () {
+    return this.getTime() === 0
+  })
+  $export(proto, 'not-empty', function date$not_empty () {
+    return this.getTime() !== 0
+  })
+
+  // indexer: overridding, interpret number value as field offset.
+  $export(proto, ':', dateIndexer($))
+
+  // override equivalence operators
+  $export(proto, '==', equals())
+  $export(proto, '!=', notEquals())
 }

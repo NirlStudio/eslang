@@ -1,10 +1,10 @@
 # this is a piece of comment
 (print code "# ")
 (print value (+ "Hello" " world!").
-(print value (+ 100 10 1).
-(print value (- 100 10 1))
-(print value (* 100 10 1))
-(print value (/ 100 10 1))
+(print value (100 + 10 1).
+(print value (100 - 10 1))
+(print value (100 * 10 1))
+(print value (100 / 10 1))
 
 ($"log100" (` Math log 100).
 (print value (log100).
@@ -71,7 +71,7 @@
 
 
 (let sumWithBase (= base
-  (= (@ base: (* base 2)) > (x y)
+  (= (@ base: (base * 2)) > (x y)
     (+ base x y).
 ($"sum" ($sumWithBase 10000).
 (print value ($sum 10 1).

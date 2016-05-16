@@ -2,10 +2,10 @@
 (let r1 (operator export opr1 (+ %0 %1),
 
 # re-declaration will happen in module scope.
-(let r2 (operator opr1 (- %0 %1),
+(let r2 (operator opr1 (%0 - %1),
 
 # further re-declaration will return false.
-(let r21 (operator opr1 (* %0 %1),
+(let r21 (operator opr1 (%0 * %1),
 
 (let r3 (operator),
 (let r4 (operator 123),

@@ -1,14 +1,11 @@
 'use strict'
 
-module.exports = function sfunction ($) {
-  var set = $.$set
-  var beval = $.$beval
-  var Signal = $.$Signal
+var $export = require('../export')
 
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
-  var SymbolLambdaShort = symbolValueOf('>')
-  var SymbolRepeat = symbolValueOf('*')
+module.exports = function function_ ($void) {
+  var set = $void.set
+  var Signal = $void.Signal
+  var Symbol$ = $void.Symbol
 
   // param or (param ...) or ((param value) ...)
   function formatParameters (params) {
@@ -26,7 +23,7 @@ module.exports = function sfunction ($) {
     for (var i = 0; i < params.length; i++) {
       var p = params[i]
       if (p instanceof Symbol$) {
-        if (p === SymbolRepeat) {
+        if (p.key === '*') {
           formatted[0] = false // variant arguments
           break // the repeat indicator is always the last one
         }
@@ -44,11 +41,13 @@ module.exports = function sfunction ($) {
     return formatted
   }
 
-  $.$functionIn = function $functionIn ($) {
-    var createSpace = $.$createSpace
+  $void.functionIn = function $functionIn (space) {
+    var createSpace = $void.createSpace // createSpace depending on functionIn.
+    var evaluate = $void.evaluate
+    var $ = space.$
 
     // body must be a list of clauses
-    return function $function (params, body) {
+    $export($, 'function', function $function (params, body) {
       if (!Array.isArray(body) || body.length < 1) {
         return null // no function body
       }
@@ -56,25 +55,34 @@ module.exports = function sfunction ($) {
       params = formatParameters(params)
       var fixedArgs = params.shift()
 
-      var f = function $F () {
-        var args = Array.prototype.slice.apply(arguments)
+      function $F () {
         // new namespace
-        var ns = createSpace($)
+        var scope = createSpace(space)
+        var ns = scope.$
         ns['this'] = this
         ns['self'] = $F
-        if (!fixedArgs) {
-          ns['argc'] = args.length
-          ns['argv'] = args
+        var argc = ns['argc'] = arguments.length
+        if (fixedArgs) {
+          ns['argv'] = null
+        } else {
+          ns['argv'] = Array.prototype.slice.apply(arguments)
         }
 
         // binding arguments with default values
-        for (var i = 0; i < params.length; i++) {
+        var i = 0
+        var length = params.length
+        for (; i < length; i++) {
           var p = params[i]
-          set(ns, p[0], args.length > i ? args[i] : p[1])
+          ns[p[0].key] = argc > i ? arguments[i] : p[1]
         }
 
         try {
-          return beval(ns, body)
+          var result = null
+          length = body.length
+          for (i = 0; i < length; i++) {
+            result = evaluate(body[i], scope)
+          }
+          return result
         } catch (signal) {
           if (signal instanceof Signal && signal.type === 'return') {
             return signal.value
@@ -83,75 +91,78 @@ module.exports = function sfunction ($) {
         }
       }
 
-      f.$fixedArgs = fixedArgs
-      f.$params = params
-      f.$body = body
-      return f
-    }
-  }
+      $F.$fixedArgs = fixedArgs
+      $F.$params = params
+      $F.$body = body
+      return $F
+    })
 
-  function createClosure ($, enclosing, params, fixedArgs, body) {
-    var createSpace = $.$createSpace
-
-    function $C () {
-      var args = Array.prototype.slice.apply(arguments)
-      // new namespace
-      var ns = createSpace($)
-      ns['this'] = this
-      ns['self'] = $C
-      Object.assign(ns, enclosing)
-
-      // variant arguments
-      if (!fixedArgs) {
-        ns['argc'] = args.length
-        ns['argv'] = args
-      }
-
-      // aguments or parameter default values can overrride enclosed values.
-      for (var i = 0; i < params.length; i++) {
-        var p = params[i]
-        set(ns, p[0], args.length > i ? args[i] : p[1])
-      }
-
-      try {
-        return beval(ns, body)
-      } catch (signal) {
-        if (signal instanceof Signal && signal.type === 'return') {
-          return signal.value
+    function createClosure (enclosing, params, fixedArgs, body) {
+      function $C () {
+        // new namespace
+        var scope = createSpace($)
+        var ns = scope.$
+        ns['this'] = this
+        ns['self'] = $C
+        Object.assign(ns, enclosing)
+        var argc = ns['argc'] = arguments.length
+        if (fixedArgs) {
+        } else {
+          // variant arguments
+          ns['argv'] = Array.prototype.slice.apply(arguments)
         }
-        throw signal
+
+        // aguments or parameter default values can overrride enclosed values.
+        var i = 0
+        var length = params.length
+        for (; i < length; i++) {
+          var p = params[i]
+          ns[p[0]] = argc > i ? arguments[i] : p[1]
+        }
+
+        try {
+          var result = null
+          length = body.length
+          for (i = 0; i < length; i++) {
+            result = evaluate(body[i], scope)
+          }
+          return result
+        } catch (signal) {
+          if (signal instanceof Signal && signal.type === 'return') {
+            return signal.value
+          }
+          throw signal
+        }
       }
+
+      $C.$enclosing = enclosing
+      $C.$fixedArgs = fixedArgs
+      $C.$params = params
+      $C.$body = body
+      return $C
     }
 
-    $C.$enclosing = enclosing
-    $C.$fixedArgs = fixedArgs
-    $C.$params = params
-    $C.$body = body
-    return $C
-  }
+    function createLambda (enclosing, params, body) {
+      function $L () {
+        var args = Array.prototype.slice.apply(arguments)
 
-  function createLambda ($, enclosing, params, body) {
-    function $L () {
-      var args = Array.prototype.slice.apply(arguments)
+        enclosing = Object.assign({}, enclosing)
+        for (var i = 0; i < params.length; i++) {
+          var p = params[i]
+          set(enclosing, p[0], args.length > i ? args[i] : p[1])
+        }
 
-      enclosing = Object.assign({}, enclosing)
-      for (var i = 0; i < params.length; i++) {
-        var p = params[i]
-        set(enclosing, p[0], args.length > i ? args[i] : p[1])
+        return space.$.lambda(enclosing, body[1], body.slice(2))
       }
 
-      return $.lambda(enclosing, body[1], body.slice(2))
+      $L.$enclosing = enclosing
+      $L.$fixedArgs = true
+      $L.$params = params
+      $L.$body = body
+      return $L
     }
 
-    $L.$enclosing = enclosing
-    $L.$fixedArgs = true
-    $L.$params = params
-    $L.$body = body
-    return $L
-  }
-
-  $.$lambdaIn = function $lambdaIn ($) {
-    return function $lambda (enclosing, params, body) {
+    $export($, 'lambda', function $lambda (enclosing, params, body) {
       if (!Array.isArray(body) || body.length < 1) {
         return null // no function body
       }
@@ -163,11 +174,12 @@ module.exports = function sfunction ($) {
       params = formatParameters(params)
       var fixedArgs = params.shift()
 
-      if (body[0] === SymbolLambdaShort) {
-        return createLambda($, enclosing, params, body)
+      var first = body[0]
+      if (first instanceof Symbol$ && first.key === '>') {
+        return createLambda(enclosing, params, body)
       } else {
-        return createClosure($, enclosing, params, fixedArgs, body)
+        return createClosure(enclosing, params, fixedArgs, body)
       }
-    }
+    })
   }
 }

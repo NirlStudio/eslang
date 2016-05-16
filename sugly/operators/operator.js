@@ -1,11 +1,9 @@
 'use strict'
 
-module.exports = function operators$operator ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
-  var SymbolExport = symbolValueOf('export')
+module.exports = function operators$operator ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+  var Symbol$ = $void.Symbol
 
   function populateOperatorCtx (ctx, operands) {
     var oprdc = operands.length
@@ -18,8 +16,8 @@ module.exports = function operators$operator ($) {
 
   // app defined operator: (operator name clause ...)
   // in the same space, an operator can only be defined once.
-  $operators['operator'] = function ($, impl) {
-    if ($.moduleSpaceIdentifier !== $.spaceIdentifier) {
+  operators['operator'] = function ($, impl) {
+    if (!$.moduleIdentifier) {
       return null // operator can only be declared in module scope
     }
 
@@ -33,8 +31,9 @@ module.exports = function operators$operator ($) {
       return null // the name must be a symbol.
     }
 
-    var exporting, offset
-    if (name === SymbolExport) {
+    var key = name.key
+    var operators, offset
+    if (key === 'export') {
       if (length < 4) {
         return null // require name & body
       }
@@ -42,43 +41,32 @@ module.exports = function operators$operator ($) {
       if (!(name instanceof Symbol$)) {
         return null
       }
-      exporting = true
+      key = name.key
+      operators = $.sealing || !$.parent ? $.operators : $.parent.operators
       offset = 3
     } else {
-      exporting = false
+      operators = $.operators
       offset = 2
     }
 
-    var key = name.key
-    var existed = $.$operators.hasOwnProperty(key)
-    if (exporting) {
-      if (existed) {
-        return false
-      }
-    } else {
-      // trying to define a new operator.
-      if (!Object.prototype.hasOwnProperty.call($, '$operators')) {
-        // create a local operator table.
-        $.$operators = Object.assign({}, $.$operators)
-      } else if (existed) {
-        return false // cannot re-create an operator in the same space.
-      }
+    if (operators.hasOwnProperty(key)) {
+      return false // an operator can only be defined once.
     }
 
     var statements = impl.slice(offset)
-    $.$operators[key] = function $OPR (ctx, clause) {
+    operators[key] = function $operator (ctx, clause) {
       var oprds = []
       for (var i = 1; i < clause.length; i++) {
-        oprds.push(seval(clause[i], ctx))
+        oprds.push(evaluate(clause[i], ctx))
       }
 
-      var oprStack = ctx.$OprStack
+      var oprStack = ctx.oprStack
       oprStack.push(oprds)
       populateOperatorCtx(ctx, oprds)
       var value = null
       try {
         for (var j = 0; j < statements.length; j++) {
-          value = seval(statements[j], ctx)
+          value = evaluate(statements[j], ctx)
         }
         oprStack.pop()
         populateOperatorCtx(ctx, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])

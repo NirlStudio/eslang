@@ -1,14 +1,10 @@
 'use strict'
 
-module.exports = function assign ($) {
+module.exports = function assign ($void) {
   var ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
 
-  $.$assign = function $assign ($, sym, value) {
+  $void.assign = function $assign ($, sym, value) {
     var key = typeof sym === 'string' ? sym : sym.key
-    if (key.startsWith('$') || key.startsWith('__')) {
-      return null
-    }
-
     if (ownsProperty($, key) || typeof $[key] === 'undefined') {
       $[key] = value
     } else {

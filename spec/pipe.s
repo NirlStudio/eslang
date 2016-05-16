@@ -1,5 +1,5 @@
 # prepare data
-(let step1 (= (x) (* x x).
+(let step1 (= (x) (x * x).
 (let step2 (= (count)
   (let list (@),
   (let i 1)

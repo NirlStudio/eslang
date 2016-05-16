@@ -2,24 +2,6 @@
 
 var $export = require('../export')
 
-function isTypeOf () {
-  return function Bool$is_type_of (value) {
-    return value === true || value === false
-  }
-}
-
-function valueOf () {
-  return function Bool$value_of (input) {
-    return typeof input !== 'undefined' && input !== null && input !== false && input !== 0
-  }
-}
-
-function toCode () {
-  return function Bool$to_code () {
-    return this ? 'true' : 'false'
-  }
-}
-
 function boolAnd (value_of) {
   return function Bool$and () {
     var length = arguments.length
@@ -52,68 +34,110 @@ function boolOr (value_of) {
   }
 }
 
-module.exports = function ($) {
-  // Bool is the type *object* of true and false.
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.Bool
-  $export(type, 'is-type-of', isTypeOf())
 
   // evaluation & conversion logic
-  var value_of = $export(type, 'value-of', valueOf())
+  var value_of = $export(type, 'value-of', function Bool$value_of (input) {
+    return typeof input !== 'undefined' && input !== null && input !== 0 && input !== false
+  })
 
   // static boolean logic operations
   var and = $export(type, 'and', boolAnd(value_of))
   var or = $export(type, 'or', boolOr(value_of))
-  $export(type, 'not', function (value) {
+  $export(type, 'not', function Bool$not (value) {
     return typeof value === 'boolean' ? !value : !value_of(value)
   })
 
-  // the virtual class of boolean type
-  var class_ = type.class
-
-  // persistency & description
-  $export(class_, 'to-code', toCode())
-  $export(class_, 'to-string', toCode())
-
-  // emptiness
-  $export(class_, 'is-empty', function () {
-    return !this
+  // define static type attributes
+  $export(type, 'is-type', function Bool$is_type () {
+    return true
   })
-  $export(class_, 'not-empty', function () {
-    return this
+  $export(type, 'is-type-of', function Bool$is_type_of (value) {
+    return typeof value === 'boolean'
   })
-
-  // indexer: general & primary predicate, readonly.
-  $export(class_, ':', function (name) {
-    if (typeof name === 'string') {
-      var value = class_[name]
-      return typeof value !== 'undefined' ? value : null
-    }
+  $export(type, 'super', function Bool$super () {
     return null
   })
+  $export(type, 'get-type', function Bool$get_type () {
+    return $.Class
+  })
+  $export(type, 'is-instance', function Bool$is_instance () {
+    return false
+  })
+  $export(type, 'is-instance-of', function Bool$is_instance_of (type) {
+    return false
+  })
+
+  // the virtual class of boolean type
+  var proto = type.proto
 
   // function form logical operations
-  $export(class_, 'and', function (value) {
+  $export(proto, 'and', function bool$and (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
       : (typeof value === 'undefined' ? true : value_of(value)))
   })
-  $export(class_, 'or', function (value) {
+  $export(proto, 'or', function bool$or (value) {
     return this || (arguments.length > 1 ? or.apply(null, arguments)
       : (typeof value === 'undefined' ? false : value_of(value)))
   })
-  $export(class_, 'not', function () {
+  $export(proto, 'not', function bool$not () {
     return !this
   })
 
   // operator form logical operations
-  $export(class_, '&&', function (value) {
+  $export(proto, '&&', function bool$opr_and (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
       : (typeof value === 'undefined' ? true : value_of(value)))
   })
-  $export(class_, '||', function (value) {
+  $export(proto, '||', function bool$opr_or (value) {
     return this || (arguments.length > 1 ? or.apply(null, arguments)
       : (typeof value === 'undefined' ? false : value_of(value)))
   })
-  $export(class_, '!', function () {
+  $export(proto, '!', function bool$opr_not () {
     return !this
+  })
+
+  // define static value attributes
+  $export(proto, 'is-type', function bool$is_type () {
+    return false
+  })
+  $export(proto, 'is-type-of', function bool$is_type_of (value) {
+    return false
+  })
+  $export(proto, 'super', function bool$super () {
+    return null
+  })
+  $export(proto, 'get-type', function bool$get_type () {
+    return type
+  })
+  $export(proto, 'is-instance', function bool$is_instance () {
+    return true
+  })
+  $export(proto, 'is-instance-of', function bool$is_instance_of (bool) {
+    return type === bool
+  })
+
+  // persistency & description
+  $export(proto, 'to-code', function bool$to_code () {
+    return this ? 'true' : 'false'
+  })
+  $export(proto, 'to-string', function bool$to_string () {
+    return this ? 'true' : 'false'
+  })
+
+  // emptiness - false is the empty value
+  $export(proto, 'is-empty', function bool$is_empty () {
+    return !this
+  })
+  $export(proto, 'not-empty', function bool$not_empty () {
+    return this
+  })
+
+  // support native boolean values
+  $export(proto, ':', function entity$indexer (name) {
+    return typeof name !== 'string' ? null
+      : (typeof proto[name] !== 'undefined' ? proto[name] : null)
   })
 }

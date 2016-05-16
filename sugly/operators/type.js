@@ -1,39 +1,30 @@
 'use strict'
 
-module.exports = function operators$type ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function operators$type ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+  var Symbol$ = $void.Symbol
 
-  var symbolValueOf = $.Symbol['value-of']
-  var SymbolLike = symbolValueOf('like')
-
-  $operators['is'] = function ($, clause) {
+  operators['is'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
-      return true
+      return true // null is null
     }
 
-    var left = clause[1]
-    if (left === SymbolLike) {
-      return false // (is like ...) is invalid
-    }
-    left = seval(left, $)
+    var left = evaluate(clause[1], $)
     if (length < 3) {
       return left === null
     }
 
-    if (left && typeof left.hasOwnProperty !== 'function') {
-      return false
-    }
-
     var right = clause[2]
-    if (right !== SymbolLike) {
-      return Object.is(left, seval(right, $))
+    if (right.key !== 'like' || !(right instanceof Symbol$)) {
+      // to be revised.
+      right = evaluate(right, $)
+      return left instanceof Symbol$ && right ? left.key === right.key : Object.is(left, right)
     }
 
     for (var i = 3; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (value === null || Object.is(left, value)) {
         continue
       } else if (typeof left !== typeof value) {
@@ -51,13 +42,13 @@ module.exports = function operators$type ($) {
   }
 
   // typeof: query base type name, test a value, check object's prototype chain
-  $operators['typeof'] = function ($, clause) {
+  operators['typeof'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return 'null'
     }
 
-    var value = seval(clause[1], $)
+    var value = evaluate(clause[1], $)
     if (length < 3) {
       if (value === null) {
         return 'null'
@@ -80,7 +71,7 @@ module.exports = function operators$type ($) {
       return type === 'boolean' ? 'bool' : type
     }
 
-    var expected = seval(clause[2], $)
+    var expected = evaluate(clause[2], $)
     if (typeof expected === 'string') {
       switch (expected) {
         case 'null':
@@ -113,15 +104,15 @@ module.exports = function operators$type ($) {
   }
 
   // generic type operators being identical with the function version.
-  $operators['bool'] = function ($, clause) {
-    return $.bool(clause.length < 2 ? undefined : seval(clause[1], $))
+  operators['bool'] = function ($, clause) {
+    return $.bool(clause.length < 2 ? undefined : evaluate(clause[1], $))
   }
 
-  $operators['number'] = function ($, clause) {
-    return clause.length < 2 ? 0 : $.number(seval(clause[1], $))
+  operators['number'] = function ($, clause) {
+    return clause.length < 2 ? 0 : $.number(evaluate(clause[1], $))
   }
 
-  $operators['string'] = function ($, clause) {
+  operators['string'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return ''
@@ -129,20 +120,20 @@ module.exports = function operators$type ($) {
 
     var values = []
     for (var i = 1; i < length; i++) {
-      values.push(seval(clause[i], $))
+      values.push(evaluate(clause[i], $))
     }
     return $.string.apply($, values)
   }
 
-  $operators['symbol'] = function ($, clause) {
-    return clause.length < 2 ? null : $.symbol(seval(clause[1], $))
+  operators['symbol'] = function ($, clause) {
+    return clause.length < 2 ? null : $.symbol(evaluate(clause[1], $))
   }
 
-  $operators['date'] = function ($, clause) {
+  operators['date'] = function ($, clause) {
     var length = clause.length
     var args = []
     for (var i = 1; i < length; i++) {
-      args.push(seval(clause[i], $))
+      args.push(evaluate(clause[i], $))
     }
     return $.date.apply(null, args)
   }

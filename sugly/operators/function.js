@@ -1,14 +1,14 @@
 'use strict'
 
-module.exports = function operators$function ($) {
-  var $operators = $.$operators
-  var set = $.$set
-  var resolve = $.$resolve
-  var seval = $.$eval
-  var createSignalOf = $.$createSignalOf
+module.exports = function operators$function ($void) {
+  var operators = $void.operators
+  var set = $void.set
+  var resolve = $void.resolve
+  var evaluate = $void.evaluate
+  var signalOf = $void.signalOf
 
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
+  var Symbol$ = $void.Symbol
+  var symbolValueOf = $void.$.Symbol['value-of']
 
   var SymbolDerive = symbolValueOf('>')
   var SymbolLambdaShort = SymbolDerive
@@ -34,7 +34,7 @@ module.exports = function operators$function ($) {
     // enclosing context values.
     if (symbols[0] === SymbolObject) {
       // it should be an object expression: (@ prop: value ...)
-      var obj = seval(symbols, $)
+      var obj = evaluate(symbols, $)
       if (typeof obj === 'object' && obj !== null) {
         enclosing = obj
       }
@@ -51,7 +51,7 @@ module.exports = function operators$function ($) {
     return $.lambda(enclosing, params, body)
   }
 
-  $operators['='] = function ($, clause) {
+  operators['='] = function ($, clause) {
     if (clause.length < 3) {
       return null
     }
@@ -77,11 +77,11 @@ module.exports = function operators$function ($) {
   }
 
   // operator function and closure are more readable aliases of '='
-  $operators['function'] = $operators['=']
-  $operators['closure'] = $operators['=']
+  operators['function'] = operators['=']
+  operators['closure'] = operators['=']
 
   // (=> params body)
-  $operators['=>'] = function ($, clause) {
+  operators['=>'] = function ($, clause) {
     if (clause.length < 3) {
       return null
     }
@@ -89,12 +89,12 @@ module.exports = function operators$function ($) {
   }
 
   // operator lambda is a more readable version of '=>'
-  $operators['lambda'] = $operators['=>']
+  operators['lambda'] = operators['=>']
 
   // leave function or module.
-  $operators['return'] = createSignalOf('return')
+  operators['return'] = signalOf('return')
   // leave a module or an event callback
-  $operators['exit'] = createSignalOf('exit')
+  operators['exit'] = signalOf('exit')
   // request to quit the whole application.
-  $operators['halt'] = createSignalOf('halt')
+  operators['halt'] = signalOf('halt')
 }

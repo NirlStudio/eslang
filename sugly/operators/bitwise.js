@@ -1,11 +1,11 @@
 'use strict'
 
-module.exports = function operators$bitwise ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
+module.exports = function operators$bitwise ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
 
-  $operators['~'] = function ($, clause) {
+  operators['~'] = function ($, clause) {
     var length = clause.length
-    return length > 1 ? ~seval(clause[1], $) : -1 // !0
+    return length > 1 ? ~evaluate(clause[1], $) : ~0
   }
 }

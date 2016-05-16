@@ -3,17 +3,22 @@
 var $export = require('../export')
 
 module.exports = function ($) {
-  var $Object = $.Object
+  var Class = $.Class
 
-  var iterator = $export($Object, 'Iterator', $.Iterator.derive({
-    derive: null  // prevent inheritence
-  }, {
+  var iterator = $export(Class, 'Iterator', Class.new({}, {
     _object: null,
     _fields: [],
     _index: -1,
-
     key: null,
     value: null,
+
+    constructor: function Object$Iterator$constructor (obj) {
+      if (typeof obj !== 'object') {
+        obj = {}
+      }
+      this._object = obj
+      this._fields = Object.getOwnPropertyNames(obj)
+    },
 
     next: function Object$Iterator$next () {
       this._index += 1
@@ -25,18 +30,9 @@ module.exports = function ($) {
       this.value = this._object[this.key]
       return true
     }
-  }))
-
-  // prevent direct invocation.
-  var create = iterator.create.bind(iterator)
-  iterator.create = null
-
-  var $Class = $Object.class
-  var isObject = Object.prototype.isPrototypeOf.bind($Class)
-  $export($Class, 'iterate', function () {
-    return create(isObject(this) ? {
-      _object: this,
-      _fields: this['get-fields']()
-    } : null)
+  })
+)
+  $export(Class.proto, 'iterate', function () {
+    return iterator.create(this)
   })
 }

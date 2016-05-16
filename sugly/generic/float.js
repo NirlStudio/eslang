@@ -3,7 +3,7 @@
 var $export = require('../export')
 
 function valueOf () {
-  return function Int$value_of (input) {
+  return function Float$value_of (input) {
     if (typeof input === 'string') {
       var value = parseFloat(input)
       return isNaN(value) ? 0.0 : value
@@ -15,29 +15,34 @@ function valueOf () {
   }
 }
 
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.Float
+
   // override to only accept string, null and number itself.
   $export(type, 'value-of', valueOf())
 
-  var class_ = type.class
-  // indexer: general & primary predicate, readonly.
-  $export(class_, ':', function (name) {
+  // super type is fixed to Number
+  $export(type, 'super', function Float$super () {
+    return $.Number
+  })
+
+  var proto = type.proto
+
+  // define a float value's type attributes
+  $export(proto, 'get-type', function float$get_type () {
+    return type
+  })
+  $export(proto, 'is-instance-of', function float$is_instance_of (float) {
+    return type === float || float === $.Number
+  })
+
+  // override indexer to expose functions
+  $export(proto, ':', function float$indexer (name) {
     if (typeof name === 'string') {
-      var value = class_[name]
+      var value = proto[name]
       return typeof value !== 'undefined' ? value : null
     }
     return null
-  })
-
-  // support common math operations
-  $export(class_, 'ceil', function () {
-    return Math.ceil(this)
-  })
-  $export(class_, 'floor', function () {
-    return Math.floor(this)
-  })
-  $export(class_, 'round', function () {
-    return Math.round(this)
   })
 }

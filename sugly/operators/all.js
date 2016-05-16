@@ -1,18 +1,18 @@
 'use strict'
 
-module.exports = function operators ($) {
+module.exports = function operators ($void) {
   // export all operators
-  $.$operators = {}
-  require('./quote')($)
-  require('./assignment')($)
-  require('./object')($)
-  require('./function')($)
-  require('./type')($)
-  require('./control')($)
-  require('./pattern')($)
-  require('./operator')($)
-  require('./general')($)
-  require('./arithmetic')($)
-  require('./bitwise')($)
-  require('./logical')($)
+  $void.operators = {}
+  require('./quote')($void)
+  require('./assignment')($void)
+  require('./object')($void)
+  require('./function')($void)
+  require('./type')($void)
+  require('./control')($void)
+  require('./pattern')($void)
+  require('./operator')($void)
+  require('./general')($void)
+  require('./arithmetic')($void)
+  require('./bitwise')($void)
+  require('./logical')($void)
 }

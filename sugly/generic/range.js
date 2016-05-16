@@ -1,13 +1,14 @@
 'use strict'
 
-var $export = require('../export')
+module.exports = function ($void) {
+  var $ = $void.$
+  var proto = $.Range.proto
 
-module.exports = function ($) {
-  var type = $.Range
-  type.derive = null // prevent further inheritence
+  proto.begin = 0
+  proto.end = 0
+  proto.step = 1
 
-  var create = type.create
-  $export(type, 'create', function (begin, end, step) {
+  proto.constructor = function (begin, end, step) {
     if (typeof begin !== 'number') {
       begin = 0
     }
@@ -18,17 +19,10 @@ module.exports = function ($) {
     if (typeof step !== 'number' || step === 0) {
       step = end >= begin ? 1 : -1
     }
-    return create.call(type, {
-      begin: begin,
-      end: end,
-      step: step
-    })
-  })
-
-  var class_ = type.class
-  class_.begin = 0
-  class_.end = 0
-  class_.step = 1
+    this.begin = begin
+    this.end = end
+    this.step = step
+  }
 
   require('./range-iterator')($)
 }

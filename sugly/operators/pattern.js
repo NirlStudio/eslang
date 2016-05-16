@@ -1,10 +1,11 @@
 'use strict'
 
-module.exports = function operators$pattern ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
+module.exports = function operators$pattern ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
+
+  var Symbol$ = $void.$.SymbolConstructor
+  var symbolValueOf = $void.$.Symbol['value-of']
 
   var SymbolContext = symbolValueOf('$')
   var SymbolQuote = symbolValueOf('`')
@@ -15,12 +16,12 @@ module.exports = function operators$pattern ($) {
   var SymbolNext = symbolValueOf('next')
 
   // (-> clause sub-clause1 sub-clause2 ...).
-  $operators['->'] = function ($, clause) {
+  operators['->'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return null
     }
-    var subject = seval(clause[1], $)
+    var subject = evaluate(clause[1], $)
     for (var i = 2; subject !== null && i < length; i++) {
       var next = clause[i]
       if (Array.isArray(subject) || subject instanceof Symbol$) {
@@ -32,19 +33,19 @@ module.exports = function operators$pattern ($) {
       } else {
         stmt.push(next)
       }
-      subject = seval(stmt, $)
+      subject = evaluate(stmt, $)
     }
     return subject
   }
-  $operators['flow'] = $operators['->']
+  operators['flow'] = operators['->']
 
   // (| clause1 clause2 ... )
-  $operators['|'] = function ($, clause) {
+  operators['|'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return null
     }
-    var output = seval(clause[1], $)
+    var output = evaluate(clause[1], $)
     for (var i = 2; i < length; i++) {
       var next = clause[i]
       var stmt = Array.isArray(next) ? next.slice(0) : [next]
@@ -60,20 +61,20 @@ module.exports = function operators$pattern ($) {
       } else {
         stmt.push(output)
       }
-      output = seval(stmt, $)
+      output = evaluate(stmt, $)
     }
     return output
   }
-  $operators['pipe'] = $operators['|']
+  operators['pipe'] = operators['|']
 
   // (? entry cb1 cb2 ...) - reversed pipe
-  $operators['?'] = function ($, clause) {
+  operators['?'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return null
     }
     var offset = length - 1
-    var output = seval(clause[offset], $)
+    var output = evaluate(clause[offset], $)
     for (offset -= 1; offset > 0; offset--) {
       var pre = clause[offset]
       var stmt = Array.isArray(pre) ? pre.slice(0) : [pre]
@@ -94,9 +95,9 @@ module.exports = function operators$pattern ($) {
       } else {
         stmt.push(output)
       }
-      output = seval(stmt, $)
+      output = evaluate(stmt, $)
     }
     return output
   }
-  $operators['premise'] = $operators['?']
+  operators['premise'] = operators['?']
 }

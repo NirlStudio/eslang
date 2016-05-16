@@ -4,7 +4,7 @@
     (let i 10)
     (let result (for (i > 0) (-- i)
       (++ counter)
-      (* counter 2)
+      (counter * 2)
     ),
     (assert 10 (` counter),
     (assert 0 (` i),
@@ -15,7 +15,7 @@
     (let result (for (i > 0) (-- i)
       (++ counter)
       (let j 0)
-      (for (j < 101) (++ j) (* j j),
+      (for (j < 101) (++ j) (j * j),
     ),
     (assert 10 (` counter),
     (assert 0 (` i),
@@ -41,7 +41,7 @@
     (let counter 0)
     (let i 10)
     (let result (for (i > 0) (-- i)
-      (if (i < 5) (break (* i i),
+      (if (i < 5) (break (i * i),
       (++ counter)
     ),
     (assert 6 (` counter),

@@ -162,8 +162,8 @@ function checkSugly ($) {
     'is', 'typeof', 'bool', 'number', 'string', 'symbol', 'date',
     'if', 'for', 'while', 'break', 'continue',
     '->', 'flow', '|', 'pipe', '?', 'premise', 'operator',
-    'concat', 'combine', 'mixin', '+', '+=',
-    '-', '-=', '/', '/=', '*', '*=', '++', '--', '&&', '||', '!'
+    'concat', '+', '+=',
+    '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
   ])
 
   checkFunctions($, '[Sugly / function] ', [

@@ -166,10 +166,10 @@
 
 ($define "(encode program clauses)" (= ()
   ($should "an array" "be encoded as a list of clauses" (= ()
-    (assert "+ x y" (` ($encode (` (+ x y),
-    (assert "(+ x y)" (` ($encode (` ((+ x y),
-    (assert "(+ x y)\n(- x y)" (` ($encode (` ((+ x y) (- x y),
-    (assert "(+ x y\n  (- x y)." (` ($encode (` ((+ x y (- x y),
+    (assert "x + y" (` ($encode (` (x + y),
+    (assert "(x + y)" (` ($encode (` ((x + y),
+    (assert "(x + y)\n(x - y)" (` ($encode (` ((x + y) (x - y),
+    (assert "(x + y\n  (x - y)." (` ($encode (` ((x + y (x - y),
 
     (assert "()" ($encode),
     (assert "()" (` ($encode null),

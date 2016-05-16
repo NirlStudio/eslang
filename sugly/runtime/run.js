@@ -1,21 +1,25 @@
 'use strict'
 
-module.exports = function run ($) {
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
-  var isSpace = Object.prototype.isPrototypeOf.bind($)
+var $export = require('../export')
 
-  $.$evalIn = function $evalIn ($) {
-    return function $eval (expr) {
-      return seval(expr, isSpace(this) ? this : $)
-    }
-  }
+module.exports = function run ($void) {
+  var Symbol$ = $void.Symbol
+  var load = $void.load
+  var evaluate = $void.evaluate
+  var execute = $void.execute
 
-  $.$loadIn = function $loadIn ($) {
-    var dir = $.$dir
-    var load = $.$load
+  $void.runIn = function runIn (space) {
+    var dir = space.dir
+    var runInDirs = [null, dir]
+    var modules = space.modules
+    var $ = space.$
+    var isSpace = Object.prototype.isPrototypeOf.bind($)
 
-    return function $load (source) {
+    $export($, 'eval', function $eval (expr) {
+      return evaluate(expr, isSpace(this) ? this : $)
+    })
+
+    $export($, 'load', function $load (source) {
       if (typeof source !== 'string') {
         return null
       }
@@ -24,35 +28,16 @@ module.exports = function run ($) {
       }
       var uri = load.resolve(source.startsWith('.') ? dir : [dir], source)
       return uri ? load(uri) : null
-    }
-  }
+    })
 
-  $.$execIn = function $execIn ($) {
-    var dir = $.$dir
-    var exec = $.$exec
-
-    return function $exec (program, source) {
-      if (typeof program === 'string' || Array.isArray(program)) {
-        if (typeof source !== 'string') {
-          source = ''
-        }
-        return exec(program, '?' + source, dir)
+    $export($, 'exec', function $exec (program, source) {
+      if (typeof source !== 'string') {
+        source = ''
       }
-      // execute a function as module: to catch exit signal.
-      if (typeof program === 'function') {
-        return exec.apply($, arguments)
-      }
-      return null
-    }
-  }
+      return execute(program, '?' + source, dir)
+    })
 
-  $.$runIn = function $runIn ($) {
-    var dir = $.$dir
-    var dirs = [null, dir]
-    var load = $.$load
-    var exec = $.$exec
-
-    return function $run (source) {
+    $export($, 'run', function $run (source) {
       if (typeof source !== 'string') {
         return null
       }
@@ -60,62 +45,56 @@ module.exports = function run ($) {
         source += '.s'
       }
 
-      var uri = load.resolve(source.startsWith('.') ? [] : dirs, source)
+      var uri = load.resolve(source.startsWith('.') ? [] : runInDirs, source)
       if (!uri) {
         return null
       }
 
       var path = load.dir(uri)
-      return exec(load(uri), uri, path)
+      return execute(load(uri), uri, path)
+    })
+
+    function modulize (mod, source, action) {
+      if (typeof mod === 'undefined' || mod === null) {
+        return null
+      }
+
+      if (mod instanceof Symbol$) {
+        mod = {value: mod}
+      } else if (typeof mod !== 'function' && typeof mod !== 'object') {
+        mod = {value: mod}
+      }
+
+      mod.sourceUri = source
+      if (!mod.timestamp) {
+        mod.timestamp = Date.now()
+      }
+
+      var code = '($' + action + ' ' + $.encode.string(source) + ')'
+      mod['to-code'] = function () {
+        return code
+      }
+
+      var str = '[module] ' + source
+      mod['to-string'] = function () {
+        return str
+      }
+      return mod
     }
-  }
 
-  function modulize (mod, source, action) {
-    if (typeof mod === 'undefined' || mod === null) {
-      return null
+    function importJSModule ($, name) {
+      try {
+        return name.startsWith('.') ? require(dir + '/' + name) : require(name)
+      } catch (err) {
+        $.print.warn({
+          form: '$/sugly/runtime/run:importJSModule',
+          message: 'failed to load JS moudle: ' + name
+        })
+        return null
+      }
     }
 
-    if (mod instanceof Symbol$) {
-      mod = {value: mod}
-    } else if (typeof mod !== 'function' && typeof mod !== 'object') {
-      mod = {value: mod}
-    }
-
-    mod.sourceUri = source
-    if (!mod.timestamp) {
-      mod.timestamp = Date.now()
-    }
-
-    var code = '($' + action + ' ' + $.encode.string(source) + ')'
-    mod['to-code'] = function () {
-      return code
-    }
-
-    var str = '[module] ' + source
-    mod['to-string'] = function () {
-      return str
-    }
-    return mod
-  }
-
-  function importJSModule ($, name) {
-    try {
-      return name.startsWith('.') ? require($.$dir + '/' + name) : require(name)
-    } catch (err) {
-      $.print.warn({
-        form: '$/sugly/runtime/run:importJSModule',
-        message: 'failed to load JS moudle: ' + name
-      })
-      return null
-    }
-  }
-
-  $.$importIn = function $importIn ($) {
-    var dir = $.$dir
-    var load = $.$load
-    var exec = $.$exec
-
-    return function $import (source, type) {
+    $export($, 'import', function $import (source, type) {
       if (typeof source !== 'string') {
         return null
       }
@@ -131,17 +110,10 @@ module.exports = function run ($) {
       }
 
       var path = load.dir(uri)
-      return modulize(exec(load(uri), uri, path), 'import', uri)
-    }
-  }
+      return modulize(execute(load(uri), uri, path), 'import', uri)
+    })
 
-  $.$requireIn = function $requireIn ($) {
-    var dir = $.$dir
-    var exec = $.$exec
-    var load = $.$load
-    var modules = $.$modules
-
-    return function $require (source) {
+    $export($, 'require', function $require (source) {
       if (typeof source !== 'string') {
         return null
       }
@@ -158,21 +130,17 @@ module.exports = function run ($) {
       }
 
       var path = load.dir(uri)
-      var result = modulize(exec(load(uri), uri, path), 'require', uri)
+      var result = modulize(execute(load(uri), uri, path), 'require', uri)
       if (result) {
         modules[uri] = result
       }
       return result
-    }
-  }
+    })
 
-  $.$retireIn = function $retireIn ($) {
-    var modules = $.$modules
-
-    return function $retire (mod) {
+    $export($, 'retire', function $retire (mod) {
       if (typeof mod.sourceUri === 'string') {
         delete modules[mod.sourceUri]
       }
-    }
+    })
   }
 }

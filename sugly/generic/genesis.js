@@ -1,75 +1,90 @@
 'use strict'
 
 module.exports = function () {
-
   /* In the beginning God created the heavens and the earth. */
-  var $ = Object.create(null)
-  var classNull = Object.create(null)
+  var $void = {}
+  var protoNull = Object.create(null)
 
   /* Now the earth was formless and empty, */
-  //var $ = Object.create(classNull)
+  var $ = $void.$ = Object.create(protoNull)
 
-  /* "Now there be light," */
-  var classBool = Object.create(classNull)
-  var classNumber = Object.create(classNull)
-  var classString = Object.create(classNull)
-  var classSymbol = Object.create(classNull)
-  var classObject = Object.create(classNull)
-  var classFunction = Object.create(classNull)
-
-  var typeNull = classNull.static = Object.create(classObject)
-  var typeBool = classBool.static = Object.create(classObject)
-  var typeNumber = classNumber.static = Object.create(classObject)
-  var typeString = classString.static = Object.create(classObject)
-  var typeSymbol = classSymbol.static = Object.create(classObject)
-  var typeObject = classObject.static = Object.create(classObject)
-  var typeFunction = classFunction.static = Object.create(classObject)
-
-  typeNull.class = classNull
-  typeBool.class = classBool
-  typeNumber.class = classNumber
-  typeString.class = classString
-  typeSymbol.class = classSymbol
-  typeObject.class = classObject
-  typeFunction.class = classFunction
+  /* “Let there be light,” and there was light. */
+  var Type$ = $void.Type = function Type$ (prototype) {
+    Object.defineProperty(this, 'proto', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: prototype ? prototype : Object.create(protoNull)
+    })
+    this.proto.type = this
+  }
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
+  function define (name, prototype) {
+    var type = new Type$(prototype)
+    type.name = name
+    type.identityName = name
+    $[type.name] = type
+  }
+
   $.identityName = '$'
-  $.Null = typeNull
-  $.Bool = typeBool
-  $.Number = typeNumber
-  $.String = typeString
-  $.Symbol = typeSymbol
-  $.Object = typeObject
-  $.Function = typeFunction
+  Type$.prototype = protoNull
+  define('Null', protoNull)
 
-  var typeInt = $.Int = Object.create(classObject)
-  var classInt = typeInt.class = Object.create(classNumber)
-  classInt.static = typeInt
+  var protoClass = Type$.prototype = Object.create(protoNull)
+  define('Class', protoClass)
+  define('Bool')
+  define('Number')
+  define('String')
+  define('Symbol')
+  define('Function')
 
-  var typeFloat = $.Float = Object.create(classObject)
-  var classFloat = typeFloat.class = Object.create(classNumber)
-  classFloat.static = typeFloat
+  var Symbol$ = $void.Symbol = function Symbol$ (key) {
+    Object.defineProperty(this, 'key', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: key
+    })
+  }
+  Symbol$.prototype = $.Symbol.proto
 
-  var typeInterface = $.Interface = Object.create(classObject)
-  var classInterface = typeInterface.class = Object.create(classObject)
-  classInterface.static = typeInterface
+  function create (name, prototype) {
+    var type = Object.create(prototype)
+    Object.defineProperty(type, 'proto', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: Object.create(prototype.proto)
+    })
+    type.proto.type = type
+    type.name = name
+    type.identityName = name
+    $[type.name] = type
+  }
 
-  var typeDate = $.Date = Object.create(classObject)
-  var classDate = typeDate.class = Object.create(classObject)
-  classDate.static = typeDate
+  create('Int', $.Number)
+  create('Float', $.Number)
 
-  var typeArray = $.Array = Object.create(classObject)
-  var classArray = typeArray.class = Object.create(classObject)
-  classArray.static = typeArray
+  create('Date', $.Class)
+  create('Range', $.Class)
+  create('Array', $.Class)
 
-  var typeRange = $.Range = Object.create(classObject)
-  var classRange = typeRange.class = Object.create(classObject)
-  classRange.static = typeRange
+  create('Interface', $.Class)
 
-  var typeIterator = $.Iterator = Object.create(typeInterface)
-  var classIterator = typeIterator.class = Object.create(classInterface)
-  classIterator.static = typeIterator
+  $void.isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
+  $void.ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
 
-  return $
+  $void.createType = function $derive (prototype) {
+    var type = Object.create(prototype)
+    Object.defineProperty(type, 'proto', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: Object.create(prototype.proto)
+    })
+    type.proto.type = type
+  }
+
+  return $void
 }

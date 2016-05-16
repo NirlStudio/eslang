@@ -1,26 +1,27 @@
 'use strict'
 
-module.exports = function ($) {
-  var $Symbol = $.Symbol
-  var Symbol$ = $.$SymbolConstructor
+module.exports = function ($void) {
+  var Symbol$ = $void.Symbol
+  var $ = $void.$
 
   var $Null = $.Null
-  var $null = $.Null.class
-  var $bool = $.Bool.class
-  var $int = $.Int.class
-  var $float = $.Float.class
-  var $string = $.String.class
-  var $symbol = $Symbol.class
-  var $object = $.Object.class
-  var $func = $.Function.class
-  var $date = $.Date.class
-  var $array = $.Array.class
+  var $null = $.Null.proto
+  var $bool = $.Bool.proto
+  var $int = $.Int.proto
+  var $float = $.Float.proto
+  var $string = $.String.proto
+  var $Symbol = $.Symbol
+  var $symbol = $Symbol.proto
+  var $object = $.Class.proto
+  var $func = $.Function.proto
+  var $date = $.Date.proto
+  var $array = $.Array.proto
 
   var isSpace = Object.prototype.isPrototypeOf.bind($)
   var isObject = Object.prototype.isPrototypeOf.bind($object)
   var ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
 
-  $.$resolve = function $resolve (subject, sym) {
+  $void.resolve = function $resolve (subject, sym) {
     // resolve key form symbol.
     var key = typeof sym === 'string' ? sym : (sym.key || '')
 

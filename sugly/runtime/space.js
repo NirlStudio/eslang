@@ -1,83 +1,63 @@
 'use strict'
 
-module.exports = function space ($) {
-  var set = $.$set
-  var symbolIsValid = $.Symbol['is-valid']
+var $export = require('../export')
 
-  var $functionIn = $.$functionIn
-  var $lambdaIn = $.$lambdaIn
+module.exports = function space ($void) {
+  var functionIn = $void.functionIn
+  var runIn = $void.runIn
 
-  var $evalIn = $.$evalIn
-  var $loadIn = $.$loadIn
-  var $execIn = $.$execIn
-  var $runIn = $.$runIn
-  var $importIn = $.$importIn
-  var $requireIn = $.$requireIn
-  var $retireIn = $.$retireIn
+  $void.spaceCounter = 0
+  $void.spaceIdentifier = 'void'
+  $void.moduleIdentifier = $void.spaceIdentifier
 
-  $.$spaceCounter = 0
-  $.spaceIdentifier = 'space-0'
-  $.moduleSpaceIdentifier = $.spaceIdentifier
-
-  // generate an export function for $.
-  function $exportTo ($) {
-    return function $export (key, value) {
-      if (typeof key !== 'string' || !symbolIsValid(key)) {
+  function exportTo (space) {
+    $export(space.$, 'export', function export_ (key, value) {
+      if (typeof key !== 'string') {
         return null
       }
-      return set($, key, typeof value === 'undefined' ? null : value)
-    }
+      return (space.$[key] = typeof value === 'undefined' ? null : value)
+    })
   }
 
   function $createSpace (parent) {
-    var space = Object.create(parent)
-    $.$spaceCounter += 1
-    space.spaceIdentifier = 'space-' + $.$spaceCounter
-    space.$loops = [] // new loop stack
-    space.$OprStack = [] // new operator stack
-    return space
+    $void.spaceCounter += 1
+    return {
+      parent: parent,
+      spaceIdentifier: 'space-' + $void.spaceCounter,
+       // new stack objects
+      loops: [],
+      oprStack: [],
+      // new app space
+      $: Object.create(parent.$)
+    }
   }
 
   function $initializeModuleSpace (space, attachExport) {
     if (attachExport) {
       // overridding parent.export
-      space.$export('export', $exportTo(space))
+      exportTo(space)
     }
 
-    // isolate function & lambda to the most recent module
-    space.$export('function', $functionIn(space))
-    space.$export('lambda', $lambdaIn(space))
-
-    // isolate eval space to the most recent module
-    space.$export('eval', $evalIn(space))
-
-    // resolving will base on the directory of current space
-    space.$export('load', $loadIn(space))
-    space.$export('exec', $execIn(space))
-    space.$export('run', $runIn(space))
-    space.$export('import', $importIn(space))
-    space.$export('require', $requireIn(space))
-    space.$export('retire', $retireIn(space))
+    functionIn(space)
+    runIn(space)
   }
 
-  // initiaize global space as a module.
-  $.$modules = {}
-  $.$createSpace = $createSpace // for $.function & $.lambda
-  $.$initializeModuleSpace = $initializeModuleSpace
-  $.$dir = __dirname
+  // prepare void as a module space.
+  $void.modules = {}
+  $void.createSpace = $createSpace // for functionIn
+  $void.initializeModuleSpace = $initializeModuleSpace // for sugly.js
 
-  $.$createModuleSpace = function $createModuleSpace (sealing, dir) {
-    var space = $createSpace($, sealing)
-    space.moduleSpaceIdentifier = space.spaceIdentifier
-    if (dir && dir !== space.$dir) {
-      space.$dir = dir // save base dir if it is changing for this space.
+  $void.createModuleSpace = function $createModuleSpace (sealing, dir) {
+    var space = $createSpace($void)
+    space.sealing = sealing
+    space.moduleIdentifier = space.spaceIdentifier
+    space.operators = {}
+
+    if (dir && dir !== space.dir) {
+      space.dir = dir // save base dir if it is changing for this space.
     }
-
     if (sealing) {
-      // isolate operators
-      space.$operators = Object.assign({}, space.$operators)
-      // separate modules
-      space.$modules = {}
+      space.modules = {} // separate module cache
     }
 
     $initializeModuleSpace(space, sealing)

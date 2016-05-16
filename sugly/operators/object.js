@@ -1,14 +1,13 @@
 'use strict'
 
-module.exports = function operators$object ($) {
-  var $operators = $.$operators
-  var set = $.$set
-  var seval = $.$eval
-  var Symbol$ = $.$SymbolConstructor
-  var symbolValueOf = $.Symbol['value-of']
+module.exports = function operators$object ($void) {
+  var operators = $void.operators
+  var set = $void.set
+  var evaluate = $void.evaluate
+  var Symbol$ = $void.Symbol
+  var symbolValueOf = $void.$.Symbol['value-of']
 
   var SymbolIndexer = symbolValueOf(':')
-
   var SymbolAssign = symbolValueOf('<')
   var SymbolDerive = symbolValueOf('>')
 
@@ -26,7 +25,7 @@ module.exports = function operators$object ($) {
       }
 
       i += 1
-      set(obj, key, i < length ? seval(clause[i], $) : null)
+      set(obj, key, i < length ? evaluate(clause[i], $) : null)
       i += 2 // next :
     }
     return obj
@@ -34,7 +33,7 @@ module.exports = function operators$object ($) {
 
   // (@ obj < prop: value ...)
   function objectAssign ($, clause) {
-    var obj = seval(clause[1], $)
+    var obj = evaluate(clause[1], $)
     if (!obj && typeof obj !== 'object' && typeof obj !== 'function') {
       return null
     }
@@ -50,7 +49,7 @@ module.exports = function operators$object ($) {
       }
 
       i += 1
-      set(obj, key, i < length ? seval(clause[i], $) : null)
+      set(obj, key, i < length ? evaluate(clause[i], $) : null)
       i += 2 // next :
     }
     return obj
@@ -64,7 +63,7 @@ module.exports = function operators$object ($) {
       prototype = null
     } else {
       i = 4
-      prototype = seval(clause[1], $)
+      prototype = evaluate(clause[1], $)
       if (typeof prototype !== 'object') {
         return null // non-object cannot derive an object.
       }
@@ -81,7 +80,7 @@ module.exports = function operators$object ($) {
       }
 
       i += 1
-      set(obj, key, i < length ? seval(clause[i], $) : null)
+      set(obj, key, i < length ? evaluate(clause[i], $) : null)
       i += 2 // next :
     }
     return obj
@@ -92,13 +91,13 @@ module.exports = function operators$object ($) {
     var result = []
     var i = 1
     while (i < clause.length) {
-      result.push(seval(clause[i], $))
+      result.push(evaluate(clause[i], $))
       i += 1
     }
     return result
   }
 
-  $operators['@'] = function ($, clause) {
+  operators['@'] = function ($, clause) {
     var length = clause.length
     if (length > 1) {
       switch (clause[1]) {
@@ -126,14 +125,14 @@ module.exports = function operators$object ($) {
   }
 
   // as operators, object and array are the readable version of @
-  $operators['object'] = function ($, clause) {
+  operators['object'] = function ($, clause) {
     if (clause.length < 2) {
       return $.object()
     }
-    return $operators['@']($, clause)
+    return operators['@']($, clause)
   }
   // force to create an array
-  $operators['array'] = function ($, clause) {
+  operators['array'] = function ($, clause) {
     return arrayCreate($, clause)
   }
 }

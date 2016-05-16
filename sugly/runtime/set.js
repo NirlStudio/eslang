@@ -1,15 +1,10 @@
 'use strict'
 
-module.exports = function set ($) {
-  $.$set = function $set (subject, sym, value) {
+module.exports = function set ($void) {
+  $void.set = function $set (subject, sym, value) {
     var key = typeof sym === 'string' ? sym : sym.key
-    if (key.startsWith('$') || key.startsWith('__')) {
-      return null
-    }
-
     try {
-      subject[key] = value
-      return value
+      return (subject[key] = value)
     } catch (err) {
       console.warn('assignment: ', subject, key, value, err)
       return null

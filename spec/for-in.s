@@ -3,7 +3,7 @@
     (let counter 0)
     (let result (for i in 3
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 3 (` counter),
     (assert 2 (` i),
@@ -12,7 +12,7 @@
     (let counter 0)
     (let result (for i in -3
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 3 (` counter),
     (assert -2  (` i),
@@ -22,7 +22,7 @@
     (let x 3)
     (let result (for i in x
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 3 (` counter),
     (assert 2 (` i),
@@ -31,7 +31,7 @@
     (let counter 0)
     (let result (for i in (+ 2 1)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 3 (` counter),
     (assert 2 (` i),
@@ -43,7 +43,7 @@
     (let counter 0)
     (let result (for i in ($range 1 3)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 2 (` counter),
     (assert 2 (` i),
@@ -52,7 +52,7 @@
     (let counter 0)
     (let result (for i in ($range -1 -3)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 2 (` counter),
     (assert -2 (` i),
@@ -64,7 +64,7 @@
     (let counter 0)
     (let result (for i in ($range 1 5 2)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 2 (` counter),
     (assert 3 (` i),
@@ -73,7 +73,7 @@
     (let counter 0)
     (let result (for i in ($range -1 -4 -2)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 2 (` counter),
     (assert -3 (` i),
@@ -86,7 +86,7 @@
     (let i -1)
     (let result (for i in (@)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 0 (` counter),
     (assert -1 (` i),
@@ -95,7 +95,7 @@
     (let counter 0)
     (let result (for i in (@ 2 4 6)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 3 (` counter),
     (assert 6 (` i),
@@ -104,7 +104,7 @@
     (let counter 0)
     (let result (for (k v) in (@ 2 4 6)
       (++ counter)
-      (* v 2)
+      (v * 2)
     ),
     (assert 3 (` counter),
     (assert 2 (` k),
@@ -118,7 +118,7 @@
     (let i -1)
     (let result (for i in (@>)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 0 (` counter),
     (assert -1 (` i),
@@ -127,7 +127,7 @@
     (let counter 0)
     (let result (for i in (@ p1: 1 p2: 2)
       (++ counter)
-      (* i 2)
+      (i * 2)
     ),
     (assert 2 (` counter)
     (assert 2 (` i)
@@ -136,7 +136,7 @@
     (let counter 0)
     (let result (for (k v) in (@ p1: 1 p2: 2)
       (++ counter)
-      (* v 2)
+      (v * 2)
     ),
     (assert 2 (` counter),
     (assert "p2" (` k),

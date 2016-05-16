@@ -1,13 +1,14 @@
 'use strict'
 
-module.exports = function operators$quote ($) {
-  var $operators = $.$operators
+module.exports = function operators$quote ($void) {
+  var operators = $void.operators
+  var nothing = $void.$.Symbol.Nothing
 
   // (` symbol) or (` (...))
-  $operators['`'] = function ($, clause) {
-    return clause.length > 1 ? clause[1] : null
+  operators['`'] = function ($, clause) {
+    return clause.length > 1 ? clause[1] : nothing
   }
 
   // a more readable version of `
-  $operators['quote'] = $operators['`']
+  operators['quote'] = operators['`']
 }

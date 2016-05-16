@@ -69,24 +69,19 @@ function notSame ($) {
   }
 }
 
-module.exports = function ($) {
-  // common symbol repository
-  $.$InvalidSymbol = InvalidSymbol
-  var sharedSymbols = $.$SharedSymbols = Object.create(null)
+module.exports = function ($void) {
+  var $ = $void.$
+  var Symbol$ = $void.Symbol
 
-  // define a construcotr for symbol.
-  var Symbol$ = $.$SymbolConstructor = function Symbol$ (key) {
-    Object.defineProperty(this, 'key', {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: key
-    })
-  }
+  // regex to test invalid symbol
+  $void.InvalidSymbol = InvalidSymbol
+
+  // common symbol repository
+  var sharedSymbols = $void.SharedSymbols = Object.create(null)
 
   // Symbol is a value type derived from Null.
   var type = $.Symbol
-  var class_ = Symbol$.prototype = type.class
+  var proto = Symbol$.prototype = type.proto
 
   // const nothing object.
   type.Nothing = sharedSymbols[''] = new Symbol$('')
@@ -104,32 +99,32 @@ module.exports = function ($) {
   $export(type, 'key-of', keyOf($))
 
   // a symbol behaves as a value entity.
-  $export(class_, 'is', isSame($))
+  $export(proto, 'is', isSame($))
   // the general equivalence - placeholder
-  $export(class_, 'equals', isSame($))
+  $export(proto, 'equals', isSame($))
 
   // persistency & description
-  $export(class_, 'to-code', toCode($))
-  $export(class_, 'to-string', toString($))
+  $export(proto, 'to-code', toCode($))
+  $export(proto, 'to-string', toString($))
 
   // emptiness: nothing symbol is taken as the empty value.
-  $export(class_, 'is-empty', function () {
+  $export(proto, 'is-empty', function () {
     return this.key.length < 1
   })
-  $export(class_, 'not-empty', function () {
+  $export(proto, 'not-empty', function () {
     return this.key.length > 0
   })
 
   // indexer: general & primary predicate, readonly.
-  $export(class_, ':', function (name) {
+  $export(proto, ':', function (name) {
     if (typeof name === 'string') {
-      var value = class_[name]
+      var value = proto[name]
       return typeof value !== 'undefined' ? value : null
     }
     return null
   })
 
   // overide general equivalence operators, being consistent with equals
-  $export(class_, '==', isSame($))
-  $export(class_, '!=', notSame($))
+  $export(proto, '==', isSame($))
+  $export(proto, '!=', notSame($))
 }

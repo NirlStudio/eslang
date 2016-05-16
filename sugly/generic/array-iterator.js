@@ -5,13 +5,14 @@ var $export = require('../export')
 module.exports = function ($) {
   var $Array = $.Array
 
-  var iterator = $export($Array, 'Iterator', $.Iterator.derive({
-    derive: null  // prevent inheritence
-  }, {
+  var iterator = $export($Array, 'Iterator', $.Class.new({}, {
     _array: null,
-
     key: -1,
     value: null,
+
+    constructor: function Array$Iterator$constructor (array) {
+      this._array = Array.isArray(array) ? array : []
+    },
 
     next: function Array$Iterator$next () {
       this.key += 1
@@ -24,12 +25,7 @@ module.exports = function ($) {
     }
   }))
 
-  // prevent direct invocation.
-  var create = iterator.create.bind(iterator)
-  iterator.create = null
-
-  var $Class = $Array.class
-  $export($Class, 'iterate', function () {
-    return create(Array.isArray(this) ? { _array: this } : [])
+  $export($Array.proto, 'iterate', function array$iterate () {
+    return iterator.create(this)
   })
 }

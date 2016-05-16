@@ -2,133 +2,28 @@
 
 var $export = require('../export')
 
-function isTypeOf ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function Object$is_type_of (value) {
-    // both native & managed objects.
-    return typeof value === 'object' && value !== null && !(value instanceof Symbol$)
-  }
-}
-
-function create (objectClass) {
-  return function Object$create () {
-    var obj = Object.create(objectClass)
-    if (arguments.length > 0) {
-      var args = [obj]
-      Object.assign.apply(Object, Array.prototype.concat.apply(args, arguments))
-    }
-    return obj
-  }
-}
-
-function derive (objectClass) {
-  return function Object$derive (type_, class_) {
-    var type = Object.create(objectClass)
-    var typeClass = type.class = Object.create(objectClass)
-    typeClass.static = type
-
-    Object.assign(type, type_)
-    Object.assign(typeClass, class_)
-    return type
-  }
-}
-
-function equals ($) {
-  return function Object$equals (another) {
-    if (this === another) {
-      return true
-    }
-    // TODO - to compare type & fields.
-    return Object.is(this, another)
-  }
-}
-
-function objectSuper ($) {
-  var Null = $.Null
-  return function object$super () {
-    var class_
-    if (this.class) {
-      class_ = Object.getPrototypeOf(this.class)
-    } else {
-      class_ = Object.getPrototypeOf(this)
-      if (class_) {
-        class_ = Object.getPrototypeOf(class_)
-      }
-    }
-    return class_ && class_.static || Null
-  }
-}
-
-function objectGetType (type) {
-  return function object$get_type () {
-    try {
-      var class_ = Object.getPrototypeOf(this)
-      return class_.static || type
-    } catch (err) {
-      console.warn('failed to get prototype of', this, 'for', err)
-      return type
-    }
-  }
-}
-
-function objectIsTypeOf () {
-  return function object$is_type_of (value) {
-    return typeof this.class !== 'undefined' && Object.getPrototypeOf(value) === this.class
-  }
-}
-
-function objectIsInstanceOf () {
-  return function object$is_instance_of (type) {
-    return typeof type !== 'undefined' && typeof type.class !== 'undefined' &&
-      Object.getPrototypeOf(this) === type.class
-  }
-}
-
-function toCode ($) {
-  return function Object$to_code () {
-    return $.encode.object(this)
-  }
-}
-
 function getFields () {
   return function object$get_fields () {
     return Object.getOwnPropertyNames(this)
   }
 }
 
-function hasField () {
-  var ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
+function hasField ($void) {
+  var ownsProperty = $void.ownsProperty
   return function object$has_field (name) {
     return typeof name !== 'string' ? null : ownsProperty(this, name)
   }
 }
 
-function getField () {
-  return function object$get_field (name) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    var value = this[name]
-    return typeof value === 'undefined' ? null : value
-  }
-}
+function removeField ($void) {
+  var ownsProperty = $void.ownsProperty
 
-function setField () {
-  return function object$set_field (name, value) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    return (this[name] = (typeof value === 'undefined' ? null : value))
-  }
-}
-
-function removeField () {
   return function object$remove_field (name) {
     if (typeof name !== 'string') {
       return null
     }
     var value
-    if (Object.prototype.hasOwnProperty.call(this, name)) {
+    if (ownsProperty(this, name)) {
       value = this[name]
       delete this[name]
     } else {
@@ -147,18 +42,36 @@ function hasProperty () {
   }
 }
 
-function combine (newObject) {
-  return function () {
-    var objs = [this]
-    Array.prototype.push.apply(objs, arguments)
-    return newObject.apply(null, objs)
+function getProperty () {
+  return function object$get_property (name) {
+    if (typeof name !== 'string') {
+      return null
+    }
+    var value = this[name]
+    return typeof value === 'undefined' ? null : value
   }
 }
 
-function mixin (objectClass) {
-  var isObject = Object.prototype.isPrototypeOf.bind(objectClass)
-  return function () {
-    if (isObject(this)) {
+function setProperty () {
+  return function object$set_property (name, value) {
+    if (typeof name !== 'string') {
+      return null
+    }
+    return (this[name] = (typeof value === 'undefined' ? null : value))
+  }
+}
+
+function combine (create) {
+  return function object$combine () {
+    var objs = [this]
+    Array.prototype.push.apply(objs, arguments)
+    return create.apply(null, objs)
+  }
+}
+
+function merge () {
+  return function object$merge () {
+    if (typeof this === 'object' && this !== null) {
       for (var i = 0; i < arguments.length; i++) {
         Object.assign(this, arguments[i])
       }
@@ -166,52 +79,20 @@ function mixin (objectClass) {
   }
 }
 
-function objectCreate (objectClass) {
-  var isObject = Object.prototype.isPrototypeOf.bind(objectClass)
-  return function object$create () {
-    // only a type can create instance
-    if (isObject(this) && isObject(this.class) && !this.abstract) {
-      var obj = Object.create(this.class)
-      if (arguments.length > 0) {
-        var args = [obj]
-        Object.assign.apply(Object, Array.prototype.concat.apply(args, arguments))
-      }
-      // constructor logic
-      return obj
-    }
-    return null
-  }
-}
-
-function objectDerive (objectClass) {
-  var isObject = Object.prototype.isPrototypeOf.bind(objectClass)
-  return function object$derive (type_, class_) {
-    // only a type can derive child types
-    if (isObject(this) && isObject(this.class)) {
-      var type = Object.create(this)
-      type.abstract = false
-
-      var typeClass = type.class = Object.create(this.class)
-      typeClass.static = type
-
-      Object.assign(type, type_)
-      Object.assign(typeClass, class_)
-      return type
-    }
-    return null
-  }
-}
-
-function objectClone (objectClass) {
-  var isObject = Object.prototype.isPrototypeOf.bind(objectClass)
+function objectClone () {
   return function object$clone () {
-    // only an instance is clonable
-    if (isObject(this) && !this.class) {
+    if (typeof this === 'object' && this !== null) {
       var obj = Object.create(Object.getPrototypeOf(this))
       Object.assign(obj, this)
       return obj
     }
     return null
+  }
+}
+
+function toCode ($) {
+  return function Object$to_code () {
+    return $.encode.object(this)
   }
 }
 
@@ -232,79 +113,84 @@ function objectIndexer () {
   }
 }
 
-module.exports = function ($) {
-  var type = $.Object
-  var class_ = type.class
+module.exports = function ($void) {
+  var $ = $void.$
+  var Type = $void.Type
+  var isPrototypeOf = $void.isPrototypeOf
 
-  // test a native or managed object.
-  $export(type, 'is-type-of', isTypeOf($))
+  var Class = $.Class
+  var proto = Class.proto
 
-  // to create an object instance by copying properties from source objects.
-  var newObject = $export(type, 'create', create(class_))
+  // object property & field (owned property) manipulation
+  // retrieve field names
+  $export(proto, 'get-fields', getFields())
+  // test the existence by a field name
+  $export(proto, 'has-field', hasField($void))
+  // remove a field from an object
+  $export(proto, 'remove-field', removeField())
+  // test a property (either owned or inherited) name
+  $export(proto, 'has-property', hasProperty())
+  // retrieve the value of a property
+  $export(proto, 'get-property', getProperty())
+  // set the value of a field
+  $export(proto, 'set-property', setProperty())
 
-  // to create a managed type by its static & instance properties.
-  $export(type, 'derive', derive(class_))
+  // generate a new object by comine this object and other objects.
+  $export(proto, 'combine', combine(Class.create))
+  // shallowly copy fields from other objects to this object.
+  $export(proto, 'merge', merge())
+  // to create a shallow copy of this instance with the same type.
+  $export(proto, 'clone', objectClone())
 
-  // default equivalence logic for all objects.
-  $export(class_, 'equals', equals($))
+  // support general operators
+  $export(proto, '+', combine(Class.create))
+  $export(proto, '+=', merge(proto))
 
-  // the default object class_-relationship logic
-  // get the super type of this type or instance
-  $export(class_, 'super', objectSuper($))
-  // get the type object for an instance or super type for a type.
-  $export(class_, 'get-type', objectGetType(type))
-  // test an object with this type.
-  $export(class_, 'is-type-of', objectIsTypeOf())
-  // test an type for this instance
-  $export(class_, 'is-instance-of', objectIsInstanceOf())
+  // define an object's type attributes
+  $export(proto, 'is-type', function object$is_type () {
+    return false
+  })
+  $export(proto, 'is-type-of', function object$is_type_of (value) {
+    return false
+  })
+  $export(proto, 'super', function object$super () {
+    return null
+  })
+  $export(proto, 'get-type', function object$get_type () {
+    return isPrototypeOf(proto, this) ? Object.getPrototypeOf(this).type : Class
+  })
+  $export(proto, 'is-instance', function object$is_instance () {
+    return true
+  })
+  $export(proto, 'is-instance-of', function object$is_instance_of (type) {
+    if (!(type instanceof Type)) {
+      return false
+    }
+    return isPrototypeOf(type.proto, this) ||
+      (typeof this === 'object' && type === Class) // for native objects
+  })
 
   // default object persistency & describing logic
-  $export(class_, 'to-code', toCode($))
-  $export(class_, 'to-string', toCode($))
+  $export(proto, 'to-code', toCode($))
+  $export(proto, 'to-string', toCode($))
 
   // default object emptiness logic
-  $export(class_, 'is-empty', function () {
+  $export(proto, 'is-empty', function object$is_empty () {
     return Object.getOwnPropertyNames(this).length > 0
   })
-  $export(class_, 'not-empty', function () {
+  $export(proto, 'not-empty', function object$not_empty () {
     return Object.getOwnPropertyNames(this).length < 1
   })
 
   // indexer: override to implement setter.
-  $export(class_, ':', objectIndexer())
+  $export(proto, ':', objectIndexer())
 
-  // property & field (owned property) manipulation
-  // retrieve field names
-  $export(class_, 'get-fields', getFields())
-  // test the existence by a field name
-  $export(class_, 'has-field', hasField())
-  // retrieve the value of a field
-  $export(class_, 'get-field', getField())
-  // set the value of a field
-  $export(class_, 'set-field', setField())
-  // remove a field from an object
-  $export(class_, 'remove-field', removeField())
-  // test a property (either owned or inherited) name
-  $export(class_, 'has-property', hasProperty())
-  // generate a new object by comine this object and other objects.
-  $export(class_, 'combine', combine(newObject))
-  // shallowly copy fiels from other objects to this object.
-  $export(class_, 'mixin', mixin(class_))
+  // override to boost - an object is always true
+  $export(proto, '?', function object$bool_test (a, b) {
+    return typeof a === 'undefined' ? true : a
+  })
 
-  // default type hierarchy system
-  // to create an instance for this type.
-  $export(class_, 'create', objectCreate(class_))
-  // to derive an inherited type for this one.
-  $export(class_, 'derive', objectDerive(class_))
-  // to create a shallow copy of this instance with the same type.
-  $export(class_, 'clone', objectClone(class_))
-
-  // default operations for a container.
-  // A general object is the container of all its fields
+  // An object is the container of all its fields
   // iterator: iterate all field names and values
   require('./object-iterator')($)
-
-  // support general operators
-  $export(class_, '+', combine(newObject))
-  $export(class_, '+=', mixin(class_))
 }

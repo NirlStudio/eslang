@@ -1,13 +1,13 @@
 ($define "and: +" (= ()
   ($should "return the sum of arugment values" (= ()
-    (assert 0 (` (+),
-    (assert 1 (` (+ 1),
-    (assert 3 (` (+ 1 2),
-    (assert 55 (` (+ 1 2 3 4 5 6 7 8 9 10),
+    (assert 0 (` (0 +),
+    (assert 1 (` (1 +),
+    (assert 3 (` (1 + 2),
+    (assert 55 (` (1 + 2 3 4 5 6 7 8 9 10),
 
-    (assert 1 (` (+ 1 ""),
-    (assert 1 (` (+ 1 "1"),
-    (assert 1 (` (+ 1 (@),
+    (assert 1 (` (1 + ""),
+    (assert 2 (` (1 + "1"),
+    (assert 1 (` (1 + (@),
 ).
 
 (let mVar1 20)
@@ -24,14 +24,14 @@
 
 ($define "subtract: -" (= ()
   ($should "return the difference of the first argument and all other arguments" (= ()
-    (assert 0 (` (-),
-    (assert 1 (` (- 1),
-    (assert -1 (` (- 1 2),
-    (assert -4 (` (- 1 2 3),
+    (assert 0 (` (0 -),
+    (assert 1 (` (1 - ),
+    (assert -1 (` (1 - 2),
+    (assert -4 (` (1 - 2 3),
 
-    (assert 1 (` (- 1 ""),
-    (assert 1 (` (- 1 "1"),
-    (assert 1 (` (- 1 (@),
+    (assert 1 (` (1 - ""),
+    (assert 0 (` (1 - "1"),
+    (assert 1 (` (1 - (@),
 ).
 
 (let mVar2 20)
@@ -48,14 +48,14 @@
 
 ($define "multiply: *" (= ()
   ($should "return the product of arguments" (= ()
-    (assert 0 (` (*),
-    (assert 1 (` (* 1),
-    (assert 2 (` (* 1 2),
-    (assert 6 (` (* 1 2 3),
+    (assert 0 (` (0 *),
+    (assert 1 (` (1 *),
+    (assert 2 (` (1 * 2),
+    (assert 6 (` (1 * 2 3),
 
-    (assert 0 (` (* 1 ""),
-    (assert 0 (` (* 1 "1"),
-    (assert 0 (` (* 1 (@),
+    (assert 0 (` (1 * ""),
+    (assert 1 (` (1 * "1"),
+    (assert 0 (` (1 * (@),
 ).
 
 (let mVar3 20)
@@ -72,15 +72,15 @@
 
 ($define "divide: /" (= ()
   ($should "return the quotient of dividing the first argument by other arguments" (= ()
-    (assert 0 (` (/),
-    (assert 1 (` (/ 1),
-    (assert false (` (Number is-finite (/ 1 0),
-    (assert 2 (` (/ 4 2),
-    (assert 3 (` (/ 18 2 3),
+    (assert 0 (` (0 /),
+    (assert 1 (` (1 / ),
+    (assert false (` (Number is-finite (1 / 0),
+    (assert 2 (` (4 / 2),
+    (assert 3 (` (18 / 2 3),
 
-    (assert true (` (Number is-not (/ 1 ""),
-    (assert true (` (Number is-not (/ 1 "1"),
-    (assert true (` (Number is-not (/ 1 (@),
+    (assert Infinity (` (1 / ""),
+    (assert 1 (` (1 / "1"),
+    (assert Infinity (` (1 / (@),
 ).
 
 (let mVar4 20)

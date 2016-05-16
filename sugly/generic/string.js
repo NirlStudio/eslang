@@ -40,7 +40,8 @@ function toString () {
   }
 }
 
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var type = $.String
   // test if an value is a string.
   $export(type, 'is-type-of', isTypeOf())
@@ -53,21 +54,21 @@ module.exports = function ($) {
     'fromCharCode': 'of-char-codes'
   })
 
-  var class_ = type.class
+  var proto = type.proto
   // persistency & describe
-  $export(class_, 'to-code', toCode($))
-  $export(class_, 'to-string', toString())
+  $export(proto, 'to-code', toCode($))
+  $export(proto, 'to-string', toString())
 
   // the emptiness if string is determined by its length.
-  $export(class_, 'is-empty', function () {
+  $export(proto, 'is-empty', function () {
     return this.length < 1
   })
-  $export(class_, 'not-empty', function () {
+  $export(proto, 'not-empty', function () {
     return this.length > 0
   })
 
   // generate sub-string from this string.
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     /* CH/FF/IE/OP/SF */
     'slice': 'slice', // [start, end), supports negative values.
     'substr': 'substring', // [start, start + length)
@@ -75,7 +76,7 @@ module.exports = function ($) {
   })
 
   // find & match substring in this string.
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     /* CH/FF/IE/OP/SF */
     'indexOf': 'index-of',
     'lastIndexOf': 'last-index-of',
@@ -88,7 +89,7 @@ module.exports = function ($) {
   })
 
   // value converting of this string.
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     'toLocaleLowerCase': 'to-locale-lower',
     'toLocaleUpperCase': 'to-locale-upper',
 
@@ -100,31 +101,31 @@ module.exports = function ($) {
   })
 
   // get a character or its unicode value by its offset in this string.
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     /* CH/FF/IE/OP/SF */
     'charAt': 'char-at',
     'charCodeAt': 'chat-code-at'
   })
 
   // combination and splitting of strings
-  $export(class_, 'concat', function () {
+  $export(proto, 'concat', function () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     'split': 'split'
   })
 
   // support ordering logic - comparable
-  $export(class_, 'compare', function (another) {
+  $export(proto, 'compare', function (another) {
     return this === another ? 0 : (this > another ? 1 : -1)
   })
-  $export.copy(class_, String.prototype, {
+  $export.copy(proto, String.prototype, {
     'localeCompare': 'locale-compare'
   })
 
   // indexer: override, interpret number as offset, readonly.
-  var indexer = class_[':']
-  $export(class_, ':', function (index) {
+  var indexer = proto[':']
+  $export(proto, ':', function (index) {
     if (typeof index === 'string') {
       return indexer.call(this, index)
     }
@@ -136,10 +137,10 @@ module.exports = function ($) {
   })
 
   // support general operators
-  $export(class_, '+', function () {
+  $export(proto, '+', function () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(class_, '-', function (value) {
+  $export(proto, '-', function (value) {
     if (typeof value === 'string') {
       // remove value by its last index in this string.
       var offset = this.lastIndexOf(value)
@@ -156,16 +157,16 @@ module.exports = function ($) {
   })
 
   // support ordering operators
-  $export(class_, '>', function (another) {
+  $export(proto, '>', function (another) {
     return typeof another === 'string' ? this > another : false
   })
-  $export(class_, '>=', function (another) {
+  $export(proto, '>=', function (another) {
     return typeof another === 'string' ? this >= another : false
   })
-  $export(class_, '<', function (another) {
+  $export(proto, '<', function (another) {
     return typeof another === 'string' ? this < another : false
   })
-  $export(class_, '<=', function (another) {
+  $export(proto, '<=', function (another) {
     return typeof another === 'string' ? this <= another : false
   })
 }

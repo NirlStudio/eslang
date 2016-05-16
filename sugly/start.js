@@ -5,14 +5,16 @@ var $export = require('./export')
 
 function createSpace () {
   // Hello, world.
-  var $ = require('./generic/genesis')($)
+  var $void = require('./generic/genesis')()
 
   // meta information
-  var sugly = $export($, 'Sugly', {})
-  $export(sugly, 'runtime', 'js')
-  $export(sugly, 'version', '0.2.0')
-  $export(sugly, 'debugging', true)
-  return $
+  var $ = $void.$
+  $export($, 'Sugly', $.Object.create({
+    'runtime': 'js',
+    'version': '0.2.0',
+    'debugging': true
+  }))
+  return $void
 }
 
 function exportConstants ($) {
@@ -24,68 +26,79 @@ function exportConstants ($) {
   $.Infinity = Infinity
 }
 
-function initializeSpace ($) {
+function initializeSpace ($void) {
   // populating
-  require('./generic/null')($)
+  require('./generic/null')($void)
 
-  require('./generic/symbol')($)
+  require('./generic/symbol')($void)
   $export($, 'symbol', $.Symbol['value-of'])
 
-  require('./generic/bool')($)
+  require('./generic/bool')($void)
   $export($, 'bool', $.Bool['value-of'])
 
-  require('./generic/number')($)
+  require('./generic/number')($void)
   $export($, 'number', $.Number['value-of'])
 
-  require('./generic/int')($)
+  require('./generic/int')($void)
   $export($, 'int', $.Int['value-of'])
 
-  require('./generic/float')($)
+  require('./generic/float')($void)
   $export($, 'float', $.Float['value-of'])
 
-  require('./generic/string')($)
+  require('./generic/string')($void)
   $export($, 'string', $.String['value-of'])
 
-  require('./generic/object')($)
-  $export($, 'object', $.Object['create'])
-
-  require('./generic/function')($)
+  require('./generic/function')($void)
   $export($, 'function', $.Function['create'])
 
-  require('./generic/date')($)
+  require('./generic/class')($void)
+  $export($, 'object', $.Class['create'])
+  $export($, 'class', $.Class['new'])
+
+  require('./generic/interface')($void)
+  $export($, 'interface', $.Interface['create'])
+
+  require('./generic/date')($void)
   $export($, 'date', $.Date['create'])
 
-  require('./generic/array')($)
+  require('./generic/array')($void)
   $export($, 'array', $.Array['create'])
 
-  require('./generic/range')($)
+  require('./generic/range')($void)
   $export($, 'range', $.Range['create'])
 
-  require('./generic/iterate')($)
+  require('./generic/iterate')($void)
 
-  require('./runtime/signal')($)
-  require('./runtime/resolve')($)
-  require('./runtime/assign')($)
-  require('./runtime/set')($)
-  require('./runtime/eval')($)
-  require('./runtime/function')($)
-
-  require('./runtime/signal-of')($)
-  require('./operators/all')($)
-
+  var $ = $void.$
   require('./lib/math')($, JS)
   require('./lib/uri')($, JS)
   require('./lib/json')($, JS)
 }
 
+function initializeRuntime ($void) {
+  require('./runtime/signal')($void)
+  require('./runtime/resolve')($void)
+  require('./runtime/assign')($void)
+  require('./runtime/set')($void)
+  require('./runtime/evaluate')($void)
+  require('./runtime/function')($void)
+  require('./runtime/signal-of')($void)
+}
+
 module.exports = function start (output) {
-  var $ = createSpace()
+  var $void = createSpace()
+  var $ = $void.$
 
   // export global constant values.
   exportConstants($)
 
   // create generic type system
-  initializeSpace($)
+  initializeSpace($void)
+
+  // prepare runtime functions
+  initializeRuntime($void)
+
+  require('./operators/all')($void)
 
   // encode function factory
   var encoder = require('./lib/encoder')($, JS)
@@ -96,8 +109,8 @@ module.exports = function start (output) {
   require('./lib/print')($, JS, output)
 
   // prepare tokenizer & compiler
-  require('./tokenizer')($)
-  require('./compiler')($)
+  require('./tokenizer')($void)
+  require('./compiler')($void)
 
   // compile a piece of code to program/clauses: [[]].
   $export($, 'compile', function (code, src) {
@@ -105,16 +118,16 @@ module.exports = function start (output) {
   })
 
   // this is only used by runtime itself or its assembler
-  $.$export = function (name, obj) {
+  $void.$export = function (name, obj) {
     $export(this, name, obj)
   }
 
   // program executor generators
-  require('./runtime/run')($)
+  require('./runtime/run')($void)
   // space/module manipulation functions.
-  require('./runtime/space')($)
+  require('./runtime/space')($void)
   // real program executors
-  require('./runtime/exec')($)
+  require('./runtime/execute')($void)
 
-  return $
+  return $void
 }

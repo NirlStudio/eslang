@@ -104,7 +104,7 @@
     (assert false (` (is obj2 like obj3),
 
     (let f (= x (+ 2 x),
-    (let c (= b > x (* 2 x),
+    (let c (= b > x (2 * x),
     (assert (` (is c like f),
     (assert false (` (is f like c),
 ).

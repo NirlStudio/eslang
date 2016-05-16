@@ -1,22 +1,22 @@
 'use strict'
 
-module.exports = function operators$logical ($) {
-  var $operators = $.$operators
-  var seval = $.$eval
+module.exports = function operators$logical ($void) {
+  var operators = $void.operators
+  var evaluate = $void.evaluate
 
-  $operators['&&'] = function ($, clause) {
+  operators['&&'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return null
     }
 
-    var base = seval(clause[1], $)
+    var base = evaluate(clause[1], $)
     if (base === false || base === null || base === 0) {
       return base
     }
 
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (value === false || value === null || value === 0) {
         return value
       } else {
@@ -26,19 +26,19 @@ module.exports = function operators$logical ($) {
     return base
   }
 
-  $operators['||'] = function ($, clause) {
+  operators['||'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return null
     }
 
-    var base = seval(clause[1], $)
+    var base = evaluate(clause[1], $)
     if (base !== false && base !== null && base !== 0) {
       return base
     }
 
     for (var i = 2; i < length; i++) {
-      var value = seval(clause[i], $)
+      var value = evaluate(clause[i], $)
       if (value !== false && value !== null && value !== 0) {
         return value
       } else {
@@ -48,13 +48,13 @@ module.exports = function operators$logical ($) {
     return base
   }
 
-  $operators['!'] = function ($, clause) {
+  operators['!'] = function ($, clause) {
     var length = clause.length
     if (length < 2) {
       return true // !null
     }
 
-    var base = seval(clause[1], $)
+    var base = evaluate(clause[1], $)
     return base === false || base === null || base === 0
   }
 }
