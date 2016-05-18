@@ -4,11 +4,12 @@ var $export = require('../export')
 
 module.exports = function run ($void) {
   var Symbol$ = $void.Symbol
-  var load = $void.load
   var evaluate = $void.evaluate
-  var execute = $void.execute
 
   $void.runIn = function runIn (space) {
+    var load = $void.load
+    var execute = $void.execute
+
     var dir = space.dir
     var runInDirs = [null, dir]
     var modules = space.modules

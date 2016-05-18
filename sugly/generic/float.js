@@ -29,14 +29,6 @@ module.exports = function ($void) {
 
   var proto = type.proto
 
-  // define a float value's type attributes
-  $export(proto, 'get-type', function float$get_type () {
-    return type
-  })
-  $export(proto, 'is-instance-of', function float$is_instance_of (float) {
-    return type === float || float === $.Number
-  })
-
   // override indexer to expose functions
   $export(proto, ':', function float$indexer (name) {
     if (typeof name === 'string') {

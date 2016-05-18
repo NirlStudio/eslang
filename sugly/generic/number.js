@@ -87,26 +87,6 @@ module.exports = function ($void) {
     return typeof value === 'undefined' || value === null ? 0 : parseFloat(value)
   })
 
-  // define type attributes
-  $export(type, 'is-type', function Number$is_type () {
-    return true
-  })
-  $export(type, 'is-type-of', function Number$is_type_of (value) {
-    return typeof value === 'number'
-  })
-  $export(type, 'super', function Number$super () {
-    return null
-  })
-  $export(type, 'get-type', function Number$get_type () {
-    return $.Class
-  })
-  $export(type, 'is-instance', function Number$is_instance () {
-    return false
-  })
-  $export(type, 'is-instance-of', function Number$is_instance_of (type) {
-    return false
-  })
-
   var proto = type.proto
   // test for special values of Nan and Infinity
   $export(proto, 'is-valid', function number$is_valid () {
@@ -143,16 +123,16 @@ module.exports = function ($void) {
   })
 
   // support ordering operators
-  $export(proto, '>', function number$gt (another) {
+  $export(proto, '>', function number$opr_gt (another) {
     return typeof another === 'number' ? this > another : false
   })
-  $export(proto, '>=', function number$ge (another) {
+  $export(proto, '>=', function number$opr_ge (another) {
     return typeof another === 'number' ? this >= another : false
   })
-  $export(proto, '<', function number$lt (another) {
+  $export(proto, '<', function number$opr_lt (another) {
     return typeof another === 'number' ? this < another : false
   })
-  $export(proto, '<=', function number$le (another) {
+  $export(proto, '<=', function number$opr_le (another) {
     return typeof another === 'number' ? this <= another : false
   })
 
@@ -168,26 +148,6 @@ module.exports = function ($void) {
   })
   $export(proto, 'round', function number$floor () {
     return Math.round(this)
-  })
-
-  // define static value attributes
-  $export(proto, 'is-type', function number$is_type () {
-    return false
-  })
-  $export(proto, 'is-type-of', function number$is_type_of (value) {
-    return false
-  })
-  $export(proto, 'super', function number$super () {
-    return null
-  })
-  $export(proto, 'get-type', function number$get_type () {
-    return type
-  })
-  $export(proto, 'is-instance', function number$is_instance () {
-    return true
-  })
-  $export(proto, 'is-instance-of', function number$is_instance_of (number) {
-    return type === number
   })
 
   // persistency & describing
@@ -214,4 +174,8 @@ module.exports = function ($void) {
     }
     return null
   })
+
+  // export to system's prototype
+  $void.injectTo(Number, 'type', type)
+  $void.injectTo(Number, ':', proto[':'])
 }

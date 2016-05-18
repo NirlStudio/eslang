@@ -1,7 +1,7 @@
 'use strict'
 
 function exportTo (container, name, obj) {
-  if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
+  /*if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
       (typeof obj === 'object' || typeof obj === 'function')) {
     var parent = container.identityName || '$'
     if (parent.startsWith('$') || name.startsWith('$')) {
@@ -11,7 +11,7 @@ function exportTo (container, name, obj) {
     } else {
       obj.identityName = '(' + parent + ' "' + name + '")'
     }
-  }
+  } */
 
   container[name] = obj
   return obj
@@ -50,7 +50,7 @@ function copyObject (target, src, mapping) {
     var key = keys[i]
     var value = src[key]
     if (typeof value === 'undefined') {
-      console.warn(src, 'missing required member:', key)
+      console.warn(src, 'missing required member:', i, key, keys)
     } else if (typeof value === 'function') {
       if (isPrototype) {
         wrapMethod(target, mapping[key], value)

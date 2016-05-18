@@ -20,7 +20,7 @@ module.exports = function operators$function ($void) {
     var enclosing = {}
     if (symbols instanceof Symbol$) {
       set(enclosing, symbols, resolve($, symbols))
-      return $.lambda(enclosing, params, body)
+      return $.$.lambda(enclosing, params, body)
     }
 
     if (!Array.isArray(symbols)) {
@@ -28,7 +28,7 @@ module.exports = function operators$function ($void) {
     }
 
     if (symbols.length < 1) {
-      return $.lambda(enclosing, params, body)
+      return $.$.lambda(enclosing, params, body)
     }
 
     // enclosing context values.
@@ -48,7 +48,7 @@ module.exports = function operators$function ($void) {
       }
     }
 
-    return $.lambda(enclosing, params, body)
+    return $.$.lambda(enclosing, params, body)
   }
 
   operators['='] = function ($, clause) {
@@ -73,7 +73,7 @@ module.exports = function operators$function ($void) {
     }
 
     // (= param body ...)
-    return $.function(clause[1], clause.slice(2))
+    return $.$.function(clause[1], clause.slice(2))
   }
 
   // operator function and closure are more readable aliases of '='

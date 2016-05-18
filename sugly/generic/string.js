@@ -2,13 +2,7 @@
 
 var $export = require('../export')
 
-function isTypeOf () {
-  return function String$is_type_of (value) {
-    return typeof value === 'string'
-  }
-}
-
-function valueOf ($) {
+function valueOf (resolve) {
   return function String$value_of () {
     var length = arguments.length
     var result = ''
@@ -21,33 +15,20 @@ function valueOf ($) {
       if (result.length > 0 && !result.endsWith(' ')) {
         result += ' '
       }
-      var to_str = $.$resolve(arg, 'to-string')
+      var to_str = resolve(arg, 'to-string')
       result += typeof to_str === 'function' ? to_str.call(arg) : ''
     }
     return result
   }
 }
 
-function toCode ($) {
-  return function String$to_code () {
-    return $.encode.string(this)
-  }
-}
-
-function toString () {
-  return function String$to_string () {
-    return typeof this === 'string' ? this : ''
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
+  var resolve = $void.resolve
   var type = $.String
-  // test if an value is a string.
-  $export(type, 'is-type-of', isTypeOf())
 
   // concatenate the to-string result of arguments
-  var value_of = $export(type, 'value-of', valueOf($))
+  var value_of = $export(type, 'value-of', valueOf(resolve))
 
   // generate a string from a series of unicode values
   $export.copy(type, String, {
@@ -55,17 +36,6 @@ module.exports = function ($void) {
   })
 
   var proto = type.proto
-  // persistency & describe
-  $export(proto, 'to-code', toCode($))
-  $export(proto, 'to-string', toString())
-
-  // the emptiness if string is determined by its length.
-  $export(proto, 'is-empty', function () {
-    return this.length < 1
-  })
-  $export(proto, 'not-empty', function () {
-    return this.length > 0
-  })
 
   // generate sub-string from this string.
   $export.copy(proto, String.prototype, {
@@ -108,39 +78,18 @@ module.exports = function ($void) {
   })
 
   // combination and splitting of strings
-  $export(proto, 'concat', function () {
+  $export(proto, 'concat', function string$concat () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
   $export.copy(proto, String.prototype, {
     'split': 'split'
   })
 
-  // support ordering logic - comparable
-  $export(proto, 'compare', function (another) {
-    return this === another ? 0 : (this > another ? 1 : -1)
-  })
-  $export.copy(proto, String.prototype, {
-    'localeCompare': 'locale-compare'
-  })
-
-  // indexer: override, interpret number as offset, readonly.
-  var indexer = proto[':']
-  $export(proto, ':', function (index) {
-    if (typeof index === 'string') {
-      return indexer.call(this, index)
-    }
-    // interpret a number a char offset
-    if (typeof index === 'number') {
-      return index >= 0 && index < this.length ? this.charAt(index) : ''
-    }
-    return null
-  })
-
   // support general operators
-  $export(proto, '+', function () {
+  $export(proto, '+', function string$opr_concat () {
     return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(proto, '-', function (value) {
+  $export(proto, '-', function string$opr_remove (value) {
     if (typeof value === 'string') {
       // remove value by its last index in this string.
       var offset = this.lastIndexOf(value)
@@ -156,17 +105,57 @@ module.exports = function ($void) {
     return this
   })
 
+  // support ordering logic - comparable
+  $export(proto, 'compare', function string$compare (another) {
+    return this === another ? 0 : (this > another ? 1 : -1)
+  })
+  $export.copy(proto, String.prototype, {
+    'localeCompare': 'locale-compare'
+  })
+
   // support ordering operators
-  $export(proto, '>', function (another) {
+  $export(proto, '>', function string$opr_gt (another) {
     return typeof another === 'string' ? this > another : false
   })
-  $export(proto, '>=', function (another) {
+  $export(proto, '>=', function string$opr_ge (another) {
     return typeof another === 'string' ? this >= another : false
   })
-  $export(proto, '<', function (another) {
+  $export(proto, '<', function string$opr_lt (another) {
     return typeof another === 'string' ? this < another : false
   })
-  $export(proto, '<=', function (another) {
+  $export(proto, '<=', function string$opr_le (another) {
     return typeof another === 'string' ? this <= another : false
   })
+
+  // persistency & describe
+  $export(proto, 'to-code', function string$to_code () {
+    return $.encode.string(this)
+  })
+  $export(proto, 'to-string', function string$to_string () {
+    return typeof this === 'string' ? this : ''
+  })
+
+  // the emptiness if string is determined by its length.
+  $export(proto, 'is-empty', function string$is_empty () {
+    return this.length < 1
+  })
+  $export(proto, 'not-empty', function string$not_empty () {
+    return this.length > 0
+  })
+
+  // indexer: override, interpret number as offset, readonly.
+  $export(proto, ':', function string$indexer (index) {
+    if (typeof index === 'string') {
+      return typeof proto[index] !== 'undefined' ? proto[index] : null
+    }
+    // interpret a number a char offset
+    if (typeof index === 'number') {
+      return index >= 0 && index < this.length ? this.charAt(index) : ''
+    }
+    return null
+  })
+
+  // export to system's prototype
+  $void.injectTo(String, 'type', type)
+  $void.injectTo(String, ':', proto[':'])
 }

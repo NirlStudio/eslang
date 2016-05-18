@@ -1,9 +1,10 @@
 'use strict'
 
-module.exports = function ($) {
-  var tokenize = $.$tokenize
+module.exports = function ($void) {
+  var $ = $void.$
+  var tokenize = $void.tokenize
 
-  $.$compiler = function () {
+  $void.compiler = function () {
     var stack = [[]]
 
     function beginClause (t) {

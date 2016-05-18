@@ -2,19 +2,6 @@
 
 var $export = require('../export')
 
-function getFields () {
-  return function object$get_fields () {
-    return Object.getOwnPropertyNames(this)
-  }
-}
-
-function hasField ($void) {
-  var ownsProperty = $void.ownsProperty
-  return function object$has_field (name) {
-    return typeof name !== 'string' ? null : ownsProperty(this, name)
-  }
-}
-
 function removeField ($void) {
   var ownsProperty = $void.ownsProperty
 
@@ -30,25 +17,6 @@ function removeField ($void) {
       value = null
     }
     return value
-  }
-}
-
-function hasProperty () {
-  return function object$has_property (name) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    return typeof this[name] !== 'undefined'
-  }
-}
-
-function getProperty () {
-  return function object$get_property (name) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    var value = this[name]
-    return typeof value === 'undefined' ? null : value
   }
 }
 
@@ -90,12 +58,6 @@ function objectClone () {
   }
 }
 
-function toCode ($) {
-  return function Object$to_code () {
-    return $.encode.object(this)
-  }
-}
-
 function objectIndexer () {
   return function object$indexer (name, value) {
     if (typeof name !== 'string') {
@@ -115,23 +77,31 @@ function objectIndexer () {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Type = $void.Type
-  var isPrototypeOf = $void.isPrototypeOf
+  var ownsProperty = $void.ownsProperty
 
   var Class = $.Class
   var proto = Class.proto
 
   // object property & field (owned property) manipulation
   // retrieve field names
-  $export(proto, 'get-fields', getFields())
+  $export(proto, 'get-fields', function object$get_fields () {
+    return Object.getOwnPropertyNames(this)
+  })
   // test the existence by a field name
-  $export(proto, 'has-field', hasField($void))
+  $export(proto, 'has-field', function object$has_field (name) {
+    return typeof name !== 'string' ? null : ownsProperty(this, name)
+  })
   // remove a field from an object
-  $export(proto, 'remove-field', removeField())
+  $export(proto, 'remove-field', removeField($void))
   // test a property (either owned or inherited) name
-  $export(proto, 'has-property', hasProperty())
+  $export(proto, 'has-property', function object$has_property (name) {
+    return typeof name !== 'string' ? false : typeof this[name] !== 'undefined'
+  })
   // retrieve the value of a property
-  $export(proto, 'get-property', getProperty())
+  $export(proto, 'get-property', function object$get_property (name) {
+    return typeof name !== 'string' ? null
+      : typeof this[name] !== 'undefined' ? this[name] : null
+  })
   // set the value of a field
   $export(proto, 'set-property', setProperty())
 
@@ -146,33 +116,13 @@ module.exports = function ($void) {
   $export(proto, '+', combine(Class.create))
   $export(proto, '+=', merge(proto))
 
-  // define an object's type attributes
-  $export(proto, 'is-type', function object$is_type () {
-    return false
-  })
-  $export(proto, 'is-type-of', function object$is_type_of (value) {
-    return false
-  })
-  $export(proto, 'super', function object$super () {
-    return null
-  })
-  $export(proto, 'get-type', function object$get_type () {
-    return isPrototypeOf(proto, this) ? Object.getPrototypeOf(this).type : Class
-  })
-  $export(proto, 'is-instance', function object$is_instance () {
-    return true
-  })
-  $export(proto, 'is-instance-of', function object$is_instance_of (type) {
-    if (!(type instanceof Type)) {
-      return false
-    }
-    return isPrototypeOf(type.proto, this) ||
-      (typeof this === 'object' && type === Class) // for native objects
-  })
-
   // default object persistency & describing logic
-  $export(proto, 'to-code', toCode($))
-  $export(proto, 'to-string', toCode($))
+  $export(proto, 'to-code', function object$to_code () {
+    return $.encode.object(this)
+  })
+  $export(proto, 'to-string', function object$to_string () {
+    return $.encode.object(this)
+  })
 
   // default object emptiness logic
   $export(proto, 'is-empty', function object$is_empty () {
@@ -193,4 +143,7 @@ module.exports = function ($void) {
   // An object is the container of all its fields
   // iterator: iterate all field names and values
   require('./object-iterator')($)
+
+  // export to system's prototype
+  $void.injectTo(Object, ':', proto[':'])
 }

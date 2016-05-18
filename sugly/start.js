@@ -3,23 +3,8 @@
 var JS = global || window
 var $export = require('./export')
 
-function createSpace () {
-  // Hello, world.
-  var $void = require('./generic/genesis')()
-
-  // meta information
-  var $ = $void.$
-  $export($, 'Sugly', $.Object.create({
-    'runtime': 'js',
-    'version': '0.2.0',
-    'debugging': true
-  }))
-  return $void
-}
-
 function exportConstants ($) {
   $[''] = null
-  $.null = null
   $.true = true
   $.false = false
   $.NaN = NaN
@@ -29,7 +14,9 @@ function exportConstants ($) {
 function initializeSpace ($void) {
   // populating
   require('./generic/null')($void)
+  require('./generic/type')($void)
 
+  var $ = $void.$
   require('./generic/symbol')($void)
   $export($, 'symbol', $.Symbol['value-of'])
 
@@ -69,7 +56,6 @@ function initializeSpace ($void) {
 
   require('./generic/iterate')($void)
 
-  var $ = $void.$
   require('./lib/math')($, JS)
   require('./lib/uri')($, JS)
   require('./lib/json')($, JS)
@@ -86,7 +72,8 @@ function initializeRuntime ($void) {
 }
 
 module.exports = function start (output) {
-  var $void = createSpace()
+  // Hello, world.
+  var $void = require('./generic/genesis')()
   var $ = $void.$
 
   // export global constant values.
@@ -101,7 +88,7 @@ module.exports = function start (output) {
   require('./operators/all')($void)
 
   // encode function factory
-  var encoder = require('./lib/encoder')($, JS)
+  var encoder = require('./lib/encoder')($void, JS)
   // default encode function
   $export($, 'encode', encoder(true))
 
@@ -114,11 +101,11 @@ module.exports = function start (output) {
 
   // compile a piece of code to program/clauses: [[]].
   $export($, 'compile', function (code, src) {
-    return $.$compiler()(code, src)
+    return $void.compiler()(code, src)
   })
 
   // this is only used by runtime itself or its assembler
-  $void.$export = function (name, obj) {
+  $void.export = function (name, obj) {
     $export(this, name, obj)
   }
 
@@ -129,5 +116,6 @@ module.exports = function start (output) {
   // real program executors
   require('./runtime/execute')($void)
 
+  require('./version')($void)
   return $void
 }

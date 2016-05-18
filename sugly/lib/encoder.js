@@ -2,9 +2,10 @@
 
 var $export = require('../export')
 
-module.exports = function ($, JS) {
+module.exports = function ($void, JS) {
+  var $ = $void.$
+  var Symbol$ = $void.Symbol
   var $Symbol = $.Symbol
-  var Symbol$ = $.$SymbolConstructor
   var symbolValueOf = $Symbol['value-of']
 
   var SymbolContext = symbolValueOf('$')

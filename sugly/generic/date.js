@@ -43,7 +43,7 @@ function notEquals () {
 }
 
 function dateIndexer ($) {
-  var resolve = $.Object.proto[':']
+  var resolve = $.Class.proto[':']
   return function date$indexer (index, value) {
     // forward to default object indexer
     if (typeof index !== 'number') {
@@ -140,14 +140,6 @@ module.exports = function ($void) {
   // parse a date/time string representation to a date object.
   $export(type, 'parse', function Date$parse (str) {
     return new Date(typeof str === 'string' ? str : 0)
-  })
-
-  // Date type is a native type, but logically inherited from managed object.
-  $export(type, 'is-type-of', function Date$is_type_of (value) {
-    return value instanceof Date
-  })
-  $export(type, 'super', function Date$super () {
-    return $.Class
   })
 
   // date/time value manipulation.
@@ -267,28 +259,28 @@ module.exports = function ($void) {
   })
 
   // support ordering operators
-  $export(proto, '>', function date$gt (another) {
+  $export(proto, '>', function date$opr_gt (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time > another.getTime()
   })
-  $export(proto, '>=', function date$ge (another) {
+  $export(proto, '>=', function date$opr_ge (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time >= another.getTime()
   })
-  $export(proto, '<', function date$lt (another) {
+  $export(proto, '<', function date$opr_lt (another) {
     if (!(another instanceof Date)) {
       return false
     }
     var time = this.getTime()
     return typeof time === 'number' && time < another.getTime()
   })
-  $export(proto, '<=', function date$le (another) {
+  $export(proto, '<=', function date$opr_le (another) {
     if (!(another instanceof Date)) {
       return false
     }
@@ -299,14 +291,6 @@ module.exports = function ($void) {
   // override equivalence logic
   $export(proto, 'equals', equals())
   $export(proto, 'not-equals', notEquals())
-
-  // define a date object's type attributes
-  $export(proto, 'is-instance-of', function object$is_instance_of (type) {
-    return type === $.Class || type === $.Date
-  })
-  $export(proto, 'get-type', function object$get_type () {
-    return $.Date
-  })
 
   // persistency
   $export(proto, 'to-code', function date$to_code () {
@@ -327,4 +311,8 @@ module.exports = function ($void) {
   // override equivalence operators
   $export(proto, '==', equals())
   $export(proto, '!=', notEquals())
+
+  // export to system's prototype
+  $void.injectTo(Date, 'type', type)
+  $void.injectTo(Date, ':', proto[':'])
 }

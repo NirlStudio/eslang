@@ -6,26 +6,6 @@ module.exports = function ($void) {
   var $ = $void.$
   var type = $.Function
 
-  // define static type attributes
-  $export(type, 'is-type', function Function$is_type () {
-    return true
-  })
-  $export(type, 'is-type-of', function Function$is_type_of (value) {
-    return typeof value === 'function'
-  })
-  $export(type, 'super', function Function$super () {
-    return null
-  })
-  $export(type, 'get-type', function Function$get_type () {
-    return $.Class
-  })
-  $export(type, 'is-instance', function Function$is_instance () {
-    return false
-  })
-  $export(type, 'is-instance-of', function Function$is_instance_of (type) {
-    return false
-  })
-
   var proto = type.proto
 
   // dynamically invoke a function.
@@ -48,26 +28,6 @@ module.exports = function ($void) {
     return this.$enclosing || null
   })
 
-  // define static value attributes
-  $export(proto, 'is-type', function function$is_type () {
-    return false
-  })
-  $export(proto, 'is-type-of', function function$is_type_of (value) {
-    return false
-  })
-  $export(proto, 'super', function function$super () {
-    return null
-  })
-  $export(proto, 'get-type', function function$get_type () {
-    return type
-  })
-  $export(proto, 'is-instance', function function$is_instance () {
-    return true
-  })
-  $export(proto, 'is-instance-of', function function$is_instance_of (func) {
-    return type === func
-  })
-
   // persistency & describing
   $export(proto, 'to-code', function function$to_code () {
     return $.encode.function(this)
@@ -83,4 +43,8 @@ module.exports = function ($void) {
     }
     typeof proto[name] !== 'undefined' ? proto[name] : null
   })
+
+  // export to system's prototype
+  $void.injectTo(Function, 'type', type)
+  $void.injectTo(Function, ':', proto[':'])
 }

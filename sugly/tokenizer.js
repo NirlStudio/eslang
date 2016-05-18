@@ -10,8 +10,9 @@ var keywords = {
   'Infinity': Infinity
 }
 
-function createTokenizer ($) {
-  var InvalidSymbol = $.$InvalidSymbol
+function createTokenizer ($void) {
+  var InvalidSymbol = $void.InvalidSymbol
+  var $ = $void.$
   var symbolValueOf = $.Symbol['value-of']
 
   return function tokenizer (lines, source) {
@@ -211,10 +212,10 @@ function createTokenizer ($) {
   }
 }
 
-module.exports = function ($) {
-  var tokenizer = createTokenizer($)
+module.exports = function ($void) {
+  var tokenizer = createTokenizer($void)
 
-  $.$tokenize = function (code, source) {
+  $void.tokenize = function (code, source) {
     if (typeof code !== 'string') {
       code = '()'
     }

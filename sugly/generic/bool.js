@@ -50,26 +50,6 @@ module.exports = function ($void) {
     return typeof value === 'boolean' ? !value : !value_of(value)
   })
 
-  // define static type attributes
-  $export(type, 'is-type', function Bool$is_type () {
-    return true
-  })
-  $export(type, 'is-type-of', function Bool$is_type_of (value) {
-    return typeof value === 'boolean'
-  })
-  $export(type, 'super', function Bool$super () {
-    return null
-  })
-  $export(type, 'get-type', function Bool$get_type () {
-    return $.Class
-  })
-  $export(type, 'is-instance', function Bool$is_instance () {
-    return false
-  })
-  $export(type, 'is-instance-of', function Bool$is_instance_of (type) {
-    return false
-  })
-
   // the virtual class of boolean type
   var proto = type.proto
 
@@ -99,26 +79,6 @@ module.exports = function ($void) {
     return !this
   })
 
-  // define static value attributes
-  $export(proto, 'is-type', function bool$is_type () {
-    return false
-  })
-  $export(proto, 'is-type-of', function bool$is_type_of (value) {
-    return false
-  })
-  $export(proto, 'super', function bool$super () {
-    return null
-  })
-  $export(proto, 'get-type', function bool$get_type () {
-    return type
-  })
-  $export(proto, 'is-instance', function bool$is_instance () {
-    return true
-  })
-  $export(proto, 'is-instance-of', function bool$is_instance_of (bool) {
-    return type === bool
-  })
-
   // persistency & description
   $export(proto, 'to-code', function bool$to_code () {
     return this ? 'true' : 'false'
@@ -140,4 +100,8 @@ module.exports = function ($void) {
     return typeof name !== 'string' ? null
       : (typeof proto[name] !== 'undefined' ? proto[name] : null)
   })
+
+  // export to system's prototype
+  $void.injectTo(Boolean, 'type', type)
+  $void.injectTo(Boolean, ':', proto[':'])
 }

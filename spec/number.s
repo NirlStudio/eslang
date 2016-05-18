@@ -91,30 +91,6 @@
     (assert false (` (Number is-finite (@),
     (assert false (` (Number is-finite (object),
   ),
-  ($should "(Int is-type-of )" "return true for integer values" (= ()
-    (assert (` (Int is-type-of -1),
-    (assert (` (Int is-type-of 1),
-    (assert (` (Int is-type-of 0),
-    (assert (` (Int is-type-of (Int MAX_VALUE),
-    (assert (` (Int is-type-of (+(Int MAX_VALUE) 1),
-    (assert (` (Int is-type-of (Int MIN_VALUE),
-    (assert (` (Int is-type-of (-(Int MIN_VALUE) 1),
-    (assert (` (Int is-type-of (Number MAX_VALUE),
-
-    (assert false (` (Int is-type-of (Number MIN_VALUE),
-    (assert false (` (Int is-type-of Infinity),
-    (assert false (` (Int is-type-of NaN),
-
-    (assert false (` (Int is),
-    (assert false (` (Int is-type-of null),
-    (assert false (` (Int is-type-of true),
-    (assert false (` (Int is-type-of false),
-    (assert false (` (Int is-type-of ""),
-    (assert false (` (Int is-type-of "0"),
-    (assert false (` (Int is-type-of (@),
-    (assert false (` (Int is-type-of (object),
-
-  ),
   ($should "(Int is-safe )" "return true for safe integer values" (= ()
     (assert (` (Int is-safe -1),
     (assert (` (Int is-safe 1),

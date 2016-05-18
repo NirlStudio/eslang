@@ -18,16 +18,9 @@
     (assert (Symbol Nothing) (` (Symbol value-of ""),
     (assert (` sym) (` (Symbol value-of "sym"),
   ),
-  ($should "(Symbol key-of)" "retrieve the key of a symbol" (= ()
-    (assert "" (` (Symbol key-of),
-    (assert "" (` (Symbol key-of null),
-    (assert "" (` (Symbol key-of 3),
-    (assert "" (` (Symbol key-of (@),
-    (assert "" (` (Symbol key-of (object),
-    (assert "" (` (Symbol key-of (= x x),
-    (assert "" (` (Symbol key-of "symbol"),
-    (assert "" (` (Symbol key-of (Symbol Nothing),
-    (assert "sym" (` (Symbol key-of (` sym),
+  ($should "(symbol key)" "retrieve the key of a symbol" (= ()
+    (assert "" (` ((`) key),
+    (assert "sym" (` ((` sym) key),
   ),
   ($should "(Symbol is-valid)" "return true for a valid symbol key." (= ()
     (assert true (` (Symbol is-valid "$"),
@@ -54,26 +47,11 @@
     (assert false (` (Symbol is-valid "s\tym"),
     (assert false (` (Symbol is-valid "s ym"),
   ),
-  ($should "(Symbol is-type-of)" "return true for a symbol." (= ()
-    (assert true (` (Symbol is-type-of (Symbol Nothing),
-    (assert true (` (Symbol is-type-of (` sym),
-
-    (assert false (` (Symbol is-type-of),
-    (assert false (` (Symbol is-type-of null),
-    (assert false (` (Symbol is-type-of true),
-    (assert false (` (Symbol is-type-of false),
-    (assert false (` (Symbol is-type-of 2),
-    (assert false (` (Symbol is-type-of ""),
-    (assert false (` (Symbol is-type-of "symbol"),
-    (assert false (` (Symbol is-type-of (@),
-    (assert false (` (Symbol is-type-of (object),
-    (assert false (` (Symbol is-type-of (= x x),
-  ),
 ).
 
 ($define "function form" (=()
   ($should "return the symbol value of a string" (= ()
-    (assert "sym" (` (Symbol key-of ($symbol "sym"),
+    (assert "sym" (` (($symbol "sym") key),
     (assert (` $) (` ($symbol "$"),
     (assert (` `) (` ($symbol "`"),
     (assert (` @) (` ($symbol "@"),
@@ -100,7 +78,7 @@
 
 ($define "operator form" (=()
   ($should "return the symbol value of a string" (= ()
-    (assert "sym" (` (Symbol key-of (symbol "sym"),
+    (assert "sym" (` ((symbol "sym") key),
     (assert (` $) (` (symbol "$"),
     (assert (` `) (` (symbol "`"),
     (assert (` @) (` (symbol "@"),

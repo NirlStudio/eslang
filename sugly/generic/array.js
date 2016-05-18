@@ -44,6 +44,7 @@ function fromSource () {
 
 function arrayIndexer ($) {
   var resolve = $.Class.proto[':']
+
   return function array$indexer (index, value) {
     if (arguments.length === 1) {
       if (typeof index === 'number') {
@@ -85,16 +86,7 @@ module.exports = function ($void) {
   // convert any iterable object to an array.
   $export(type, 'from', fromSource())
 
-  // define static type attributes
-  $export(type, 'is-type-of', function Array$is_type_of (value) {
-    return Array.isArray(value)
-  })
-  $export(type, 'super', function Array$super () {
-    return $.Class
-  })
-
   var proto = type.proto
-
   // array element accessors
   $export(proto, 'get', function array$get (offset) {
     return typeof offset === 'number' && offset >= 0 && offset < this.length
@@ -176,14 +168,6 @@ module.exports = function ($void) {
     Array.prototype.concat.apply(this, arguments)
   })
 
-  // define an array object's type attributes
-  $export(proto, 'get-type', function object$get_type () {
-    return $.Array
-  })
-  $export(proto, 'is-instance-of', function object$is_instance_of (type) {
-    return type === $.Class || type === $.Array
-  })
-
   // persistency & describing
   $export(proto, 'to-code', function array$to_code () {
     return $.encode.array(this)
@@ -213,4 +197,8 @@ module.exports = function ($void) {
 
   // iterator: iterate all offsets and values
   require('./array-iterator')($)
+
+  // export to system's prototype
+  $void.injectTo(Array, 'type', type)
+  $void.injectTo(Array, ':', proto[':'])
 }

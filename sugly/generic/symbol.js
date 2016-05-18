@@ -5,67 +5,17 @@ var $export = require('../export')
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
 var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
 
-function isValid () {
-  return function Symbol$is_valid (key) {
-    return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
-  }
-}
-
-function isTypeOf ($) {
-  var constructor = $.$SymbolConstructor
-  return function Symbol$is_type_of (value) {
-    return value instanceof constructor
-  }
-}
-
-function valueOf ($) {
-  var sharedSymbols = $.$SharedSymbols
-  var Symbol$ = $.$SymbolConstructor
-  var nothing = $.Symbol.Nothing
-  var is_valid = $.Symbol['is-valid']
-  return function Symbol$value_of (key) {
-    if (is_valid(key)) {
-      var sym = sharedSymbols[key]
-      return sym ? sym : (sharedSymbols[key] = new Symbol$(key))
-    }
-    return nothing
-  }
-}
-
-function keyOf ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function Symbol$key_of (sym) {
-    return sym instanceof Symbol$ ? sym.key : ''
-  }
-}
-
-function toCode ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function symbol$to_code () {
-    return this instanceof Symbol$ ? this.key : ''
-  }
-}
-
-function toString ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function symbol$to_string () {
-    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
-  }
-}
-
-function isSame ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function symbol$is (another) {
+function isSame (Symbol$) {
+  return function symbol$is_same (another) {
     return this === another ||
-      (this instanceof Symbol$ && another instanceof Symbol$ && this.key === another.key)
+      (this.key === another.key && this instanceof Symbol$ && another instanceof Symbol$)
   }
 }
 
-function notSame ($) {
-  var Symbol$ = $.$SymbolConstructor
-  return function symbol$is_not (another) {
+function notSame (Symbol$) {
+  return function symbol$not_same (another) {
     return this !== another &&
-      (!(this instanceof Symbol$) || !(another instanceof Symbol$) || this.key !== another.key)
+      (this.key !== another.key || !(this instanceof Symbol$) || !(another instanceof Symbol$))
   }
 }
 
@@ -75,37 +25,50 @@ module.exports = function ($void) {
 
   // regex to test invalid symbol
   $void.InvalidSymbol = InvalidSymbol
-
   // common symbol repository
   var sharedSymbols = $void.SharedSymbols = Object.create(null)
 
   // Symbol is a value type derived from Null.
   var type = $.Symbol
-  var proto = Symbol$.prototype = type.proto
-
   // const nothing object.
-  type.Nothing = sharedSymbols[''] = new Symbol$('')
+  var nothing = type.Nothing = sharedSymbols[''] = new Symbol$('')
 
   // check whether a string is a valid symbol key.
-  $export(type, 'is-valid', isValid())
-
-  // check if an entity is a symbol.
-  $export(type, 'is-type-of', isTypeOf($))
+  var is_valid = $export(type, 'is-valid', function Symbol$is_valid (key) {
+    return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
+  })
 
   // a symbol can only be created from a valid symbol name (string).
-  $export(type, 'value-of', valueOf($))
+  $export(type, 'value-of', function Symbol$value_of (key) {
+    return !is_valid(key) ? nothing
+      : typeof sharedSymbols[key] !== 'undefined'
+        ? sharedSymbols[key] : (sharedSymbols[key] = new Symbol$(key))
+  })
 
   // try to retrieve the key of a symbol.
-  $export(type, 'key-of', keyOf($))
+  $export(type, 'key-of', function Symbol$key_of (sym) {
+    return sym instanceof Symbol$ ? sym.key : ''
+  })
+
+  var proto = type.proto
+
+  $export(proto, 'key', function symbol$key () {
+    return this.key
+  })
 
   // a symbol behaves as a value entity.
-  $export(proto, 'is', isSame($))
-  // the general equivalence - placeholder
-  $export(proto, 'equals', isSame($))
+  $export(proto, 'is', isSame(Symbol$))
+  $export(proto, 'is-not', notSame(Symbol$))
+  $export(proto, 'equals', isSame(Symbol$))
+  $export(proto, 'not-equals', notSame(Symbol$))
 
   // persistency & description
-  $export(proto, 'to-code', toCode($))
-  $export(proto, 'to-string', toString($))
+  $export(proto, 'to-code', function symbol$to_code () {
+    return this instanceof Symbol$ ? this.key : ''
+  })
+  $export(proto, 'to-string', function symbol$to_string () {
+    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
+  })
 
   // emptiness: nothing symbol is taken as the empty value.
   $export(proto, 'is-empty', function () {
@@ -117,14 +80,11 @@ module.exports = function ($void) {
 
   // indexer: general & primary predicate, readonly.
   $export(proto, ':', function (name) {
-    if (typeof name === 'string') {
-      var value = proto[name]
-      return typeof value !== 'undefined' ? value : null
-    }
-    return null
+    return typeof name !== 'string' ? null
+      : typeof proto[name] !== 'undefined' ? proto[name] : null
   })
 
   // overide general equivalence operators, being consistent with equals
-  $export(proto, '==', isSame($))
-  $export(proto, '!=', notSame($))
+  $export(proto, '==', isSame(Symbol$))
+  $export(proto, '!=', notSame(Symbol$))
 }

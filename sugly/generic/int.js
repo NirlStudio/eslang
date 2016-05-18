@@ -51,19 +51,6 @@ module.exports = function ($void) {
   // override to support radix argument.
   $export(type, 'value-of', valueOf(parse))
 
-  // override to test an integer value.
-  $export(type, 'is-type-of', Number.isInteger ? function Int$is_type_of (value) {
-    return Number.isInteger(value)
-  } : function Number$is_int (value) {
-    return typeof value === 'number' &&
-      isFinite(value) &&
-      Math.floor(value) === value
-  })
-  // super type is fixed to Number
-  $export(type, 'super', function Int$super () {
-    return $.Number
-  })
-
   // support bitwise operations for 32-bit integer values.
   type.MAX_BITS = Math.pow(2, 31) - 1
   type.MIN_BITS = -Math.pow(2, 31)
@@ -102,14 +89,6 @@ module.exports = function ($void) {
   })
   $export(proto, '>>>', function bit$lshift (offset) {
     return this >>> offset
-  })
-
-  // define an integer value's type attributes
-  $export(proto, 'get-type', function int$get_type () {
-    return type
-  })
-  $export(proto, 'is-instance-of', function int$is_instance_of (int) {
-    return type === int || int === $.Number
   })
 
   // override indexer to expose functions & operators

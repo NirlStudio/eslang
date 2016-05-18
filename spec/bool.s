@@ -47,17 +47,6 @@
   ),
 ).
 
-($define "(Bool is-type-of x" (= ()
-  ($should "test if a value is a bool value." (= ()
-    (assert (` (Bool is-type-of true),
-    (assert (` (Bool is-type-of false),
-    (assert false (` (Bool is-type-of 0),
-    (assert false (` (Bool is-type-of 1),
-    (assert false (` (Bool is-type-of null),
-    (assert false (` (Bool is-type-of ""),
-  ),
-).
-
 ($define "(Bool value-of x) " (= ()
   ($should "standardize a value to its bool value." (= ()
     (assert (` (Bool value-of true),

@@ -5,7 +5,7 @@ module.exports = function ($void) {
   var $ = $void.$
 
   var $Null = $.Null
-  var $null = $.Null.proto
+  var $null = $.Type.proto
   var $bool = $.Bool.proto
   var $int = $.Int.proto
   var $float = $.Float.proto

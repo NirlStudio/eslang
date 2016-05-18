@@ -19,8 +19,8 @@ module.exports = function evaluate ($void) {
     // intercept subject
     if (subject instanceof Symbol$) {
       var key = subject.key
-      if ($.$operators && typeof $.$operators[key] !== 'undefined') {
-        return $.$operators[key]($, clause)
+      if ($.operators && typeof $.operators[key] !== 'undefined') {
+        return $.operators[key]($, clause)
       } else if (typeof $void.operators[key] !== 'undefined') {
         return $void.operators[key]($, clause)
       }

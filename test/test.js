@@ -14,7 +14,7 @@ function passed (feature) {
 }
 
 function assert (feature, expected) {
-  if (expected !== 'string') {
+  if (typeof expected !== 'string') {
     expected = 'function'
   }
 
@@ -42,14 +42,6 @@ function checkJavascript () {
   }
 }
 
-function checkSymbol () {
-  if (typeof JS.Symbol === 'function') {
-    passed('Sugly is using native symbol type.')
-  } else {
-    passed('Sugly is using polyfill symbol type.')
-  }
-}
-
 function checkPolyfill () {
   var polyfill = require('../lib/polyfill')
   if (polyfill.length > 0) {
@@ -64,7 +56,6 @@ function checkPolyfill () {
 function checkSystem () {
   console.log('\n  Checking Javascript environment')
   checkJavascript()
-  checkSymbol()
   checkPolyfill()
 }
 
@@ -73,6 +64,8 @@ function checkObject () {
   assert('Object.assign')
   assert('Object.create')
   assert('Object.is')
+  assert('Object.defineProperty')
+  assert('Object.getOwnPropertyNames')
 }
 
 function checkString () {
@@ -86,6 +79,11 @@ function checkArray () {
   assert('Array.isArray')
 }
 
+function checkNumber () {
+  console.log('\n  - Array')
+  assert('Number.isInteger')
+}
+
 function checkEnvronment ($) {
   failing = []
   passing = 0
@@ -94,6 +92,7 @@ function checkEnvronment ($) {
   checkObject()
   checkString()
   checkArray()
+  checkNumber()
 
   if (failing.length < 1) {
     checkSugly($)
@@ -118,7 +117,7 @@ function checkOperators ($, group, names) {
   console.log('\n  - operators')
   for (var i = 0; i < names.length; i++) {
     var name = names[i]
-    if (typeof $.$operators[name] === 'function') {
+    if (typeof $.operators[name] === 'function') {
       passed(name)
     } else {
       failed(group + name)
@@ -150,46 +149,69 @@ function checkObjects ($, group, names) {
   }
 }
 
-function checkSugly ($) {
-  if (typeof $ === 'undefined') {
-    $ = require('..')
+function checkInjections () {
+  console.log('\n  - Type Injections')
+  assert('Boolean.prototype.type', 'object')
+  assert('Boolean.prototype.:')
+
+  assert('Number.prototype.type', 'object')
+  assert('Number.prototype.:')
+
+  assert('String.prototype.type', 'object')
+  assert('String.prototype.:')
+
+  assert('Object.prototype.type', 'object')
+  assert('Object.prototype.:')
+
+  assert('Date.prototype.type', 'object')
+  assert('Date.prototype.:')
+
+  assert('Array.prototype.type', 'object')
+  assert('Array.prototype.:')
+}
+
+function checkSugly ($void) {
+  if (typeof $void === 'undefined') {
+    $void = require('..')
   }
   console.log('\n  Checking Sugly runtime ...')
 
-  checkOperators($, '[Sugly / operator] ', [
+  checkOperators($void, '[Void / operator] ', [
     '`', 'quote', 'let', '@', 'object', 'array',
     '=', 'function', 'closure', '=>', 'lambda', 'return', 'exit', 'halt',
     'is', 'typeof', 'bool', 'number', 'string', 'symbol', 'date',
     'if', 'for', 'while', 'break', 'continue',
     '->', 'flow', '|', 'pipe', '?', 'premise', 'operator',
-    'concat', '+', '+=',
-    '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
+    '+', '+=', '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
   ])
 
-  checkFunctions($, '[Sugly / function] ', [
+  checkFunctions($void, '[Void / function] ', [
+    'Signal', 'resolve', 'assign', 'set', 'evaluate', 'signalOf',
+    'export', 'load', 'createSpace', 'createModuleSpace', 'execute'
+  ])
+
+  checkFunctions($void.$, '[Sugly / function] ', [
     'bool', 'string', 'symbol', 'object', 'date', 'array', 'range', 'iterate',
     'compile', 'encoder', 'encode', 'print',
-    '$Signal', '$resolve', '$assign', '$set', '$eval', '$beval', '$createSignalOf',
-    '$export', '$load', '$createSpace', '$createModuleSpace', '$exec',
     'export', 'function', 'lambda', 'eval',
     'load', 'exec', 'run', 'import', 'require', 'retire'
   ])
 
-  checkObjects($, '[Sugly / object] ', [
-    'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Object', 'Function',
+  checkObjects($void.$, '[Sugly / object] ', [
+    'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Class', 'Function',
     'Date', 'Array', 'Uri', 'Math', 'Json', 'Sugly'
   ])
+
+  checkInjections()
 }
 
 function check ($) {
-  var result
   if (typeof console.log === 'function') {
-    result = checkEnvronment($)
+    return checkEnvronment($)
   } else {
     window.alert('The global console object is required.')
-    result = false
+    return false
   }
-  return result
 }
 
 if (require.main === module) {

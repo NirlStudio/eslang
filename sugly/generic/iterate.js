@@ -15,7 +15,7 @@ module.exports = function iterate ($void) {
       return $.Range.create(target).iterate()
     }
 
-    return typeof target === 'object' && typeof target.iterate === 'function'
+    return target && typeof target === 'object' && typeof target.iterate === 'function'
       ? target.iterate() : $.Class.create({
         value: null,
         next: function () {

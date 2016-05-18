@@ -1,44 +1,90 @@
 'use strict'
 
 module.exports = function () {
-  /* In the beginning God created the heavens and the earth. */
+  /*
+    The Prologue.
+  */
   var $void = {}
-  var protoNull = Object.create(null)
 
+  /* In the beginning God created the heavens and the earth. */
+  var Null = $void.null = Object.create(null)
   /* Now the earth was formless and empty, */
-  var $ = $void.$ = Object.create(protoNull)
+  var $ = $void.$ = Object.create(Null)
 
   /* “Let there be light,” and there was light. */
-  var Type$ = $void.Type = function Type$ (prototype) {
+  // The light is the laws, which is the foundation of all beings.
+  var Prototype = Object.create(Null)
+  var Type$ = $void.Type = function Type$ () {
+    // In both theory and reality, this function should be executed once, and
+    // can only be executed once.
     Object.defineProperty(this, 'proto', {
       enumerable: false,
       configurable: false,
       writable: false,
-      value: prototype ? prototype : Object.create(protoNull)
+      value: Prototype
     })
-    this.proto.type = this
+    Object.defineProperty(this.proto, 'type', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: this
+    })
   }
+  Type$.prototype = Prototype
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
-  function define (name, prototype) {
-    var type = new Type$(prototype)
+  $.name = '$'
+
+  /* ... he separated the light from the darkness, */
+  var Type = new Type$()
+  /* ... called the light “day,”  */
+  Type.name = 'Type'
+  $.Type = Type
+
+  /* ... and the darkness he called “night.” */
+  Null.name = 'null'
+  $.null = null
+  // The logical noumenon of null is not accessible directly, otherwise it will
+  // cause some confusion in evalution process.
+  // P.S, so is our fate either?
+
+  /* And there was evening, and there was morning—the first day. */
+  // - from Bible and Dao Te Ching
+
+  /*
+    Prepare to build generice type system.
+  */
+  function create (name, prototype) {
+    prototype = prototype || Type
+    var type = Object.create(prototype)
+    // a type includes a prototype
+    Object.defineProperty(type, 'proto', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: Object.create(prototype.proto)
+    })
+    // a prototype link to its type
+    Object.defineProperty(type.proto, 'type', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: type
+    })
+    // export to space.
     type.name = name
-    type.identityName = name
-    $[type.name] = type
+    $[name] = type
   }
 
-  $.identityName = '$'
-  Type$.prototype = protoNull
-  define('Null', protoNull)
+  // create primitive types
+  create('Bool')
+  create('Number')
+  create('String')
+  create('Symbol')
+  create('Function')
+  create('Class')
 
-  var protoClass = Type$.prototype = Object.create(protoNull)
-  define('Class', protoClass)
-  define('Bool')
-  define('Number')
-  define('String')
-  define('Symbol')
-  define('Function')
-
+  // prepare the constructor of symbol type.
   var Symbol$ = $void.Symbol = function Symbol$ (key) {
     Object.defineProperty(this, 'key', {
       enumerable: false,
@@ -49,20 +95,7 @@ module.exports = function () {
   }
   Symbol$.prototype = $.Symbol.proto
 
-  function create (name, prototype) {
-    var type = Object.create(prototype)
-    Object.defineProperty(type, 'proto', {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: Object.create(prototype.proto)
-    })
-    type.proto.type = type
-    type.name = name
-    type.identityName = name
-    $[type.name] = type
-  }
-
+  // create other fundamental types
   create('Int', $.Number)
   create('Float', $.Number)
 
@@ -75,7 +108,8 @@ module.exports = function () {
   $void.isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
   $void.ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
 
-  $void.createType = function $derive (prototype) {
+  // expose a method to create new types further.
+  $void.createType = function $createType (prototype) {
     var type = Object.create(prototype)
     Object.defineProperty(type, 'proto', {
       enumerable: false,
@@ -83,8 +117,22 @@ module.exports = function () {
       writable: false,
       value: Object.create(prototype.proto)
     })
-    type.proto.type = type
+    Object.defineProperty(type.proto, 'type', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: type
+    })
+    return type
   }
 
+  $void.injectTo = function (type, name, value) {
+    Object.defineProperty(type.prototype, name, {
+      enumerable: false,
+      configurable: false,
+      writable: true,
+      value: value
+    })
+  }
   return $void
 }
