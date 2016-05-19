@@ -1,14 +1,15 @@
 'use strict'
 
 module.exports = function evaluate ($void) {
-  var set = $void.set
   var resolve = $void.resolve
+  var get = $void.get
+  var set = $void.set
   var Symbol$ = $void.Symbol
 
-  $void.evaluate = function evaluate (clause, $) {
+  $void.evaluate = function evaluate (clause, space) {
     if (!Array.isArray(clause)) {
       // not a clause.
-      return clause instanceof Symbol$ ? resolve($, clause) : clause
+      return clause instanceof Symbol$ ? resolve(space, clause) : clause
     }
     var length = clause.length
     if (length < 1) {
@@ -19,18 +20,18 @@ module.exports = function evaluate ($void) {
     // intercept subject
     if (subject instanceof Symbol$) {
       var key = subject.key
-      if ($.operators && typeof $.operators[key] !== 'undefined') {
-        return $.operators[key]($, clause)
+      if (space.operators && typeof space.operators[key] !== 'undefined') {
+        return space.operators[key](space, clause)
       } else if (typeof $void.operators[key] !== 'undefined') {
-        return $void.operators[key]($, clause)
+        return $void.operators[key](space, clause)
       }
       if (key === '$') {
-        subject = $ // shortcut
+        subject = space.$ // shortcut
       } else {
-        subject = resolve($, subject)
+        subject = resolve(space, subject)
       }
     } else if (Array.isArray(subject)) {
-      subject = evaluate(subject, $)
+      subject = evaluate(subject, space)
     }
 
     if (subject === null) {
@@ -39,33 +40,27 @@ module.exports = function evaluate ($void) {
 
     // with only subject, take the value of subject as another clause.
     if (length < 2) {
-      return evaluate(subject, $)
+      return evaluate(subject, space)
     }
 
     // predicate exists.
     var predicate = clause[1]
     if (Array.isArray(predicate)) {
-      predicate = evaluate(predicate, $)
+      predicate = evaluate(predicate, space)
     }
 
-    var func, offset
+    var func
     if (predicate instanceof Symbol$) {
-      func = resolve(subject, predicate)
+      func = get(subject, predicate)
       if (typeof func !== 'function') {
         return func // interpret to getter if result is not a function.
       }
-      offset = 2
     } else if (typeof predicate === 'string') {
       // a string as verb is indicating a getting/setting command.
-      func = resolve(subject, ':') // all object must be resolved to an indexer.
-      if (typeof func !== 'function') {
-        // only for space now
-        return length > 2 ? set(subject, predicate, evaluate(clause[2], $)) : resolve(subject, predicate)
-      }
-      offset = 1
+      return length > 2 ? set(subject, predicate, evaluate(clause[2], space))
+        : get(subject, predicate)
     } else if (typeof predicate === 'function') {
       func = predicate
-      offset = 2
     } else {
       return predicate
     }
@@ -76,8 +71,8 @@ module.exports = function evaluate ($void) {
       max = length
     }
     var args = []
-    for (var i = offset; i < max; i++) {
-      args.push(evaluate(clause[i], $))
+    for (var i = 2; i < max; i++) {
+      args.push(evaluate(clause[i], space))
     }
 
     // execute the clause.

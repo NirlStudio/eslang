@@ -169,8 +169,7 @@ module.exports = function ($void) {
   // override indexer to create range object.
   $export(proto, ':', function number$indexer (name) {
     if (typeof name === 'string') {
-      var value = proto[name]
-      return typeof value !== 'undefined' ? value : null
+      return typeof proto[name] !== 'undefined' ? proto[name] : null
     }
     return null
   })

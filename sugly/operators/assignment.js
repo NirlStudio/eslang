@@ -6,9 +6,14 @@ module.exports = function operators$let ($void) {
   var Symbol$ = $void.Symbol
 
   function assignAs (local) {
-    var assign = local ? $void.set : $void.assign
+    var assign = local ? function $let (space, sym, value) {
+      return (space.$[sym.key] = value)
+    } : function $global (space, sym, value) {
+      return !space.moduleIdentifier && space.parent
+        ? (space.parent.$[sym.key] = value) : (space.$[sym.key] = value)
+    }
 
-    return function $assigning ($, clause) {
+    return function $assigning (space, clause) {
       var length = clause.length
       if (length < 2) {
         return null
@@ -17,7 +22,7 @@ module.exports = function operators$let ($void) {
       var c1 = clause[1]
       // (let symbol value)
       if (c1 instanceof Symbol$) {
-        return assign($, c1, length < 3 ? null : evaluate(clause[2], $))
+        return assign(space, c1, length < 3 ? null : evaluate(clause[2], space))
       } else if (!Array.isArray(c1)) {
         return null
       }
@@ -29,7 +34,7 @@ module.exports = function operators$let ($void) {
         if (Array.isArray(pair) && pair.length > 1) {
           var p0 = pair[0]
           if (p0 instanceof Symbol$) {
-            last = assign($, p0, evaluate(pair[1], $))
+            last = assign(space, p0, evaluate(pair[1], space))
             continue
           }
         }
@@ -39,9 +44,15 @@ module.exports = function operators$let ($void) {
     }
   }
 
-  // (var var-name value) or (var (var-name value) ...)
+  // 'let' accesses variables in most recent space.
+  // (let var-name value) or (let (var-name value) ...)
+  operators['let'] = assignAs(true)
+
+  // var is only an alias of let to be used when a varible is used first time.
   operators['var'] = assignAs(true)
 
-  // (let var-name value) or (let (var-name value) ...)
-  operators['let'] = assignAs(false)
+  // 'global' accesses variables shared in module space. It's identical with
+  // let/var when being used in module context.
+  // (global var-name value) or (global (var-name value) ...)
+  operators['global'] = assignAs(false)
 }

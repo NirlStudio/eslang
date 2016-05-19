@@ -5,10 +5,10 @@
 
 ($export "define" (= (feature define-it)
    (let pre current)
-   (let current (let spec (@ feature),
+   (global current (let spec (@ feature),
    ((|| pre cases) push spec),
    ($ define-it)
-   (let current pre)
+   (global current pre)
    (return spec)
 ).
 

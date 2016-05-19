@@ -210,7 +210,7 @@
     (let s (object),
     (let args (@ 1 2),
     (let r (f apply s args),
-    (assert (` (is s (r s),
+    (assert (` (s is (r s),
     (assert 2 (` (r argc),
     (assert 1 (` ((r argv):0),
     (assert 2 (` (-> r argv (:1),

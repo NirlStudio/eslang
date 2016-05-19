@@ -42,16 +42,13 @@ function notEquals () {
   }
 }
 
-function dateIndexer ($) {
-  var resolve = $.Class.proto[':']
+function dateIndexer (proto) {
   return function date$indexer (index, value) {
     // forward to default object indexer
-    if (typeof index !== 'number') {
-      if (arguments.length === 1) {
-        return resolve.call(this, index)
-      } else if (arguments.length > 1) {
-        return resolve.call(this, index, value)
-      }
+    if (index === 'string') {
+      // read only
+      return typeof proto[index] === 'undefined' ? null : proto[index]
+    } else if (typeof index !== 'number') {
       return null
     }
     // try to retrieve value by field offset.
@@ -306,7 +303,7 @@ module.exports = function ($void) {
   })
 
   // indexer: overridding, interpret number value as field offset.
-  $export(proto, ':', dateIndexer($))
+  $export(proto, ':', dateIndexer(proto))
 
   // override equivalence operators
   $export(proto, '==', equals())

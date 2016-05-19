@@ -37,7 +37,7 @@ module.exports = function ($void) {
       return false
     }
     var proto = Object.getPrototypeOf(this)
-    if (!(proto.type instanceof Type)) {
+    if (!(proto.type instanceof Type$)) {
       return false
     }
     return proto.type === type || isPrototypeOf(type, proto.type)
@@ -48,7 +48,7 @@ module.exports = function ($void) {
       return true
     }
     var proto = Object.getPrototypeOf(this)
-    if (!(proto.type instanceof Type)) {
+    if (!(proto.type instanceof Type$)) {
       return true
     }
     return proto.type === type || isPrototypeOf(type, proto.type)

@@ -1,26 +1,19 @@
 'use strict'
 
 module.exports = function operators$function ($void) {
+  var Symbol$ = $void.Symbol
   var operators = $void.operators
-  var set = $void.set
   var resolve = $void.resolve
   var evaluate = $void.evaluate
   var signalOf = $void.signalOf
 
-  var Symbol$ = $void.Symbol
-  var symbolValueOf = $void.$.Symbol['value-of']
-
-  var SymbolDerive = symbolValueOf('>')
-  var SymbolLambdaShort = SymbolDerive
-  var SymbolObject = symbolValueOf('@')
-
   // (= symbols > params body ...)
   // symbols can be symbol or (symbol ...) or (@ prop: value ...)
-  function lambdaCreate ($, symbols, params, body) {
-    var enclosing = {}
+  function lambdaCreate (space, symbols, params, body) {
+    var enclosing = Object.create(null)
     if (symbols instanceof Symbol$) {
-      set(enclosing, symbols, resolve($, symbols))
-      return $.$.lambda(enclosing, params, body)
+      enclosing[symbols.key] = resolve(space, symbols)
+      return space.$.lambda(enclosing, params, body)
     }
 
     if (!Array.isArray(symbols)) {
@@ -28,13 +21,13 @@ module.exports = function operators$function ($void) {
     }
 
     if (symbols.length < 1) {
-      return $.$.lambda(enclosing, params, body)
+      return space.$.lambda(enclosing, params, body)
     }
 
     // enclosing context values.
-    if (symbols[0] === SymbolObject) {
+    if (symbols[0] instanceof Symbol$ && symbols[0].key === '@') {
       // it should be an object expression: (@ prop: value ...)
-      var obj = evaluate(symbols, $)
+      var obj = evaluate(symbols, space)
       if (typeof obj === 'object' && obj !== null) {
         enclosing = obj
       }
@@ -43,37 +36,39 @@ module.exports = function operators$function ($void) {
       for (var i = 0; i < symbols.length; i++) {
         var s = symbols[i]
         if (s instanceof Symbol$) {
-          set(enclosing, s, resolve($, s))
+          enclosing[s.key] = resolve(space, s)
         }
       }
     }
 
-    return $.$.lambda(enclosing, params, body)
+    return space.$.lambda(enclosing, params, body)
   }
 
-  operators['='] = function ($, clause) {
+  operators['='] = function (space, clause) {
     if (clause.length < 3) {
       return null
     }
 
-    if (clause[1] === SymbolDerive) {
+    var c1 = clause[1]
+    if (c1 instanceof Symbol$ && c1.key === '>') {
       // (= > params body)
       if (clause.length < 4) {
         return null
       }
-      return lambdaCreate($, [], clause[2], clause.slice(3))
+      return lambdaCreate(space, [], clause[2], clause.slice(3))
     }
 
-    if (clause[2] === SymbolLambdaShort) {
+    var c2 = clause[2]
+    if (c2 instanceof Symbol$ && c2.key === '>') {
       // (= enclosing > params body)
       if (clause.length < 5) {
         return null
       }
-      return lambdaCreate($, clause[1], clause[3], clause.slice(4))
+      return lambdaCreate(space, c1, clause[3], clause.slice(4))
     }
 
     // (= param body ...)
-    return $.$.function(clause[1], clause.slice(2))
+    return space.$.function(c1, clause.slice(2))
   }
 
   // operator function and closure are more readable aliases of '='
@@ -81,11 +76,11 @@ module.exports = function operators$function ($void) {
   operators['closure'] = operators['=']
 
   // (=> params body)
-  operators['=>'] = function ($, clause) {
+  operators['=>'] = function (space, clause) {
     if (clause.length < 3) {
       return null
     }
-    return lambdaCreate($, [], clause[1], clause.slice(2))
+    return lambdaCreate(space, [], clause[1], clause.slice(2))
   }
 
   // operator lambda is a more readable version of '=>'

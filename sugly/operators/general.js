@@ -6,133 +6,149 @@ module.exports = function operators$general ($void) {
   var assign = $void.assign
   var Symbol$ = $void.Symbol
 
-  function concat ($, str, clause) {
+  function concat (space, str, clause) {
     var length = clause.length
     for (var i = 2; i < length; i++) {
-      var value = evaluate(clause[i], $)
+      var value = evaluate(clause[i], space)
       if (typeof value === 'string') {
         str += value
       } else {
-        str += $.encode.value(value)
+        str += space.$.encode.value(value)
       }
     }
     return str
   }
 
-  function merge ($, base, clause, target) {
-    var length = clause.length
-    if (length < 2) {
-      return null
-    }
-
-    if (typeof target !== 'object' || target === null) {
-      target = base
-      if (typeof target !== 'object' || target === null) {
-        return null
-      }
-    } else {
-      Object.assign(target, base)
-    }
-
-    for (var i = 2; i < length; i++) {
-      Object.assign(target, evaluate(clause[i], $))
-    }
-    return target
-  }
-
-  function sum ($, num, clause) {
+  function sum (space, num, clause) {
     var length = clause.length
     for (var i = 2; i < length; i++) {
-      var value = evaluate(clause[i], $)
+      var value = evaluate(clause[i], space)
       if (typeof value === 'number') {
         num += value
+      } else {
+        num += space.$.Number['value-of'](value)
       }
     }
     return num
   }
 
-  operators['+'] = function ($, clause) {
+  operators['+'] = function (space, clause) {
     var length = clause.length
     if (length < 2) {
       return 0
     }
 
-    var base = evaluate(clause[1], $)
-    if (length === 2) {
-      return typeof base === 'object' ? merge($, base, clause, $.object()) : base
-    }
-
-    if (typeof base === 'number') {
-      return sum($, base, clause)
-    }
-    if (typeof base === 'string') {
-      return concat($, base, clause)
-    }
-    if (typeof base === 'object') {
-      return merge($, base, clause, $.object()) // combination
-    }
-    return base // return the first argument for other types
-  }
-
-  operators['+='] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) {
-      return 0
-    }
-
-    var sym = clause[1]
-    var base = evaluate(sym, $)
+    var base = evaluate(clause[1], space)
     if (length === 2) {
       return base
     }
 
     if (typeof base === 'number') {
-      base = sum($, base, clause)
-    } else if (typeof base === 'string') {
-      base = concat($, base, clause)
-    } else if (typeof base === 'object') {
-      return merge($, base, clause, null) // mixin
-    } else {
-      return base // for other types
+      return sum(space, base, clause)
     }
-    // try to assign value back for primal types
-    return sym instanceof Symbol$ ? assign($, sym, base) : base
+    if (typeof base === 'string') {
+      return concat(space, base, clause)
+    }
+    return base // return the first argument for other types
   }
 
-  function subtract ($, clause) {
+  operators['+='] = function (space, clause) {
     var length = clause.length
-    if (length < 2) { return 0 }
+    if (length < 2) {
+      return 0
+    }
 
-    var result = evaluate(clause[1], $)
-    if (typeof result !== 'number') {
-      if (typeof result !== 'string' || length < 3) {
-        return result
+    var sym = clause[1]
+    var base = evaluate(sym, space)
+    if (length === 2) {
+      return base // nop
+    }
+
+    if (typeof base === 'number') {
+      base = sum(space, base, clause)
+    } else if (typeof base === 'string') {
+      base = concat(space, base, clause)
+    }else {
+      return base // for other types
+    }
+
+    // try to assign new value back to its symbol
+    if (sym instanceof Symbol$) {
+      assign(space, sym, base)
+    }
+    return base
+  }
+
+  function subtract (space, num, clause) {
+    var length = clause.length
+    // negative operator of number
+    if (length < 3) {
+      return 0 - num
+    }
+
+    // subtraction for number
+    for (var i = 2; i < length; i++) {
+      var value = evaluate(clause[i], space)
+      if (typeof value === 'number') {
+        num -= value
+      } else {
+        num -= space.$.Number['value-of'](value)
       }
-      var minuend = evaluate(clause[2], $)
-      if (typeof minuend === 'string') {
-        return result.split(minuend).join('')
+    }
+    return num
+  }
+
+  function trimRight (space, str, clause) {
+    // trim for string
+    var minuend = evaluate(clause[2], space)
+    if (typeof minuend === 'string') {
+      var offset = str.lastIndexOf(minuend)
+      return offset >= 0 ? str.substring(0, offset) : str
+    }
+    if (typeof minuend === 'number') {
+      if (minuend > str.length) {
+        return ''
+      } else if (minuend < 0) {
+        return str
       }
-      if (typeof minuend === 'number') {
-        return minuend > result.length ? '' : result.substr(0, result.length - minuend)
-      }
+      return str.substring(0, str.length - minuend)
+    }
+    return str
+  }
+
+  operators['-'] = function (space, clause) {
+    var length = clause.length
+    if (length < 2) {
+      return 0
+    }
+
+    var base = evaluate(clause[1], space)
+    if (typeof base === 'number') {
+      return subtract(space, base, clause)
+    } else if (typeof result === 'string' && length > 2) {
+      return trimRight(space, base, clause)
+    }
+    return base
+  }
+
+  operators['-='] = function (space, clause) {
+    var length = clause.length
+    if (length < 2) {
+      return 0
+    }
+
+    var sym = clause[1]
+    var result = evaluate(sym, space)
+    if (typeof result === 'number') {
+      result = subtract(space, result, clause)
+    } else if (typeof result === 'string' && length > 2) {
+      result = trimRight(space, result, clause)
+    } else {
       return result
     }
 
-    for (var i = 2; i < length; i++) {
-      var value = evaluate(clause[i], $)
-      if (typeof value === 'number') {
-        result -= value
-      }
-    }
-    return result
-  }
-
-  operators['-'] = subtract
-  operators['-='] = function ($, clause) {
-    var result = subtract($, clause)
-    var sym = clause[1]
     if (sym instanceof Symbol$) {
-      assign($, sym, result)
+      assign(space, sym, result)
     }
     return result
   }

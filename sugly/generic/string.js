@@ -2,7 +2,7 @@
 
 var $export = require('../export')
 
-function valueOf (resolve) {
+function valueOf (get) {
   return function String$value_of () {
     var length = arguments.length
     var result = ''
@@ -15,7 +15,7 @@ function valueOf (resolve) {
       if (result.length > 0 && !result.endsWith(' ')) {
         result += ' '
       }
-      var to_str = resolve(arg, 'to-string')
+      var to_str = get(arg, 'to-string')
       result += typeof to_str === 'function' ? to_str.call(arg) : ''
     }
     return result
@@ -24,11 +24,11 @@ function valueOf (resolve) {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var resolve = $void.resolve
+  var get = $void.get
   var type = $.String
 
   // concatenate the to-string result of arguments
-  var value_of = $export(type, 'value-of', valueOf(resolve))
+  var value_of = $export(type, 'value-of', valueOf(get))
 
   // generate a string from a series of unicode values
   $export.copy(type, String, {
@@ -36,6 +36,11 @@ module.exports = function ($void) {
   })
 
   var proto = type.proto
+
+  // forward the length property.
+  $export(proto, 'length', function string$length () {
+    return this.length
+  })
 
   // generate sub-string from this string.
   $export.copy(proto, String.prototype, {
@@ -98,7 +103,9 @@ module.exports = function ($void) {
     if (typeof value === 'number') {
       // remove the trailing characters by the length of value.
       if (value > this.length) {
-        value = this.length
+        return ''
+      } else if (value < 0) {
+        return this
       }
       return this.substring(0, this.length - value)
     }
@@ -153,6 +160,11 @@ module.exports = function ($void) {
       return index >= 0 && index < this.length ? this.charAt(index) : ''
     }
     return null
+  })
+
+  // override to boost - an object is always true
+  $export(proto, '?', function string$bool_test (a, b) {
+    return typeof a === 'undefined' ? true : a
   })
 
   // export to system's prototype

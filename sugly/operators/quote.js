@@ -5,7 +5,7 @@ module.exports = function operators$quote ($void) {
   var nothing = $void.$.Symbol.Nothing
 
   // (` symbol) or (` (...))
-  operators['`'] = function ($, clause) {
+  operators['`'] = function opr_quote ($, clause) {
     return clause.length > 1 ? clause[1] : nothing
   }
 

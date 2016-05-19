@@ -42,27 +42,6 @@ function fromSource () {
   }
 }
 
-function arrayIndexer ($) {
-  var resolve = $.Class.proto[':']
-
-  return function array$indexer (index, value) {
-    if (arguments.length === 1) {
-      if (typeof index === 'number') {
-        return index < 0 || index >= this.length ? null : this[index]
-      } else {
-        return resolve.call(this, index)
-      }
-    } else if (arguments.length > 1) {
-      if (typeof index === 'number') {
-        return index < 0 || index >= this.length ? null : (this[index] = value)
-      } else {
-        return resolve.call(this, index, value)
-      }
-    }
-    return null
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.Array
@@ -87,6 +66,12 @@ module.exports = function ($void) {
   $export(type, 'from', fromSource())
 
   var proto = type.proto
+
+  // forward the length property.
+  $export(proto, 'length', function array$length () {
+    return this.length
+  })
+
   // array element accessors
   $export(proto, 'get', function array$get (offset) {
     return typeof offset === 'number' && offset >= 0 && offset < this.length
@@ -193,7 +178,22 @@ module.exports = function ($void) {
   })
 
   // indexer: overridding, interpret number value as offset.
-  $export(proto, ':', arrayIndexer($))
+  $export(proto, ':', function array$indexer (index, value) {
+    if (arguments.length === 1) {
+      if (typeof index === 'number') {
+        return index < 0 || index >= this.length ? null : this[index]
+      } else {
+        return typeof proto[index] === 'undefined' ? null : proto[index]
+      }
+    } else if (arguments.length > 1) {
+      if (typeof index === 'number') {
+        return index < 0 || index >= this.length ? null : (this[index] = value)
+      } else {
+        // prevent give a managed array extra properties
+      }
+    }
+    return null
+  })
 
   // iterator: iterate all offsets and values
   require('./array-iterator')($)

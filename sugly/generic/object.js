@@ -58,23 +58,6 @@ function objectClone () {
   }
 }
 
-function objectIndexer () {
-  return function object$indexer (name, value) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    switch (arguments.length) {
-      case 1:
-        value = this[name]
-        return typeof value === 'undefined' ? null : value
-      case 2:
-        return (this[name] = (typeof value === 'undefined' ? null : value))
-      default:
-        return null
-    }
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
   var ownsProperty = $void.ownsProperty
@@ -133,7 +116,21 @@ module.exports = function ($void) {
   })
 
   // indexer: override to implement setter.
-  $export(proto, ':', objectIndexer())
+  $export(proto, ':', function object$indexer (name, value) {
+    if (typeof name !== 'string') {
+      return null
+    }
+    switch (arguments.length) {
+      case 1:
+        value = this[name]
+        return typeof value !== 'undefined' ? value
+          : typeof proto[name] === 'undefined' ? null : proto[name]
+      case 2:
+        return (this[name] = (typeof value === 'undefined' ? null : value))
+      default:
+        return null
+    }
+  })
 
   // override to boost - an object is always true
   $export(proto, '?', function object$bool_test (a, b) {

@@ -32,8 +32,7 @@ module.exports = function ($void) {
   // override indexer to expose functions
   $export(proto, ':', function float$indexer (name) {
     if (typeof name === 'string') {
-      var value = proto[name]
-      return typeof value !== 'undefined' ? value : null
+      return typeof proto[name] !== 'undefined' ? proto[name] : null
     }
     return null
   })

@@ -9,7 +9,7 @@ module.exports = function () {
   /* In the beginning God created the heavens and the earth. */
   var Null = $void.null = Object.create(null)
   /* Now the earth was formless and empty, */
-  var $ = $void.$ = Object.create(Null)
+  var $ = $void.$ = Object.create(null)
 
   /* “Let there be light,” and there was light. */
   // The light is the laws, which is the foundation of all beings.
@@ -33,16 +33,16 @@ module.exports = function () {
   Type$.prototype = Prototype
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
-  $.name = '$'
+  $.name = $.identityName = '$'
 
   /* ... he separated the light from the darkness, */
   var Type = new Type$()
   /* ... called the light “day,”  */
-  Type.name = 'Type'
+  Type.name = Type.identityName = 'Type'
   $.Type = Type
 
   /* ... and the darkness he called “night.” */
-  Null.name = 'null'
+  Null.name = Null.identityName = 'null'
   $.null = null
   // The logical noumenon of null is not accessible directly, otherwise it will
   // cause some confusion in evalution process.
@@ -72,9 +72,17 @@ module.exports = function () {
       value: type
     })
     // export to space.
-    type.name = name
+    type.name = type.identityName = name
     $[name] = type
   }
+
+  // the type of Null is itself.
+  Object.defineProperty(Null, 'type', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: null
+  })
 
   // create primitive types
   create('Bool')
@@ -87,7 +95,7 @@ module.exports = function () {
   // prepare the constructor of symbol type.
   var Symbol$ = $void.Symbol = function Symbol$ (key) {
     Object.defineProperty(this, 'key', {
-      enumerable: false,
+      enumerable: true,
       configurable: false,
       writable: false,
       value: key

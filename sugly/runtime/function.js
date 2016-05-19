@@ -3,7 +3,6 @@
 var $export = require('../export')
 
 module.exports = function function_ ($void) {
-  var set = $void.set
   var Signal = $void.Signal
   var Symbol$ = $void.Symbol
 
@@ -42,8 +41,9 @@ module.exports = function function_ ($void) {
   }
 
   $void.functionIn = function $functionIn (space) {
-    var createSpace = $void.createSpace // createSpace depending on functionIn.
     var evaluate = $void.evaluate
+    var spaceStack = $void.spaceStack
+    var createSpace = $void.createSpace // createSpace depending on functionIn.
     var $ = space.$
 
     // body must be a list of clauses
@@ -58,9 +58,10 @@ module.exports = function function_ ($void) {
       function $F () {
         // new namespace
         var scope = createSpace(space)
+        spaceStack.push(scope, $F)
         var ns = scope.$
-        ns['this'] = this
         ns['self'] = $F
+        ns['this'] = this
         var argc = ns['argc'] = arguments.length
         if (fixedArgs) {
           ns['argv'] = null
@@ -82,8 +83,10 @@ module.exports = function function_ ($void) {
           for (i = 0; i < length; i++) {
             result = evaluate(body[i], scope)
           }
+          spaceStack.pop()
           return result
         } catch (signal) {
+          spaceStack.pop()
           if (signal instanceof Signal && signal.type === 'return') {
             return signal.value
           }
@@ -100,15 +103,16 @@ module.exports = function function_ ($void) {
     function createClosure (enclosing, params, fixedArgs, body) {
       function $C () {
         // new namespace
-        var scope = createSpace($)
+        var scope = createSpace(space)
+        spaceStack.push(scope, $C)
         var ns = scope.$
-        ns['this'] = this
         ns['self'] = $C
+        ns['this'] = this
         Object.assign(ns, enclosing)
         var argc = ns['argc'] = arguments.length
         if (fixedArgs) {
+          ns['argv'] = null
         } else {
-          // variant arguments
           ns['argv'] = Array.prototype.slice.apply(arguments)
         }
 
@@ -117,7 +121,7 @@ module.exports = function function_ ($void) {
         var length = params.length
         for (; i < length; i++) {
           var p = params[i]
-          ns[p[0]] = argc > i ? arguments[i] : p[1]
+          ns[p[0].key] = argc > i ? arguments[i] : p[1]
         }
 
         try {
@@ -126,8 +130,10 @@ module.exports = function function_ ($void) {
           for (i = 0; i < length; i++) {
             result = evaluate(body[i], scope)
           }
+          spaceStack.pop()
           return result
         } catch (signal) {
+          spaceStack.pop()
           if (signal instanceof Signal && signal.type === 'return') {
             return signal.value
           }
@@ -146,13 +152,13 @@ module.exports = function function_ ($void) {
       function $L () {
         var args = Array.prototype.slice.apply(arguments)
 
-        enclosing = Object.assign({}, enclosing)
+        enclosing = Object.assign(Object.create(null), enclosing)
         for (var i = 0; i < params.length; i++) {
           var p = params[i]
-          set(enclosing, p[0], args.length > i ? args[i] : p[1])
+          enclosing[p[0].key] = args.length > i ? args[i] : p[1]
         }
 
-        return space.$.lambda(enclosing, body[1], body.slice(2))
+        return $.lambda(enclosing, body[1], body.slice(2))
       }
 
       $L.$enclosing = enclosing
@@ -168,7 +174,7 @@ module.exports = function function_ ($void) {
       }
 
       if (typeof enclosing !== 'object' || enclosing === null) {
-        enclosing = {}
+        enclosing = Object.create(null)
       }
 
       params = formatParameters(params)

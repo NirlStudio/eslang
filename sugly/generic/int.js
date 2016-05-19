@@ -94,8 +94,7 @@ module.exports = function ($void) {
   // override indexer to expose functions & operators
   $export(proto, ':', function int$indexer (name, step) {
     if (typeof name === 'string') {
-      var value = proto[name]
-      return typeof value !== 'undefined' ? value : null
+      return typeof proto[name] !== 'undefined' ? proto[name] : null
     }
     if (typeof name === 'number') {
       if (typeof step !== 'number') {

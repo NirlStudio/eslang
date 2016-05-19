@@ -12,7 +12,7 @@ module.exports = function ($) {
     value: 0,
 
     constructor: function (range) {
-      if (Range['is-type-of'](range)) {
+      if (range['is-a'](Range)) {
         this._begin = range.begin
         this._end = range.end
         this._step = range.step

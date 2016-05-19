@@ -59,14 +59,20 @@ module.exports = function ($void) {
   // a symbol behaves as a value entity.
   $export(proto, 'is', isSame(Symbol$))
   $export(proto, 'is-not', notSame(Symbol$))
+
   $export(proto, 'equals', isSame(Symbol$))
   $export(proto, 'not-equals', notSame(Symbol$))
+  $export(proto, '==', isSame(Symbol$))
+  $export(proto, '!=', notSame(Symbol$))
 
   // persistency & description
   $export(proto, 'to-code', function symbol$to_code () {
     return this instanceof Symbol$ ? this.key : ''
   })
   $export(proto, 'to-string', function symbol$to_string () {
+    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
+  })
+  $export(proto, 'toString', function symbol$to_string () {
     return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
   })
 
@@ -84,7 +90,8 @@ module.exports = function ($void) {
       : typeof proto[name] !== 'undefined' ? proto[name] : null
   })
 
-  // overide general equivalence operators, being consistent with equals
-  $export(proto, '==', isSame(Symbol$))
-  $export(proto, '!=', notSame(Symbol$))
+  // override to boost - an object is always true
+  $export(proto, '?', function object$bool_test (a, b) {
+    return typeof a === 'undefined' ? true : a
+  })
 }

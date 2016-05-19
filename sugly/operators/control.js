@@ -2,7 +2,6 @@
 
 module.exports = function operators$control ($void) {
   var operators = $void.operators
-  var set = $void.set
   var evaluate = $void.evaluate
   var resolve = $void.resolve
   var Signal = $void.Signal
@@ -13,7 +12,7 @@ module.exports = function operators$control ($void) {
   var symbolValueOf = $void.$.Symbol['value-of']
   var SymbolElse = symbolValueOf('else')
 
-  operators['if'] = function ($, clause) {
+  operators['if'] = function (space, clause) {
     var length = clause.length
     if (length < 3) {
       return null // short circuit - the result will be null anyway.
@@ -25,7 +24,7 @@ module.exports = function operators$control ($void) {
       return null // short circuit - the cond is required.
     }
 
-    var cond = evaluate(clause[1], $)
+    var cond = evaluate(clause[1], space)
     var tb, fb
     if (offset > 0) {
       tb = clause.slice(2, offset)
@@ -42,7 +41,7 @@ module.exports = function operators$control ($void) {
 
     var result
     for (var i = 0; i < option.length; i++) {
-      result = evaluate(option[i], $)
+      result = evaluate(option[i], space)
     }
     return result
   }
@@ -60,18 +59,18 @@ module.exports = function operators$control ($void) {
   operators['break'] = createLoopSignal('break')
   operators['continue'] = createLoopSignal('continue')
 
-  function loopTest ($, cond) {
+  function loopTest (space, cond) {
     // loop test function returns a BREAK flag
     if (cond instanceof Symbol$) {
       return function loopTestOfSymbol () {
-        var value = resolve($, cond)
+        var value = resolve(space, cond)
         return value === false || value === null || value === 0
       }
     }
 
     if (Array.isArray(cond)) {
       return function loopTestOfClause () {
-        var value = evaluate(cond, $)
+        var value = evaluate(cond, space)
         return value === false || value === null || value === 0
       }
     }
@@ -79,18 +78,18 @@ module.exports = function operators$control ($void) {
     return cond === false || cond === null || cond === 0
   }
 
-  operators['while'] = function ($, clause) {
+  operators['while'] = function (space, clause) {
     var length = clause.length
     if (length < 3) {
       return null // short circuit - no loop body
     }
 
-    var test = loopTest($, clause[1])
+    var test = loopTest(space, clause[1])
     var dynamicTest = typeof test === 'function'
 
     var body = clause.slice(2)
     var result = null
-    $.loops.push(test)
+    space.loops.push(test)
     while (true) {
       try { // break/continue can be used in condition expression.
         if (dynamicTest ? test() : test) {
@@ -98,7 +97,7 @@ module.exports = function operators$control ($void) {
         }
         length = body.length
         for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], $)
+          result = evaluate(body[i], space)
         }
       } catch (signal) {
         if (signal instanceof Signal) {
@@ -111,18 +110,18 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        $.loops.pop()
+        space.loops.pop()
         throw signal
       }
     }
-    $.loops.pop()
+    space.loops.pop()
     return result
   }
 
   // (for value in iterable body) OR
   // (for (value) in iterable body) OR
   // (for (key value) in iterable body)
-  function forEach ($, clause) {
+  function forEach (space, clause) {
     var length = clause.length
     if (length < 5) {
       return null // short circuit - no loop body
@@ -153,7 +152,7 @@ module.exports = function operators$control ($void) {
       return null // invalid field(s) expression
     }
 
-    var iterable = evaluate(clause[3], $)
+    var iterable = evaluate(clause[3], space)
     var iterator = iterate(iterable)
     if (iterator === null || typeof iterator.next !== 'function') {
       return null // not an iterable object.
@@ -161,16 +160,16 @@ module.exports = function operators$control ($void) {
 
     var body = clause.slice(4)
     var result = null
-    $.loops.push(iterator)
+    space.loops.push(iterator)
     while (iterator.next()) {
-      set($, valueSymbol, typeof iterator.value !== 'undefined' ? iterator.value : null)
+      space.$[valueSymbol.key] = typeof iterator.value !== 'undefined' ? iterator.value : null
       if (keySymbol) {
-        set($, keySymbol, typeof iterator.key !== 'undefined' ? iterator.key : null)
+        space.$[keySymbol.key] = typeof iterator.key !== 'undefined' ? iterator.key : null
       }
       try {
         length = body.length
         for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], $)
+          result = evaluate(body[i], space)
         }
       } catch (signal) {
         if (signal instanceof Signal) {
@@ -183,16 +182,16 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        $.loops.pop()
+        space.loops.pop()
         throw signal
       }
     }
-    $.loops.pop()
+    space.loops.pop()
     return result
   }
 
   // (for condition incremental body)
-  operators['for'] = function ($, clause) {
+  operators['for'] = function (space, clause) {
     var length = clause.length
     if (length < 4) {
       return null // short circuit - no loop body
@@ -200,16 +199,16 @@ module.exports = function operators$control ($void) {
 
     var step = clause[2]
     if (step instanceof Symbol$ && step.key === 'in') {
-      return forEach($, clause)
+      return forEach(space, clause)
     }
     var runStep = Array.isArray(step)
 
-    var test = loopTest($, clause[1])
+    var test = loopTest(space, clause[1])
     var dynamicTest = typeof test === 'function'
 
     var body = clause.slice(3)
     var result = null
-    $.loops.push(test)
+    space.loops.push(test)
     while (true) {
       try { // break/continue can be used in condition expression.
         if (dynamicTest ? test() : test) {
@@ -217,17 +216,17 @@ module.exports = function operators$control ($void) {
         }
         length = body.length
         for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], $)
+          result = evaluate(body[i], space)
         }
         if (runStep) {
-          evaluate(step, $)
+          evaluate(step, space)
         }
       } catch (signal) {
         if (signal instanceof Signal) {
           if (signal.type === 'continue') {
             result = signal.value
             if (runStep) {
-              evaluate(step, $)
+              evaluate(step, space)
             }
             continue
           }
@@ -236,11 +235,11 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        $.loops.pop()
+        space.loops.pop()
         throw signal
       }
     }
-    $.loops.pop()
+    space.loops.pop()
     return result
   }
 }

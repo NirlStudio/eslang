@@ -5,6 +5,7 @@ var $export = require('../export')
 module.exports = function run ($void) {
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
+  var spaceStack = $void.spaceStack
 
   $void.runIn = function runIn (space) {
     var load = $void.load
@@ -14,10 +15,9 @@ module.exports = function run ($void) {
     var runInDirs = [null, dir]
     var modules = space.modules
     var $ = space.$
-    var isSpace = Object.prototype.isPrototypeOf.bind($)
 
     $export($, 'eval', function $eval (expr) {
-      return evaluate(expr, isSpace(this) ? this : $)
+      return evaluate(expr, spaceStack.current() || space)
     })
 
     $export($, 'load', function $load (source) {
@@ -55,7 +55,7 @@ module.exports = function run ($void) {
       return execute(load(uri), uri, path)
     })
 
-    function modulize (mod, source, action) {
+    function modulize (mod, action, source) {
       if (typeof mod === 'undefined' || mod === null) {
         return null
       }

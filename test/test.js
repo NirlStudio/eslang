@@ -168,6 +168,9 @@ function checkInjections () {
 
   assert('Array.prototype.type', 'object')
   assert('Array.prototype.:')
+
+  assert('Function.prototype.type', 'object')
+  assert('Function.prototype.:')
 }
 
 function checkSugly ($void) {
@@ -179,9 +182,8 @@ function checkSugly ($void) {
   checkOperators($void, '[Void / operator] ', [
     '`', 'quote', 'let', '@', 'object', 'array',
     '=', 'function', 'closure', '=>', 'lambda', 'return', 'exit', 'halt',
-    'is', 'typeof', 'bool', 'number', 'string', 'symbol', 'date',
-    'if', 'for', 'while', 'break', 'continue',
-    '->', 'flow', '|', 'pipe', '?', 'premise', 'operator',
+    'bool', 'number', 'string', 'symbol', 'date',
+    'if', 'for', 'while', 'break', 'continue', 'operator',
     '+', '+=', '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
   ])
 

@@ -1,4 +1,4 @@
-($define "test objects/values (is A B)" (= ()
+($define "test objects/values (A is B)" (= ()
   ($should "return true for the same object" (= ()
     (assert (` (is),
     (assert (` (is null),

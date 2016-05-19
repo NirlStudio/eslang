@@ -10,6 +10,28 @@ module.exports = function space ($void) {
   $void.spaceIdentifier = 'void'
   $void.moduleIdentifier = $void.spaceIdentifier
 
+  // prepare void as a module space.
+  $void.modules = {}
+  $void.spaceStack = {
+    scopes: [],
+    frames: [],
+    push: function (scope, func, args) {
+      this.scopes.push(scope)
+      this.frames.push('' + func.name || func)
+      if (this.frames.length > 1000) {
+        console.log(this.frames.slice(-3))
+        throw new RangeError('dead loop?', this.frames)
+      }
+    },
+    pop: function () {
+      this.scopes.pop()
+      this.frames.pop()
+    },
+    current: function () {
+      return this.scopes.length > 0 ? this.scopes[this.scopes.length - 1] : null
+    }
+  }
+
   function exportTo (space) {
     $export(space.$, 'export', function export_ (key, value) {
       if (typeof key !== 'string') {
@@ -19,7 +41,7 @@ module.exports = function space ($void) {
     })
   }
 
-  function $createSpace (parent) {
+  var createSpace = $void.createSpace = function $createSpace (parent) {
     $void.spaceCounter += 1
     return {
       parent: parent,
@@ -32,7 +54,7 @@ module.exports = function space ($void) {
     }
   }
 
-  function $initializeModuleSpace (space, attachExport) {
+  var initializeModuleSpace = $void.initializeModuleSpace = function $initializeModuleSpace (space, attachExport) {
     if (attachExport) {
       // overridding parent.export
       exportTo(space)
@@ -42,13 +64,8 @@ module.exports = function space ($void) {
     runIn(space)
   }
 
-  // prepare void as a module space.
-  $void.modules = {}
-  $void.createSpace = $createSpace // for functionIn
-  $void.initializeModuleSpace = $initializeModuleSpace // for sugly.js
-
   $void.createModuleSpace = function $createModuleSpace (sealing, dir) {
-    var space = $createSpace($void)
+    var space = createSpace($void)
     space.sealing = sealing
     space.moduleIdentifier = space.spaceIdentifier
     space.operators = {}
@@ -60,7 +77,7 @@ module.exports = function space ($void) {
       space.modules = {} // separate module cache
     }
 
-    $initializeModuleSpace(space, sealing)
+    initializeModuleSpace(space, sealing)
     return space
   }
 }

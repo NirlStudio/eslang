@@ -3,116 +3,23 @@
 module.exports = function operators$type ($void) {
   var operators = $void.operators
   var evaluate = $void.evaluate
-  var Symbol$ = $void.Symbol
-
-  operators['is'] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) {
-      return true // null is null
-    }
-
-    var left = evaluate(clause[1], $)
-    if (length < 3) {
-      return left === null
-    }
-
-    var right = clause[2]
-    if (right.key !== 'like' || !(right instanceof Symbol$)) {
-      // to be revised.
-      right = evaluate(right, $)
-      return left instanceof Symbol$ && right ? left.key === right.key : Object.is(left, right)
-    }
-
-    for (var i = 3; i < length; i++) {
-      var value = evaluate(clause[i], $)
-      if (value === null || Object.is(left, value)) {
-        continue
-      } else if (typeof left !== typeof value) {
-        return false
-      } else if (value.isPrototypeOf && value.isPrototypeOf(left)) {
-        continue
-      }
-      for (var key in value) {
-        if (!left || !left.hasOwnProperty(key)) {
-          return false
-        }
-      }
-    }
-    return true // all objects are alike with null.
-  }
-
-  // typeof: query base type name, test a value, check object's prototype chain
-  operators['typeof'] = function ($, clause) {
-    var length = clause.length
-    if (length < 2) {
-      return 'null'
-    }
-
-    var value = evaluate(clause[1], $)
-    if (length < 3) {
-      if (value === null) {
-        return 'null'
-      }
-      if (Array.isArray(value)) {
-        return 'array'
-      }
-      if (value instanceof Date) {
-        return 'date'
-      }
-      // app defined type identifier
-      if (typeof value === 'object') {
-        if (value.typeId) {
-          return value.typeId
-        } else if (value instanceof Symbol$) {
-          return 'symbol' // polyfill symbol
-        }
-      }
-      var type = typeof value
-      return type === 'boolean' ? 'bool' : type
-    }
-
-    var expected = evaluate(clause[2], $)
-    if (typeof expected === 'string') {
-      switch (expected) {
-        case 'null':
-          return value === null
-        case 'bool':
-          return typeof value === 'boolean'
-        case 'number':
-          return typeof value === 'number'
-        case 'string':
-          return typeof value === 'string'
-        case 'symbol':
-          return value instanceof Symbol$
-        case 'function':
-          return typeof value === 'function'
-        case 'object':
-          return typeof value === 'object'
-        /* array and date are also objects */
-        case 'array':
-          return Array.isArray(value)
-        case 'date':
-          return value instanceof Date // Would frame-boundary be a problem?
-        default:
-          return typeof value === 'object' && value !== null && value.typeId === expected
-      }
-    }
-    if (expected && expected.isPrototypeOf && expected.isPrototypeOf(value)) {
-      return true
-    }
-    return false
-  }
+  var $bool = $void.$.bool
+  var $number = $void.$.number
+  var $string = $void.$.string
+  var $symbol = $void.$.symbol
+  var $date = $void.$.date
+  var $class = $void.$.class
 
   // generic type operators being identical with the function version.
-  operators['bool'] = function ($, clause) {
-    return $.bool(clause.length < 2 ? undefined : evaluate(clause[1], $))
+  operators['bool'] = function (space, clause) {
+    return $bool(clause.length < 2 ? null : evaluate(clause[1], space))
   }
 
-  operators['number'] = function ($, clause) {
-    return clause.length < 2 ? 0 : $.number(evaluate(clause[1], $))
+  operators['number'] = function (space, clause) {
+    return $number(clause.length < 2 ? null : evaluate(clause[1], space))
   }
 
-  operators['string'] = function ($, clause) {
+  operators['string'] = function (space, clause) {
     var length = clause.length
     if (length < 2) {
       return ''
@@ -120,21 +27,23 @@ module.exports = function operators$type ($void) {
 
     var values = []
     for (var i = 1; i < length; i++) {
-      values.push(evaluate(clause[i], $))
+      values.push(evaluate(clause[i], space))
     }
-    return $.string.apply($, values)
+    return $string.apply(null, values)
   }
 
-  operators['symbol'] = function ($, clause) {
-    return clause.length < 2 ? null : $.symbol(evaluate(clause[1], $))
+  operators['symbol'] = function (space, clause) {
+    return $symbol(clause.length < 2 ? '' : evaluate(clause[1], space))
   }
 
-  operators['date'] = function ($, clause) {
+  operators['date'] = function (space, clause) {
+    return $date(clause.length < 2 ? null : evaluate(clause[1], space))
+  }
+
+  operators['class'] = function (space, clause) {
     var length = clause.length
-    var args = []
-    for (var i = 1; i < length; i++) {
-      args.push(evaluate(clause[i], $))
-    }
-    return $.date.apply(null, args)
+    var type = length > 1 ? evaluate(clause[1], space) : null
+    var proto = length > 2 ? evaluate(clause[2], space) : null
+    return $class(type, proto)
   }
 }

@@ -2,137 +2,54 @@
 
 module.exports = function operators$object ($void) {
   var operators = $void.operators
-  var set = $void.set
   var evaluate = $void.evaluate
   var Symbol$ = $void.Symbol
-  var symbolValueOf = $void.$.Symbol['value-of']
-
-  var SymbolIndexer = symbolValueOf(':')
-  var SymbolAssign = symbolValueOf('<')
-  var SymbolDerive = symbolValueOf('>')
+  var createObject = $void.$.object
 
   // (@ prop: value ...)
-  function objectCreate ($, clause) {
-    var obj = $.object()
+  function objectCreate (space, clause) {
+    var obj = createObject()
     var i = 2
     var length = clause.length
-    while (i < length && clause[i] === SymbolIndexer) {
-      var key = clause[i - 1]
-      if (typeof key === 'string') {
-        key = symbolValueOf(key)
-      } else if (!(key instanceof Symbol$)) {
+    while (i < length &&
+      clause[i] instanceof Symbol$ && clause[i].key === ':') {
+      var name = clause[i - 1]
+      if (name instanceof Symbol$) {
+        name = name.key
+      } else if (typeof name !== 'string') {
         break
       }
 
       i += 1
-      set(obj, key, i < length ? evaluate(clause[i], $) : null)
-      i += 2 // next :
-    }
-    return obj
-  }
-
-  // (@ obj < prop: value ...)
-  function objectAssign ($, clause) {
-    var obj = evaluate(clause[1], $)
-    if (!obj && typeof obj !== 'object' && typeof obj !== 'function') {
-      return null
-    }
-
-    var i = 4
-    var length = clause.length
-    while (i < length && clause[i] === SymbolIndexer) {
-      var key = clause[i - 1]
-      if (typeof key === 'string') {
-        key = symbolValueOf(key)
-      } else if (!(key instanceof Symbol$)) {
-        break
-      }
-
-      i += 1
-      set(obj, key, i < length ? evaluate(clause[i], $) : null)
-      i += 2 // next :
-    }
-    return obj
-  }
-
-  // (@ optional-prototype > prop: value ...).
-  function objectDerive ($, clause) {
-    var i, prototype
-    if (clause[1] === SymbolDerive) {
-      i = 3
-      prototype = null
-    } else {
-      i = 4
-      prototype = evaluate(clause[1], $)
-      if (typeof prototype !== 'object') {
-        return null // non-object cannot derive an object.
-      }
-    }
-
-    var obj = $.object(prototype)
-    var length = clause.length
-    while (i < length && clause[i] === SymbolIndexer) {
-      var key = clause[i - 1]
-      if (typeof key === 'string') {
-        key = symbolValueOf(key)
-      } else if (!(key instanceof Symbol$)) {
-        break
-      }
-
-      i += 1
-      set(obj, key, i < length ? evaluate(clause[i], $) : null)
+      obj[name] = i < length ? evaluate(clause[i], space) : null
       i += 2 // next :
     }
     return obj
   }
 
   // (@ value ...)
-  function arrayCreate ($, clause) {
+  function arrayCreate (space, clause) {
     var result = []
     var i = 1
     while (i < clause.length) {
-      result.push(evaluate(clause[i], $))
+      result.push(evaluate(clause[i], space))
       i += 1
     }
     return result
   }
 
-  operators['@'] = function ($, clause) {
+  operators['@'] = function (space, clause) {
     var length = clause.length
-    if (length > 1) {
-      switch (clause[1]) {
-        case SymbolIndexer:
-          return null
-        case SymbolAssign:
-          return null
-        case SymbolDerive:
-          return objectDerive($, clause)
-      }
+    if (length > 2 && clause[2] instanceof Symbol$ && clause[2].key === ':') {
+      return objectCreate(space, clause)
+    } else {
+      return arrayCreate(space, clause)
     }
-    if (length > 2) {
-      switch (clause[2]) {
-        case SymbolIndexer:
-          return objectCreate($, clause)
-
-        case SymbolAssign:
-          return objectAssign($, clause)
-
-        case SymbolDerive:
-          return objectDerive($, clause)
-      }
-    }
-    return arrayCreate($, clause)
   }
 
   // as operators, object and array are the readable version of @
-  operators['object'] = function ($, clause) {
-    if (clause.length < 2) {
-      return $.object()
-    }
-    return operators['@']($, clause)
-  }
+  operators['object'] = objectCreate
+
   // force to create an array
-  operators['array'] = function ($, clause) {
-    return arrayCreate($, clause)
-  }
+  operators['array'] = arrayCreate
 }

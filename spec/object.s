@@ -78,13 +78,13 @@
 
     (let obj1 (object),
     (let obj2 (@ obj1 <),
-    (assert (` (is obj1 obj2),
+    (assert (` (obj1 is obj2),
     (assert "object" (` (typeof obj1),
     (assert false (` (($iterate obj1) next),
 
     (let obj1 (object),
     (let obj2 (@ obj1 < p: 2),
-    (assert (` (is obj1 obj2),
+    (assert (` (obj1 is obj2),
     (assert "object" (` (typeof obj1),
     (let iter ($iterate obj1),
     (assert (` (iter next),

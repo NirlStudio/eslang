@@ -16,8 +16,8 @@ module.exports = function operators$operator ($void) {
 
   // app defined operator: (operator name clause ...)
   // in the same space, an operator can only be defined once.
-  operators['operator'] = function ($, impl) {
-    if (!$.moduleIdentifier) {
+  operators['operator'] = function (space, impl) {
+    if (!space.moduleIdentifier) {
       return null // operator can only be declared in module scope
     }
 
@@ -42,10 +42,11 @@ module.exports = function operators$operator ($void) {
         return null
       }
       key = name.key
-      operators = $.sealing || !$.parent ? $.operators : $.parent.operators
-      offset = 3
+      operators = space.sealing || !space.parent
+        ? space.operators : space.parent.operators
+      offset = 3 // skip keyword export
     } else {
-      operators = $.operators
+      operators = space.operators
       offset = 2
     }
 

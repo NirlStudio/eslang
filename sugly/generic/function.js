@@ -41,7 +41,15 @@ module.exports = function ($void) {
     if (typeof name !== 'string') {
       return null
     }
+    if (typeof this[name] !== 'undefined') {
+      return this[name]
+    }
     typeof proto[name] !== 'undefined' ? proto[name] : null
+  })
+
+  // override to boost - an object is always true
+  $export(proto, '?', function function$bool_test (a, b) {
+    return typeof a === 'undefined' ? true : a
   })
 
   // export to system's prototype

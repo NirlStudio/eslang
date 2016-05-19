@@ -6,6 +6,7 @@ module.exports = function execute ($void) {
   var Signal = $void.Signal
   var evaluate = $void.evaluate
   var createModuleSpace = $void.createModuleSpace
+  var spaceStack = $void.spaceStack
   var compile = $void.$.compile
 
   $export($void.$.Function.proto, 'exec', function function$exec () {
@@ -35,6 +36,7 @@ module.exports = function execute ($void) {
     try {
       // sealing if the source of code is not verified.
       var space = createModuleSpace(source.startsWith('?'), dir)
+      spaceStack.push(space, source)
       var length = program.length
       for (var i = 0; i < length; i++) {
         result = evaluate(program[i], space)
@@ -44,9 +46,11 @@ module.exports = function execute ($void) {
          (signal.type === 'return' || signal.type === 'exit')) {
         result = signal.value
       } else {
+        spaceStack.pop()
         throw signal
       }
     }
+    spaceStack.pop()
     return result
   }
 }

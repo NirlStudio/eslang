@@ -63,9 +63,8 @@ function initializeSpace ($void) {
 
 function initializeRuntime ($void) {
   require('./runtime/signal')($void)
-  require('./runtime/resolve')($void)
   require('./runtime/assign')($void)
-  require('./runtime/set')($void)
+  require('./runtime/resolve')($void)
   require('./runtime/evaluate')($void)
   require('./runtime/function')($void)
   require('./runtime/signal-of')($void)

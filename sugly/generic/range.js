@@ -2,8 +2,13 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var proto = $.Range.proto
+  var type = $.Range
 
+  type.create = function () {
+    return $.Class.create.apply(type, arguments)
+  }
+
+  var proto = type.proto
   proto.begin = 0
   proto.end = 0
   proto.step = 1

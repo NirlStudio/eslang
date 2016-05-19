@@ -8,7 +8,7 @@
     (assert 0 (` obj),
 
     (let obj (+ s1),
-    (assert false (` (is s1 obj),
+    (assert false (` (s1 is obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
     (assert "p1" (` (iter key),
@@ -16,7 +16,7 @@
     (assert false (` (iter next),
 
     (let obj (+ s1 s2),
-    (assert false (` (is s1 obj),
+    (assert false (` (s1 is obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
     (assert "p1" (` (iter key),
@@ -38,7 +38,7 @@
     (assert 0 (` obj),
 
     (let obj (+= s1),
-    (assert (` (is s1 obj),
+    (assert (` (s1 is obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
     (assert "p1" (` (iter key),
@@ -46,7 +46,7 @@
     (assert false (` (iter next),
 
     (let obj (+= s1 s2),
-    (assert (` (is s1 obj),
+    (assert (` (s1 is obj),
     (let iter ($iterate obj),
     (assert (` (iter next),
     (assert "p1" (` (iter key),
