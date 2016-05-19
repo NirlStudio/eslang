@@ -33,14 +33,15 @@
 ).
 
 ($define "string of chars" (=()
-  ($should "return the string of characters" (= ()
-    (assert "" (` (String of-chars),
-    (assert "A" (` (String of-chars 65),
-    (assert "AB" (` (String of-chars 65 66),
-    (assert "ABC" (` (String of-chars 65 66 67),
+  ($should "return the string of characters' code values" (= ()
+    (assert "" (` (String of-char-codes),
+    (assert "A" (` (String of-char-codes 65),
+    (assert "AB" (` (String of-char-codes 65 66),
+    (assert "ABC" (` (String of-char-codes 65 66 67),
 ).
 
 ($define "String object" (= ()
-  ($should "be reserved" (= ()
-    (assert true (` (typeof ($String) "object"),
+  ($should "be a type" (= ()
+    (assert (` (String is-not-a Class),
+    (assert (` (String is-a Type),
 ).

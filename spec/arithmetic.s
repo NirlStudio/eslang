@@ -74,7 +74,7 @@
   ($should "return the quotient of dividing the first argument by other arguments" (= ()
     (assert 0 (` (0 /),
     (assert 1 (` (1 / ),
-    (assert false (` (Number is-finite (1 / 0),
+    (assert false (` ((1 / 0) is-finite),
     (assert 2 (` (4 / 2),
     (assert 3 (` (18 / 2 3),
 

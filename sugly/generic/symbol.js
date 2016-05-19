@@ -45,11 +45,6 @@ module.exports = function ($void) {
         ? sharedSymbols[key] : (sharedSymbols[key] = new Symbol$(key))
   })
 
-  // try to retrieve the key of a symbol.
-  $export(type, 'key-of', function Symbol$key_of (sym) {
-    return sym instanceof Symbol$ ? sym.key : ''
-  })
-
   var proto = type.proto
 
   $export(proto, 'key', function symbol$key () {

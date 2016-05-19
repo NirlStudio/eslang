@@ -116,7 +116,7 @@
   ($should "iterate all properties in the object" (= ()
     (let counter 0)
     (let i -1)
-    (let result (for i in (@>)
+    (let result (for i in (object)
       (++ counter)
       (i * 2)
     ),

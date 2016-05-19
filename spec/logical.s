@@ -20,7 +20,7 @@
     (assert (` (|| true false),
     (assert (` (|| false true),
     (assert (` (|| 0 true 1),
-    (assert "object" (` (typeof (|| false 0 (object),
+    (assert (` ((|| false 0 (object)) is-a Object),
     (assert false (` (|| null 0 false),
 ).
 

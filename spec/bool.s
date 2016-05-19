@@ -36,14 +36,10 @@
   ),
 ).
 
-($define "Bool object" (= ()
-  ($should "provide shared functions." (= ()
-    (assert "object" (` (typeof ($Bool),
-    (assert "function" (` (typeof (Bool "is"),
-    (assert "function" (` (typeof (Bool "value-of"),
-    (assert "function" (` (typeof (Bool "and"),
-    (assert "function" (` (typeof (Bool "or"),
-    (assert "function" (` (typeof (Bool "not"),
+($define "Bool type" (= ()
+  ($should "be the type object of boolean values" (= ()
+    (assert (` ((Bool is-a Type),
+    (assert (` ((Bool is-not-a Class),
   ),
 ).
 
@@ -94,33 +90,6 @@
     (assert false (` (Bool not 1),
     (assert false (` (Bool not (@)),
     (assert (` (Bool not null),
-).
-
-($define "a bool value" (= ()
-  ($should "have instance functions." (= ()
-    (let (t true) (f false),
-    (assert "function" (` (typeof (t "is"),
-    (assert "function" (` (typeof (t "equals"),
-    (assert "function" (` (typeof (t "to-code"),
-    (assert "function" (` (typeof (t "to-string"),
-    (assert "function" (` (typeof (t "and"),
-    (assert "function" (` (typeof (t "or"),
-    (assert "function" (` (typeof (t "not"),
-    (assert "function" (` (typeof (t "&&"),
-    (assert "function" (` (typeof (t "||"),
-    (assert "function" (` (typeof (t "!"),
-
-    (assert "function" (` (typeof (f "is"),
-    (assert "function" (` (typeof (f "equals"),
-    (assert "function" (` (typeof (f "to-code"),
-    (assert "function" (` (typeof (f "to-string"),
-    (assert "function" (` (typeof (f "and"),
-    (assert "function" (` (typeof (f "or"),
-    (assert "function" (` (typeof (f "not"),
-    (assert "function" (` (typeof (f "&&"),
-    (assert "function" (` (typeof (f "||"),
-    (assert "function" (` (typeof (f "!"),
-  ),
 ).
 
 ($define "(a is b)" (= ()

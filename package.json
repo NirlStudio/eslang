@@ -1,7 +1,7 @@
 {
   "name": "sugly",
   "main": "index.js",
-  "version": "0.1.12",
+  "version": "0.1.15",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi"

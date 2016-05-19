@@ -1,12 +1,8 @@
 
 ($define "Symbol object" (= ()
   ($should "exist with its members" (= ()
-    (assert "object" (` (typeof ($Symbol),
-    (assert "symbol" (` (typeof (Symbol Nothing),
-    (assert "function" (` (typeof (Symbol "value-of"),
-    (assert "function" (` (typeof (Symbol "key-of"),
-    (assert "function" (` (typeof (Symbol "is-valid"),
-    (assert "function" (` (typeof (Symbol "is"),
+    (assert (` (Symbol is-a Type),
+    (assert (` (Symbol is-not-a Class),
   ),
   ($should "(Symbol value-of )" "create an symbol for a key" (= ()
     (assert (Symbol Nothing) (` (Symbol value-of),

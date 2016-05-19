@@ -45,7 +45,7 @@ function notEquals () {
 function dateIndexer (proto) {
   return function date$indexer (index, value) {
     // forward to default object indexer
-    if (index === 'string') {
+    if (typeof index === 'string') {
       // read only
       return typeof proto[index] === 'undefined' ? null : proto[index]
     } else if (typeof index !== 'number') {
@@ -115,7 +115,7 @@ module.exports = function ($void) {
 
   // create a date object from a timestamp value.
   $export(type, 'create', function Date$create (time) {
-    return typeof time === 'number' ? new Date(time) : new Date(0)
+    return typeof time === 'number' ? new Date(time) : new Date()
   })
 
   // get current time as a date object.
@@ -124,7 +124,7 @@ module.exports = function ($void) {
   })
   // get current time as its timestamp value.
   $export(type, 'time', function Date$time () {
-    return typeof Date.now === 'function' ? Date.now() : new Date().getTime()
+    return (new Date()).getTime()
   })
 
   // compose a date object with values of its fields
@@ -197,27 +197,12 @@ module.exports = function ($void) {
     'toUTCString': 'to-utc-string'
   })
 
-  // override combine, merge and clone functions
-  $export(proto, 'combine', function date$combine (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() + milliseconds
-    return new Date(time)
-  })
-  $export(proto, 'merge', function date$merge (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() + milliseconds
-    this.setTime(time)
-    return this
-  })
+  // override clone function
   $export(proto, 'clone', function date$clone () {
     return new Date(this.getTime())
   })
 
-  // support general operators
+  // support & override general operators
   $export(proto, '+', function date$opr_combine (milliseconds) {
     if (typeof milliseconds !== 'number') {
       return this
@@ -257,6 +242,7 @@ module.exports = function ($void) {
 
   // support ordering operators
   $export(proto, '>', function date$opr_gt (another) {
+    console.log('date gt', another)
     if (!(another instanceof Date)) {
       return false
     }

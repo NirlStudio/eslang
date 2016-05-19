@@ -1,12 +1,12 @@
 ($define "space levels" (= ()
   ($should "a module" "have same spaceIdentifier and moduleIdentifier" (= ()
       (let r ($exec "(@ sid: spaceIdentifier mid: moduleIdentifier)"),
-      (assert ('((r"sid") == (r"mid"),
+      (assert (` ((r "sid") == (r"mid"),
   ),
 
   ($should "a function" "have different spaceIdentifier and moduleIdentifier" (= ()
       (let r ($exec "($ (=() (@ sid: spaceIdentifier mid: moduleIdentifier)"),
-      (assert ('((r "sid") != (r "mid"),
+      (assert (` ((r "sid") != (r "mid"),
   ),
 
   ($should "a closure" "have different spaceIdentifier and moduleIdentifier" (= ()
@@ -23,7 +23,7 @@
 
   ($should "$export" "export an object to global space" (= ()
       ($require "space-mod"),
-      (assert "object" (`(typeof _exported),
+      (assert (`(_exported is-a Object),
       (assert "obj" (`(_exported "name")
   ),
 

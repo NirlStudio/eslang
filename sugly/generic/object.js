@@ -44,6 +44,7 @@ function merge () {
         Object.assign(this, arguments[i])
       }
     }
+    return this
   }
 }
 
@@ -62,7 +63,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var ownsProperty = $void.ownsProperty
 
-  var Class = $.Class
+  var Class = $.Object = $.Class // make an alias of Class as Object.
   var proto = Class.proto
 
   // object property & field (owned property) manipulation
@@ -88,15 +89,13 @@ module.exports = function ($void) {
   // set the value of a field
   $export(proto, 'set-property', setProperty())
 
-  // generate a new object by comine this object and other objects.
-  $export(proto, 'combine', combine(Class.create))
-  // shallowly copy fields from other objects to this object.
-  $export(proto, 'merge', merge())
   // to create a shallow copy of this instance with the same type.
   $export(proto, 'clone', objectClone())
 
   // support general operators
+  // generate a new object by comine this object and other objects.
   $export(proto, '+', combine(Class.create))
+  // shallowly copy fields from other objects to this object.
   $export(proto, '+=', merge(proto))
 
   // default object persistency & describing logic

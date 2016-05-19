@@ -35,4 +35,13 @@ module.exports = function ($void) {
     }
     return typeof value === 'undefined' ? null : value
   }
+
+  $void.geti = function $geti (subject, index) {
+    if (typeof subject === 'number') {
+      var indexer = Number.isInteger(subject) ? $int[':'] : $float[':']
+      return indexer.call(subject, index)
+    } else {
+      return typeof subject[':'] === 'function' ? subject[':'](index) : null
+    }
+  }
 }

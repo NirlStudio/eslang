@@ -107,6 +107,25 @@ module.exports = function ($void) {
   })
 
   // array data structure manipulation.
+  $export(proto, 'swap', function array$swap (x, y) {
+    var tmp
+    var length = this.length
+    if (x >= 0 && x < length) {
+      tmp = this[x]
+      if (y >= 0 && y < length) {
+        this[x] = this[y]
+        this[y] = tmp
+      } else {
+        this[x] = null
+      }
+    } else {
+      tmp = null
+      if (y >= 0 && y < length) {
+        this[y] = null
+      }
+    }
+    return tmp
+  })
   $export.copy(proto, Array.prototype, {
     /* IE5.5 */
     'splice': 'splice',
@@ -134,18 +153,11 @@ module.exports = function ($void) {
     'filter': 'filter'
   })
 
-  // override combine, merge and clone functions
-  $export.copy(proto, Array.prototype, {
-    'concat': 'combine' /* IE5.5 */
-  })
-  $export(proto, 'merge', function array$merge () {
-    Array.prototype.concat.apply(this, arguments)
-  })
   $export.copy(proto, Array.prototype, {
     'slice': 'clone'
   })
 
-  // support general operators
+  // override general operators
   $export.copy(proto, Array.prototype, {
     'concat': '+' /* IE5.5 */
   })
@@ -157,11 +169,25 @@ module.exports = function ($void) {
   $export(proto, 'to-code', function array$to_code () {
     return $.encode.array(this)
   })
-  $export(proto, 'to-string', function array$to_string () {
-    return $.encode.array(this)
-  })
-  $export.copy(proto, Array.prototype, {
-    'join': 'join' // TODO - to override
+  $export(proto, 'to-string', function array$to_string (separator) {
+    if (typeof separator !== 'string') {
+      separator = ' '
+    }
+    var length = this.length
+    var result = ''
+    for (var i = 0; i < length; i++) {
+      var item = this[i]
+      if (i > 0) {
+        result += separator
+      }
+      if (typeof item === 'string') {
+        result += item
+        continue
+      }
+      var to_str = $void.get(item, 'to-string')
+      result += typeof to_str === 'function' ? to_str.call(item) : '(?)'
+    }
+    return result
   })
 
   // special persistency lgoic according to its literal meaning.

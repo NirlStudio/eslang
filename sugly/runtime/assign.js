@@ -28,4 +28,8 @@ module.exports = function assign ($void) {
       return null
     }
   }
+
+  $void.seti = function $seti (subject, index, value) {
+    return typeof subject[':'] === 'function' ? subject[':'](index, value) : null
+  }
 }

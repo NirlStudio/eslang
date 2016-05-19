@@ -1,12 +1,6 @@
 (let data ($import "sort-data").
 (print warn data)
 
-(let swap (= (x y)
-  (let t (data:x),
-  (data:x (data:y),
-  (data:y t)
-).
-
 (let quick (= (start end)
   (if (start >= end) (return),
 
@@ -21,11 +15,11 @@
       (&& ((data:right) >= mid) (left < right),
       (-- right 1)
     ),
-    ($swap left right)
+    (data swap left right)
   ),
   (if
     ((data:left) >= mid),
-    ($swap left end)
+    (data swap left end)
     (++ left)
   ),
   ($quick start (left - 1),

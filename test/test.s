@@ -65,12 +65,11 @@
 ).
 
 (let execute (= (case)
-  (print code indent (case:0),
-  (path push (case:0),
+  (print code indent (case 0),
+  (path push (case 0),
   (+= indent "  ")
 
-  (for i
-    in ($range 1 (case length),
+  (for i in (1 (case length))
     (let item (case:i),
     (if (item is-a Array)
       ($self item)
@@ -87,8 +86,8 @@
 ).
 
 (let print-f (= f
-  (print code (+ "  " (f:0) ") [" ((f:1) join " / ") "] " (f:2),
-  (let r (f:3),
+  (print code (+ "  " (f 0) ") [" ((f 1) to-string " / ") "] " (f 2),
+  (let r (f 3),
   (print code (+
     (C red (+ "     step-" (r step) " is expecting "),
     (C green (C underline (encode value (r "expected"),

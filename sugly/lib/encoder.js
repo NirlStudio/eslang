@@ -5,6 +5,8 @@ var $export = require('../export')
 module.exports = function ($void, JS) {
   var $ = $void.$
   var Symbol$ = $void.Symbol
+  var ownsProperty = $void.ownsProperty
+
   var $Symbol = $.Symbol
   var symbolValueOf = $Symbol['value-of']
 
@@ -47,8 +49,7 @@ module.exports = function ($void, JS) {
     }
 
     function encodeSymbol (sym) {
-      var key = sym instanceof Symbol$ ? sym.key : ''
-      return key.length > 0 ? '(` ' + key + ')' : ''
+      return sym instanceof Symbol$ ? sym.key : ''
     }
 
     function encodeNumber (num) {
@@ -64,38 +65,34 @@ module.exports = function ($void, JS) {
     }
 
     function encodeObject (obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, 'identityName')) {
-        return obj.identityName
+      if (ownsProperty(obj, 'identityName')) {
+        return obj.identityName // a unique entity.
       }
-
-      var code = '(@'
-      var pt = Object.getPrototypeOf(obj)
-      if (pt && Object.prototype.hasOwnProperty.call(pt, 'identityName') &&
-        typeof pt.identityName === 'string') {
-        code += pt.identityName + ' >'
+      if (obj.proto) {
+        return obj.identityName // A type must have a identityName
       }
-
+      // an instance object.
+      var hasType = obj.type && obj.type !== $.Object && obj.type.identityName
+      var code = hasType ? '(' + obj.type.identityName + ' create ' : ''
       var keys = Object.getOwnPropertyNames(obj)
       if (keys.length < 1) {
-        return code.endsWith('>') ? code + ')' : code + '>)'
+        return code.length > 0 ? code + ')' : '(object )'
       }
-
+      code += '(@'
       increaseIndent()
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i]
-        if (key.startsWith('$') || key.startsWith('__')) {
-          continue
-        }
         code += (code.length < 3 ? '' : '\n' + getIndent()) + key + ': '
         code += encodeValue(obj[key])
       }
       decreaseIndent()
-      return code + ')'
+      return code + (hasType ? '))' : ')')
     }
 
     function encodeNativeFunction (func) {
       // encode anonymous function to null.
-      return func.hasOwnProperty('identityName') ? func.identityName : 'null'
+      return func.hasOwnProperty('identityName')
+        ? func.identityName : func.name || '(=(native function) ())'
     }
 
     function encodeSuglyFunction (func) {
@@ -107,7 +104,7 @@ module.exports = function ($void, JS) {
       var enclosing = func.$enclosing
       if (enclosing) {
         var obj = encodeObject(enclosing)
-        if (obj.length > 4) { // not an empty onject.
+        if (obj !== '(object )') { // not an empty onject.
           code += obj + ' > '
         }
       }
@@ -297,7 +294,7 @@ module.exports = function ($void, JS) {
         return 'null' // null is always possible.
       }
       if (typeof obj !== 'object' || obj instanceof Symbol$) {
-        return '(@>)' // empty object for non-object
+        return '(object )' // empty object for non-object
       }
       // array and date are valid objects.
       if (Array.isArray(obj)) {

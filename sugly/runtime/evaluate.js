@@ -4,6 +4,8 @@ module.exports = function evaluate ($void) {
   var resolve = $void.resolve
   var get = $void.get
   var set = $void.set
+  var geti = $void.geti
+  var seti = $void.seti
   var Symbol$ = $void.Symbol
 
   $void.evaluate = function evaluate (clause, space) {
@@ -56,10 +58,14 @@ module.exports = function evaluate ($void) {
       // a string as verb is indicating a getting/setting command.
       return length > 2 ? set(subject, predicate, evaluate(clause[2], space))
         : get(subject, predicate)
+    } else if (typeof predicate === 'number') {
+      // a number may be a valid index for some types.
+      return length > 2 ? seti(subject, predicate, evaluate(clause[2], space))
+        : geti(subject, predicate)
     } else if (typeof predicate === 'function') {
       func = predicate
     } else {
-      return predicate
+      return null // invalid predicate
     }
 
     // evaluate arguments.

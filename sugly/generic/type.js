@@ -4,7 +4,6 @@ var $export = require('../export')
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Type$ = $void.Type
   var isPrototypeOf = $void.isPrototypeOf
   var Type = $.Type
 
@@ -32,26 +31,24 @@ module.exports = function ($void) {
   // Type Verification: to test if an entity is an instance of a type.
   // native types should override all these logic.
   $export(proto, 'is-a', function entity$is_a (type) {
-    if (typeof type === 'undefined' || type === null ||
-      !(type instanceof Type$)) {
+    if (typeof type === 'undefined' || type === null || !type.proto) {
       return false
     }
     var proto = Object.getPrototypeOf(this)
-    if (!(proto.type instanceof Type$)) {
+    if (!proto.type) {
       return false
     }
     return proto.type === type || isPrototypeOf(type, proto.type)
   })
   $export(proto, 'is-not-a', function entity$is_not_a (type) {
-    if (typeof type === 'undefined' || type === null ||
-      !(type instanceof Type$)) {
+    if (typeof type === 'undefined' || type === null || !type.proto) {
       return true
     }
     var proto = Object.getPrototypeOf(this)
-    if (!(proto.type instanceof Type$)) {
+    if (!proto.type) {
       return true
     }
-    return proto.type === type || isPrototypeOf(type, proto.type)
+    return proto.type !== type && !isPrototypeOf(type, proto.type)
   })
   // Type Determination: any enity has a type, which could be null.
   $export(proto, 'get-type', function entity$get_type () {
@@ -61,7 +58,7 @@ module.exports = function ($void) {
   // Generalization: the super type is determined by the proto field.
   $export(proto, 'super', function entity$super () {
     var proto = Object.getPrototypeOf(this)
-    return proto && proto.type instanceof Type$ ? proto.type.super() : null
+    return proto && proto.type ? proto.type.super() : null
   })
 
   // all known types should implement their own to-code logic.

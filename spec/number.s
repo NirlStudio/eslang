@@ -28,8 +28,8 @@
     (assert 1 (` ($number 1),
     (assert 1.5 (` ($number 1.5),
 
-    (assert (` (Number is-nan ($number NaN),
-    (assert false (` (Number is-finite ($number Infinity),
+    (assert false (` (($number NaN) is-valid),
+    (assert false (` (($number Infinity) is-finite),
   ),
 ).
 
@@ -63,33 +63,24 @@
     (assert 1 (` (number 1),
     (assert 1.5 (` (number 1.5),
 
-    (assert (` (Number is-nan (number NaN),
-    (assert false (` (Number is-finite (number Infinity),
+    (assert false (` ((number NaN) is-valid),
+    (assert false (` ((number Infinity) is-finite),
   ),
 ).
 
 ($define "Number object" (=()
-  ($should "(Number is-finite )" "return true for finite number values" (= ()
-    (assert (` (Number is-finite -1),
-    (assert (` (Number is-finite 1),
-    (assert (` (Number is-finite 0),
-    (assert (` (Number is-finite (Number MAX_VALUE),
-    (assert (` (Number is-finite (Number MIN_VALUE),
-    (assert (` (Number is-finite (Int MAX_VALUE),
-    (assert (` (Number is-finite (Int MIN_VALUE),
+  ($should "(num is-finite )" "return true for finite number values" (= ()
+    (assert (` (-1 is-finite),
+    (assert (` (1 is-finite),
+    (assert (` (0 is-finite),
+    (assert (` ((Number MAX_VALUE) is-finite),
+    (assert (` ((Number MIN_VALUE) is-finite),
+    (assert (` ((Int MAX_VALUE) is-finite),
+    (assert (` ((Int MIN_VALUE) is-finite),
 
-    (assert false (` (Number is-finite Infinity),
-    (assert false (` (Number is-finite (Number "POSITIVE_INFINITY"),
-    (assert false (` (Number is-finite (Number "NEGATIVE_INFINITY"),
-
-    (assert false (` (Number is-finite),
-    (assert false (` (Number is-finite null),
-    (assert false (` (Number is-finite true),
-    (assert false (` (Number is-finite false),
-    (assert false (` (Number is-finite ""),
-    (assert false (` (Number is-finite "0"),
-    (assert false (` (Number is-finite (@),
-    (assert false (` (Number is-finite (object),
+    (assert false (` (Infinity is-finite),
+    (assert false (` ((Number "POSITIVE_INFINITY") is-finite),
+    (assert false (` ((Number "NEGATIVE_INFINITY") is-finite),
   ),
   ($should "(Int is-safe )" "return true for safe integer values" (= ()
     (assert (` (Int is-safe -1),

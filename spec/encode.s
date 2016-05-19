@@ -18,7 +18,7 @@
   ),
 
   ($should "a symbol" "be encoded to its key" (= ()
-    (assert "(` sym)" (` (encode value (` sym),
+    (assert "sym" (` (encode value (` sym),
 
     (assert "null" (` (encode symbol),
     (assert "null" (` (encode symbol null),
@@ -80,17 +80,17 @@
 
   ($should "an object" "be encoded to its identityName or an expression" (= ()
     (let obj (object),
-    (assert "(@>)" (` (encode value obj),
+    (assert "(object )" (` (encode value obj),
 
     (let obj (@ p : 1 ),
     (assert "(@p: 1)" (` (encode value obj),
 
-    (let pt (@ identityName : "type" ),
-    (let obj (@ pt >),
-    (assert "(@type >)" (` (encode value obj),
+    (let cls (class (@identityName : "type"),
+    (let obj (cls create),
+    (assert "(type create )" (` (encode value obj),
 
-    (let obj (@ pt > p : 1 ),
-    (assert "(@type >\n  p: 1)" (` (encode value obj),
+    (let obj (cls create (@ p : 1 ),
+    (assert "(type create (@\n  p: 1))" (` (encode value obj),
 
     (let obj (@ identityName : "special-object" ),
     (assert "special-object" (` (encode value obj),
@@ -100,12 +100,12 @@
 
     (assert "null" (` (encode object),
     (assert "null" (` (encode object null),
-    (assert "(@>)" (` (encode object false),
-    (assert "(@>)" (` (encode object 12),
-    (assert "(@>)" (` (encode object ""),
-    (assert "(@>)" (` (encode object (` sym),
-    (assert "(@>)" (` (encode object (object),
-    (assert "(@>)" (` (encode object (= x x),
+    (assert "(object )" (` (encode object false),
+    (assert "(object )" (` (encode object 12),
+    (assert "(object )" (` (encode object ""),
+    (assert "(object )" (` (encode object (` sym),
+    (assert "(object )" (` (encode object (object),
+    (assert "(object )" (` (encode object (= x x),
   ),
 
   ($should "an array" "be encoded to an expression" (= ()

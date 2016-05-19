@@ -202,7 +202,7 @@
 
 ($define "(func apply subject args)" (= ()
   ($should "execute a function with a subject and arguments from an array" (= ()
-    (let f (= (*) (@ s: ($ ":") argc: argc argv: argv),
+    (let f (= (*) (@ s: ($ "this") argc: argc argv: argv),
     (let r (f apply),
     (assert null (` (r s),
     (assert 0 (` (r argc),
@@ -213,10 +213,11 @@
     (assert (` (s is (r s),
     (assert 2 (` (r argc),
     (assert 1 (` ((r argv):0),
-    (assert 2 (` (-> r argv (:1),
+    (assert 2 (` ((r argv):1),
 ).
 
 ($define "Function object" (= ()
-  ($should "be reserved" (= ()
-    (assert "object" (` (typeof ($Function),
+  ($should "is the type object of functions" (= ()
+    (assert (` (Function is-a Type),
+    (assert (` ((= x x) is-a Function),
 ).
