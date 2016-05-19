@@ -1,19 +1,19 @@
-(let data ($import "sort-data").
+(let data (to import "sort-data").
 (print warn data)
 
-(let quick (= (start end)
+(let sort (= (start end)
   (if (start >= end) (return),
 
   (let mid (data:end),
   (let (left start) (right (end - 1),
   (while (left < right)
     (while
-      (&& ((data:left) < mid) (left < right),
+      (((data:left) < mid) && (left < right),
       (++ left)
     ),
     (while
-      (&& ((data:right) >= mid) (left < right),
-      (-- right 1)
+      (((data:right) >= mid) && (left < right),
+      (-- right)
     ),
     (data swap left right)
   ),
@@ -22,9 +22,9 @@
     (data swap left end)
     (++ left)
   ),
-  ($quick start (left - 1),
-  ($quick (+ left 1) end)
+  (to do start (left - 1),
+  (to do (left + 1) end)
 ).
 
-($quick 0 ((data length) - 1).
+(to sort 0 ((data length) - 1).
 (exit data)

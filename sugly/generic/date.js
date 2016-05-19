@@ -197,8 +197,8 @@ module.exports = function ($void) {
     'toUTCString': 'to-utc-string'
   })
 
-  // override clone function
-  $export(proto, 'clone', function date$clone () {
+  // override copy function
+  $export(proto, 'copy', function date$clone () {
     return new Date(this.getTime())
   })
 
@@ -242,7 +242,6 @@ module.exports = function ($void) {
 
   // support ordering operators
   $export(proto, '>', function date$opr_gt (another) {
-    console.log('date gt', another)
     if (!(another instanceof Date)) {
       return false
     }

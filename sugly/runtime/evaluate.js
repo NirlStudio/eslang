@@ -28,7 +28,7 @@ module.exports = function evaluate ($void) {
       } else if (typeof $void.operators[key] !== 'undefined') {
         return $void.operators[key](space, clause)
       }
-      if (key === '$') {
+      if (key === '$' || key === 'to' || key === 'it') {
         subject = space.$ // shortcut
       } else {
         subject = resolve(space, subject)

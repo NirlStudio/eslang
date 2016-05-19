@@ -10,7 +10,7 @@ module.exports = function ($void) {
 
   $void.resolve = function $resolve (space, sym) {
     var key = typeof sym === 'string' ? sym : (sym.key || '')
-    if (key === '$') {
+    if (key === '$' || key === 'to' || key === 'it') {
       return space.$
     }
     var value = space.$[key]

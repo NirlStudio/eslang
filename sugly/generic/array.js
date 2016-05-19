@@ -153,8 +153,23 @@ module.exports = function ($void) {
     'filter': 'filter'
   })
 
+  // support comparison operators to test length
+  $export(proto, '>', function array$opr_gt (length) {
+    return typeof length === 'number' ? this.length > length : false
+  })
+  $export(proto, '>=', function array$opr_ge (length) {
+    return typeof length === 'number' ? this.length >= length : false
+  })
+  $export(proto, '<', function array$opr_lt (length) {
+    return typeof length === 'number' ? this.length < length : false
+  })
+  $export(proto, '<=', function array$opr_le (length) {
+    return typeof length === 'number' ? this.length <= length : false
+  })
+
+  // override copy function
   $export.copy(proto, Array.prototype, {
-    'slice': 'clone'
+    'slice': 'copy'
   })
 
   // override general operators

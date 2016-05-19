@@ -60,7 +60,7 @@ module.exports = function function_ ($void) {
         var scope = createSpace(space)
         spaceStack.push(scope, $F)
         var ns = scope.$
-        ns['self'] = $F
+        ns['do'] = $F
         ns['this'] = this
         var argc = ns['argc'] = arguments.length
         if (fixedArgs) {
@@ -106,7 +106,7 @@ module.exports = function function_ ($void) {
         var scope = createSpace(space)
         spaceStack.push(scope, $C)
         var ns = scope.$
-        ns['self'] = $C
+        ns['do'] = $C
         ns['this'] = this
         Object.assign(ns, enclosing)
         var argc = ns['argc'] = arguments.length

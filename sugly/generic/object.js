@@ -48,8 +48,8 @@ function merge () {
   }
 }
 
-function objectClone () {
-  return function object$clone () {
+function objectCopy () {
+  return function object$copy () {
     if (typeof this === 'object' && this !== null) {
       var obj = Object.create(Object.getPrototypeOf(this))
       Object.assign(obj, this)
@@ -90,7 +90,7 @@ module.exports = function ($void) {
   $export(proto, 'set-property', setProperty())
 
   // to create a shallow copy of this instance with the same type.
-  $export(proto, 'clone', objectClone())
+  $export(proto, 'copy', objectCopy())
 
   // support general operators
   // generate a new object by comine this object and other objects.

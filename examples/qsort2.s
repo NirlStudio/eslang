@@ -1,17 +1,15 @@
-(let data ($import "sort-data").
+(let data (it import "sort-data").
 (print warn data)
 
-(let quick (= (arr)
-  (if ((arr length) < 2) (return arr),
+(let sort (= (arr)
+  (if (arr < 2) (return arr),
 
-  (let (mid (arr:0)) (left (@)) (right (@),
-  (for i in ($range 1 (arr length))
+  (let (mid (arr 0)) (left (@)) (right (@),
+  (for i in (1 (arr length))
     (let v (arr:i),
-    (print value i)
-    ((if (v >= mid) right left) push v),
+    (((v >= mid) ? right left) push v),
   ),
-  (($quick left) concat (@mid) ($quick right),
+  ((it do left) concat (@mid) (it do right),
 ).
 
-(let result ($quick data).
-(print value result)
+(exit (it sort data).

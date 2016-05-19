@@ -61,7 +61,7 @@
     (assert false (` (0 < ""),
     (assert false (` ("" < 0),
     (assert false (` ((date 1000) < (` sym),
-    (assert null (` ((@) < (object),
+    (assert false (` ((@) < (object),
     (assert null (` ((object) < (@),
   ),
 
@@ -89,7 +89,7 @@
     (assert false (` (0 <= ""),
     (assert false (` ("" <= 0),
     (assert false (` ((date 1000) <= (` sym),
-    (assert null (` ((@) <= (object),
+    (assert false (` ((@) <= (object),
     (assert null (` ((object) <= (@),
   ),
 
