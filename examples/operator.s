@@ -11,3 +11,23 @@
 
 (print code (add2 1 10 100 1000 10000))
 (print code counter)
+
+(operator export add3
+  (+ 100 %0 %1).
+(print value (add3 10 1).
+
+(operator add3
+  (+ 10000 %0 %1).
+
+(operator add3
+  (+ 1000000 %0 %1).
+
+(print value (add3 10 1).
+
+(operator opr5 # (operands)
+  (@ %C %V %0 %9)
+).
+
+(let r (opr5 10 11 12 13 14 15 16 17 18 19 20 21).
+(print value r)
+(print value (r:0).

@@ -42,7 +42,7 @@
   ($should "be passed correctly" (= ()
     (let r (opr5 10 11 12 13 14 15 16 17 18 19 20 21),
     (assert 12 (` (r:0),
-    (assert "array" (` (typeof (r:1),
+    (assert (` ((r:1) is-a Array),
     (assert 12 (` ((r:1) length),
     (assert 10 (` (r:2),
     (assert 19 (` (r:3),
@@ -78,7 +78,7 @@
     (assert 97 (` (r:5),
     (assert 98 (` (r:6),
 
-    (assert "array" (` (typeof (r:3),
+    (assert (` ((r:3) is-a Array),
     (let r (r:3),
     (assert 93 (` (r:0),
     (assert 94 (` (r:1),

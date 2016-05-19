@@ -1,9 +1,9 @@
 ($define "constants" (= ()
   ($should "have constant E" (= ()
-    (assert (` (typeof (Math E) "number"),
+    (assert (` ((Math E) is-a Number),
 ).
 
 ($define "functions" (= ()
   ($should "have function abs" (= ()
-    (assert 1 (` (Math abs -1),
+    (assert (` ((Math "abs") is-a Function),
 ).

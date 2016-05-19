@@ -5,6 +5,6 @@
 ).
 ($define "(Json parse ...)" (= ()
   ($should "return an object or value from a json string." (= ()
-    (assert "array" (` (typeof (Json parse "[1,2,3]"),
+    (assert (` ((Json parse "[1,2,3]") is-a Array),
   ),
 ).

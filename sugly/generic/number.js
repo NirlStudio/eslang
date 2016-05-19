@@ -150,6 +150,14 @@ module.exports = function ($void) {
     return Math.round(this)
   })
 
+  // override for NaN
+  $export(proto, 'is', function number$is (another) {
+    return Object.is(this, another)
+  })
+  $export(proto, 'is-not', function number$is_not (another) {
+    return !Object.is(this, another)
+  })
+
   // persistency & describing
   $export(proto, 'to-code', function number$to_code () {
     return typeof this === 'number' ? this.toString() : 'NaN'

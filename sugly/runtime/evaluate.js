@@ -20,8 +20,9 @@ module.exports = function evaluate ($void) {
     // intercept subject
     if (subject instanceof Symbol$) {
       var key = subject.key
-      if (space.operators && typeof space.operators[key] !== 'undefined') {
-        return space.operators[key](space, clause)
+      var localOperators = space.operators || space.parent.operators
+      if (typeof localOperators[key] !== 'undefined') {
+        return localOperators[key](space, clause)
       } else if (typeof $void.operators[key] !== 'undefined') {
         return $void.operators[key](space, clause)
       }
