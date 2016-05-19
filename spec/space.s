@@ -1,22 +1,22 @@
 ($define "space levels" (= ()
-  ($should "a module" "have same spaceIdentifier and moduleSpaceIdentifier" (= ()
-      (let r ($exec "(@ sid: spaceIdentifier mid: moduleSpaceIdentifier)"),
+  ($should "a module" "have same spaceIdentifier and moduleIdentifier" (= ()
+      (let r ($exec "(@ sid: spaceIdentifier mid: moduleIdentifier)"),
       (assert ('((r"sid") == (r"mid"),
   ),
 
-  ($should "a function" "have different spaceIdentifier and moduleSpaceIdentifier" (= ()
-      (let r ($exec "($ (=() (@ sid: spaceIdentifier mid: moduleSpaceIdentifier)"),
+  ($should "a function" "have different spaceIdentifier and moduleIdentifier" (= ()
+      (let r ($exec "($ (=() (@ sid: spaceIdentifier mid: moduleIdentifier)"),
       (assert ('((r "sid") != (r "mid"),
   ),
 
-  ($should "a closure" "have different spaceIdentifier and moduleSpaceIdentifier" (= ()
-      (let c (= a > () (@ sid: spaceIdentifier mid: moduleSpaceIdentifier),
+  ($should "a closure" "have different spaceIdentifier and moduleIdentifier" (= ()
+      (let c (= a > () (@ sid: spaceIdentifier mid: moduleIdentifier),
       (let r ($ c),
       (assert (`((r "sid") != (r "mid"),
   ),
 
-  ($should "a lambda" "have different spaceIdentifier and moduleSpaceIdentifier" (= ()
-      (let l (=> (x) > (y) (@ sid: spaceIdentifier mid: moduleSpaceIdentifier),
+  ($should "a lambda" "have different spaceIdentifier and moduleIdentifier" (= ()
+      (let l (=> (x) > (y) (@ sid: spaceIdentifier mid: moduleIdentifier),
       (let r ($ ($l),
       (assert (`((r "sid") != (r "mid"),
   ),

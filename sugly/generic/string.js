@@ -2,7 +2,7 @@
 
 var $export = require('../export')
 
-function valueOf (get) {
+function valueOf ($void) {
   return function String$value_of () {
     var length = arguments.length
     var result = ''
@@ -15,7 +15,7 @@ function valueOf (get) {
       if (result.length > 0 && !result.endsWith(' ')) {
         result += ' '
       }
-      var to_str = get(arg, 'to-string')
+      var to_str = $void.get(arg, 'to-string')
       result += typeof to_str === 'function' ? to_str.call(arg) : ''
     }
     return result
@@ -24,11 +24,10 @@ function valueOf (get) {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var get = $void.get
   var type = $.String
 
   // concatenate the to-string result of arguments
-  var value_of = $export(type, 'value-of', valueOf(get))
+  var value_of = $export(type, 'value-of', valueOf($void))
 
   // generate a string from a series of unicode values
   $export.copy(type, String, {

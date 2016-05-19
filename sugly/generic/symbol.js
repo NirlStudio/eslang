@@ -72,9 +72,6 @@ module.exports = function ($void) {
   $export(proto, 'to-string', function symbol$to_string () {
     return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
   })
-  $export(proto, 'toString', function symbol$to_string () {
-    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
-  })
 
   // emptiness: nothing symbol is taken as the empty value.
   $export(proto, 'is-empty', function () {

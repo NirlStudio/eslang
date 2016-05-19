@@ -43,7 +43,7 @@ module.exports = function space ($void) {
 
   var createSpace = $void.createSpace = function $createSpace (parent) {
     $void.spaceCounter += 1
-    return {
+    var space = {
       parent: parent,
       spaceIdentifier: 'space-' + $void.spaceCounter,
        // new stack objects
@@ -52,6 +52,8 @@ module.exports = function space ($void) {
       // new app space
       $: Object.create(parent.$)
     }
+    space.$.spaceIdentifier = space.spaceIdentifier
+    return space
   }
 
   var initializeModuleSpace = $void.initializeModuleSpace = function $initializeModuleSpace (space, attachExport) {
@@ -68,6 +70,7 @@ module.exports = function space ($void) {
     var space = createSpace($void)
     space.sealing = sealing
     space.moduleIdentifier = space.spaceIdentifier
+    space.$.moduleIdentifier = space.spaceIdentifier
     space.operators = {}
 
     if (dir && dir !== space.dir) {

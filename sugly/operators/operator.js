@@ -63,18 +63,18 @@ module.exports = function operators$operator ($void) {
 
       var oprStack = ctx.oprStack
       oprStack.push(oprds)
-      populateOperatorCtx(ctx, oprds)
+      populateOperatorCtx(ctx.$, oprds)
       var value = null
       try {
         for (var j = 0; j < statements.length; j++) {
           value = evaluate(statements[j], ctx)
         }
         oprStack.pop()
-        populateOperatorCtx(ctx, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
+        populateOperatorCtx(ctx.$, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
         return value
       } catch (signal) {
         oprStack.pop()
-        populateOperatorCtx(ctx, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
+        populateOperatorCtx(ctx.$, oprStack.length > 0 ? oprStack[oprStack.length - 1] : [])
         throw signal
       }
     }

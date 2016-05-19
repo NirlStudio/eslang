@@ -5,7 +5,7 @@
 
 (print code (add1 "xyz" 123).
 
-(operator add2
+(operator export add2
   (++ counter )
   (+ %0 %1 (add1 %2 %3).
 

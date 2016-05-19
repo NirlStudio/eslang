@@ -14,7 +14,7 @@ module.exports = function ($void) {
       : isPrototypeOf(type, this)
   })
   $export(Type, 'is-not-a', function Type$is_not_a (type) {
-    typeof type === 'undefined' || type === null ? true
+    return typeof type === 'undefined' || type === null ? true
       : !isPrototypeOf(type, this)
   })
   $export(Type, 'get-type', function Type$get_type () {

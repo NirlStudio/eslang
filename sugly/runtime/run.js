@@ -5,15 +5,15 @@ var $export = require('../export')
 module.exports = function run ($void) {
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
-  var spaceStack = $void.spaceStack
 
   $void.runIn = function runIn (space) {
     var load = $void.load
     var execute = $void.execute
+    var spaceStack = $void.spaceStack
 
     var dir = space.dir
     var runInDirs = [null, dir]
-    var modules = space.modules
+    var modules = space.modules || $void.modules
     var $ = space.$
 
     $export($, 'eval', function $eval (expr) {

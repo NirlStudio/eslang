@@ -44,7 +44,7 @@ module.exports = function ($void) {
     if (typeof this[name] !== 'undefined') {
       return this[name]
     }
-    typeof proto[name] !== 'undefined' ? proto[name] : null
+    return typeof proto[name] !== 'undefined' ? proto[name] : null
   })
 
   // override to boost - an object is always true

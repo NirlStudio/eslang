@@ -34,7 +34,7 @@
   (let %9 ($eval %1),
   (if (%0 != %9)
     (exit (@
-      typeId: "assert-failure"
+      is-failure: true
       step: %assert-step
       expected: %0
       expr: %1
@@ -72,11 +72,11 @@
   (for i
     in ($range 1 (case length),
     (let item (case:i),
-    (if (typeof item "array")
-      ($execute item)
+    (if (item is-a Array)
+      ($self item)
     else
       (let result ((item "action") exec),
-      (if (typeof result "assert-failure")
+      (if (result is-failure)
         ($failed (item "behaviour") result)
       else
         ($succeeded (item "behaviour")
@@ -103,7 +103,7 @@
 (= (*)
   (for module in argv
     (let load ($run module),
-    (if (typeof load "function") ($load),
+    (if (load is-a Function) ($load),
   ),
 
   (if ((cases length) < 1) (exit),
