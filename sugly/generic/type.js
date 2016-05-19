@@ -55,8 +55,8 @@ module.exports = function ($void) {
   })
   // Type Determination: any enity has a type, which could be null.
   $export(proto, 'get-type', function entity$get_type () {
-    var proto = Object.getPrototypeOf(this)
-    return (proto && proto.type instanceof Type$ && proto.type) || null
+    return typeof this.type !== 'undefined'
+      ? this.type : typeof this === 'object' ? $.Class : null
   })
   // Generalization: the super type is determined by the proto field.
   $export(proto, 'super', function entity$super () {

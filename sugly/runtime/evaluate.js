@@ -34,10 +34,6 @@ module.exports = function evaluate ($void) {
       subject = evaluate(subject, space)
     }
 
-    if (subject === null) {
-      return null // short circuit - ignoring arguments
-    }
-
     // with only subject, take the value of subject as another clause.
     if (length < 2) {
       return evaluate(subject, space)

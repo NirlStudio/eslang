@@ -2,13 +2,13 @@
 
 var RegexNumber = /^-?\d+\.?\d*$/
 
-var keywords = {
+var keywords = Object.assign(Object.create(null), {
   'null': null,
   'true': true,
   'false': false,
   'NaN': NaN,
   'Infinity': Infinity
-}
+})
 
 function createTokenizer ($void) {
   var InvalidSymbol = $void.InvalidSymbol

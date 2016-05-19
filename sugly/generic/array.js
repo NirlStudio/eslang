@@ -160,6 +160,9 @@ module.exports = function ($void) {
   $export(proto, 'to-string', function array$to_string () {
     return $.encode.array(this)
   })
+  $export.copy(proto, Array.prototype, {
+    'join': 'join' // TODO - to override
+  })
 
   // special persistency lgoic according to its literal meaning.
   $export(proto, 'to-clause', function array$to_clause (pretty) {
