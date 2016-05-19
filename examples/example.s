@@ -3,10 +3,12 @@
 (print value (+ "Hello" " world!").
 (print value (100 + 10 1).
 (print value (100 - 10 1))
+(print value (- 100 10 1))
+(print value (- 100))
 (print value (100 * 10 1))
 (print value (100 / 10 1))
 
-($"log100" (` Math log 100).
+($"log100" (` (Math log 100).
 (print value (log100).
 
 (print value (+ ""
@@ -59,7 +61,9 @@
 ($"sumWithBase" (= base
   (= base > (x y)
     (+ base x y).
+(print value sumWithBase)
 ($"sum" ($sumWithBase 1000).
+(print value sum)
 (print value ($sum 10 1).
 
 
@@ -108,16 +112,7 @@
 (print value (obj"b").
  #" 12312312
 
-(print value (typeof ($import "colors" "js").
-
-(let f (= (*) (@ s: ($ "this") argc: argc argv: argv),
-(let s (object))
-(let args (@ 1 2))
-(let r (f apply s args),
-(print value (-> r "argv" (:1)),
-
-(let r (f call s 3 4),
-(print value (-> r "argv" (:1)),
+(print value (($import "colors" "js") get-type).
 
 (exit -1 2)
 (return 0)

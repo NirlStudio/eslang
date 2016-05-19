@@ -7,9 +7,11 @@
   (let (mid (arr:0)) (left (@)) (right (@),
   (for i in ($range 1 (arr length))
     (let v (arr:i),
+    (print value i)
     ((if (v >= mid) right left) push v),
   ),
   (($quick left) concat (@mid) ($quick right),
 ).
 
-($quick data)
+(let result ($quick data).
+(print value result)
