@@ -19,7 +19,8 @@ function createObject ($void) {
       constructor.apply(obj, arguments)
     } else if (arguments.length > 0) {
       var args = [obj]
-      Object.assign.apply(Object, Array.prototype.concat.apply(args, arguments))
+      Array.prototype.push.apply(args, arguments)
+      Object.assign.apply(Object, args)
     }
     return obj
   }

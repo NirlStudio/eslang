@@ -7,9 +7,7 @@ module.exports = function operators ($void) {
   require('./assignment')($void)
   require('./object')($void)
   require('./function')($void)
-  require('./type')($void)
   require('./control')($void)
-  // require('./pattern')($void) - TODO - to be removed ?
   require('./operator')($void)
   require('./general')($void)
   require('./arithmetic')($void)

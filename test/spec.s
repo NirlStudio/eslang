@@ -11,8 +11,8 @@
 ).
 
 (= (*)
-  (let scope (if argc argv features),
+  (let scope (argc ? argv features),
   (for name in scope
-    ($define name (= name > ()
-      ($run (+ "spec/" name),
+    (define name (= name > ()
+      (run ("spec/" + name),
 ).

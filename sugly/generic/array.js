@@ -210,7 +210,7 @@ module.exports = function ($void) {
     return $.encode.clause(this)
   })
   $export(proto, 'to-program', function array$to_program (pretty) {
-    return $.encode(this)
+    return $.encode.program(this)
   })
 
   // determine emptiness by array's length

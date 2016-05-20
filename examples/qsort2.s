@@ -1,4 +1,4 @@
-(let data (it import "sort-data").
+(let data (import "sort-data").
 (print warn data)
 
 (let sort (= (arr)
@@ -9,7 +9,7 @@
     (let v (arr:i),
     (((v >= mid) ? right left) push v),
   ),
-  ((it do left) concat (@mid) (it do right),
+  ((do left) concat (@mid) (do right),
 ).
 
-(exit (it sort data).
+(exit (sort data).

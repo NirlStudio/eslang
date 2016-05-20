@@ -9,10 +9,24 @@ module.exports = function execute ($void) {
   var spaceStack = $void.spaceStack
   var compile = $void.$.compile
 
-  $export($void.$.Function.proto, 'exec', function function$exec () {
+  $export($void.$.Function, 'execute', function function$execute (func) {
     try {
-      return typeof this !== 'function' ? this
-        : Function.prototype.call.apply(this, arguments.length > 0 ? arguments : [null])
+      return typeof func !== 'function' ? null
+        : func.apply(null, Array.prototype.slice.call(arguments, 1))
+    } catch (signal) {
+      if (signal instanceof Signal &&
+         (signal.type === 'return' || signal.type === 'exit')) {
+        return signal.value
+      } else {
+        throw signal
+      }
+    }
+  })
+
+  $export($void.$.Function, 'execute-with', function function$execute_with (subject, func) {
+    try {
+      return typeof func !== 'function' ? null
+        : func.apply(subject, Array.prototype.slice.call(arguments, 2))
     } catch (signal) {
       if (signal instanceof Signal &&
          (signal.type === 'return' || signal.type === 'exit')) {

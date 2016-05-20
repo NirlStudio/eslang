@@ -246,50 +246,46 @@ module.exports = function ($void, JS) {
       return code + ')'
     }
 
-    // encode a piece of program(clauses): [[]]
-    function encode (clauses) {
-      return Array.isArray(clauses) ? encodeProgram(clauses, false) : '()'
-    }
-
     // export functions
+    var encode = $.object()
     encode.identityName = 'encode'
 
-    $export(encode, 'string', function (str) {
+    $export(encode, 'string', function encode$string (str) {
       if (typeof str === 'undefined' || str === null) {
         return 'null' // null is always possible.
       }
       return typeof str !== 'string' ? '""' : encodeString(str)
     })
 
-    $export(encode, 'symbol', function (sym) {
+    $export(encode, 'symbol', function encode$symbol (sym) {
       if (typeof sym === 'undefined' || sym === null) {
         return 'null' // null is always possible.
       }
       return encodeSymbol(sym)
     })
 
-    $export(encode, 'number', function (num) {
+    $export(encode, 'number', function encode$number (num) {
       if (typeof num === 'undefined' || num === null) {
         return 'null' // null is always possible.
       }
       return typeof num !== 'number' ? 'NaN' : encodeNumber(num)
     })
 
-    $export(encode, 'bool', function (bool) {
+    $export(encode, 'bool', function encode$bool (bool) {
       if (typeof bool === 'undefined' || bool === null) {
         return 'null' // null is always possible.
       }
       return typeof bool !== 'boolean' ? 'false' : encodeBool(bool)
     })
 
-    $export(encode, 'date', function (date) {
+    $export(encode, 'date', function encode$date (date) {
       if (typeof date === 'undefined' || date === null) {
         return 'null' // null is always possible.
       }
       return date instanceof Date ? encodeDate(date) : '(date 0)'
     })
 
-    $export(encode, 'object', function (obj) {
+    $export(encode, 'object', function encode$object (obj) {
       if (typeof obj === 'undefined' || obj === null) {
         return 'null' // null is always possible.
       }
@@ -306,19 +302,28 @@ module.exports = function ($void, JS) {
       return encodeObject(obj)
     })
 
-    $export(encode, 'function', function (func) {
+    $export(encode, 'function', function encode$function (func) {
       return typeof func !== 'function' ? 'null' : encodeFunction(func)
     })
 
-    $export(encode, 'array', function (arr) {
+    $export(encode, 'array', function encode$array (arr) {
       if (typeof arr === 'undefined' || arr === null) {
         return 'null' // null is always possible.
       }
       return Array.isArray(arr) ? encodeArray(arr) : '(@)'
     })
 
-    $export(encode, 'value', encodeValue)
-    $export(encode, 'clause', encodeClause)
+    $export(encode, 'value', function encode$value (value) {
+      return typeof value === 'undefined' ? 'null' : encodeValue(value)
+    })
+
+    $export(encode, 'clause', function encode$clause (clause) {
+      return typeof clause === 'undefined' ? '()' : encodeClause(clause)
+    })
+
+    $export(encode, 'program', function encode$program (clauses) {
+      return Array.isArray(clauses) ? encodeProgram(clauses, false) : '()'
+    })
     return encode
   })
 }

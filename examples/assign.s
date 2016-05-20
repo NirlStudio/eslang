@@ -4,7 +4,7 @@
 
 (let increment (= ()
   (++ x).
-($increment)
+(increment)
 (print value x)
 
 (let increment (= ()
@@ -13,6 +13,6 @@
   (print value (global x),
   (print value x).
 
-($increment)
-($increment)
+(increment)
+(increment)
 (print value x)

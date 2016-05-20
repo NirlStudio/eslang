@@ -1,30 +1,11 @@
-($define "function form" (= ()
-  ($should "return false for false, zero and null" (= ()
-    (assert false (` ($bool ),
-    (assert false (` ($bool false),
-    (assert false (` ($bool 0),
-    (assert false (` ($bool null),
-  ),
-  ($should "return true for any other values" (= ()
-    (assert true (` ($bool true),
-    (assert true (` ($bool 1),
-    (assert true (` ($bool -1),
-    (assert true (` ($bool ""),
-    (assert true (` ($bool "0"),
-    (assert true (` ($bool "false"),
-    (assert true (` ($bool (@),
-    (assert true (` ($bool (object),
-  ),
-).
-
-($define "operator form" (= ()
-  ($should "return false for false, zero and null" (= ()
+(define "function form" (= ()
+  (should "return false for false, zero and null" (= ()
     (assert false (` (bool ),
     (assert false (` (bool false),
     (assert false (` (bool 0),
     (assert false (` (bool null),
   ),
-  ($should "return true for any other values" (= ()
+  (should "return true for any other values" (= ()
     (assert true (` (bool true),
     (assert true (` (bool 1),
     (assert true (` (bool -1),
@@ -36,15 +17,15 @@
   ),
 ).
 
-($define "Bool type" (= ()
-  ($should "be the type object of boolean values" (= ()
+(define "Bool type" (= ()
+  (should "be the type object of boolean values" (= ()
     (assert (` ((Bool is-a Type),
     (assert (` ((Bool is-not-a Class),
   ),
 ).
 
-($define "(Bool value-of x) " (= ()
-  ($should "standardize a value to its bool value." (= ()
+(define "(Bool value-of x) " (= ()
+  (should "standardize a value to its bool value." (= ()
     (assert (` (Bool value-of true),
     (assert false (` (Bool value-of false),
 
@@ -58,8 +39,8 @@
     (assert (` (Bool value-of (@>)),
 ).
 
-($define "(Bool and x y z ...)" (= ()
-  ($should "give a result by logical AND." (= ()
+(define "(Bool and x y z ...)" (= ()
+  (should "give a result by logical AND." (= ()
     (assert (` (Bool and),
     (assert (` (Bool and true),
     (assert false (` (Bool and true false),
@@ -69,8 +50,8 @@
     (assert false (` (Bool and true null),
 ).
 
-($define "(Bool or x y z ...)" (= ()
-  ($should "give a result by logical OR." (= ()
+(define "(Bool or x y z ...)" (= ()
+  (should "give a result by logical OR." (= ()
     (assert false (` (Bool or),
     (assert (` (Bool or true),
     (assert (` (Bool or true false),
@@ -81,8 +62,8 @@
     (assert false (` (Bool or false null),
 ).
 
-($define "(Bool not x)" (= ()
-  ($should "give a result by logical NOT." (= ()
+(define "(Bool not x)" (= ()
+  (should "give a result by logical NOT." (= ()
     (assert (` (Bool not),
     (assert false (` (Bool not true),
     (assert (` (Bool not false),
@@ -92,8 +73,8 @@
     (assert (` (Bool not null),
 ).
 
-($define "(a is b)" (= ()
-  ($should "only return true if a and b are the same bool value." (= ()
+(define "(a is b)" (= ()
+  (should "only return true if a and b are the same bool value." (= ()
     (assert (` (true is true),
     (assert (` (false is false),
     (assert false (` (true is false),
@@ -110,8 +91,8 @@
   ),
 ).
 
-($define "(a equals b)" (= ()
-  ($should "only return true if a and b are the same bool value." (= ()
+(define "(a equals b)" (= ()
+  (should "only return true if a and b are the same bool value." (= ()
     (assert (` (true equals true),
     (assert (` (false equals false),
     (assert false (` (true equals false),
@@ -125,22 +106,22 @@
   ),
 ).
 
-($define "(bool-value to-code )" (= ()
-  ($should "return 'true' for true 'false' for 'false'." (= ()
+(define "(bool-value to-code )" (= ()
+  (should "return 'true' for true 'false' for 'false'." (= ()
     (assert "true" (` (true to-code ),
     (assert "false" (` (false to-code),
   ),
 ).
 
-($define "(bool-value to-string )" (= ()
-  ($should "return 'true' for true 'false' for 'false'." (= ()
+(define "(bool-value to-string )" (= ()
+  (should "return 'true' for true 'false' for 'false'." (= ()
     (assert "true" (` (true to-string),
     (assert "false" (` (false to-string),
   ),
 ).
 
-($define "(bool-value and value) or (bool-value && value)" (= ()
-  ($should "return result by logical AND." (= ()
+(define "(bool-value and value) or (bool-value && value)" (= ()
+  (should "return result by logical AND." (= ()
     (assert (` (true and true),
     (assert false (` (true and false),
     (assert false (` (false and true),

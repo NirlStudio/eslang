@@ -28,53 +28,65 @@ module.exports = function evaluate ($void) {
       } else if (typeof $void.operators[key] !== 'undefined') {
         return $void.operators[key](space, clause)
       }
-      if (key === '$' || key === 'to' || key === 'it') {
-        subject = space.$ // shortcut
-      } else {
-        subject = resolve(space, subject)
-      }
+      subject = resolve(space, subject)
     } else if (Array.isArray(subject)) {
       subject = evaluate(subject, space)
     }
 
+    var predicate
+    if (typeof subject === 'function') {
+      predicate = subject
+      subject = null
+    } else {
+      predicate = null
+    }
+
     // with only subject, take the value of subject as another clause.
-    if (length < 2) {
+    if (length < 2 && predicate === null) {
       return evaluate(subject, space)
     }
 
-    // predicate exists.
-    var predicate = clause[1]
-    if (Array.isArray(predicate)) {
-      predicate = evaluate(predicate, space)
-    }
-
-    var func
-    if (predicate instanceof Symbol$) {
-      func = get(subject, predicate)
-      if (typeof func !== 'function') {
-        return func // interpret to getter if result is not a function.
-      }
-    } else if (typeof predicate === 'string') {
-      // a string as verb is indicating a getting/setting command.
-      return length > 2 ? set(subject, predicate, evaluate(clause[2], space))
-        : get(subject, predicate)
-    } else if (typeof predicate === 'number') {
-      // a number may be a valid index for some types.
-      return length > 2 ? seti(subject, predicate, evaluate(clause[2], space))
-        : geti(subject, predicate)
-    } else if (typeof predicate === 'function') {
+    var func, offset
+    if (predicate) {
+      // global function as predicate
+      offset = 1
       func = predicate
     } else {
-      return null // invalid predicate
+      // resolve the predicate
+      offset = 2
+      predicate = clause[1]
+      if (Array.isArray(predicate)) {
+        // nested clause
+        predicate = evaluate(predicate, space)
+      }
+      // try to find a function as verb
+      if (predicate instanceof Symbol$) {
+        func = get(subject, predicate)
+        if (typeof func !== 'function') {
+          return func // interpret to getter if result is not a function.
+        }
+      } else if (typeof predicate === 'string') {
+        // a string as verb is indicating a getting/setting command.
+        return length > 2 ? set(subject, predicate, evaluate(clause[2], space))
+          : get(subject, predicate)
+      } else if (typeof predicate === 'number') {
+        // a number may be a valid index for some types.
+        return length > 2 ? seti(subject, predicate, evaluate(clause[2], space))
+          : geti(subject, predicate)
+      } else if (typeof predicate === 'function') {
+        func = predicate
+      } else {
+        return null // invalid predicate
+      }
     }
 
     // evaluate arguments.
-    var max = func.$fixedArgs ? func.$params.length + 2 : length
+    var max = func.$fixedArgs ? func.$params.length + offset : length
     if (max > length) {
       max = length
     }
     var args = []
-    for (var i = 2; i < max; i++) {
+    for (var i = offset; i < max; i++) {
       args.push(evaluate(clause[i], space))
     }
 

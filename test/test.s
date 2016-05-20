@@ -1,18 +1,18 @@
-(let C (to import "../lib/colors" "js").
+(let C (import "../lib/colors" "js").
 
 (let cases (@).
 (let current null).
 
-(to export "define" (= (feature define-it)
+(export "define" (= (feature define-it)
    (let pre current)
    (global current (let spec (@ feature),
    ((|| pre cases) push spec),
-   (to define-it)
+   (define-it)
    (global current pre)
    (return spec)
 ).
 
-(to export "should" (= (subject do action)
+(export "should" (= (subject do action)
   (if action is-missing
     (let action do)
     (let do subject)
@@ -31,7 +31,7 @@
     (let (%1 %0) (%0 true),
   ),
   (++ %assert-step)
-  (let %9 (to eval %1),
+  (let %9 (eval %1),
   (if (%0 != %9)
     (exit (@
       is-failure: true
@@ -64,7 +64,7 @@
   (failures push (@ failing (path copy) behaviour failure ),
 ).
 
-(let execute (= (case)
+(let exec (= (case)
   (print code indent (case first),
   (path push (case first),
   (+= indent "  ")
@@ -72,13 +72,13 @@
   (for i in (1:(case length))
     (let task (case:i),
     (if (task is-a Array)
-      (to do task)
+      (do task)
     else
-      (let result ((task "action") exec),
+      (let result (execute (task "action")),
       (if (result is-failure)
-        (it failed (task "behaviour") result)
+        (failed (task "behaviour") result)
       else
-        (it succeeded (task "behaviour")
+        (succeeded (task "behaviour")
   ),
 
   (path pop)
@@ -101,16 +101,16 @@
 
 (= (*)
   (for module in argv
-    (let load (to run module),
-    (if (load is-a Function) (to load),
+    (let load (run module),
+    (if (load is-a Function) (load),
   ),
 
   (if (cases is-empty) (exit),
 
   (print code "  Start to run sugly test suite ...\n")
-  (let t1 (Date time),
-  (for case in cases (to execute case),
-  (let t2 (Date time),
+  (let t1 (date ),
+  (for case in cases (exec case),
+  (let t2 (date ),
 
   (print code (+
     (C green (+ "\n  passing: " passing),
@@ -119,7 +119,7 @@
   (if (failing > 0)
     (print code (C red (+ "  failing: " failing "\n"),
     (for failure in failures
-      (to print- failure)
+      (print- failure)
     ), else do-nothing
   ),
   (if (C is-missing)

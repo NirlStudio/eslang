@@ -2,7 +2,6 @@
 
 module.exports = function assign ($void) {
   var ownsProperty = $void.ownsProperty
-  var isSpace = Object.prototype.isPrototypeOf.bind($void.$)
 
   $void.assign = function $assign (space, sym, value) {
     var key = typeof sym === 'string' ? sym : sym.key
@@ -19,8 +18,6 @@ module.exports = function assign ($void) {
     var key = typeof sym === 'string' ? sym : sym.key
     if (typeof subject[':'] === 'function') {
       return subject[':'](key, value)
-    } else if (isSpace(subject)) {
-      return (subject[key] = value)
     } else if (typeof subject === 'object') {
       // object from prototype of null
       return (subject[key] = value)

@@ -1,18 +1,7 @@
 'use strict'
 
 function exportTo (container, name, obj) {
-  /*if (Object.prototype.hasOwnProperty.call(obj, 'identityName') &&
-      (typeof obj === 'object' || typeof obj === 'function')) {
-    var parent = container.identityName || '$'
-    if (parent.startsWith('$') || name.startsWith('$')) {
-      obj.identityName = name
-    } else if (typeof obj === 'object') {
-      obj.identityName = '(' + parent + ' ' + name + ')'
-    } else {
-      obj.identityName = '(' + parent + ' "' + name + '")'
-    }
-  } */
-
+  obj.identityName = name
   container[name] = obj
   return obj
 }

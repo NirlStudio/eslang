@@ -8,7 +8,7 @@
 (print value (100 * 10 1))
 (print value (100 / 10 1))
 
-($"log100" (` (Math log 100).
+(let log100 (` (Math log 100).
 (print value (log100).
 
 (print value (+ ""
@@ -16,10 +16,10 @@
 ).
 
 
-($"obj" ($object ))
+(let obj (object ))
 (obj "code" 43)
 
-($"msg" "message")
+(let msg "message")
 (print value (obj:msg "Hello world!").
 (print value (obj "message"))
 
@@ -30,55 +30,55 @@
 (print (` log) "obj.message: " (obj:msg).
 
 (print value "---------" function)
-($"add" (= (x y) (+ x y 10).
-(print value ($add 3 2).
+(let add (= (x y) (+ x y 10).
+(print value (add 3 2).
 
-($"add" ($function (`(x y)) (`( (+ x y 10)).
-(print value ($add 3 2).
+(let add (function (`(x y)) (`( (+ x y 10)).
+(print value (add 3 2).
 
-($"add" (= (x y)
+(let add (= (x y)
   (+ x y 100).
-(print value ($add 1 2).
+(print value (add 1 2).
 
-($"sumWithBase" ($function (`base) (`(
-  ($"ctx" ($object),
+(let sumWithBase (function (`base) (`(
+  (let ctx (object),
   (ctx "base" base),
-  ($lambda ctx (`(x y)) (`( (+ base x y).
+  (lambda ctx (`(x y)) (`( (+ base x y).
 
-($"sum" ($sumWithBase 100).
-(print value ($sum 10 1).
+(let sum (sumWithBase 100).
+(print value (sum 10 1).
 
-($"sumWithBase" (=> base > (x y)
+(let sumWithBase (=> base > (x y)
   (+ base x y).
 
 (print value sumWithBase)
-($"sum" ($sumWithBase 100).
+(let sum (sumWithBase 100).
 
 (print value sum)
-(print value ($sum 10 2).
+(print value (sum 10 2).
 
 
-($"sumWithBase" (= base
+(let sumWithBase (= base
   (= base > (x y)
     (+ base x y).
 (print value sumWithBase)
-($"sum" ($sumWithBase 1000).
+(let sum (sumWithBase 1000).
 (print value sum)
-(print value ($sum 10 1).
+(print value (sum 10 1).
 
 
-($"sumWithBase" (= base
+(let sumWithBase (= base
   (= (base) > (x y)
     (+ base x y).
-($"sum" ($sumWithBase 10000).
-(print value ($sum 10 1).
+(let sum (sumWithBase 10000).
+(print value (sum 10 1).
 
 
 (let sumWithBase (= base
   (= (@ base: (base * 2)) > (x y)
     (+ base x y).
-($"sum" ($sumWithBase 10000).
-(print value ($sum 10 1).
+(let sum (sumWithBase 10000).
+(print value (sum 10 1).
 
 
 (print value (if "" 1 2))
@@ -90,13 +90,13 @@
   (if (counter == 4) (break ), # this is inline comment.
 ).
 
-($"sum" (= (*)
-  ($"i" -1)
-  ($"result" 0)
+(let sum (= (*)
+  (let i -1)
+  (let result 0)
   (while ((++ i) != argc)
     (++ result (argv:i).
 
-(print code "# sum" ($sum 1 2 3 9 100 1 "fhfgh").
+(print code "# sum" (sum 1 2 3 9 100 1 "fhfgh").
 
 (let sum (= (*)
   (let i 0)
@@ -104,7 +104,7 @@
   (for (i != argc) (++ i)
     (++ result (argv:i).
 
-(print code "#sum" ($sum 100 100 100).
+(print code "#sum" (sum 100 100 100).
 
 (print value (let (a 12) (b 18).
 
@@ -112,7 +112,7 @@
 (print value (obj"b").
  #" 12312312
 
-(print value (($import "colors" "js") get-type).
+(print value ((import "colors" "js") get-type).
 
 (exit -1 2)
 (return 0)

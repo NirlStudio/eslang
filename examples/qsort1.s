@@ -1,4 +1,4 @@
-(let data (to import "sort-data").
+(let data (import "sort-data").
 (print warn data)
 
 (let sort (= (start end)
@@ -22,9 +22,9 @@
     (data swap left end)
     (++ left)
   ),
-  (to do start (left - 1),
-  (to do (left + 1) end)
+  (do start (left - 1),
+  (do (left + 1) end)
 ).
 
-(to sort 0 ((data length) - 1).
+(sort 0 ((data length) - 1).
 (exit data)

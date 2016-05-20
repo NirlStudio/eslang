@@ -36,7 +36,10 @@ function initializeSpace ($void) {
   $export($, 'string', $.String['value-of'])
 
   require('./generic/function')($void)
-  $export($, 'function', $.Function['create'])
+  $export($, 'call', $.Function['call'])
+  $export($, 'call-with', $.Function['call-with'])
+  $export($, 'apply', $.Function['apply'])
+  $export($, 'apply-with', $.Function['apply-with'])
 
   require('./generic/class')($void)
   $export($, 'object', $.Class['create'])
@@ -114,6 +117,10 @@ module.exports = function start (output) {
   require('./runtime/space')($void)
   // real program executors
   require('./runtime/execute')($void)
+
+  // export function executors as global functions
+  $export($, 'execute', $.Function['execute'])
+  $export($, 'execute-with', $.Function['execute-with'])
 
   require('./version')($void)
   return $void

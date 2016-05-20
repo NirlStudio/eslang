@@ -6,13 +6,9 @@ module.exports = function ($void) {
   var $null = $.Type.proto
   var $int = $.Int.proto
   var $float = $.Float.proto
-  var isSpace = Object.prototype.isPrototypeOf.bind($)
 
   $void.resolve = function $resolve (space, sym) {
     var key = typeof sym === 'string' ? sym : (sym.key || '')
-    if (key === '$' || key === 'to' || key === 'it') {
-      return space.$
-    }
     var value = space.$[key]
     return typeof value === 'undefined' ? null : value
   }
@@ -20,9 +16,7 @@ module.exports = function ($void) {
   $void.get = function $get (subject, sym) {
     var key = typeof sym === 'string' ? sym : (sym.key || '')
     var value
-    if (isSpace(subject)) {
-      value = subject[key]
-    } else if (typeof subject === 'undefined' || subject === null) {
+    if (typeof subject === 'undefined' || subject === null) {
       value = $Null[key]
     } else if (typeof subject === 'number') {
       value = Number.isInteger(subject) ? $int[key] : $float[key]

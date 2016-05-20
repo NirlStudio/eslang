@@ -4,45 +4,27 @@ var $export = require('../export')
 
 module.exports = function ($void) {
   var $ = $void.$
-  var ownsProperty = $void.ownsProperty
   var type = $.Function
+
+  // dynamically call a function. execute & execute-with will be implmented with $execute.
+  $export(type, 'call', function Function$call (func) {
+    return typeof func !== 'function' ? null
+      : func.apply(null, Array.prototype.slice.call(arguments, 1))
+  })
+  $export(type, 'call-with', function Function$call_with (subject, func) {
+    return typeof func !== 'function' ? null
+      : func.apply(subject, Array.prototype.slice.call(arguments, 2))
+  })
+  $export(type, 'apply', function Function$apply (func, args) {
+    return typeof func !== 'function' ? null
+      : func.apply(null, Array.isArray(args) ? args : [])
+  })
+  $export(type, 'apply-with', function Function$apply_with (subject, func, args) {
+    return typeof func !== 'function' ? null
+      : func.apply(subject, Array.isArray(args) ? args : [])
+  })
+
   var proto = type.proto
-
-  // attach/detach a property or subfunction.
-  var attach = $export(proto, 'attach', function function$attach (name, value) {
-    if (typeof name !== 'string' || name.startsWith('$')) {
-      return null
-    }
-    return (this[name] = typeof value === 'undefined' ? null : value)
-  })
-  // query the value of a property or a subfunction
-  var query = $export(proto, 'query', function function$query (name) {
-    if (typeof name !== 'string' || name.startsWith('$')) {
-      return null
-    }
-    return typeof this[name] !== 'undefined' ? this[name]
-      : typeof proto[name] !== 'undefined' ? proto[name] : null
-  })
-  // remove a property or subfunction
-  var detach = $export(proto, 'detach', function function$detach (name) {
-    if (typeof name !== 'string' || name.startsWith('$')) {
-      return null
-    }
-    var value
-    if (ownsProperty(this, name)) {
-      value = this[name]
-      delete this[name]
-    } else {
-      value = null
-    }
-    return value
-  })
-
-  // dynamically invoke a function.
-  $export.copy(proto, Function.prototype, {
-    'apply': 'apply',
-    'call': 'call'
-  })
 
   // A function can have one or more sub-functions
   $export(proto, 'is-fixed-args', function function$is_fixed_args () {
@@ -66,11 +48,10 @@ module.exports = function ($void) {
     return '[Function ' + (this.identityName || this.Name || '(anonymous)') + ']'
   })
 
-  // indexer: override to implement setter.
-  $export(proto, ':', function function$indexer (name, value) {
-    return typeof value === 'undefined' ? query.call(this, name)
-      : value === null ? detach.call(this, name)
-        : attach.call(this, name)
+  // indexer: override to expose this function's meta information.
+  $export(proto, ':', function function$indexer (name) {
+    return typeof value !== 'string' ? null
+      : typeof proto[name] === 'undefined' ? null : proto[name]
   })
 
   // override to boost - an object is always true

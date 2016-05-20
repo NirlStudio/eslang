@@ -180,9 +180,8 @@ function checkSugly ($void) {
   console.log('\n  Checking Sugly runtime ...')
 
   checkOperators($void, '[Void / operator] ', [
-    '`', 'quote', 'let', '@', 'object', 'array',
+    '`', 'quote', 'let', 'var', 'global', '@',
     '=', 'function', 'closure', '=>', 'lambda', 'return', 'exit', 'halt',
-    'bool', 'number', 'string', 'symbol', 'date',
     'if', 'for', 'while', 'break', 'continue', 'operator',
     '+', '+=', '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
   ])
@@ -194,14 +193,13 @@ function checkSugly ($void) {
 
   checkFunctions($void.$, '[Sugly / function] ', [
     'bool', 'string', 'symbol', 'object', 'date', 'array', 'range', 'iterate',
-    'compile', 'encoder', 'encode', 'print',
-    'export', 'function', 'lambda', 'eval',
+    'compile', 'encoder', 'export', 'function', 'lambda', 'eval',
     'load', 'exec', 'run', 'import', 'require', 'retire'
   ])
 
   checkObjects($void.$, '[Sugly / object] ', [
     'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Class', 'Function',
-    'Date', 'Array', 'Uri', 'Math', 'Json', 'Sugly'
+    'Date', 'Array', 'Uri', 'Math', 'Json', 'Sugly', 'encode', 'print'
   ])
 
   checkInjections()

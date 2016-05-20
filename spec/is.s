@@ -1,5 +1,5 @@
-($define "test objects/values (A is B)" (= ()
-  ($should "return true for the same object" (= ()
+(define "test objects/values (A is B)" (= ()
+  (should "return true for the same object" (= ()
     (assert (` (null is),
     (assert (` (null is null),
     (assert (` (NaN is NaN),
@@ -23,7 +23,7 @@
     (assert (` (obj1 is obj1),
     (assert false (` (obj1 is obj2),
   ),
-  ($should "return true for the same values of bool, number, string and symbol" (= ()
+  (should "return true for the same values of bool, number, string and symbol" (= ()
     (let v1 true)
     (let v2 true)
     (assert (` (v1 is v2),

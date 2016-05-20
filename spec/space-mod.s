@@ -1,1 +1,1 @@
-($export "_exported" (@name: "obj").
+(export "_exported" (@name: "obj").

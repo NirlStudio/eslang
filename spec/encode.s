@@ -1,9 +1,9 @@
-($define "(encode value some-value)" (= ()
-  ($should "null" "be encoded to \"null\"" (= ()
+(define "(encode value some-value)" (= ()
+  (should "null" "be encoded to \"null\"" (= ()
     (assert "null" (` (encode value null),
   ),
 
-  ($should "a string" "be encoded to \"...\"" (= ()
+  (should "a string" "be encoded to \"...\"" (= ()
     (assert "\"ab\\\"12\"" (` (encode value "ab\"12"),
 
     (assert "null" (` (encode string),
@@ -17,7 +17,7 @@
     (assert "\"\"" (` (encode string (= x x),
   ),
 
-  ($should "a symbol" "be encoded to its key" (= ()
+  (should "a symbol" "be encoded to its key" (= ()
     (assert "sym" (` (encode value (` sym),
 
     (assert "null" (` (encode symbol),
@@ -32,7 +32,7 @@
     (assert "" (` (encode symbol (= x x),
   ),
 
-  ($should "a number" "be encoded to its value" (= ()
+  (should "a number" "be encoded to its value" (= ()
     (assert "-1" (` (encode value -1),
     (assert "0" (` (encode value -0),
     (assert "1" (` (encode value 1),
@@ -49,7 +49,7 @@
     (assert "NaN" (` (encode number (= x x),
   ),
 
-  ($should "a boolean value" "be encoded to true or false" (= ()
+  (should "a boolean value" "be encoded to true or false" (= ()
     (assert "true" (` (encode value true),
     (assert "false" (` (encode value false),
 
@@ -64,7 +64,7 @@
     (assert "false" (` (encode bool (= x x),
   ),
 
-  ($should "a date" "be encoded to (date xxx)" (= ()
+  (should "a date" "be encoded to (date xxx)" (= ()
     (assert "(date 1024)" (` (encode value (date 1024),
 
     (assert "null" (` (encode date),
@@ -78,7 +78,7 @@
     (assert "(date 0)" (` (encode date (= x x),
   ),
 
-  ($should "an object" "be encoded to its identityName or an expression" (= ()
+  (should "an object" "be encoded to its identityName or an expression" (= ()
     (let obj (object),
     (assert "(object )" (` (encode value obj),
 
@@ -108,7 +108,7 @@
     (assert "(object )" (` (encode object (= x x),
   ),
 
-  ($should "an array" "be encoded to an expression" (= ()
+  (should "an array" "be encoded to an expression" (= ()
     (assert "(@)" (` (encode value (@),
     (assert "(@ 1)" (` (encode value (@1),
     (assert "(@ 1 2 3)" (` (encode value (@1 2   3),
@@ -124,7 +124,7 @@
     (assert "(@)" (` (encode array (= x x),
   ),
 
-  ($should "a function" "be encoded to an expression" (= ()
+  (should "a function" "be encoded to an expression" (= ()
     (assert "(= (x) x)" (` (encode value (= x x),
     (assert "(= (x y) (+ x y))" (` (encode value (= (x y) (+ x y),
     (assert "(= (@base: null) > (x y) (+ x y base))" (` (encode value (= base > (x y) (+ x y base),
@@ -142,16 +142,16 @@
   ),
 ).
 
-($define "(encode clause expr)" (= ()
-  ($should "a symbol" "be encoded to its key" (= ()
+(define "(encode clause expr)" (= ()
+  (should "a symbol" "be encoded to its key" (= ()
     (assert "sym" (` (encode clause (` sym),
   ),
-  ($should "an array" "be encoded to a clause" (= ()
+  (should "an array" "be encoded to a clause" (= ()
     (assert "(+ x y)" (` (encode clause (` (+ x y),
   ),
 
-  ($should "other types" "be encoded by its value" (= ()
-    (assert "null" (` (encode clause),
+  (should "other types" "be encoded by its value" (= ()
+    (assert "()" (` (encode clause),
     (assert "null" (` (encode clause null),
 
     (assert "true" (` (encode clause true),
@@ -164,23 +164,23 @@
   ),
 ).
 
-($define "(encode program clauses)" (= ()
-  ($should "an array" "be encoded as a list of clauses" (= ()
-    (assert "x + y" (` ($encode (` (x + y),
-    (assert "(x + y)" (` ($encode (` ((x + y),
-    (assert "(x + y)\n(x - y)" (` ($encode (` ((x + y) (x - y),
-    (assert "(x + y\n  (x - y)." (` ($encode (` ((x + y (x - y),
+(define "(encode program clauses)" (= ()
+  (should "an array" "be encoded as a list of clauses" (= ()
+    (assert "x + y" (` (encode program (` (x + y),
+    (assert "(x + y)" (` (encode program (` ((x + y),
+    (assert "(x + y)\n(x - y)" (` (encode program (` ((x + y) (x - y),
+    (assert "(x + y\n  (x - y)." (` (encode program (` ((x + y (x - y),
 
-    (assert "()" ($encode),
-    (assert "()" (` ($encode null),
-    (assert "()" (` ($encode true),
-    (assert "()" (` ($encode false),
-    (assert "()" (` ($encode 12),
-    (assert "()" (` ($encode ""),
-    (assert "()" (` ($encode "abc"),
-    (assert "()" (` ($encode (` sym),
-    (assert "()" (` ($encode (date 1234),
-    (assert "()" (` ($encode (@ p: 1),
-    (assert "()" (` ($encode (= x x),
+    (assert "()" (` (encode program),
+    (assert "()" (` (encode program null),
+    (assert "()" (` (encode program true),
+    (assert "()" (` (encode program false),
+    (assert "()" (` (encode program 12),
+    (assert "()" (` (encode program ""),
+    (assert "()" (` (encode program "abc"),
+    (assert "()" (` (encode program (` sym),
+    (assert "()" (` (encode program (date 1234),
+    (assert "()" (` (encode program (@ p: 1),
+    (assert "()" (` (encode program (= x x),
   ),
 ).

@@ -1,5 +1,5 @@
-($define "(for value in x)" (= ()
-  ($should "iterate all values in range [0 x) by step 1" (= ()
+(define "(for value in x)" (= ()
+  (should "iterate all values in range [0 x) by step 1" (= ()
     (let counter 0)
     (let result (for i in 3
       (++ counter)
@@ -38,10 +38,10 @@
     (assert 4 (` result),
 ).
 
-($define "(for value in ($range x y)" (= ()
-  ($should "iterate all values in the range [x y) by step 1" (= ()
+(define "(for value in (range x y)" (= ()
+  (should "iterate all values in the range [x y) by step 1" (= ()
     (let counter 0)
-    (let result (for i in ($range 1 3)
+    (let result (for i in (range 1 3)
       (++ counter)
       (i * 2)
     ),
@@ -50,7 +50,7 @@
     (assert 4 (` result),
 
     (let counter 0)
-    (let result (for i in ($range -1 -3)
+    (let result (for i in (range -1 -3)
       (++ counter)
       (i * 2)
     ),
@@ -59,10 +59,10 @@
     (assert -4 (` result),
 ).
 
-($define "(for value in ($range x y s)" (= ()
-  ($should "iterate all values in the range [x y) by step s" (= ()
+(define "(for value in (range x y s)" (= ()
+  (should "iterate all values in the range [x y) by step s" (= ()
     (let counter 0)
-    (let result (for i in ($range 1 5 2)
+    (let result (for i in (range 1 5 2)
       (++ counter)
       (i * 2)
     ),
@@ -71,7 +71,7 @@
     (assert 6 (` result),
 
     (let counter 0)
-    (let result (for i in ($range -1 -4 -2)
+    (let result (for i in (range -1 -4 -2)
       (++ counter)
       (i * 2)
     ),
@@ -80,8 +80,8 @@
     (assert -6 (` result),
 ).
 
-($define "(for value in array)" (= ()
-  ($should "iterate all values in the array" (= ()
+(define "(for value in array)" (= ()
+  (should "iterate all values in the array" (= ()
     (let counter 0)
     (let i -1)
     (let result (for i in (@)
@@ -112,8 +112,8 @@
     (assert 12 (` result),
 ).
 
-($define "(for value in object)" (= ()
-  ($should "iterate all properties in the object" (= ()
+(define "(for value in object)" (= ()
+  (should "iterate all properties in the object" (= ()
     (let counter 0)
     (let i -1)
     (let result (for i in (object)

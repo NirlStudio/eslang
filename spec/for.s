@@ -1,5 +1,5 @@
-($define "basic" (= ()
-  ($should "keep looping until the condtion is evaluated to false." (= ()
+(define "basic" (= ()
+  (should "keep looping until the condtion is evaluated to false." (= ()
     (let counter 0)
     (let i 10)
     (let result (for (i > 0) (-- i)
@@ -22,8 +22,8 @@
     (assert 10000 (` result),
 ).
 
-($define "continue" (= ()
-  ($should "skip to next loop ignoring following clauses and use the argument(s)\
+(define "continue" (= ()
+  (should "skip to next loop ignoring following clauses and use the argument(s)\
             as result." (= ()
     (let counter 0)
     (let i 10)
@@ -36,8 +36,8 @@
     (assert 99 (` result),
 ).
 
-($define "break" (= ()
-  ($should "stop looping and use the argument(s) as result." (= ()
+(define "break" (= ()
+  (should "stop looping and use the argument(s) as result." (= ()
     (let counter 0)
     (let i 10)
     (let result (for (i > 0) (-- i)

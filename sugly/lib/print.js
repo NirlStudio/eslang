@@ -47,11 +47,11 @@ module.exports = function ($, JS, output) {
   var print = printer($)
   var printCode = codePrinter(output)
 
+  var $print = $export($, 'print', $.object())
   // print a piece of program which is a set of clauses
-  var $print = $export($, 'print', function $print (clauses) {
-    return printCode($.encode, clauses)
+  $export($print, 'program', function print$program (clauses) {
+    return printCode($.encode.program, clauses)
   })
-
   // print text literally
   $export($print, 'code', function () {
     var args = Array.prototype.slice.apply(arguments)
@@ -80,6 +80,4 @@ module.exports = function ($, JS, output) {
   $export($print, 'warn', function () {
     return print.apply(output.warn, arguments)
   })
-
-  return $print
 }

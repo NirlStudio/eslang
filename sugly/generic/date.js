@@ -218,12 +218,14 @@ module.exports = function ($void) {
     this.setTime(time)
     return this
   })
-  $export(proto, '-', function date$opr_substract (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
+  $export(proto, '-', function date$opr_substract (dateOrTime) {
+    if (typeof dateOrTime === 'number') {
+      var time = this.getTime() - dateOrTime
+      return new Date(time)
+    } else if (dateOrTime instanceof Date) {
+      return this.getTime() - dateOrTime.getTime()
     }
-    var time = this.getTime() - milliseconds
-    return new Date(time)
+    return this
   })
   $export(proto, '-=', function date$opr_deduct (milliseconds) {
     if (typeof milliseconds !== 'number') {

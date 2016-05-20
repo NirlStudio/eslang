@@ -1,5 +1,5 @@
-($define "and: +" (= ()
-  ($should "return the sum of arugment values" (= ()
+(define "and: +" (= ()
+  (should "return the sum of arugment values" (= ()
     (assert 0 (` (0 +),
     (assert 1 (` (1 +),
     (assert 3 (` (1 + 2),
@@ -11,8 +11,8 @@
 ).
 
 (let mVar1 20)
-($define "and & save: +=" (= ()
-  ($should "return the sum of argument values and assign it to the first\
+(define "and & save: +=" (= ()
+  (should "return the sum of argument values and assign it to the first\
             arugment if it's a symbol" (= ()
     (let num 1)
     (assert 11 (` (+= num 10),
@@ -22,8 +22,8 @@
     (assert 30 (` mVar1),
 ).
 
-($define "subtract: -" (= ()
-  ($should "return the difference of the first argument and all other arguments" (= ()
+(define "subtract: -" (= ()
+  (should "return the difference of the first argument and all other arguments" (= ()
     (assert 0 (` (0 -),
     (assert 1 (` (1 - ),
     (assert -1 (` (1 - 2),
@@ -35,8 +35,8 @@
 ).
 
 (let mVar2 20)
-($define "subtract & save: -=" (= ()
-  ($should "return the difference of the first argument and all other arguments,\
+(define "subtract & save: -=" (= ()
+  (should "return the difference of the first argument and all other arguments,\
             and assign it to the first arugment if it's a symbol" (= ()
     (let num 1)
     (assert -9 (` (-= num 10),
@@ -46,8 +46,8 @@
     (assert 19 (` mVar2),
 ).
 
-($define "multiply: *" (= ()
-  ($should "return the product of arguments" (= ()
+(define "multiply: *" (= ()
+  (should "return the product of arguments" (= ()
     (assert 0 (` (0 *),
     (assert 1 (` (1 *),
     (assert 2 (` (1 * 2),
@@ -59,8 +59,8 @@
 ).
 
 (let mVar3 20)
-($define "multiply & save: *=" (= ()
-  ($should "return the product of arguments, and assign it to the first \
+(define "multiply & save: *=" (= ()
+  (should "return the product of arguments, and assign it to the first \
             arugment if it's a symbol" (= ()
     (let num 2)
     (assert 20 (` (*= num 10),
@@ -70,8 +70,8 @@
     (assert 200 (` mVar3),
 ).
 
-($define "divide: /" (= ()
-  ($should "return the quotient of dividing the first argument by other arguments" (= ()
+(define "divide: /" (= ()
+  (should "return the quotient of dividing the first argument by other arguments" (= ()
     (assert 0 (` (0 /),
     (assert 1 (` (1 / ),
     (assert false (` ((1 / 0) is-finite),
@@ -84,8 +84,8 @@
 ).
 
 (let mVar4 20)
-($define "divide & save: /=" (= ()
-  ($should "return the quotient of dividing the first argument by other arguments, \
+(define "divide & save: /=" (= ()
+  (should "return the quotient of dividing the first argument by other arguments, \
             and assign it to the first arugment if it's a symbol" (= ()
     (let num 20)
     (assert 2 (` (/= num 10),
@@ -96,8 +96,8 @@
 ).
 
 (let mVar5 20)
-($define "self increment: ++" (= ()
-  ($should "return the quotient of dividing the first argument by other arguments, \
+(define "self increment: ++" (= ()
+  (should "return the quotient of dividing the first argument by other arguments, \
             and assign it to the first arugment if it's a symbol" (= ()
     (assert 1 (` (++),
     (assert 1 (` (++ ""),
@@ -112,8 +112,8 @@
 ).
 
 (let mVar6 20)
-($define "self decrement: --" (= ()
-  ($should "return the quotient of dividing the first argument by other arguments, \
+(define "self decrement: --" (= ()
+  (should "return the quotient of dividing the first argument by other arguments, \
             and assign it to the first arugment if it's a symbol" (= ()
     (assert -1 (` (--),
     (assert -1 (` (-- ""),

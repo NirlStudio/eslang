@@ -46,10 +46,4 @@ module.exports = function operators$object ($void) {
       return arrayCreate(space, clause)
     }
   }
-
-  // as operators, object and array are the readable version of @
-  operators['object'] = objectCreate
-
-  // force to create an array
-  operators['array'] = arrayCreate
 }
