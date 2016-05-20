@@ -18,10 +18,10 @@
     (assert (` (obj1 is obj1),
     (assert false (` (obj1 is obj2),
 
-    (let obj1 (=  x (+ x 2),
-    (let obj2 (= x (+ x 2),
-    (assert (` (obj1 is obj1),
-    (assert false (` (obj1 is obj2),
+    (let func1 (=  x (+ x 2),
+    (let func2 (= x (+ x 2),
+    (assert (` ($func1 is func1),
+    (assert false (` ($func1 is func2),
   ),
   (should "return true for the same values of bool, number, string and symbol" (= ()
     (let v1 true)

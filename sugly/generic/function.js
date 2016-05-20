@@ -7,19 +7,14 @@ module.exports = function ($void) {
   var type = $.Function
 
   // dynamically call a function. execute & execute-with will be implmented with $execute.
-  $export(type, 'call', function Function$call (func) {
-    return typeof func !== 'function' ? null
-      : func.apply(null, Array.prototype.slice.call(arguments, 1))
-  })
-  $export(type, 'call-with', function Function$call_with (subject, func) {
+  $export(type, 'call', function Function$call (subject, func) {
     return typeof func !== 'function' ? null
       : func.apply(subject, Array.prototype.slice.call(arguments, 2))
   })
-  $export(type, 'apply', function Function$apply (func, args) {
-    return typeof func !== 'function' ? null
-      : func.apply(null, Array.isArray(args) ? args : [])
-  })
-  $export(type, 'apply-with', function Function$apply_with (subject, func, args) {
+  $export(type, 'apply', function Function$apply (subject, func, args) {
+    if (typeof args === 'undefined') {
+      args = func; func = subject; subject = null
+    }
     return typeof func !== 'function' ? null
       : func.apply(subject, Array.isArray(args) ? args : [])
   })
@@ -50,7 +45,7 @@ module.exports = function ($void) {
 
   // indexer: override to expose this function's meta information.
   $export(proto, ':', function function$indexer (name) {
-    return typeof value !== 'string' ? null
+    return typeof name !== 'string' ? null
       : typeof proto[name] === 'undefined' ? null : proto[name]
   })
 

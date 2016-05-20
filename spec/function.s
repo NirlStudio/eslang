@@ -200,7 +200,7 @@
   ),
 ).
 
-(define "(apply func args) / (apply-with subject func args)" (= ()
+(define "(apply func args subject)" (= ()
   (should "execute a function with a subject and arguments from an array" (= ()
     (let f (= (*) (@ s: this argc: argc argv: argv),
     (let r (apply f),
@@ -209,7 +209,7 @@
 
     (let s (object),
     (let args (@ 1 2),
-    (let r (apply-with s f args),
+    (let r (apply s f args),
     (assert (` (s is (r s),
     (assert 2 (` (r argc),
     (assert 1 (` ((r argv):0),
@@ -219,5 +219,5 @@
 (define "Function object" (= ()
   (should "is the type object of functions" (= ()
     (assert (` (Function is-a Type),
-    (assert (` ((= x x) is-a Function),
+    (assert (` ($(= x x) is-a Function),
 ).

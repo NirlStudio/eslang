@@ -44,7 +44,7 @@
     (assert (` ((null to-string) == "null"),
   ),
   (should "implement common indexer (:)" (= ()
-    (assert (` ((null ":") is-a Function),
+    (assert (` ($(null ":") is-a Function),
   ),
   (should "implement bool test" (= ()
     (assert false (` (null ?),

@@ -74,7 +74,7 @@
     (if (task is-a Array)
       (do task)
     else
-      (let result (execute (task "action")),
+      (let result (execute (task "action"),
       (if (result is-failure)
         (failed (task "behaviour") result)
       else

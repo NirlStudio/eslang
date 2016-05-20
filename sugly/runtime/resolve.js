@@ -3,7 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var $Null = $void.null
-  var $null = $.Type.proto
+  var $entity = $.Type.proto
   var $int = $.Int.proto
   var $float = $.Float.proto
 
@@ -23,7 +23,7 @@ module.exports = function ($void) {
     } else {
       var indexer = subject[':']
       if (typeof indexer !== 'function') {
-        indexer = $null[':']
+        indexer = $entity[':']
       }
       value = indexer.call(subject, key)
     }
