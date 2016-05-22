@@ -12,7 +12,7 @@ module.exports = function () {
   var $ = $void.$ = Object.create(null)
 
   /* “Let there be light,” and there was light. */
-  // The light is the laws, which is the foundation of all beings.
+  // The light is the laws, which are the foundation of all beings.
   var Prototype = Object.create(Null)
   var Type$ = $void.Type = function Type$ () {
     // In both theory and reality, this function should be executed once, and
@@ -33,10 +33,9 @@ module.exports = function () {
   Type$.prototype = Prototype
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
-  $.name = $.identityName = '$'
-
   /* ... he separated the light from the darkness, */
   var Type = new Type$()
+
   /* ... called the light “day,”  */
   Type.name = Type.identityName = 'Type'
   $.Type = Type

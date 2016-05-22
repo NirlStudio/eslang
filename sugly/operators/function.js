@@ -71,10 +71,6 @@ module.exports = function operators$function ($void) {
     return space.$.function(c1, clause.slice(2))
   }
 
-  // operator function and closure are more readable aliases of '='
-  operators['function'] = operators['=']
-  operators['closure'] = operators['=']
-
   // (=> params body)
   operators['=>'] = function (space, clause) {
     if (clause.length < 3) {
@@ -82,9 +78,6 @@ module.exports = function operators$function ($void) {
     }
     return lambdaCreate(space, [], clause[1], clause.slice(2))
   }
-
-  // operator lambda is a more readable version of '=>'
-  operators['lambda'] = operators['=>']
 
   // leave function or module.
   operators['return'] = signalOf('return')

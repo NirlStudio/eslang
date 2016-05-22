@@ -27,6 +27,8 @@ module.exports = function assign ($void) {
   }
 
   $void.seti = function $seti (subject, index, value) {
-    return typeof subject[':'] === 'function' ? subject[':'](index, value) : null
+    // null has no number index now.
+    return typeof subject !== 'undefined' && subject !== null &&
+      typeof subject[':'] === 'function' ? subject[':'](index, value) : null
   }
 }

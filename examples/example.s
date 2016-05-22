@@ -33,14 +33,14 @@
 (let add (= (x y) (+ x y 10).
 (print value (add 3 2).
 
-(let add (function (`(x y)) (`( (+ x y 10)).
+(let add (= (`(x y)) (`( (+ x y 10)).
 (print value (add 3 2).
 
 (let add (= (x y)
   (+ x y 100).
 (print value (add 1 2).
 
-(let sumWithBase (function (`base) (`(
+(let sumWithBase (= (`base) (`(
   (let ctx (object),
   (ctx "base" base),
   (lambda ctx (`(x y)) (`( (+ base x y).

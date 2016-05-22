@@ -3,7 +3,7 @@
 var $export = require('../export')
 
 var SpecialSymbol = /^[\$\`\@\:]{1}$/
-var InvalidSymbol = /[\(\)\$\`\'\@\:\"\#\\\s]/
+var InvalidSymbol = /[\$\`\@\:\(\)\'\"\#\,\;\\\s]/
 
 function isSame (Symbol$) {
   return function symbol$is_same (another) {

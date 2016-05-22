@@ -180,8 +180,8 @@ function checkSugly ($void) {
   console.log('\n  Checking Sugly runtime ...')
 
   checkOperators($void, '[Void / operator] ', [
-    '`', 'quote', 'let', 'var', 'global', '@',
-    '=', 'function', 'closure', '=>', 'lambda', 'return', 'exit', 'halt',
+    '`', 'quote', 'let', 'var', 'global',
+    '@', '=', '=>', 'return', 'exit', 'halt',
     'if', 'for', 'while', 'break', 'continue', 'operator',
     '+', '+=', '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
   ])

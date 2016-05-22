@@ -34,8 +34,10 @@ module.exports = function ($void) {
     if (typeof subject === 'number') {
       var indexer = Number.isInteger(subject) ? $int[':'] : $float[':']
       return indexer.call(subject, index)
-    } else {
+    } else if (typeof subject !== 'undefined' && subject !== null) {
       return typeof subject[':'] === 'function' ? subject[':'](index) : null
+    } else {
+      return null // shortcut, null has no number index now.
     }
   }
 }
