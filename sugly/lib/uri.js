@@ -3,7 +3,7 @@
 var $export = require('../export')
 
 module.exports = function ($, JS) {
-  var uri = $export($, 'Uri', $.object())
+  var uri = $export($, 'uri', $.object())
   $export.copy(uri, JS, {
     'encodeURI': 'encode',
     'encodeURIComponent': 'escape',

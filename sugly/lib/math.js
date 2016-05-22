@@ -3,7 +3,7 @@
 var $export = require('../export')
 
 module.exports = function ($, JS) {
-  var math = $export($, 'Math', $.object())
+  var math = $export($, 'math', $.object())
   $export.copy(math, JS.Math, {
     /* basic */
     'E': 'E',

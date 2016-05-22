@@ -152,4 +152,50 @@ module.exports = function operators$general ($void) {
     }
     return result
   }
+
+  operators['?'] = function (space, clause) {
+    var length = clause.length
+    if (length < 2) {
+      return null
+    }
+
+    var sym = clause[1]
+    var value = evaluate(sym, space)
+    if (value !== null && value !== 0 && value !== false) {
+      return value
+    }
+    if (length > 2) {
+      value = evaluate(clause[2], space)
+    } else {
+      value = null
+    }
+
+    if (sym instanceof Symbol$) {
+      assign(space, sym, value)
+    }
+    return value
+  }
+
+  operators['??'] = function (space, clause) {
+    var length = clause.length
+    if (length < 2) {
+      return null
+    }
+
+    var sym = clause[1]
+    var value = evaluate(sym, space)
+    if (value !== null) {
+      return value
+    }
+    if (length > 2) {
+      value = evaluate(clause[2], space)
+    } else {
+      value = null
+    }
+
+    if (sym instanceof Symbol$) {
+      assign(space, sym, value)
+    }
+    return value
+  }
 }

@@ -118,6 +118,6 @@ module.exports = function start (output) {
   // export function executors as global functions
   $export($, 'execute', $.Function['execute'])
 
-  require('./version')($void)
+  require('./runtime/meta')($void)
   return $void
 }

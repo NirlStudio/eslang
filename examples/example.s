@@ -8,7 +8,7 @@
 (print value (100 * 10 1))
 (print value (100 / 10 1))
 
-(let log100 (` (Math log 100).
+(let log100 (` (math log 100).
 (print value (log100).
 
 (print value (+ ""

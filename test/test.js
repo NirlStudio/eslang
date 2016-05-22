@@ -183,23 +183,26 @@ function checkSugly ($void) {
     '`', 'quote', 'let', 'var', 'global',
     '@', '=', '=>', 'return', 'exit', 'halt',
     'if', 'for', 'while', 'break', 'continue', 'operator',
-    '+', '+=', '-', '-=', '/=', '*=', '++', '--', '&&', '||', '!'
+    '+', '+=', '-', '-=', '/=', '*=', '++', '--', '~',
+    '&&', '||', '!'
   ])
 
   checkFunctions($void, '[Void / function] ', [
-    'Signal', 'resolve', 'assign', 'set', 'evaluate', 'signalOf',
-    'export', 'load', 'createSpace', 'createModuleSpace', 'execute'
+    'Type', 'Signal', 'signalOf', 'evaluate', 'execute',
+    'resolve', 'assign', 'set', 'get', 'seti', 'geti',
+    'export', 'load', 'createSpace', 'createModuleSpace'
   ])
 
   checkFunctions($void.$, '[Sugly / function] ', [
-    'bool', 'string', 'symbol', 'object', 'date', 'array', 'range', 'iterate',
-    'compile', 'encoder', 'export', 'function', 'lambda', 'eval',
-    'load', 'exec', 'run', 'import', 'require', 'retire'
+    'bool', 'number', 'string', 'symbol', 'object', 'class', 'date', 'array',
+    'range', 'iterate', 'compile', 'encoder', 'export', 'function', 'lambda',
+    'eval', 'load', 'exec', 'run', 'import', 'require', 'retire',
+    'call', 'apply', 'execute'
   ])
 
   checkObjects($void.$, '[Sugly / object] ', [
-    'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Class', 'Function',
-    'Date', 'Array', 'Uri', 'Math', 'Json', 'Sugly', 'encode', 'print'
+    'Type', 'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Function',
+    'Class', 'Date', 'Array', 'uri', 'math', 'json', 'runtime', 'encode', 'print'
   ])
 
   checkInjections()

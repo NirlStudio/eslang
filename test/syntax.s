@@ -3,6 +3,13 @@
 ###############################################################################
 
 # keywords & opertors
+(` a)
+(`(a))
+(` (a))
+(` a)
+(` `)
+(` =>)
+
 (quote)
 (quote(a))
 (quote (a))
@@ -10,25 +17,24 @@
 (quote `)
 (quote =>)
 (quote quote -quote quote-"quote")
+
 (let let "let")
+(var var "let")
+(global global "let")
 
-(object object "object")
-(array array "array")
-
-(function function "function")
-(closure closure "closure")
-(lambda lambda "lambda")
 (return return "return")
 (exit exit "exit")
 (halt halt "halt")
-
-(is is "is")
-(typeof typeof "typeof")
 
 (bool bool "bool")
 (number number "number")
 (string string "string")
 (symbol symbol "symbol")
+(function function "function")
+(lambda lambda "lambda")
+(object object "object")
+(class class "class")
+(array array "array")
 (date date "date")
 
 (if if  "if")
@@ -40,19 +46,9 @@
 (break break "break")
 (continue continue "continue"
 
-(flow flow "flow")
-(pipe pipe "pipe")
-(premise premise "premise")
-(then then "then")
-(next next "next")
-
 (operator operator "operator" operator)
 (operator export operator "operator" operator)
-(operator   export operator "operator" operator)
-
-(concat concat "concate")
-(combine combine "combine")
-(mixin mixin "mixin")
+(operator export operator "operator" operator)
 
 (assert assert "assert")
 
@@ -98,8 +94,8 @@
 (argc  argc  -argc argc- "argc" argc)
 (argv argv -argv argv- "argv" argv)
 
-(self self -self self- "argv" self)
-(self  self  -self self- "argv" self)
+(this this -this this- "this" this)
+(do  do  -do do- "do" do)
 
 (%C %C  %C)
 (%V  %V  %V)
@@ -119,59 +115,54 @@
 (+ 1 2 3.5 0.7)
 
 # global functions
-($bool bool -bool bool- bool)(bool bool)
-($string string)(string string)
-($symbol symbol)(symbol symbol)
-($object object)(object object)
-($date date)(date date)
-($array array)(array array)
+(bool bool -bool bool- bool)(bool bool)
+(string string)(string string)
+(symbol symbol)(symbol symbol)
+(object object)(object object)
+(date date)(date date)
+(array array)(array array)
 
-($range range)(range range)
-($iterate iterate)(iterate iterate)
+(range range)(range range)
+(iterate iterate)(iterate iterate)
 
-($is-empty is-empty)(is-empty is-empty)
-($not-empty not-empty)(not-empty not-empty)
+(is-empty is-empty)(is-empty is-empty)
+(not-empty not-empty)(not-empty not-empty)
 
-($compile compile)(compile compile)
-($encoder encoder)(encoder encoder)
-($encode encode)(encode encode)
-($print print)(print print)
+(compile compile)(compile compile)
+(encoder encoder)(encoder encoder)
 
-($call call)(call call)
-($export export)(export export)
+(call call)(call call)
+(apply apply)(apply apply)
+(execute execute)(execute execute)
+(export export)(export export)
 
-($function function)(function function)
-($lambda lambda)(lambda lambda)
+(function function)(function function)
+(lambda lambda)(lambda lambda)
 
-($eval eval)(eval eval)
-($load load)(load load)
-($beval beval)(beval beval) # get removed
-
-($exec exec)(exec exec)
-($run run)(run run)
-($import import)(import import)
-($require require)(require require)
+(eval eval)(eval eval)
+(load load)(load load)
+(exec exec)(exec exec)
+(run run)(run run)
+(import import)(import import)
+(require require)(require require)
+(retire retire)(retire retire)
 
 # from sugly test
-($define define)(define define)
-($should should) (should should)
+(define define)(define define)
+(should should) (should should)
 
 # global objects
-$
-($)
-($ func var1 var2)
-($func var1 var2)
 (obj $ var1 var2)
 (obj func $ var1 var2)
 "123$bcd $\t xyz"
 
 (Bool Bool -Bool Bool- "Bool" Bool)
-(String Symbol Object Function Date Array Bit Uri Math Json Sugly)
+(String Symbol Object Function Date Array print encode uri math json runtime)
 
 # encode function group
-($encode)
-($encode )
-($encode program)
+(encode)
+(encode )
+(encode program)
 (encode bool)
 (encode bool- )
 (encode -bool )
@@ -205,6 +196,8 @@ $
 (print "value" var)
 (print non-sugly-method var)
 
+(math pow asa)
+
 # more examples
 (let var (x == 1).
 (let func (=> x (+ x 1).
@@ -215,9 +208,6 @@ $
 
 (let func (function x (+ x 1).
 (let func (function (x y) (+ x 1).
-
-(let func (closure x (+ x 1).
-(let func (closure (x y) (+ x 1).
 
 (let func (lambda x (+ x 1).
 (let func (lambda (x y) (+ x 1).
@@ -231,13 +221,7 @@ $
 (let obj2 (@ p: 1 m: (= (x y) (+ x y 10).
 (obj2 m 1)
 
-(@x < p:1 v:2)
-(@x< p:1 v:2)
-(@ x< p:1 v:2)
-(@ x < p:1 v:2)
-
-(@>p:1)
-(@ x > p:1 v:2)
+(@ p:1 v:2)
 
 # code snippets.
 (if condition  true else  false),
