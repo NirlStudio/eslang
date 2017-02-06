@@ -57,7 +57,7 @@ module.exports = function ($void) {
   })
 
   // persistency
-  virtual(Null, 'to-code', function null$toCode (context) {
+  readonly(Null, 'to-code', function null$toCode (context) {
     return 'null'
   })
   // readable description

@@ -256,10 +256,9 @@ module.exports = function ($void) {
       return '()'
     }
     var ctx = coding.start(this, asCompat)
-    var code = ['(']
+    var code = []
     ctx.decompile(this, code)
-    code.push(')')
-    return code.join(' ')
+    return '(' + code.join(' ') + ')'
   })
   readonly(proto, 'to-program', function array$toString (asCompat) {
     if (!Array.isArray(this)) {

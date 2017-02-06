@@ -49,13 +49,12 @@ function toCodeAsChild (func, ctx) {
 }
 
 function functionToCode (func, ctx, skipContext) {
-  var code = ['(=']
+  var code = []
   if (!skipContext) {
-    code.push(ctx.toCode(func.context))
-    code.push('>')
+    code.push(ctx.toCode(func.context) + ' >')
   }
 
-  code.push('(')
+  var params = []
   func.parameters.forEach(function printParam (param) {
     var name = param[0] && param[0].key
     if (typeof name !== 'string') {
@@ -63,20 +62,20 @@ function functionToCode (func, ctx, skipContext) {
     }
     var defaulue = param[1]
     if (typeof defaulue === 'undefined' || defaulue === null) {
-      code.push(name)
+      params.push(name)
     } else {
-      code.push('(' + name + ' ' + ctx.decompile(defaulue) + ')')
+      params.push('(' + name + ' ' + ctx.decompile(defaulue) + ')')
     }
   })
 
   if (!func['fixed-args']) {
-    code.push('*')
+    code.push('(' + params.join(' ') + ' *)')
+  } else {
+    code.push('(' + params.join(' ') + ')')
   }
-  code.push(')')
 
   ctx.decompile(func.body, code)
-  code.push(')')
-  return code.join(ctx.asCompat ? ' ' : '\n')
+  return '(=' + code.join(ctx.asCompat ? ' ' : '\n') + ')'
 }
 
 module.exports = function ($void) {

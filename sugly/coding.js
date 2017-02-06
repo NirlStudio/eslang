@@ -2,6 +2,7 @@
 
 module.exports = function $coding ($void) {
   var Symbol$ = $void.Symbol
+  var $array = $void.$.Array.proto
 
   function $Coding (root, asCompat) {
     // compat mode ignores any unnecessary whitespace.
@@ -60,7 +61,7 @@ module.exports = function $coding ($void) {
       return status
     },
     // provide code to update the object with its properties.
-    update: function update (obj, code) {
+    update: function update (code) {
       this._code.push(code)
     },
     // return the count of lines of code
@@ -70,7 +71,7 @@ module.exports = function $coding ($void) {
     // generate final code with the last piece of it.
     end: function end (code) {
       this._code.push(code)
-      this._code.push(') ).')
+      this._code.push(')).')
       return this._code.join(this.asCompat ? ' ' : '\n')
     },
     // only used to check if the same object has appeared once.
@@ -107,13 +108,15 @@ module.exports = function $coding ($void) {
       } else if (typeof value !== 'object') {
         code.push('()')
       } else if (!Array.isArray(value)) {
-        code.push('(@:)')
+        code.push('()') // unknown type
       } else {
-        code.push('(')
         value.forEach(function decompileClause (clause) {
-          this.decompile(clause, code)
+          if (Array.isArray(clause)) {
+            code.push($array['to-clause'].call(clause, this))
+          } else {
+            this.decompile(clause, code)
+          }
         }, this)
-        code.push(')')
       }
       return code
     }
