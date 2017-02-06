@@ -98,7 +98,7 @@ module.exports = function ($void) {
         switch (t.type) {
           case 'error':
             // only try to describe the on-site problem.
-            $.print.warn({
+            $.warn({
               from: '$/sugly/compiler',
               message: 'compiling cancelled for the last tokenizer error.'
             })

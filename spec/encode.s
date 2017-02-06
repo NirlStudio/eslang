@@ -82,15 +82,18 @@
     (let obj (object),
     (assert "(object )" (` (encode value obj),
 
-    (let obj (@ p : 1 ),
-    (assert "(@p: 1)" (` (encode value obj),
+    (let obj (@ p : 1 str : "string" b: false n: null),
+    (assert "(@\np: 1\nstr: \"string\"\nb: false\nn: null\n)" (` (obj to-code),
+    (obj "obj" obj)
+    (assert "(@\n  p: 1\n  str: \"string\"\n  b: false\n  n: null\n  obj: (object )\n)" (` (obj to-string),
+    (assert "(@ p: 1 str: \"string\" b: false n: null )" (` (obj to-code true),
 
-    (let cls (class (@identityName : "type"),
-    (let obj (cls create),
-    (assert "(type create )" (` (encode value obj),
+    (let Cls (class (@identityName: "Cls"),
+    (let obj (Cls construct),
+    (assert "(Cls create )" (` (encode value obj),
 
-    (let obj (cls create (@ p : 1 ),
-    (assert "(type create (@\n  p: 1))" (` (encode value obj),
+    (let obj (Cls create (@ p: 1 ),
+    (assert "(Cls create (@\n  p: 1))" (` (encode value obj),
 
     (let obj (@ identityName : "special-object" ),
     (assert "special-object" (` (encode value obj),

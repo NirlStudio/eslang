@@ -1,15 +1,14 @@
 'use strict'
 
-var $export = require('../export')
-
 module.exports = function execute ($void) {
   var Signal = $void.Signal
   var evaluate = $void.evaluate
+  var constant = $void.constant
   var createModuleSpace = $void.createModuleSpace
   var spaceStack = $void.spaceStack
   var compile = $void.$.compile
 
-  $export($void.$.Function, 'execute', function function$execute (subject, func, args) {
+  constant($void.$.Function, 'execute', function function$execute (subject, func, args) {
     if (typeof args === 'undefined') {
       args = func; func = subject; subject = null
     }
@@ -18,7 +17,7 @@ module.exports = function execute ($void) {
         : func.apply(subject, Array.isArray(args) ? args : [])
     } catch (signal) {
       if (signal instanceof Signal &&
-         (signal.type === 'return' || signal.type === 'exit')) {
+         (signal.id === 'return' || signal.id === 'exit')) {
         return signal.value
       } else {
         throw signal
@@ -46,7 +45,7 @@ module.exports = function execute ($void) {
       }
     } catch (signal) {
       if (signal instanceof Signal &&
-         (signal.type === 'return' || signal.type === 'exit')) {
+         (signal.id === 'return' || signal.id === 'exit')) {
         result = signal.value
       } else {
         spaceStack.pop()

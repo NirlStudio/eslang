@@ -22,8 +22,8 @@
     (assert 0 (` (epoch get-utc-minutes),
     (assert 0 (` (epoch get-utc-seconds),
   ),
-  (should "(Date of year month ...)" "return the date basing on fields" (= ()
-    (let epoch (Date of 1972 0 1 1 2 3),
+  (should "(Date on year month ...)" "return the date basing on fields" (= ()
+    (let epoch (Date on 1972 0 1 1 2 3),
     (assert 1972 (epoch get-year),
     (assert 0 (` (epoch get-month),
     (assert 1 (` (epoch get-day),
@@ -57,8 +57,8 @@
     (assert 0 (` (epoch get-utc-minutes),
     (assert 0 (` (epoch get-utc-seconds),
   ),
-  (should "(Date of year month ...)" "return the date basing on fields" (= ()
-    (let epoch (Date of 1972 0 1 1 2 3),
+  (should "(Date on year month ...)" "return the date basing on fields" (= ()
+    (let epoch (Date on 1972 0 1 1 2 3),
     (assert 1972 (` (epoch get-year),
     (assert 0 (` (epoch get-month),
     (assert 1 (` (epoch get-day),

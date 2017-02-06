@@ -13,7 +13,9 @@ module.exports = function operators$general ($void) {
       if (typeof value === 'string') {
         str += value
       } else {
-        str += space.$.encode.value(value)
+        var toString = value === null ? 'null'
+          : typeof value[':'] === 'function' && value[':']('to-string')
+        str += typeof toString === 'function' ? toString.call(value) : 'null'
       }
     }
     return str
@@ -68,7 +70,7 @@ module.exports = function operators$general ($void) {
       base = sum(space, base, clause)
     } else if (typeof base === 'string') {
       base = concat(space, base, clause)
-    }else {
+    } else {
       return base // for other types
     }
 

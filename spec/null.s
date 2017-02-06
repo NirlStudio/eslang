@@ -25,12 +25,11 @@
     (assert (` (null is-not-a Type),
     (assert (` (null is-not-a String),
   ),
-  (should "implement type/get-type" (= ()
+  (should "implement type" (= ()
     (assert (` ((null type) is null),
     (assert (` ((null type) is-not Type),
     (assert (` ((null "type") is null),
     (assert (` ((null "type") is-not Type),
-    (assert (` ((null get-type) is null),
   ),
   (should "implement super" (= ()
     (assert (` ((null super) is null),
@@ -44,7 +43,7 @@
     (assert (` ((null to-string) == "null"),
   ),
   (should "implement common indexer (:)" (= ()
-    (assert (` ($(null ":") is-a Function),
+    (assert (` (:(null ":") is-a Function),
   ),
   (should "implement bool test" (= ()
     (assert false (` (null ?),

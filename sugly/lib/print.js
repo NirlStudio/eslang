@@ -1,83 +1,48 @@
 'use strict'
 
-var $export = require('../export')
+module.exports = function ($void, JS) {
+  var $ = $void.$
+  var constant = $void.constant
 
-function printer ($) {
-  return function print () {
-    if (typeof this !== 'function') {
-      return null
+  constant($, 'print', function print () {
+    var strings = []
+    for (var i = 0; i < arguments.length; i++) {
+      var value = arguments[i]
+      if (typeof value === 'string') {
+        strings.push(value)
+      } else if (typeof value === 'undefined' || value === null) {
+        strings.push(value)
+      } else {
+        var toString = value['to-string'] ||
+          (value.type && value.type.proto && value.type.proto['to-string'])
+        strings.push(typeof toString === 'function' ? toString.call(value) : '(?)')
+      }
     }
-
-    var args = Array.prototype.slice.apply(arguments)
-    var code
-    if (args.length < 1) {
-      code = ''
-    } else if (args.length === 1) {
-      code = $.encode.value(args[0])
+    if (strings.length > 0) {
+      console.log(strings.join(''))
     } else {
-      code = $.encode.value(args)
+      console.log('')
     }
-    this(code)
-    return code
-  }
-}
+  })
 
-function codePrinter (output) {
-  if (typeof output.log !== 'function') {
-    return function () { return null }
-  }
-
-  var log = output.log
-  return function printCode (encode, program) {
-    var text = encode ? encode(program) : program
-    log(text)
-    return text
-  }
-}
-
-module.exports = function ($, JS, output) {
-  if (!output) {
-    output = JS.console || {
-      log: null,
-      info: null,
-      warn: null
+  constant($, 'warn', function warn () {
+    var strings = []
+    for (var i = 0; i < arguments.length; i++) {
+      var value = arguments[i]
+      if (typeof value === 'string') {
+        strings.push(value)
+      } else if (typeof value === 'undefined' || value === null) {
+        strings.push(value)
+      } else {
+        var toCode = value['to-code'] ||
+          (value.type && value.type.proto && value.type.proto['to-code'])
+        strings.push(typeof toCode === 'function' ? toCode.call(value) : '(?)')
+      }
     }
-  }
-
-  var print = printer($)
-  var printCode = codePrinter(output)
-
-  var $print = $export($, 'print', $.object())
-  // print a piece of program which is a set of clauses
-  $export($print, 'program', function print$program (clauses) {
-    return printCode($.encode.program, clauses)
-  })
-  // print text literally
-  $export($print, 'code', function () {
-    var args = Array.prototype.slice.apply(arguments)
-    var values = []
-    for (var i = 0; i < args.length; i++) {
-      var value = args[i]
-      values.push(typeof value === 'string' ? value : $.encode.value(value))
+    if (strings.length > 0) {
+      console.warn(strings.join(''))
+    } else {
+      console.warn('')
     }
-    return printCode(null, values.join(''))
-  })
-  // encode and print one or more values to standard output.
-  $export($print, 'value', function () {
-    return print.apply(output.log, arguments)
-  })
-  // encode and print an clause to standard output.
-  $export($print, 'clause', function (clause) {
-    return printCode($.encode.clause, clause)
-  })
-
-  // encode arguments and print it as some diagnostic information to standard error.
-  $export($print, 'info', function () {
-    return print.apply(output.info, arguments)
-  })
-
-  // encode arguments and print it as an issue record to standard error.
-  $export($print, 'warn', function () {
-    return print.apply(output.warn, arguments)
   })
 }

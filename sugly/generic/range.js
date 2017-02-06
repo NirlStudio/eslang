@@ -2,32 +2,30 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var type = $.Range
+  var Range = $.Range
+  var readonly = $void.readonly
 
-  type.create = function () {
-    return $.Class.create.apply(type, arguments)
-  }
-
-  var proto = type.proto
-  proto.begin = 0
-  proto.end = 0
-  proto.step = 1
-
-  proto.constructor = function (begin, end, step) {
-    if (typeof begin !== 'number') {
+  readonly(Range, 'create', function Range$create (begin, end, step) {
+    if (typeof begin !== 'number' || isNaN(begin)) {
       begin = 0
     }
-    if (typeof end !== 'number') {
+    if (typeof end !== 'number' || isNaN(end)) {
       end = begin
       begin = 0
     }
-    if (typeof step !== 'number' || step === 0) {
+    if (typeof step !== 'number' || isNaN(step) || step === 0) {
       step = end >= begin ? 1 : -1
     }
-    this.begin = begin
-    this.end = end
-    this.step = step
-  }
 
-  require('./range-iterator')($)
+    var range = Object.create(Range.proto)
+    range.begin = begin
+    range.end = end
+    range.step = step
+    return range
+  })
+
+  var proto = Range.proto
+  proto.begin = 0
+  proto.end = 0
+  proto.step = 1
 }

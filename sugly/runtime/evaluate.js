@@ -2,11 +2,8 @@
 
 module.exports = function evaluate ($void) {
   var resolve = $void.resolve
-  var get = $void.get
-  var set = $void.set
-  var geti = $void.geti
-  var seti = $void.seti
   var Symbol$ = $void.Symbol
+  var indexerOf = $void.indexerOf
 
   $void.evaluate = function evaluate (clause, space) {
     if (!Array.isArray(clause)) {
@@ -21,7 +18,7 @@ module.exports = function evaluate ($void) {
     var subject = clause[0]
     // check sentence mode: implicit (auto-test) or explicit (S P O).
     var implicitMode, offset
-    if (subject instanceof Symbol$ && subject.key === '$') {
+    if (subject instanceof Symbol$ && subject.key === ':') {
       if (length < 2) {
         return null
       }
@@ -60,6 +57,7 @@ module.exports = function evaluate ($void) {
       return evaluate(subject, space)
     }
 
+    var args = []
     if (predicate === null) {
       // resolve the predicate
       predicate = clause[offset]
@@ -70,31 +68,23 @@ module.exports = function evaluate ($void) {
       }
       // try to find a function as verb
       if (predicate instanceof Symbol$) {
-        predicate = get(subject, predicate)
+        predicate = predicate.key === ':' ? indexerOf(subject)
+          : indexerOf(subject).call(subject, predicate.key)
         if (typeof predicate !== 'function') {
           return predicate // interpret to getter if result is not a function.
         }
-      } else if (typeof predicate === 'string') {
-        // a string as verb is indicating a getting/setting command.
-        return length > 2 ? set(subject, predicate, evaluate(clause[2], space))
-          : get(subject, predicate)
-      } else if (typeof predicate === 'number') {
-        // a number may be a valid index for some types.
-        return length > 2 ? seti(subject, predicate, evaluate(clause[2], space))
-          : geti(subject, predicate)
+      } else if (typeof predicate === 'string' || typeof predicate === 'number') {
+        args.push(predicate)
+        predicate = indexerOf(subject)
       } else if (typeof predicate !== 'function') {
         return null // invalid predicate
       }
     }
 
     // evaluate arguments.
-    var max = predicate.$fixedArgs ? predicate.$params.length + offset : length
-    if (max > length) {
-      max = length
-    }
-    var args = []
-    for (var i = offset; i < max; i++) {
-      args.push(evaluate(clause[i], space))
+    var max = predicate['fixed-args'] ? predicate.parameters.length : 1024
+    for (; offset < length && args.length < max; offset++) {
+      args.push(evaluate(clause[offset], space))
     }
 
     // execute the clause.

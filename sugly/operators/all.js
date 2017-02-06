@@ -3,6 +3,7 @@
 module.exports = function operators ($void) {
   // export all operators
   $void.operators = {}
+
   require('./quote')($void)
   require('./assignment')($void)
   require('./object')($void)

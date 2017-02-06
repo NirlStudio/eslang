@@ -1,10 +1,13 @@
 'use strict'
 
-var $export = require('../export')
+module.exports = function ($void, JS) {
+  var $ = $void.$
+  var object = $.object
+  var constant = $void.constant
+  var copyObject = $void.copyObject
 
-module.exports = function ($, JS) {
-  var math = $export($, 'math', $.object())
-  $export.copy(math, JS.Math, {
+  var math = constant($, 'math', object())
+  copyObject(math, JS.Math, {
     /* basic */
     'E': 'E',
     'LN10': 'LN10',

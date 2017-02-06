@@ -1,9 +1,7 @@
 'use strict'
 
-var $export = require('../export')
-
-function valueOf () {
-  return function Number$value_of (input) {
+function createValueOf () {
+  return function Number$valueOf (input) {
     if (typeof input === 'string') {
       var num = parseFloat(input)
       return isNaN(num) ? 0 : num
@@ -21,49 +19,49 @@ function valueOf () {
   }
 }
 
-function numberAnd (value_of) {
+function numberAnd (valueOf) {
   return function number$and () {
-    var result = typeof this === 'number' ? this : value_of(this)
+    var result = typeof this === 'number' ? this : valueOf(this)
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      result += typeof arg === 'number' ? arg : value_of(arg)
+      result += typeof arg === 'number' ? arg : valueOf(arg)
     }
     return result
   }
 }
 
-function numberSubtract (value_of) {
+function numberSubtract (valueOf) {
   return function number$substract () {
-    var result = typeof this === 'number' ? this : value_of(this)
+    var result = typeof this === 'number' ? this : valueOf(this)
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      result -= typeof arg === 'number' ? arg : value_of(arg)
+      result -= typeof arg === 'number' ? arg : valueOf(arg)
     }
     return result
   }
 }
 
-function numberTimes (value_of) {
+function numberTimes (valueOf) {
   return function number$times () {
-    var result = typeof this === 'number' ? this : value_of(this)
+    var result = typeof this === 'number' ? this : valueOf(this)
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      result *= typeof arg === 'number' ? arg : value_of(arg)
+      result *= typeof arg === 'number' ? arg : valueOf(arg)
     }
     return result
   }
 }
 
-function numberDivide (value_of) {
+function numberDivide (valueOf) {
   return function number$divide () {
-    var result = typeof this === 'number' ? this : value_of(this)
+    var result = typeof this === 'number' ? this : valueOf(this)
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
-      result /= typeof arg === 'number' ? arg : value_of(arg)
+      result /= typeof arg === 'number' ? arg : valueOf(arg)
     }
     return result
   }
@@ -72,32 +70,38 @@ function numberDivide (value_of) {
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.Number
+  var readonly = $void.readonly
+  var copyObject = $void.copyObject
+  var copyProto = $void.copyProto
 
-  type.MAX_VALUE = Number.MAX_VALUE
-  type.MIN_VALUE = Number.MIN_VALUE
-
-  type.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY
-  type.POSITIVE_INFINITY = Number.POSITIVE_INFINITY
+  copyObject(type, Number, {
+    MAX_VALUE: 'MAX_VALUE',
+    MIN_VALUE: 'MIN_VALUE',
+    NEGATIVE_INFINITY: 'NEGATIVE_INFINITY',
+    POSITIVE_INFINITY: 'POSITIVE_INFINITY'
+  })
 
   // get a number value from the input
-  var value_of = $export(type, 'value-of', valueOf())
+  var valueOf = readonly(type, 'value-of', createValueOf())
 
   // parse a string to its number value.
-  $export(type, 'parse', function Number$parse (value) {
+  readonly(type, 'parse', function Number$parse (value) {
     return typeof value === 'undefined' || value === null ? 0 : parseFloat(value)
   })
 
   var proto = type.proto
   // test for special values of Nan and Infinity
-  $export(proto, 'is-valid', function number$is_valid () {
+  readonly(proto, 'is-valid', function number$isValid () {
     return typeof this === 'number' && !isNaN(this)
   })
-  $export(proto, 'is-finite', function number$is_finite () {
+  readonly(proto, 'is-finite', function number$isFinite () {
     return typeof this === 'number' && isFinite(this)
   })
 
   // TODO - remove unnecessary functions?
-  $export.copy(proto, Number.prototype, {
+  copyProto(type, Number, function (value) {
+    return typeof value === 'number'
+  }, {
     'toExponential': 'to-exponential',
     'toFixed': 'to-fixed',
     'toLocaleString': 'to-locale-string',
@@ -105,78 +109,73 @@ module.exports = function ($void) {
   })
 
   // support basic arithmetic operations
-  $export(proto, 'and', numberAnd(value_of))
-  $export(proto, 'subtract', numberSubtract(value_of))
-  $export(proto, 'times', numberTimes(value_of))
-  $export(proto, 'divide', numberDivide(value_of))
+  readonly(proto, 'and', numberAnd(valueOf))
+  readonly(proto, 'subtract', numberSubtract(valueOf))
+  readonly(proto, 'times', numberTimes(valueOf))
+  readonly(proto, 'divide', numberDivide(valueOf))
 
   // support arithmetic operators
-  $export(proto, '+', numberAnd(value_of))
-  $export(proto, '-', numberSubtract(value_of))
-  $export(proto, '*', numberTimes(value_of))
-  $export(proto, '/', numberDivide(value_of))
+  readonly(proto, '+', numberAnd(valueOf))
+  readonly(proto, '-', numberSubtract(valueOf))
+  readonly(proto, '*', numberTimes(valueOf))
+  readonly(proto, '/', numberDivide(valueOf))
 
   // support ordering logic - comparable
-  $export(proto, 'compare', function number$compare (another) {
+  readonly(proto, 'compare', function number$compare (another) {
     var diff = this - another
     return diff === 0 ? 0 : diff / Math.abs(diff)
   })
 
   // support ordering operators
-  $export(proto, '>', function number$opr_gt (another) {
+  readonly(proto, '>', function number$oprGT (another) {
     return typeof another === 'number' ? this > another : false
   })
-  $export(proto, '>=', function number$opr_ge (another) {
+  readonly(proto, '>=', function number$oprGE (another) {
     return typeof another === 'number' ? this >= another : false
   })
-  $export(proto, '<', function number$opr_lt (another) {
+  readonly(proto, '<', function number$oprLT (another) {
     return typeof another === 'number' ? this < another : false
   })
-  $export(proto, '<=', function number$opr_le (another) {
+  readonly(proto, '<=', function number$oprLE (another) {
     return typeof another === 'number' ? this <= another : false
   })
 
   // support common math operations
-  $export(proto, 'abs', function number$abs () {
+  readonly(proto, 'abs', function number$abs () {
     return Math.abs(this)
   })
-  $export(proto, 'ceil', function number$ceil () {
+  readonly(proto, 'ceil', function number$ceil () {
     return Math.ceil(this)
   })
-  $export(proto, 'floor', function number$floor () {
+  readonly(proto, 'floor', function number$floor () {
     return Math.floor(this)
   })
-  $export(proto, 'round', function number$floor () {
+  readonly(proto, 'round', function number$floor () {
     return Math.round(this)
   })
 
-  // override for NaN
-  $export(proto, 'is', function number$is (another) {
-    return Object.is(this, another)
-  })
-  $export(proto, 'is-not', function number$is_not (another) {
-    return !Object.is(this, another)
-  })
-
-  // persistency & describing
-  $export(proto, 'to-code', function number$to_code () {
-    return typeof this === 'number' ? this.toString() : 'NaN'
-  })
-  $export(proto, 'to-string', function number$to_string () {
-    return typeof this === 'number' ? this.toString() : 'NaN'
-  })
-
   // O and NaN are defined as empty.
-  $export(proto, 'is-empty', function number$is_empty () {
+  readonly(proto, 'is-empty', function number$isEmpty () {
     return this === 0 || isNaN(this)
   })
-  $export(proto, 'not-empty', function number$not_empty () {
+  readonly(proto, 'not-empty', function number$notEmpty () {
     return this !== 0 && !isNaN(this)
   })
 
-  // override indexer to create range object.
-  $export(proto, ':', function number$indexer (name) {
+  // persistency & describing
+  readonly(proto, 'to-code', function number$toCode () {
+    return typeof this === 'number' ? this.toString() : 'NaN'
+  })
+  readonly(proto, 'to-string', function number$toString () {
+    return typeof this === 'number' ? this.toString() : 'NaN'
+  })
+
+  // override indexer to expose number properties and methods
+  readonly(proto, ':', function number$indexer (name) {
     if (typeof name === 'string') {
+      if (name === 'type') {
+        return Number.isInteger(this) ? $.Int : $.Float
+      }
       return typeof proto[name] !== 'undefined' ? proto[name] : null
     }
     return null

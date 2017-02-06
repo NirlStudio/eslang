@@ -139,5 +139,5 @@
 (define "Function object" (= ()
   (should "is the type object of functions" (= ()
     (assert (` (Function is-a Type),
-    (assert (` ($(= x x) is-a Function),
+    (assert (` (:(= x x) is-a Function),
 ).

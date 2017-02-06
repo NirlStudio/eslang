@@ -1,12 +1,10 @@
 'use strict'
 
-var $export = require('../export')
-
-function createObject ($void) {
+function constructInstance ($void) {
   var isPrototypeOf = $void.isPrototypeOf
   var Class = $void.$.Class
 
-  return function Class$create () {
+  return function Class$construct () {
     var class_ = this === Class || (isPrototypeOf(Class, this) &&
       isPrototypeOf(Class.proto, this.proto)) ? this : Class
     if (!class_ || class_['abstract']) {
@@ -17,29 +15,34 @@ function createObject ($void) {
     var constructor = class_.proto.constructor
     if (typeof constructor === 'function') {
       constructor.apply(obj, arguments)
-    } else if (arguments.length > 0) {
-      var args = [obj]
-      Array.prototype.push.apply(args, arguments)
-      Object.assign.apply(Object, args)
     }
     return obj
   }
 }
 
-function newClass ($void) {
-  var createType = $void.createType
+function deriveClass ($void) {
+  var createUserType = $void.createUserType
   var isPrototypeOf = $void.isPrototypeOf
   var Class = $void.$.Class
 
-  return function Class$new (type, proto) {
+  return function Class$of (proto) {
     var parent = this === Class || (isPrototypeOf(Class, this) &&
       isPrototypeOf(Class.proto, this.proto)) ? this : Class
     if (!parent || parent['finalized']) {
       return null
     }
 
-    var class_ = createType(parent)
-    Object.assign(class_, type)
+    var class_ = createUserType(parent)
+    if (typeof proto !== 'object') {
+      return class_
+    }
+
+    if (typeof proto.constructor === 'function') {
+      proto.upper = parent.proto.constructor
+    } else {
+      delete proto.constructor
+    }
+
     Object.assign(class_.proto, proto)
     return class_
   }
@@ -48,15 +51,15 @@ function newClass ($void) {
 module.exports = function ($void) {
   var $ = $void.$
   var Class = $.Class
-
-  // create a new object and copy properties from source objects.
-  $export(Class, 'create', createObject($void))
+  var readonly = $void.readonly
+  var virtual = $void.virtual
 
   // derive from this class to create a new class with its static & instance properties.
-  $export(Class, 'new', newClass($void))
+  readonly(Class, 'define', deriveClass($void))
 
-  require('./object')($void)
+  // construct a new object by calling constructor with some arguments.
+  readonly(Class, 'construct', constructInstance($void))
 
-  // export to system's prototype
-  $void.injectTo(Object, 'type', Class)
+  // default constructor
+  virtual(Class.proto, 'constructor', function Class$constructor () {})
 }

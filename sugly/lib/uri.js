@@ -1,10 +1,13 @@
 'use strict'
 
-var $export = require('../export')
+module.exports = function ($void, JS) {
+  var $ = $void.$
+  var object = $.object
+  var constant = $void.constant
+  var copyObject = $void.copyObject
 
-module.exports = function ($, JS) {
-  var uri = $export($, 'uri', $.object())
-  $export.copy(uri, JS, {
+  var uri = constant($, 'uri', object())
+  copyObject(uri, JS, {
     'encodeURI': 'encode',
     'encodeURIComponent': 'escape',
     'decodeURI': 'decode',

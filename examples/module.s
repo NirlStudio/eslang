@@ -1,11 +1,14 @@
-(let mVar null)
-(let mVar null)
+(let gVar null)
+(let lVar null)
+(var vVar 1)
 
 (let f1 (= (x)
-  (global mVar x)
-  (let fVar x)
+  (let gVar x)
+  (var lVar x)
+  (+= vVar 2)
 ).
 
 (f1 123)
-(print value mVar)
-(print value fVar)
+(print gVar)
+(print lVar)
+(print vVar)

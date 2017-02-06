@@ -1,11 +1,14 @@
 'use strict'
 
-var $export = require('../export')
+module.exports = function ($void, JS) {
+  var $ = $void.$
+  var object = $.object
+  var constant = $void.constant
+  var copyObject = $void.copyObject
 
-module.exports = function ($, JS) {
-  var json = $export($, 'json', $.object())
-  $export.copy(json, JS.JSON, {
-    'stringify': 'of',
+  var json = constant($, 'json', object())
+  copyObject(json, JS.JSON, {
+    'stringify': 'string-of',
     'parse': 'parse'
   })
   return json

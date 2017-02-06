@@ -42,6 +42,8 @@ module.exports = function operators$object ($void) {
     var length = clause.length
     if (length > 2 && clause[2] instanceof Symbol$ && clause[2].key === ':') {
       return objectCreate(space, clause)
+    } else if (length > 1 && clause[1] instanceof Symbol$ && clause[1].key === ':') {
+      return createObject()
     } else {
       return arrayCreate(space, clause)
     }

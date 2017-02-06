@@ -1,10 +1,11 @@
 'use strict'
 
-var $export = require('../export')
-
 module.exports = function function_ ($void) {
   var Signal = $void.Signal
   var Symbol$ = $void.Symbol
+  var constant = $void.constant
+  var readonly = $void.readonly
+  var virtual = $void.virtual
 
   // param or (param ...) or ((param value) ...)
   function formatParameters (params) {
@@ -47,7 +48,7 @@ module.exports = function function_ ($void) {
     var $ = space.$
 
     // body must be a list of clauses
-    $export($, 'function', function $function (params, body) {
+    constant($, 'function', function $function (params, body) {
       if (!Array.isArray(body) || body.length < 1) {
         return null // no function body
       }
@@ -62,6 +63,7 @@ module.exports = function function_ ($void) {
         var ns = scope.$
         ns['do'] = $F
         ns['this'] = this
+        Object.assign(ns, $F.context)
         var argc = ns['argc'] = arguments.length
         if (fixedArgs) {
           ns['argv'] = null
@@ -87,16 +89,17 @@ module.exports = function function_ ($void) {
           return result
         } catch (signal) {
           spaceStack.pop()
-          if (signal instanceof Signal && signal.type === 'return') {
+          if (signal instanceof Signal && signal.id === 'return') {
             return signal.value
           }
           throw signal
         }
       }
 
-      $F.$fixedArgs = fixedArgs
-      $F.$params = params
-      $F.$body = body
+      readonly($F, 'context', null)
+      readonly($F, 'fixed-args', fixedArgs)
+      readonly($F, 'parameters', params)
+      readonly($F, 'body', body)
       return $F
     })
 
@@ -108,7 +111,7 @@ module.exports = function function_ ($void) {
         var ns = scope.$
         ns['do'] = $C
         ns['this'] = this
-        Object.assign(ns, enclosing)
+        Object.assign(ns, $C.context)
         var argc = ns['argc'] = arguments.length
         if (fixedArgs) {
           ns['argv'] = null
@@ -134,17 +137,17 @@ module.exports = function function_ ($void) {
           return result
         } catch (signal) {
           spaceStack.pop()
-          if (signal instanceof Signal && signal.type === 'return') {
+          if (signal instanceof Signal && signal.id === 'return') {
             return signal.value
           }
           throw signal
         }
       }
 
-      $C.$enclosing = enclosing
-      $C.$fixedArgs = fixedArgs
-      $C.$params = params
-      $C.$body = body
+      virtual($C, 'context', enclosing)
+      readonly($C, 'fixed-args', fixedArgs)
+      readonly($C, 'parameters', params)
+      readonly($C, 'body', body)
       return $C
     }
 
@@ -161,14 +164,14 @@ module.exports = function function_ ($void) {
         return $.lambda(enclosing, body[1], body.slice(2))
       }
 
-      $L.$enclosing = enclosing
-      $L.$fixedArgs = true
-      $L.$params = params
-      $L.$body = body
+      virtual($L, 'context', enclosing)
+      readonly($L, 'fixed-args', true)
+      readonly($L, 'parameters', params)
+      readonly($L, 'body', body)
       return $L
     }
 
-    $export($, 'lambda', function $lambda (enclosing, params, body) {
+    constant($, 'lambda', function $lambda (enclosing, params, body) {
       if (!Array.isArray(body) || body.length < 1) {
         return null // no function body
       }

@@ -1,14 +1,14 @@
 'use strict'
 
 var JS = global || window
-var $export = require('./export')
 
-function exportConstants ($) {
-  $[''] = null
-  $.true = true
-  $.false = false
-  $.NaN = NaN
-  $.Infinity = Infinity
+function exportConstants ($void) {
+  var $ = $void.$
+  $void.constant($, '', null)
+  $void.constant($, 'true', true)
+  $void.constant($, 'false', false)
+  $void.constant($, 'NaN', NaN)
+  $void.constant($, 'Infinity', Infinity)
 }
 
 function initializeSpace ($void) {
@@ -17,53 +17,70 @@ function initializeSpace ($void) {
   require('./generic/type')($void)
 
   var $ = $void.$
+  var constant = $void.constant
+
   require('./generic/symbol')($void)
-  $export($, 'symbol', $.Symbol['value-of'])
+  constant($, 'symbol', $.Symbol['value-of'])
 
   require('./generic/bool')($void)
-  $export($, 'bool', $.Bool['value-of'])
+  constant($, 'bool', $.Bool['value-of'])
 
   require('./generic/number')($void)
-  $export($, 'number', $.Number['value-of'])
+  constant($, 'number', $.Number['value-of'])
 
   require('./generic/int')($void)
-  $export($, 'int', $.Int['value-of'])
+  constant($, 'int', $.Int['value-of'])
 
   require('./generic/float')($void)
-  $export($, 'float', $.Float['value-of'])
-
-  require('./generic/string')($void)
-  $export($, 'string', $.String['value-of'])
-
-  require('./generic/function')($void)
-  $export($, 'call', $.Function['call'])
-  $export($, 'apply', $.Function['apply'])
-
-  require('./generic/class')($void)
-  $export($, 'object', $.Class['create'])
-  $export($, 'class', $.Class['new'])
-
-  require('./generic/interface')($void)
-  $export($, 'interface', $.Interface['create'])
+  constant($, 'float', $.Float['value-of'])
 
   require('./generic/date')($void)
-  $export($, 'date', $.Date['create'])
+  constant($, 'date', $.Date['value-of'])
+
+  require('./generic/string')($void)
+  constant($, 'string', $.String['value-of'])
+
+  require('./generic/function')($void)
+  constant($, 'call', $.Function['call'])
+  constant($, 'apply', $.Function['apply'])
+
+  require('./generic/object')($void)
+  constant($, 'object', $.Object['create'])
 
   require('./generic/array')($void)
-  $export($, 'array', $.Array['create'])
+  constant($, 'array', $.Array['create'])
 
   require('./generic/range')($void)
-  $export($, 'range', $.Range['create'])
+  constant($, 'range', $.Range['create'])
 
+  require('./generic/enum')($void)
+  constant($, 'enum', $.Enum['define'])
+
+  require('./generic/flags')($void)
+  constant($, 'flags', $.Flags['define'])
+
+  require('./generic/interface')($void)
+  constant($, 'interface', $.Interface['create'])
+
+  require('./generic/class')($void)
+  constant($, 'class', $.Class['define'])
+
+  // iterate all field names and values
+  require('./generic/object-iterator')($void)
+  // iterate all offsets and values
+  require('./generic/array-iterator')($void)
+  // iterate all values in the range
+  require('./generic/range-iterator')($void)
   require('./generic/iterate')($void)
 
-  require('./lib/math')($, JS)
-  require('./lib/uri')($, JS)
-  require('./lib/json')($, JS)
+  require('./lib/math')($void, JS)
+  require('./lib/uri')($void, JS)
+  require('./lib/json')($void, JS)
 }
 
 function initializeRuntime ($void) {
   require('./runtime/signal')($void)
+  require('./runtime/indexer')($void)
   require('./runtime/assign')($void)
   require('./runtime/resolve')($void)
   require('./runtime/evaluate')($void)
@@ -71,15 +88,17 @@ function initializeRuntime ($void) {
   require('./runtime/signal-of')($void)
 }
 
-module.exports = function start (output) {
+module.exports = function start () {
   // Hello, world.
   var $void = require('./generic/genesis')()
   var $ = $void.$
+  var constant = $void.constant
 
   // export global constant values.
-  exportConstants($)
+  exportConstants($void)
 
   // create generic type system
+  require('./coding')($void)
   initializeSpace($void)
 
   // prepare runtime functions
@@ -87,27 +106,19 @@ module.exports = function start (output) {
 
   require('./operators/all')($void)
 
-  // encode function factory
-  var encoder = require('./lib/encoder')($void, JS)
-  // default encode function
-  $export($, 'encode', encoder(true))
-
+  // encode a value or an array to a piece of program
+  require('./lib/encode')($void, JS)
   // default output function. depending on $.encode
-  require('./lib/print')($, JS, output)
+  require('./lib/print')($void, JS)
 
   // prepare tokenizer & compiler
   require('./tokenizer')($void)
   require('./compiler')($void)
 
   // compile a piece of code to program/clauses: [[]].
-  $export($, 'compile', function (code, src) {
+  constant($, 'compile', function (code, src) {
     return $void.compiler()(code, src)
   })
-
-  // this is only used by runtime itself or its assembler
-  $void.export = function (name, obj) {
-    $export(this, name, obj)
-  }
 
   // program executor generators
   require('./runtime/run')($void)
@@ -116,7 +127,7 @@ module.exports = function start (output) {
   // real program executors
   require('./runtime/execute')($void)
   // export function executors as global functions
-  $export($, 'execute', $.Function['execute'])
+  constant($, 'execute', $.Function['execute'])
 
   require('./runtime/meta')($void)
   return $void

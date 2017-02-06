@@ -1,5 +1,5 @@
 (let data (import "sort-data").
-(print warn data)
+(warn data)
 
 (let sort (= (start end)
   (if (start >= end) (return),

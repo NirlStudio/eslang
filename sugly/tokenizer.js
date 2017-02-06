@@ -98,7 +98,7 @@ function createTokenizer ($void) {
         offset = index
         return finalizeToken(token, JSON.parse(str))
       } catch (err) {
-        $.print.warn({
+        $.warn({
           from: '$/sugly/tokenizer',
           message: 'Invalid string input: ' + str,
           source: source,
@@ -196,7 +196,7 @@ function createTokenizer ($void) {
           if (indent < 0) {
             return nextToken()
           }
-          $.print.warn({
+          $.warn({
             from: '$/sugly/tokenizer',
             message: 'TAB is not allowed to be used as an indent character in source code.',
             source: source,

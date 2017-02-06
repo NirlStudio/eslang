@@ -1,95 +1,76 @@
 'use strict'
 
-var $export = require('../export')
-
 module.exports = function ($void) {
   var $ = $void.$
-  var isPrototypeOf = $void.isPrototypeOf
   var Type = $.Type
+  var typeOf = $void.typeOf
+  var readonly = $void.readonly
+  var virtual = $void.virtual
+  var isPrototypeOf = $void.isPrototypeOf
 
   // all types will inherits here.
-  $export(Type, 'is-a', function Type$is_a (type) {
+  readonly(Type, 'is-a', function Type$isA (type) {
     return typeof type === 'undefined' || type === null ? false
-      : isPrototypeOf(type, this)
+      : this === type || isPrototypeOf(type, this)
   })
-  $export(Type, 'is-not-a', function Type$is_not_a (type) {
+  readonly(Type, 'is-not-a', function Type$isNotA (type) {
     return typeof type === 'undefined' || type === null ? true
-      : !isPrototypeOf(type, this)
+      : this !== type && !isPrototypeOf(type, this)
   })
-  $export(Type, 'get-type', function Type$get_type () {
-    return Type // Type is the type of all types
-  })
-  $export(Type, 'super', function Type$super () {
-    return Object.getPrototypeOf(this.proto).type || null
+  readonly(Type, 'super', function Type$super () {
+    var type = Object.getPrototypeOf(this)
+    return type === Type || isPrototypeOf(Type, type) ? type : null
   })
 
   // all types and their instances will inherits here.
   var proto = Type.proto
 
-  // Identity and Equivalence behaviour inherits from null.
-
   // Type Verification: to test if an entity is an instance of a type.
   // native types should override all these logic.
-  $export(proto, 'is-a', function entity$is_a (type) {
-    if (typeof type === 'undefined' || type === null || !type.proto) {
-      return false
-    }
-    var proto = Object.getPrototypeOf(this)
-    if (!proto.type) {
-      return false
-    }
-    return proto.type === type || isPrototypeOf(type, proto.type)
+  virtual(proto, 'is-a', function entity$isA (type) {
+    var thisType = typeOf(this)
+    return thisType === type || isPrototypeOf(type, thisType)
   })
-  $export(proto, 'is-not-a', function entity$is_not_a (type) {
-    if (typeof type === 'undefined' || type === null || !type.proto) {
-      return true
-    }
-    var proto = Object.getPrototypeOf(this)
-    if (!proto.type) {
-      return true
-    }
-    return proto.type !== type && !isPrototypeOf(type, proto.type)
-  })
-  // Type Determination: any enity has a type, which could be null.
-  $export(proto, 'get-type', function entity$get_type () {
-    return typeof this.type !== 'undefined'
-      ? this.type : typeof this === 'object' ? $.Class : null
+
+  virtual(proto, 'is-not-a', function entity$isNotA (type) {
+    var thisType = typeOf(this)
+    return thisType !== type && !isPrototypeOf(type, typeOf(this))
   })
   // Generalization: the super type is determined by the proto field.
-  $export(proto, 'super', function entity$super () {
-    var proto = Object.getPrototypeOf(this)
-    return proto && proto.type ? proto.type.super() : null
+  virtual(proto, 'super', function entity$super () {
+    return this && this.type && typeof this.type.super === 'function'
+      ? this.type.super() : null
   })
 
   // all known types should implement their own to-code logic.
-  $export(proto, 'to-code', function entity$to_code () {
-    return this.identityName || this.name || '()' // differ it from 'null'
+  readonly(proto, 'to-code', function entity$toCode () {
+    return '()' // differ it from 'null'
   })
 
   // all known types should implement their own describing logic.
-  $export(proto, 'to-string', function entity$to_string () {
-    return this.identityName || this.name || '()'
+  virtual(proto, 'to-string', function entity$toString () {
+    return '()'
   })
 
   // Ordinarily, an entity will be taken as a non-empty since it's different
   // with null. So null can be the default empty value of all entities, but a
   // type can define its own empty entity.
-  $export(proto, 'is-empty', function entity$is_empty () {
+  virtual(proto, 'is-empty', function entity$isEmpty () {
     return false
   })
-  $export(proto, 'not-empty', function entity$not_empty () {
+  virtual(proto, 'not-empty', function entity$notEmpty () {
     return true
   })
 
   // indexer: general & primary predicate.
   // any entity can have the capabilities of Type.proto at least.
-  $export(proto, ':', function entity$indexer (name) {
+  readonly(proto, ':', function entity$indexer (name) {
     return typeof name !== 'string' ? null
       : typeof this[name] !== 'undefined' ? this[name] : null
   })
 
   // common logical predicates to serve all null and entities.
-  $export(proto, '?', function enity$bool_test (a, b) {
+  virtual(proto, '?', function enity$boolTest (a, b) {
     if (typeof a === 'undefined') {
       // booleanize
       a = true; b = false
@@ -100,7 +81,7 @@ module.exports = function ($void) {
     // A-B test
     return this !== 0 && this !== false ? a : b
   })
-  $export(proto, '??', function enity$null_fallback (alternative) {
+  virtual(proto, '??', function enity$nullFallback () {
     return this
   })
 }

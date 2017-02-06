@@ -1,17 +1,17 @@
 # this is a piece of comment
-(print code "# ")
-(print value (+ "Hello" " world!").
-(print value (100 + 10 1).
-(print value (100 - 10 1))
-(print value (- 100 10 1))
-(print value (- 100))
-(print value (100 * 10 1))
-(print value (100 / 10 1))
+(print "# ")
+(print (+ "Hello" " world!").
+(print (100 + 10 1).
+(print (100 - 10 1))
+(print (- 100 10 1))
+(print (- 100))
+(print (100 * 10 1))
+(print (100 / 10 1))
 
 (let log100 (` (math log 100).
-(print value (log100).
+(print (log100).
 
-(print value (+ ""
+(print (+ ""
   (log100) " is a great number"
 ).
 
@@ -20,25 +20,25 @@
 (obj "code" 43)
 
 (let msg "message")
-(print value (obj:msg "Hello world!").
-(print value (obj "message"))
+(print (obj:msg "Hello world!").
+(print (obj "message"))
 
-(print code "# obj.code: " (obj "code").
-(print value msg)
-(print value (obj "message").
-(print value (obj:msg).
+(print "# obj.code: " (obj "code").
+(print msg)
+(print (obj "message").
+(print (obj:msg).
 (print (` log) "obj.message: " (obj:msg).
 
-(print value "---------" function)
+(print "---------" function)
 (let add (= (x y) (+ x y 10).
-(print value (add 3 2).
+(print (add 3 2).
 
 (let add (= (`(x y)) (`( (+ x y 10)).
-(print value (add 3 2).
+(print (add 3 2).
 
 (let add (= (x y)
   (+ x y 100).
-(print value (add 1 2).
+(print (add 1 2).
 
 (let sumWithBase (= (`base) (`(
   (let ctx (object),
@@ -46,47 +46,47 @@
   (lambda ctx (`(x y)) (`( (+ base x y).
 
 (let sum (sumWithBase 100).
-(print value (sum 10 1).
+(print (sum 10 1).
 
 (let sumWithBase (=> base > (x y)
   (+ base x y).
 
-(print value sumWithBase)
+(print sumWithBase)
 (let sum (sumWithBase 100).
 
-(print value sum)
-(print value (sum 10 2).
+(print sum)
+(print (sum 10 2).
 
 
 (let sumWithBase (= base
   (= base > (x y)
     (+ base x y).
-(print value sumWithBase)
+(print sumWithBase)
 (let sum (sumWithBase 1000).
-(print value sum)
-(print value (sum 10 1).
+(print sum)
+(print (sum 10 1).
 
 
 (let sumWithBase (= base
   (= (base) > (x y)
     (+ base x y).
 (let sum (sumWithBase 10000).
-(print value (sum 10 1).
+(print (sum 10 1).
 
 
 (let sumWithBase (= base
   (= (@ base: (base * 2)) > (x y)
     (+ base x y).
 (let sum (sumWithBase 10000).
-(print value (sum 10 1).
+(print (sum 10 1).
 
 
-(print value (if "" 1 2))
+(print (if "" 1 2))
 
 (let counter 10)
 (while (-- counter)
   (if (counter == 8) (continue ),
-  (print code "# counter is" counter)
+  (print "# counter is" counter)
   (if (counter == 4) (break ), # this is inline comment.
 ).
 
@@ -96,7 +96,7 @@
   (while ((++ i) != argc)
     (++ result (argv:i).
 
-(print code "# sum" (sum 1 2 3 9 100 1 "fhfgh").
+(print "# sum" (sum 1 2 3 9 100 1 "fhfgh").
 
 (let sum (= (*)
   (let i 0)
@@ -104,15 +104,15 @@
   (for (i != argc) (++ i)
     (++ result (argv:i).
 
-(print code "#sum" (sum 100 100 100).
+(print "#sum" (sum 100 100 100).
 
-(print value (let (a 12) (b 18).
+(print (let (a 12) (b 18).
 
 (let obj (@ "a": 12 b: 13).
-(print value (obj"b").
+(print (obj"b").
  #" 12312312
 
-(print value ((import "colors" "js") get-type).
+(print ((import "colors" "js") type).
 
 (exit -1 2)
 (return 0)

@@ -1,10 +1,9 @@
 'use strict'
 
-var $export = require('../export')
-
 module.exports = function space ($void) {
   var functionIn = $void.functionIn
   var runIn = $void.runIn
+  var constant = $void.constant
 
   $void.spaceCounter = 0
   $void.spaceIdentifier = 'void'
@@ -33,7 +32,7 @@ module.exports = function space ($void) {
   }
 
   function exportTo (space) {
-    $export(space.$, 'export', function export_ (key, value) {
+    constant(space.$, 'export', function export_ (key, value) {
       if (typeof key !== 'string') {
         return null
       }

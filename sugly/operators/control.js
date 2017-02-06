@@ -101,11 +101,11 @@ module.exports = function operators$control ($void) {
         }
       } catch (signal) {
         if (signal instanceof Signal) {
-          if (signal.type === 'continue') {
+          if (signal.id === 'continue') {
             result = signal.value
             continue
           }
-          if (signal.type === 'break') {
+          if (signal.id === 'break') {
             result = signal.value
             break
           }
@@ -173,11 +173,11 @@ module.exports = function operators$control ($void) {
         }
       } catch (signal) {
         if (signal instanceof Signal) {
-          if (signal.type === 'continue') {
+          if (signal.id === 'continue') {
             result = signal.value
             continue
           }
-          if (signal.type === 'break') {
+          if (signal.id === 'break') {
             result = signal.value
             break
           }
@@ -223,14 +223,14 @@ module.exports = function operators$control ($void) {
         }
       } catch (signal) {
         if (signal instanceof Signal) {
-          if (signal.type === 'continue') {
+          if (signal.id === 'continue') {
             result = signal.value
             if (runStep) {
               evaluate(step, space)
             }
             continue
           }
-          if (signal.type === 'break') {
+          if (signal.id === 'break') {
             result = signal.value
             break
           }

@@ -20,7 +20,6 @@
 
 (let let "let")
 (var var "let")
-(global global "let")
 
 (return return "return")
 (exit exit "exit")
@@ -129,7 +128,6 @@
 (not-empty not-empty)(not-empty not-empty)
 
 (compile compile)(compile compile)
-(encoder encoder)(encoder encoder)
 
 (call call)(call call)
 (apply apply)(apply apply)
@@ -159,42 +157,20 @@
 (Bool Bool -Bool Bool- "Bool" Bool)
 (String Symbol Object Function Date Array print encode uri math json runtime)
 
-# encode function group
-(encode)
-(encode )
-(encode program)
-(encode bool)
-(encode bool- )
-(encode -bool )
-(encode bool var)
-(encode number var)
-(encode string var)
-(encode symbol var)
-(encode object var)
-(encode function var)
-(encode date var)
-(encode array var)
-(encode value var)
-(encode clause var)
-
-(encode "value")
-(encode non-sugly-method)
 
 # print function group
-($print)
-($print )
-($print program)
 (print code)
 (print code-)
 (print -code)
-(print code var)
-(print value var)
-(print clause var)
-(print info var)
-(print warn var)
-
+(print var)
 (print "value" var)
 (print non-sugly-method var)
+(warn code)
+(warn code-)
+(warn -code)
+(warn code var)
+(warn "value" var)
+(warn non-sugly-method var)
 
 (math pow asa)
 

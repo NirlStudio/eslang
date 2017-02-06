@@ -20,8 +20,8 @@
 
     (let func1 (=  x (+ x 2),
     (let func2 (= x (+ x 2),
-    (assert (` ($func1 is func1),
-    (assert false (` ($func1 is func2),
+    (assert (` (:func1 is func1),
+    (assert false (` (:func1 is func2),
   ),
   (should "return true for the same values of bool, number, string and symbol" (= ()
     (let v1 true)

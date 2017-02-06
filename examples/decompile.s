@@ -1,15 +1,15 @@
 (let code (load "example.s").
-(print code "#---- code loaded ----\n" code)
+(print "#---- code loaded ----\n" code)
 
 (let p (compile code).
-(print code "\n#---- code compiled ----")
-(print program p).
+(print "\n#---- code compiled ----")
+(print (encode program p).
 
-(let code (encode program p).
-(print code "\n#---- program decompiled ----" code)
+(let code (p to-program).
+(print "\n#---- program decompiled ----" code)
 
 (let program (compile code).
-(print code "\n#---- code compiled again ----")
-(print program p).
+(print "\n#---- code compiled again ----")
+(print (encode program p).
 
 (exec p) # run it!

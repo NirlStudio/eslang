@@ -1,11 +1,12 @@
 'use strict'
 
-var $export = require('../export')
-
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var Range = $.Range
+  var constant = $void.constant
+  var readonly = $void.readonly
 
-  var iterator = $export(Range, 'Iterator', $.Class.new({}, {
+  var iterator = constant(Range, 'Iterator', $.class({
     _begin: 0,
     _end: 0,
     _step: 1,
@@ -30,10 +31,15 @@ module.exports = function ($) {
         return true
       }
       return false
+    },
+
+    'is-empty': function Range$Iterator$isEmpty () {
+      return this._step === 0 ? false
+        : this._step > 0 ? this._end > this._begin : this._end < this._begin
     }
   }))
 
-  $export(Range.proto, 'iterate', function () {
-    return iterator.create(this)
+  readonly(Range.proto, 'iterate', function () {
+    return iterator.construct(this)
   })
 }

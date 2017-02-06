@@ -1,14 +1,12 @@
 'use strict'
 
-var $export = require('../export')
-
-function boolAnd (value_of) {
+function boolAnd (valueOf) {
   return function Bool$and () {
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
       if (typeof arg !== 'boolean') {
-        arg = value_of(arg)
+        arg = valueOf(arg)
       }
       if (!arg) {
         return false
@@ -18,13 +16,13 @@ function boolAnd (value_of) {
   }
 }
 
-function boolOr (value_of) {
+function boolOr (valueOf) {
   return function Bool$or () {
     var length = arguments.length
     for (var i = 0; i < length; i++) {
       var arg = arguments[i]
       if (typeof arg !== 'boolean') {
-        arg = value_of(arg)
+        arg = valueOf(arg)
       }
       if (arg) {
         return true
@@ -37,66 +35,67 @@ function boolOr (value_of) {
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.Bool
+  var readonly = $void.readonly
 
   // evaluation & conversion logic
-  var value_of = $export(type, 'value-of', function Bool$value_of (input) {
+  var valueOf = readonly(type, 'value-of', function Bool$valueOf (input) {
     return typeof input !== 'undefined' && input !== null && input !== 0 && input !== false
   })
 
   // static boolean logic operations
-  var and = $export(type, 'and', boolAnd(value_of))
-  var or = $export(type, 'or', boolOr(value_of))
-  $export(type, 'not', function Bool$not (value) {
-    return typeof value === 'boolean' ? !value : !value_of(value)
+  var and = readonly(type, 'and', boolAnd(valueOf))
+  var or = readonly(type, 'or', boolOr(valueOf))
+  readonly(type, 'not', function Bool$not (value) {
+    return typeof value === 'boolean' ? !value : !valueOf(value)
   })
 
   // the virtual class of boolean type
   var proto = type.proto
 
   // function form logical operations
-  $export(proto, 'and', function bool$and (value) {
+  readonly(proto, 'and', function bool$and (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
-      : (typeof value === 'undefined' ? true : value_of(value)))
+      : (typeof value === 'undefined' ? true : valueOf(value)))
   })
-  $export(proto, 'or', function bool$or (value) {
+  readonly(proto, 'or', function bool$or (value) {
     return this || (arguments.length > 1 ? or.apply(null, arguments)
-      : (typeof value === 'undefined' ? false : value_of(value)))
+      : (typeof value === 'undefined' ? false : valueOf(value)))
   })
-  $export(proto, 'not', function bool$not () {
+  readonly(proto, 'not', function bool$not () {
     return !this
   })
 
   // operator form logical operations
-  $export(proto, '&&', function bool$opr_and (value) {
+  readonly(proto, '&&', function bool$oprAND (value) {
     return this && (arguments.length > 1 ? and.apply(null, arguments)
-      : (typeof value === 'undefined' ? true : value_of(value)))
+      : (typeof value === 'undefined' ? true : valueOf(value)))
   })
-  $export(proto, '||', function bool$opr_or (value) {
+  readonly(proto, '||', function bool$oprOR (value) {
     return this || (arguments.length > 1 ? or.apply(null, arguments)
-      : (typeof value === 'undefined' ? false : value_of(value)))
+      : (typeof value === 'undefined' ? false : valueOf(value)))
   })
-  $export(proto, '!', function bool$opr_not () {
+  readonly(proto, '!', function bool$oprNOT () {
     return !this
   })
 
   // persistency & description
-  $export(proto, 'to-code', function bool$to_code () {
-    return this ? 'true' : 'false'
+  readonly(proto, 'to-code', function bool$toCode () {
+    return this === true ? 'true' : 'false'
   })
-  $export(proto, 'to-string', function bool$to_string () {
-    return this ? 'true' : 'false'
+  readonly(proto, 'to-string', function bool$toString () {
+    return this === true ? 'true' : 'false'
   })
 
   // emptiness - false is the empty value
-  $export(proto, 'is-empty', function bool$is_empty () {
+  readonly(proto, 'is-empty', function bool$isEmpty () {
     return !this
   })
-  $export(proto, 'not-empty', function bool$not_empty () {
+  readonly(proto, 'not-empty', function bool$notEmpty () {
     return this
   })
 
   // support native boolean values
-  $export(proto, ':', function entity$indexer (name) {
+  readonly(proto, ':', function entity$indexer (name) {
     return typeof name !== 'string' ? null
       : (typeof proto[name] !== 'undefined' ? proto[name] : null)
   })

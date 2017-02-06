@@ -5,5 +5,5 @@
 
 (define "functions" (= ()
   (should "have function abs" (= ()
-    (assert (` ($(math "abs") is-a Function),
+    (assert (` (:(math "abs") is-a Function),
 ).

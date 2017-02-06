@@ -1,9 +1,7 @@
 'use strict'
 
-var $export = require('../export')
-
-function valueOf ($void) {
-  return function String$value_of () {
+function ceateValueOf ($void) {
+  return function String$valueOf () {
     var length = arguments.length
     var result = ''
     for (var i = 0; i < length; i++) {
@@ -15,8 +13,8 @@ function valueOf ($void) {
       if (result.length > 0 && !result.endsWith(' ')) {
         result += ' '
       }
-      var to_str = $void.get(arg, 'to-string')
-      result += typeof to_str === 'function' ? to_str.call(arg) : ''
+      var toStr = $void.indexerOf(arg).call(arg, 'to-string')
+      result += typeof toStr === 'function' ? toStr.call(arg) : ''
     }
     return result
   }
@@ -25,24 +23,31 @@ function valueOf ($void) {
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.String
+  var readonly = $void.readonly
+  var copyObject = $void.copyObject
+  var copyProto = $void.copyProto
 
   // concatenate the to-string result of arguments
-  var value_of = $export(type, 'value-of', valueOf($void))
+  var valueOf = readonly(type, 'value-of', ceateValueOf($void))
 
   // generate a string from a series of unicode values
-  $export.copy(type, String, {
+  copyObject(type, String, {
     'fromCharCode': 'of-char-codes'
   })
 
   var proto = type.proto
 
   // forward the length property.
-  $export(proto, 'length', function string$length () {
+  readonly(proto, 'length', function string$length () {
     return this.length
   })
 
+  var verify = function string$verify (value) {
+    return typeof value === 'string'
+  }
+
   // generate sub-string from this string.
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     /* CH/FF/IE/OP/SF */
     'slice': 'slice', // [start, end), supports negative values.
     'substr': 'substring', // [start, start + length)
@@ -50,7 +55,7 @@ module.exports = function ($void) {
   })
 
   // find & match substring in this string.
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     /* CH/FF/IE/OP/SF */
     'indexOf': 'index-of',
     'lastIndexOf': 'last-index-of',
@@ -63,7 +68,7 @@ module.exports = function ($void) {
   })
 
   // value converting of this string.
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     'toLocaleLowerCase': 'to-locale-lower',
     'toLocaleUpperCase': 'to-locale-upper',
 
@@ -75,25 +80,25 @@ module.exports = function ($void) {
   })
 
   // get a character or its unicode value by its offset in this string.
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     /* CH/FF/IE/OP/SF */
     'charAt': 'char-at',
     'charCodeAt': 'chat-code-at'
   })
 
   // combination and splitting of strings
-  $export(proto, 'concat', function string$concat () {
-    return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  readonly(proto, 'concat', function string$concat () {
+    return valueOf.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     'split': 'split'
   })
 
   // support general operators
-  $export(proto, '+', function string$opr_concat () {
-    return value_of.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  readonly(proto, '+', function string$oprConcat () {
+    return valueOf.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
   })
-  $export(proto, '-', function string$opr_remove (value) {
+  readonly(proto, '-', function string$oprRemove (value) {
     if (typeof value === 'string') {
       // remove value by its last index in this string.
       var offset = this.lastIndexOf(value)
@@ -112,45 +117,45 @@ module.exports = function ($void) {
   })
 
   // support ordering logic - comparable
-  $export(proto, 'compare', function string$compare (another) {
+  readonly(proto, 'compare', function string$compare (another) {
     return this === another ? 0 : (this > another ? 1 : -1)
   })
-  $export.copy(proto, String.prototype, {
+  copyProto(type, String, verify, {
     'localeCompare': 'locale-compare'
   })
 
   // support ordering operators
-  $export(proto, '>', function string$opr_gt (another) {
+  readonly(proto, '>', function string$oprGT (another) {
     return typeof another === 'string' ? this > another : false
   })
-  $export(proto, '>=', function string$opr_ge (another) {
+  readonly(proto, '>=', function string$oprGE (another) {
     return typeof another === 'string' ? this >= another : false
   })
-  $export(proto, '<', function string$opr_lt (another) {
+  readonly(proto, '<', function string$oprLT (another) {
     return typeof another === 'string' ? this < another : false
   })
-  $export(proto, '<=', function string$opr_le (another) {
+  readonly(proto, '<=', function string$oprLE (another) {
     return typeof another === 'string' ? this <= another : false
   })
 
-  // persistency & describe
-  $export(proto, 'to-code', function string$to_code () {
-    return $.encode.string(this)
-  })
-  $export(proto, 'to-string', function string$to_string () {
-    return typeof this === 'string' ? this : ''
-  })
-
   // the emptiness if string is determined by its length.
-  $export(proto, 'is-empty', function string$is_empty () {
+  readonly(proto, 'is-empty', function string$isEmpty () {
     return this.length < 1
   })
-  $export(proto, 'not-empty', function string$not_empty () {
+  readonly(proto, 'not-empty', function string$notEmpty () {
     return this.length > 0
   })
 
+  // persistency & describe
+  readonly(proto, 'to-code', function string$toCode () {
+    return JSON.stringify(typeof this === 'string' ? this : '')
+  })
+  readonly(proto, 'to-string', function string$toString () {
+    return this
+  })
+
   // indexer: override, interpret number as offset, readonly.
-  $export(proto, ':', function string$indexer (index) {
+  readonly(proto, ':', function string$indexer (index) {
     if (typeof index === 'string') {
       return typeof proto[index] !== 'undefined' ? proto[index] : null
     }
@@ -162,7 +167,7 @@ module.exports = function ($void) {
   })
 
   // override to boost - an object is always true
-  $export(proto, '?', function string$bool_test (a, b) {
+  readonly(proto, '?', function string$boolTest (a, b) {
     return typeof a === 'undefined' ? true : a
   })
 

@@ -2,9 +2,9 @@
 
 require('./lib/polyfill')
 
-module.exports = function sugly (loader, output/*, more options */) {
+module.exports = function sugly (loader/*, more options */) {
   var start = require('./sugly/start')
-  var $void = start(output)
+  var $void = start()
 
   $void.dir = __dirname
   $void.load = loader($void.$)

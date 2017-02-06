@@ -32,6 +32,7 @@
 
 (define "Object" (= ()
   (should "be an alias of type Class" (= ()
-    (assert (` (Object is Class),
     (assert (` (Object is-a Type),
+    (assert (` (Object is-not-a Class),
+    (assert (` (Class is-a Object),
 ).

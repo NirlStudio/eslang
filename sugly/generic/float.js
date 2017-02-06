@@ -1,9 +1,7 @@
 'use strict'
 
-var $export = require('../export')
-
-function valueOf () {
-  return function Float$value_of (input) {
+function createValueOf () {
+  return function Float$valueOf (input) {
     if (typeof input === 'string') {
       var value = parseFloat(input)
       return isNaN(value) ? 0.0 : value
@@ -18,19 +16,20 @@ function valueOf () {
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.Float
+  var readonly = $void.readonly
 
   // override to only accept string, null and number itself.
-  $export(type, 'value-of', valueOf())
+  readonly(type, 'value-of', createValueOf())
 
   // super type is fixed to Number
-  $export(type, 'super', function Float$super () {
+  readonly(type, 'super', function Float$super () {
     return $.Number
   })
 
   var proto = type.proto
 
   // override indexer to expose functions
-  $export(proto, ':', function float$indexer (name) {
+  readonly(proto, ':', function float$indexer (name) {
     if (typeof name === 'string') {
       return typeof proto[name] !== 'undefined' ? proto[name] : null
     }

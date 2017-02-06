@@ -8,7 +8,7 @@ A simple &amp; ugly programming language
 ```
 or
 ```sugly
-(print code "Hello, world!")
+(print "Hello, world!")
 () #reset module output
 ```
 

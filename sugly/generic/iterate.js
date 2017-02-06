@@ -1,12 +1,11 @@
 'use strict'
 
-var $export = require('../export')
-
 module.exports = function iterate ($void) {
   var $ = $void.$
+  var constant = $void.constant
 
   // generate a global iterate method which will safely generate an iterator.
-  $export($, 'iterate', function iterate (target) {
+  constant($, 'iterate', function iterate (target) {
     if (Array.isArray(target)) {
       return $.Array.proto.iterate.call(target)
     }
@@ -17,9 +16,13 @@ module.exports = function iterate ($void) {
 
     return target && typeof target === 'object' && typeof target.iterate === 'function'
       ? target.iterate() : $.Class.create({
+        // an empty iterator
         value: null,
         next: function () {
           return false
+        },
+        'is-empty': function () {
+          return true
         }
       })
   })

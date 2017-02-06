@@ -1,11 +1,10 @@
 (let data (import "sort-data").
-(print warn data)
+(warn data)
 
 (let sort (= (arr)
   (if (arr < 2) (return arr),
-
   (let (mid (arr 0)) (left (@)) (right (@),
-  (for i in (1 (arr length))
+  (for i in (range 1 (arr length))
     (let v (arr:i),
     (((v >= mid) ? right left) push v),
   ),

@@ -1,7 +1,5 @@
 'use strict'
 
-var $export = require('../export')
-
 function intParse () {
   return function Int$parse (input, radix) {
     if (typeof input !== 'string') {
@@ -26,8 +24,8 @@ function intParse () {
   }
 }
 
-function valueOf (parse) {
-  return function Int$value_of (input, radix) {
+function createValueOf (parse) {
+  return function Int$valueOf (input, radix) {
     if (typeof input === 'string') {
       return parse(input, radix)
     }
@@ -44,55 +42,56 @@ function valueOf (parse) {
 module.exports = function ($void) {
   var $ = $void.$
   var type = $.Int
+  var readonly = $void.readonly
 
   // parse an string to its integer value
-  var parse = $export(type, 'parse', intParse())
+  var parse = readonly(type, 'parse', intParse())
 
   // override to support radix argument.
-  $export(type, 'value-of', valueOf(parse))
+  readonly(type, 'value-of', createValueOf(parse))
 
   // support bitwise operations for 32-bit integer values.
-  type.MAX_BITS = Math.pow(2, 31) - 1
-  type.MIN_BITS = -Math.pow(2, 31)
+  readonly(type, 'MAX_BITS', Math.pow(2, 31) - 1)
+  readonly(type, 'MIN_BITS', -Math.pow(2, 31))
 
   // the value range of safe integer in internal floating-point representation.
-  type.MAX_VALUE = Number.MAX_SAFE_INTEGER || (Math.pow(2, 53) - 1)
-  type.MIN_VALUE = Number.MIN_SAFE_INTEGER || -(Math.pow(2, 53) - 1)
+  readonly(type, 'MAX_VALUE', Number.MAX_SAFE_INTEGER || (Math.pow(2, 53) - 1))
+  readonly(type, 'MIN_VALUE', Number.MIN_SAFE_INTEGER || -(Math.pow(2, 53) - 1))
 
   // to test a value if being in the safe integer value range.
-  $export(type, 'is-safe', Number.isSafeInteger ? function Int$is_safe (value) {
+  readonly(type, 'is-safe', Number.isSafeInteger ? function Int$isSafe (value) {
     return Number.isSafeInteger(value)
-  } : function Number$safe_int (value) {
+  } : function Number$safeInt (value) {
     return type.isInteger(value) && Math.abs(value) <= type.MAX_SAFE_INTEGER
   })
 
   var proto = type.proto
 
   // support bitwise operators for integer values
-  $export(proto, '&', function bit$and (value) {
+  readonly(proto, '&', function bit$and (value) {
     return this & value
   })
-  $export(proto, '|', function bit$or (value) {
+  readonly(proto, '|', function bit$or (value) {
     return this | value
   })
-  $export(proto, '^', function bit$xor (value) {
+  readonly(proto, '^', function bit$xor (value) {
     return this ^ value
   })
-  $export(proto, '~', function bit$not () {
+  readonly(proto, '~', function bit$not () {
     return ~this
   })
-  $export(proto, '<<', function bit$lshift (offset) {
+  readonly(proto, '<<', function bit$lshift (offset) {
     return this << offset
   })
-  $export(proto, '>>', function bit$lshift (offset) {
+  readonly(proto, '>>', function bit$lshift (offset) {
     return this >> offset
   })
-  $export(proto, '>>>', function bit$lshift (offset) {
+  readonly(proto, '>>>', function bit$lshift (offset) {
     return this >>> offset
   })
 
   // override indexer to expose functions & operators
-  $export(proto, ':', function int$indexer (name, step) {
+  readonly(proto, ':', function int$indexer (name, step) {
     if (typeof name === 'string') {
       return typeof proto[name] !== 'undefined' ? proto[name] : null
     }

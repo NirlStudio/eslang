@@ -1,12 +1,18 @@
 'use strict'
 
-var $export = require('../export')
-
-module.exports = function set ($void) {
+module.exports = function meta ($void) {
   var $ = $void.$
-  $export($, 'runtime', $.object({
-    'core': 'js',
-    'version': '0.2.0',
-    'debugging': true
-  }))
+  var object = $.object
+  var constant = $void.constant
+  var readonly = $void.readonly
+  var variable = $void.variable
+
+  var runtime = constant($, 'runtime', object())
+  readonly(runtime, 'core', 'js')
+  variable(runtime, 'debugging', true)
+
+  var version = readonly(runtime, 'version', object())
+  readonly(version, 'major', 0)
+  readonly(version, 'minor', 3)
+  readonly(version, 'build', 0)
 }

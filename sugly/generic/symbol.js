@@ -1,19 +1,17 @@
 'use strict'
 
-var $export = require('../export')
-
-var SpecialSymbol = /^[\$\`\@\:]{1}$/
-var InvalidSymbol = /[\$\`\@\:\(\)\'\"\#\,\;\\\s]/
+var SpecialSymbol = /^[$`@:]{1}$/
+var InvalidSymbol = /[$`@:()'"#,;\\\s]/
 
 function isSame (Symbol$) {
-  return function symbol$is_same (another) {
+  return function symbol$isSame (another) {
     return this === another ||
       (this.key === another.key && this instanceof Symbol$ && another instanceof Symbol$)
   }
 }
 
 function notSame (Symbol$) {
-  return function symbol$not_same (another) {
+  return function symbol$notSame (another) {
     return this !== another &&
       (this.key !== another.key || !(this instanceof Symbol$) || !(another instanceof Symbol$))
   }
@@ -22,6 +20,7 @@ function notSame (Symbol$) {
 module.exports = function ($void) {
   var $ = $void.$
   var Symbol$ = $void.Symbol
+  var readonly = $void.readonly
 
   // regex to test invalid symbol
   $void.InvalidSymbol = InvalidSymbol
@@ -34,56 +33,56 @@ module.exports = function ($void) {
   var nothing = type.Nothing = sharedSymbols[''] = new Symbol$('')
 
   // check whether a string is a valid symbol key.
-  var is_valid = $export(type, 'is-valid', function Symbol$is_valid (key) {
+  var isValid = readonly(type, 'is-valid', function Symbol$isValid (key) {
     return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
   })
 
   // a symbol can only be created from a valid symbol name (string).
-  $export(type, 'value-of', function Symbol$value_of (key) {
-    return !is_valid(key) ? nothing
+  readonly(type, 'value-of', function Symbol$valueOf (key) {
+    return !isValid(key) ? nothing
       : typeof sharedSymbols[key] !== 'undefined'
         ? sharedSymbols[key] : (sharedSymbols[key] = new Symbol$(key))
   })
 
   var proto = type.proto
 
-  $export(proto, 'key', function symbol$key () {
+  readonly(proto, 'key', function symbol$key () {
     return this.key
   })
 
   // a symbol behaves as a value entity.
-  $export(proto, 'is', isSame(Symbol$))
-  $export(proto, 'is-not', notSame(Symbol$))
+  readonly(proto, 'is', isSame(Symbol$))
+  readonly(proto, 'is-not', notSame(Symbol$))
 
-  $export(proto, 'equals', isSame(Symbol$))
-  $export(proto, 'not-equals', notSame(Symbol$))
-  $export(proto, '==', isSame(Symbol$))
-  $export(proto, '!=', notSame(Symbol$))
+  readonly(proto, 'equals', isSame(Symbol$))
+  readonly(proto, 'not-equals', notSame(Symbol$))
+  readonly(proto, '==', isSame(Symbol$))
+  readonly(proto, '!=', notSame(Symbol$))
 
   // persistency & description
-  $export(proto, 'to-code', function symbol$to_code () {
+  readonly(proto, 'to-code', function symbol$toCode () {
     return this instanceof Symbol$ ? this.key : ''
   })
-  $export(proto, 'to-string', function symbol$to_string () {
+  readonly(proto, 'to-string', function symbol$toString () {
     return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
   })
 
   // emptiness: nothing symbol is taken as the empty value.
-  $export(proto, 'is-empty', function () {
+  readonly(proto, 'is-empty', function () {
     return this.key.length < 1
   })
-  $export(proto, 'not-empty', function () {
+  readonly(proto, 'not-empty', function () {
     return this.key.length > 0
   })
 
   // indexer: general & primary predicate, readonly.
-  $export(proto, ':', function (name) {
+  readonly(proto, ':', function (name) {
     return typeof name !== 'string' ? null
       : typeof proto[name] !== 'undefined' ? proto[name] : null
   })
 
   // override to boost - an object is always true
-  $export(proto, '?', function object$bool_test (a, b) {
+  readonly(proto, '?', function object$boolTest (a, b) {
     return typeof a === 'undefined' ? true : a
   })
 }

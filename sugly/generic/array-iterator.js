@@ -1,11 +1,12 @@
 'use strict'
 
-var $export = require('../export')
-
-module.exports = function ($) {
+module.exports = function ($void) {
+  var $ = $void.$
   var $Array = $.Array
+  var constant = $void.constant
+  var readonly = $void.readonly
 
-  var iterator = $export($Array, 'Iterator', $.Class.new({}, {
+  var iterator = constant($Array, 'Iterator', $.class({
     _array: null,
     key: -1,
     value: null,
@@ -22,10 +23,15 @@ module.exports = function ($) {
 
       this.value = this._array[this.key]
       return true
+    },
+
+    'is-empty': function Array$Iterator$isEmpty () {
+      return this._array === null ||
+        this._array.length < 1 || this.key >= this._array.length
     }
   }))
 
-  $export($Array.proto, 'iterate', function array$iterate () {
-    return iterator.create(this)
+  readonly($Array.proto, 'iterate', function array$iterate () {
+    return iterator.construct(this)
   })
 }
