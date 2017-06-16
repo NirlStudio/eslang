@@ -3,10 +3,11 @@
 module.exports = function ($void, JS) {
   var $ = $void.$
   var object = $.object
-  var constant = $void.constant
+  var $export = $void.export
   var copyObject = $void.copyObject
 
-  var math = constant($, 'math', object())
+  var math = $export($, 'math', object.empty())
+  // TODO: naming & removing?
   copyObject(math, JS.Math, {
     /* basic */
     'E': 'E',
@@ -17,11 +18,6 @@ module.exports = function ($void, JS) {
     'PI': 'PI',
     'SQRT1_2': 'SQRT1_2',
     'SQRT2': 'SQRT2',
-
-    'abs': 'abs',
-    'ceil': 'ceil',
-    'floor': 'floor',
-    'round': 'round',
 
     'sin': 'sin',
     'cos': 'cos',
@@ -45,5 +41,4 @@ module.exports = function ($void, JS) {
     'log2': 'log2',
     'log10': 'log10'
   })
-  return math
 }

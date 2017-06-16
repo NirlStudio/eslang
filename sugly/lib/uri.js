@@ -3,15 +3,14 @@
 module.exports = function ($void, JS) {
   var $ = $void.$
   var object = $.object
-  var constant = $void.constant
+  var $export = $void.export
   var copyObject = $void.copyObject
 
-  var uri = constant($, 'uri', object())
+  var uri = $export($, 'uri', object.empty())
   copyObject(uri, JS, {
     'encodeURI': 'encode',
-    'encodeURIComponent': 'escape',
     'decodeURI': 'decode',
+    'encodeURIComponent': 'escape',
     'decodeURIComponent': 'unescape'
   })
-  return uri
 }

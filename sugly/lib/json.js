@@ -3,13 +3,13 @@
 module.exports = function ($void, JS) {
   var $ = $void.$
   var object = $.object
-  var constant = $void.constant
+  var $export = $void.export
   var copyObject = $void.copyObject
 
-  var json = constant($, 'json', object())
+  var json = $export($, 'json', object.empty())
+  // TODO - type adaptation
   copyObject(json, JS.JSON, {
     'stringify': 'string-of',
     'parse': 'parse'
   })
-  return json
 }
