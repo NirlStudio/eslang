@@ -2,75 +2,50 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Type = $.Type
-  var typeOf = $void.typeOf
-  var readonly = $void.readonly
-  var virtual = $void.virtual
+  var Type = $.type
+  var proto = Type.proto
+  var Type$ = $void.Type
+  var link = $void.link
+  var ownsProperty = $void.ownsProperty
+  var sharedSymbolOf = $void.sharedSymbolOf
   var isPrototypeOf = $void.isPrototypeOf
 
-  // all types will inherits here.
-  readonly(Type, 'is-a', function Type$isA (type) {
-    return typeof type === 'undefined' || type === null ? false
-      : this === type || isPrototypeOf(type, this)
-  })
-  readonly(Type, 'is-not-a', function Type$isNotA (type) {
-    return typeof type === 'undefined' || type === null ? true
-      : this !== type && !isPrototypeOf(type, this)
-  })
-  readonly(Type, 'super', function Type$super () {
-    var type = Object.getPrototypeOf(this)
-    return type === Type || isPrototypeOf(Type, type) ? type : null
+  /* The Supreme Prototype */
+  // Identity inherits null: the default identity logic.
+  // Equivalence inherits null: the identity-based equivalence logic.
+  // Ordering inherits null: the identity-based equivalence or non-sortable.
+
+  // Type Verification: override to support descendant protos.
+  link(proto, 'is-a', function (type) {
+    return this !== proto ? type === proto
+      : typeof type === 'undefined' || type === null
+  }, 'is-not-a', function (type) {
+    return this !== proto ? type !== proto
+      : typeof type !== 'undefined' && type !== null
   })
 
-  // all types and their instances will inherits here.
-  var proto = Type.proto
+  // Emptiness inherits null: all prototypes are taken as empty.
 
-  // Type Verification: to test if an entity is an instance of a type.
-  // native types should override all these logic.
-  virtual(proto, 'is-a', function entity$isA (type) {
-    var thisType = typeOf(this)
-    return thisType === type || isPrototypeOf(type, thisType)
-  })
+  // Encoding inherits null. Here means prototypes are not encodable.
 
-  virtual(proto, 'is-not-a', function entity$isNotA (type) {
-    var thisType = typeOf(this)
-    return thisType !== type && !isPrototypeOf(type, typeOf(this))
-  })
-  // Generalization: the super type is determined by the proto field.
-  virtual(proto, 'super', function entity$super () {
-    return this && this.type && typeof this.type.super === 'function'
-      ? this.type.super() : null
+  // Description
+  link(proto, 'to-string', function () { // TODO for class and device
+    return typeof this !== 'object' ? null // not a valid prototype
+      : this.type && typeof this.type.name === 'string' && this.type.name
+          ? '(' + this.type.name + ' proto)' // the prototype of a name type.
+          : '(? proto)' // the prototype of an anonymous type.
   })
 
-  // all known types should implement their own to-code logic.
-  readonly(proto, 'to-code', function entity$toCode () {
-    return '()' // differ it from 'null'
+  // Indexer
+  link(proto, ':', function (name) {
+    return typeof name !== 'string' || name === ':' ? null
+      : name === 'type' ? null // fake field
+        : (typeof proto[name] !== 'undefined' ? proto[name] : null)
   })
 
-  // all known types should implement their own describing logic.
-  virtual(proto, 'to-string', function entity$toString () {
-    return '()'
-  })
-
-  // Ordinarily, an entity will be taken as a non-empty since it's different
-  // with null. So null can be the default empty value of all entities, but a
-  // type can define its own empty entity.
-  virtual(proto, 'is-empty', function entity$isEmpty () {
-    return false
-  })
-  virtual(proto, 'not-empty', function entity$notEmpty () {
-    return true
-  })
-
-  // indexer: general & primary predicate.
-  // any entity can have the capabilities of Type.proto at least.
-  readonly(proto, ':', function entity$indexer (name) {
-    return typeof name !== 'string' ? null
-      : typeof this[name] !== 'undefined' ? this[name] : null
-  })
-
-  // common logical predicates to serve all null and entities.
-  virtual(proto, '?', function enity$boolTest (a, b) {
+  // Boolean Test: shared for all non-null values.
+  // TODO - convert to an operator
+  link(proto, '?', function (a, b) {
     if (typeof a === 'undefined') {
       // booleanize
       a = true; b = false
@@ -81,7 +56,60 @@ module.exports = function ($void) {
     // A-B test
     return this !== 0 && this !== false ? a : b
   })
-  virtual(proto, '??', function enity$nullFallback () {
-    return this
+
+  // Null Fallback: shared for non-null values.
+  // TODO - convert to an operator
+  link(proto, '??', function () {
+    return typeof this === 'undefined' ? null : this
+  })
+
+  /* The Primal Type */
+  // Identity inherits type.proto.
+  // Equivalence inherits type.proto.
+  // Ordering inherits type.proto.
+
+  // Type Verification: shared for all instantiable types.
+  // the primal type is a prototype.
+  // Another instantiable type is a type.
+  link(Type, 'is-a', function (type) {
+    return type === (this === Type ? proto : Type)
+  }, 'is-not-a', function (type) {
+    return type !== (this === Type ? proto : Type)
+  })
+
+  // Type Hierarchy: shared for all types.
+  // retrieve the most recent super type of a type.
+  link(Type, 'super', function () {
+    return this instanceof Type$ ? Object.getPrototypeOf(this) : null
+  })
+  // test if a type is a specific type or its descendant.
+  link(Type, 'is-of', function (type) {
+    return this === type || isPrototypeOf(type, this)
+  }, 'is-not-of')
+
+  // Emptiness: shared by all types
+  // a type is not taken as empty.
+  link(Type, 'is-empty', function () {
+    return false
+  }, 'not-empty', function () {
+    return true
+  })
+
+  // Encoding: shared for all global types.
+  link(Type, 'to-code', function () {
+    return this instanceof Type$ && ownsProperty(this, proto)
+      ? sharedSymbolOf(this.name) : null
+  })
+
+  // Description: shared for all global types.
+  link(Type, 'to-string', function () {
+    return this && typeof this.name === 'string' ? this.name : null
+  })
+
+  // Indexer: only for the primal type.
+  link(Type, ':', function (name) {
+    return typeof name !== 'string' || name === ':' ? null
+      : name === 'type' ? this === Type ? proto : Type // fake field
+        : (typeof Type[name] !== 'undefined' ? Type[name] : null)
   })
 }

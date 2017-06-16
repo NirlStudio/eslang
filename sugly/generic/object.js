@@ -1,72 +1,68 @@
 'use strict'
 
-function createObject ($void) {
-  var isPrototypeOf = $void.isPrototypeOf
-  var $Object = $void.$.Object
+function createObjectOf ($void) {
+  var Type = $void.$.object
+  var Object$ = $void.Object
+  var ObjectType$ = $void.ObjectType
 
-  return function Object$create () {
-    var parent = this === $Object || (isPrototypeOf($Object, this) &&
-      isPrototypeOf($Object.proto, this.proto)) ? this : $Object
-
-    var obj = Object.create(parent.proto)
-    if (arguments.length > 0) {
-      var args = [obj]
-      Array.prototype.push.apply(args, arguments)
-      Object.assign.apply(Object, args)
+  return function () {
+    var type = this === Type || this instanceof ObjectType$ ? this : Type
+    var obj = Object.create(type.proto)
+    for (var i = 0; i < arguments.length; i++) {
+      var src = arguments[i]
+      if (src instanceof Object$) {
+        Object.assign(obj, src)
+      }
     }
     return obj
   }
 }
 
 function removeField ($void) {
+  var Object$ = $void.Object
   var ownsProperty = $void.ownsProperty
 
-  return function object$removeField (name) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    var value
-    if (ownsProperty(this, name)) {
-      value = this[name]
+  return function (name) {
+    if (name && typeof name === 'string' &&
+        this instanceof Object$ && ownsProperty(this, name)) {
+      var value = this[name]
       delete this[name]
-    } else {
-      value = null
+      return typeof value === 'undefined' ? null : value
     }
-    return value
+    return null
   }
 }
 
-function setProperty () {
-  return function object$setProperty (name, value) {
-    if (typeof name !== 'string') {
-      return null
-    }
-    return (this[name] = (typeof value === 'undefined' ? null : value))
-  }
-}
-
-function combine (create) {
-  return function object$combine () {
+function combine (objectOf) {
+  return function () {
     var objs = [this]
     Array.prototype.push.apply(objs, arguments)
-    return create.apply(null, objs)
+    return objectOf.apply(null, objs)
   }
 }
 
-function merge () {
-  return function object$merge () {
-    if (typeof this === 'object' && this !== null) {
+function merge ($void) {
+  var Object$ = $void.Object
+
+  return function () {
+    if (this instanceof Object$) {
       for (var i = 0; i < arguments.length; i++) {
-        Object.assign(this, arguments[i])
+        var obj = arguments[i]
+        if (obj instanceof Object$) {
+          Object.assign(this, obj)
+        }
       }
+      return this
     }
-    return this
+    return null
   }
 }
 
-function objectCopy () {
-  return function object$copy () {
-    if (typeof this === 'object' && this !== null) {
+function copy ($void) {
+  var Object$ = $void.Object
+
+  return function () {
+    if (this instanceof Object$) {
       var obj = Object.create(Object.getPrototypeOf(this))
       Object.assign(obj, this)
       return obj
@@ -75,206 +71,284 @@ function objectCopy () {
   }
 }
 
-function toCodeAsRoot (obj, ctx) {
-  analyzeObject(obj, ctx)
-  ctx.analyzed = true
+function iterator ($void) {
+  var Object$ = $void.Object
 
-  // update status for this object.
-  var status = ctx.generating(obj)
-  var code = objectToCode(obj, ctx)
-  if (ctx.count() > 0) { // use ctx result
-    if (status.key) {
-      return ctx.end('(' + status.key + ' += ' + code + ')') // update
-    } else {
-      return ctx.end(code)
+  return function () {
+    if (!(this instanceof Object$)) {
+      return null
     }
-  } else {
-    return code // no nested object, return code directly
-  }
-}
-
-function toCodeAsChild (obj, ctx) {
-  if (!ctx.analyzed) { // in analyzing
-    switch (ctx.analyze(obj)) {
-      case 0: // not repeated yet.
-        return analyzeObject(obj, ctx)
-      case 1: // repeated once
-        return ctx.create(obj, '(@:)')
-      default: // more than once
-        return // do nothing
+    var fields = Object.getOwnPropertyNames(this)
+    var index = 0
+    return function (inSitu) {
+      if (index >= fields.length) {
+        return null
+      }
+      return typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
+        ? fields[index] : fields[index++]
     }
   }
-
-  // generating code
-  var status = ctx.generating(obj)
-  if (!status.key) { // single occurrence
-    return objectToCode(obj, ctx)
-  }
-  if (status.stage === 1) { // repeated first time.
-    ctx.update('(' + status.key + ' += ' + objectToCode(obj, ctx) + ')')
-  }
-  // generated before, so here returns variable name only.
-  return status.key
-}
-
-function analyzeObject (obj, ctx) {
-  Object.getOwnPropertyNames(obj).forEach(function analyzeField (name) {
-    var value = obj[name]
-    if (value !== null && (typeof value === 'object' ||
-      typeof value === 'function')) {
-      ctx.toCode(value)
-    }
-  })
-}
-
-function objectToCode (obj, ctx) {
-  var type = ctx.toCode(obj.type, '') || 'Object'
-  var begin, end
-  if (type && type !== 'Object' && type !== 'Class') {
-    begin = '(' + type + ' create (@'
-    end = '))'
-  } else {
-    begin = '(@'
-    end = ')'
-  }
-  var code = [begin]
-  Object.getOwnPropertyNames(obj).forEach(function printField (name) {
-    code.push(name + ': ' + ctx.toCode(obj[name], '()'))
-  })
-  code.push(end)
-  return code.join(ctx.asCompat ? ' ' : '\n')
 }
 
 module.exports = function ($void) {
   var $ = $void.$
-  var $Object = $.Object
-  var proto = $Object.proto
-  var readonly = $void.readonly
-  var virtual = $void.virtual
+  var Type = $.object
+  var $Tuple = $.tuple
+  var $Symbol = $.symbol
+  var link = $void.link
+  var typeOf = $void.typeOf
+  var Tuple$ = $void.Tuple
+  var Object$ = $void.Object
+  var thisCall = $void.thisCall
+  var ObjectType$ = $void.ObjectType
+  var CodingContext$ = $void.CodingContext
+  var typeIndexer = $void.typeIndexer
   var ownsProperty = $void.ownsProperty
+  var nativeIndexer = $void.nativeIndexer
+  var encodingTypeOf = $void.encodingTypeOf
+
+  // create an empty object.
+  link(Type, 'empty', function () {
+    return new Object$()
+  })
 
   // create a new object and copy properties from source objects.
-  readonly($Object, 'create', createObject($void))
+  var objectOf = link(Type, 'of', createObjectOf($void))
 
-  // orverride helper functions to test equivalency.
-  virtual(proto, 'not-equals', function object$notEquals (another) {
-    if (typeof this.equals === 'function') {
-      return this.equals(another) !== true
-    }
-    return this !== (typeof another === 'undefined' ? null : another)
-  })
-  virtual(proto, '==', function object$oprEquals (another) {
-    if (typeof this.equals === 'function') {
-      return this.equals(another) === true
-    }
-    return this === (typeof another === 'undefined' ? null : another)
-  })
-  virtual(proto, '!=', function object$oprNotEquals (another) {
-    if (typeof this.equals === 'function') {
-      return this.equals(another) !== true
-    }
-    return this !== (typeof another === 'undefined' ? null : another)
-  })
+  // Indexer for object type itself.
+  typeIndexer(Type)
+
+  var proto = Type.proto
+  // to create a shallow copy of this instance with the same type.
+  link(proto, 'copy', copy($void))
+
+  // generate an iterator function
+  link(proto, 'iterate', iterator($void))
+
+  // generate a new object by comine this object and other objects.
+  link(proto, '+', combine(objectOf))
+
+  // shallowly copy fields from other objects to this object.
+  link(proto, '+=', merge($void))
 
   // object property & field (owned property) manipulation
   // retrieve field names
-  virtual(proto, 'get-fields', function object$getFields () {
-    return Object.getOwnPropertyNames(this)
+  link(proto, 'get-fields', function () {
+    return this instanceof Object$ ? Object.getOwnPropertyNames(this) : []
   })
   // test the existence by a field name
-  virtual(proto, 'has-field', function object$hasField (name) {
-    return typeof name !== 'string' ? null : ownsProperty(this, name)
+  link(proto, 'has-field', function (name) {
+    return this instanceof Object$ && typeof name === 'string' && name !== ':'
+      ? ownsProperty(this, name) : false
   })
-  // remove a field from an object
-  virtual(proto, 'remove-field', removeField($void))
-  // test a property (either owned or inherited) name
-  virtual(proto, 'has-property', function object$hasProperty (name) {
-    return typeof name !== 'string' ? false : typeof this[name] !== 'undefined'
-  })
-  // retrieve the value of a property
-  virtual(proto, 'get-property', function object$getProperty (name) {
-    return typeof name !== 'string' ? null
-      : typeof this[name] !== 'undefined' ? this[name] : null
+  // retrieve the value of a field
+  link(proto, 'get-field', function (name) {
+    return this instanceof Object$ && typeof name === 'string' && name !== ':' &&
+      typeof this[name] !== 'undefined' && ownsProperty(this, name)
+        ? this[name] : null
   })
   // set the value of a field
-  virtual(proto, 'set-property', setProperty())
-
-  // to create a shallow copy of this instance with the same type.
-  virtual(proto, 'copy', objectCopy())
-
-  // support general operators
-  // generate a new object by comine this object and other objects.
-  virtual(proto, '+', combine($Object.create))
-  // shallowly copy fields from other objects to this object.
-  virtual(proto, '+=', merge(proto))
-
-  // default object emptiness logic
-  virtual(proto, 'is-empty', function object$isEmpty () {
-    return Object.getOwnPropertyNames(this).length > 0
+  var setField = link(proto, 'set-field', function (name, value) {
+    return this instanceof Object$ && typeof name === 'string' &&
+        name && name !== ':' && name !== 'type' && name !== 'to-code'
+      ? (this[name] = (typeof value === 'undefined' ? null : value))
+      : null
   })
-  virtual(proto, 'not-empty', function object$notEmpty () {
-    if (typeof this['is-empty'] === 'function') {
-      return this['is-empty']() !== true
-    }
-    return Object.getOwnPropertyNames(this).length < 1
-  })
+  // remove a field from an object
+  link(proto, 'remove-field', removeField($void))
 
-  // default object persistency & describing logic
-  var coding = $void.coding
-  readonly(proto, 'to-code', function object$toCode (asCompat) {
-    if (this === null || typeof this !== 'object') {
-      return '(@:)'
-    }
-    return coding.is(asCompat) ? toCodeAsChild(this, asCompat)
-      : toCodeAsRoot(this, coding.start(this, asCompat))
+  // test if a property (either owned or inherited) exists
+  link(proto, 'has-property', function (name) {
+    return (this instanceof Object$ || typeOf(this) instanceof ObjectType$) &&
+        typeof name === 'string' && name !== ':'
+      ? typeof this[name] !== 'undefined' : false
+  })
+  // retrieve the value of a property
+  var getProperty = link(proto, 'get-property', function (name) {
+    return (this instanceof Object$ || typeOf(this) instanceof ObjectType$) &&
+        typeof name === 'string' && name !== ':' &&
+      typeof this[name] !== 'undefined' ? this[name] : null
   })
 
-  virtual(proto, 'to-string', function object$toString () {
-    if (!this || typeof this !== 'object') {
-      return '()'
+  // test if a property exists and is an operation
+  link(proto, 'has-operation', function (name) {
+    return (this instanceof Object$ || typeOf(this) instanceof ObjectType$) &&
+        typeof name === 'string' && name !== ':'
+      ? typeof this[name] === 'function'
+      : false
+  })
+  // retrieve a property if it's an operation.
+  link(proto, 'get-operation', function (name) {
+    return (this instanceof Object$ || typeOf(this) instanceof ObjectType$) &&
+        typeof name === 'string' && name !== ':' &&
+      typeof this[name] === 'function' ? this[name] : null
+  })
+
+  // Identity: override the negative logic to use current positive one.
+  link(proto, 'is-not', function (another) {
+    return this && typeof this.is === 'function'
+      ? this.is(another) : !Object.is(this, another)
+  })
+  // Equivalence: override the operator to use current equals function.
+  link(proto, '==', function object$oprEquals (another) {
+    return this && typeof this.equals === 'function'
+      ? this.equals(another) : Object.is(this, another)
+  })
+  // orverride the negative testing to use the positive one.
+  link(proto, ['not-equals', '!='], function (another) {
+    return this && typeof this.equals === 'function'
+      ? this.equals(another) : !Object.is(this, another)
+  })
+
+  // Type Verification
+  link(proto, 'is-a', function (t) {
+    var type = typeOf(this)
+    return t === type || t === Type || (isPrototypeOf(Type, t) &&
+      isPrototypeOf(t, type) && ownsProperty(t, 'proto'))
+  }, 'is-not-a', function (t) {
+    var type = typeOf(this)
+    return t !== type && t !== Type && (!isPrototypeOf(Type, t) ||
+      !isPrototypeOf(t, type) || ownsProperty(t, 'proto'))
+  })
+  // check if this object complys to a template object.
+  link(proto, 'as', function (template) {
+    if (!(this instanceof Object$) || !(template instanceof Object$)) {
+      return false
     }
-    var fields = ['(@']
-    Object.getOwnPropertyNames(this).forEach(function printField (name) {
-      var value = this[name]
-      if (value === null) {
-        fields.push('  ' + name + ': null')
-      } else if (typeof value !== 'object' || value instanceof Date) {
-        fields.push('  ' + name + ': ' + coding.toString(value))
-      } else {
-        if (value.type && value.type.name) {
-          fields.push('  ' + name + ': (' + value.type.name.toLowerCase() + ' )')
-        } else {
-          fields.push('  ' + name + ': (@:)')
+    var fields = Object.getOwnPropertyNames(template)
+    for (var i = 0; i < fields.length; i++) {
+      var field = fields[i]
+      var value = this[field]
+      if (typeof value === 'undefined' || value === null) {
+        return false
+      }
+      var tvalue = template[field]
+      if (tvalue !== null) {
+        var type = typeOf(value)
+        if (!thisCall(type, 'is-of', tvalue) &&
+          !thisCall(type, 'is-of', typeOf(tvalue))) {
+          return false
         }
       }
-    }, this)
+    }
+    return true
+  })
+
+  // default object emptiness logic
+  link(proto, 'is-empty', function () {
+    return this instanceof Object$
+      ? Object.getOwnPropertyNames(this).length < 1 : null
+  }, 'not-empty', function () { // use the positive function if it does exist.
+    return this && typeof this['is-empty'] === 'function' ? this['is-empty']()
+      : this instanceof Object$
+        ? Object.getOwnPropertyNames(this).length > 0 : null
+  })
+
+  // Encoding
+  // add an overridable method to report persistent fields.
+  // null: to be encoded to as null.
+  //   []: an empty arrry indicates to be encoded to an empty object.
+  link(proto, 'resolve', null)
+  // an overriable method to report the expected encoding type.
+  link(proto, 'encoding-type', null)
+  // encoding logic for all object instances.
+  link(proto, 'to-code', function (ctx) {
+    if (!(this instanceof Object$)) {
+      return null // illegal call.
+    }
+    // customized objects can hide some or all fields.
+    var fields = typeof this.resolve === 'function'
+      ? this.resolve() : Object.getOwnPropertyNames(this)
+    if (!Array.isArray(fields)) {
+      return null // this is an volatile entity.
+    }
+    // customized objects can replace its type in encoding.
+    var type = encodingTypeOf(
+      typeof this['encoding-type'] === 'function'
+        ? this['encoding-type']() : this.type
+    )
+    // an empty object.
+    if (fields.length < 1) {
+      return type === Type ? $Tuple.object
+        : $Tuple.of($Symbol.object, $Symbol.pairing, type['to-code']())
+    }
+    // this is a compound object.
+    if (ctx instanceof CodingContext$) {
+      var sym = ctx.touch(this, type)
+      if (sym) {
+        return sym
+      }
+      return encodeObject(ctx, this, type, fields)
+    } else { // as root
+      ctx = new CodingContext$()
+      ctx.touch(this, type)
+      var code = encodeObject(ctx, this, type, fields)
+      return ctx.final(code)
+    }
+  })
+
+  function encodeObject (ctx, obj, type, fields) {
+    var list = [$Symbol.object, $Symbol.pairing] // (@: ...
+    if (type !== Type) { // a special object
+      list.push(type['to-code']()) // (@:type)
+    }
+    for (var i = 0; i < fields.length; i++) {
+      var name = fields[i]
+      var value = obj[name]
+      var vtype = typeOf(value)
+      var code = vtype === Type || vtype instanceof ObjectType$
+        ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code')
+      list.push($Symbol.of(name), $Symbol.pairing, code)
+    }
+    return ctx.complete(obj, new Tuple$(list))
+  }
+
+  // Description
+  link(proto, 'to-string', function () {
+    if (!(this instanceof Object$)) {
+      return this && typeof this === 'object' ? '(@:genric)' : null
+    }
+    // type
+    var fields = ['(@']
+    if (this.type !== Type) {
+      fields.push(':' + this.type['to-string']())
+    }
+    // fields
+    Object.getOwnPropertyNames(this).forEach(function (name) {
+      var value = this[name]
+      var valueType = typeOf(value)
+      if (valueType === Type || valueType instanceof ObjectType$) {
+        // prevent recursive call.
+        fields.push('  ' + name + ': (@:' + valueType['to-string']() + ' ... )')
+      } else {
+        fields.push('  ' + name + ': ' + thisCall(value, 'to-string'))
+      }
+    })
     fields.push(')')
     return fields.join('\n')
   })
 
-  // indexer: override to implement setter.
-  readonly(proto, ':', function object$indexer (name, value) {
-    if (typeof name !== 'string') {
+  // Indexer:
+  // an object can provide a customized indexer.
+  link(proto, 'indexer', null)
+  nativeIndexer(Type, Object, Object$, function (name, value) {
+    if (!(this instanceof Object$) || name === ':') {
       return null
     }
-    switch (arguments.length) {
-      case 1:
-        value = this[name]
-        return typeof value !== 'undefined' ? value
-          : typeof proto[name] === 'undefined' ? null : proto[name]
-      case 2:
-        return (this[name] = (typeof value === 'undefined' ? null : value))
-      default:
-        return null
+    // global static properties.
+    if (name === 'type') {
+      return this.type
+    } else if (name === 'to-code') {
+      return this.type.proto['to-code'] // to keep the to-code mechanisim consistent.
     }
+    // try to forward to user's indexer
+    if (typeof this.indexer === 'function') {
+      return this.indexer(name, value)
+    }
+    // default read/write behaviour
+    return !name || typeof name !== 'string' ? null
+      : typeof value === 'undefined'
+        ? getProperty.call(this, name, value)
+        : setField.call(this, name, value)
   })
-
-  // override to boost - an object is always true
-  virtual(proto, '?', function object$boolTest (a, b) {
-    return typeof a === 'undefined' ? true : a
-  })
-
-  // export to system's prototype
-  $void.injectTo(Object, 'type', $Object)
-  $void.injectTo(Object, ':', proto[':'])
 }

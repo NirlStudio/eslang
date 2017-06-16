@@ -1,309 +1,180 @@
 'use strict'
 
-function onDate () {
-  return function Date$on (year, month, day, hour, minute, second, millisecond) {
-    year = Number.isInteger(year) ? year : 1970
-    month = Number.isInteger(month) ? month : 0
-    day = Number.isInteger(day) ? day : 0
-    hour = Number.isInteger(hour) ? hour : 0
-    minute = Number.isInteger(minute) ? minute : 0
-    second = Number.isInteger(second) ? second : 0
-    millisecond = Number.isInteger(millisecond) ? millisecond : 0
-    return new Date(year, month, day, hour, minute, second, millisecond)
-  }
-}
-
-function equals () {
-  return function date$equals (another) {
-    if (!(another instanceof Date)) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time === another.getTime()
-  }
-}
-
-function notEquals () {
-  return function date$notEquals (another) {
-    if (!(another instanceof Date)) {
-      return true
-    }
-    var time = this.getTime()
-    return typeof time !== 'number' || time !== another.getTime()
-  }
-}
-
-function dateIndexer (proto) {
-  return function date$indexer (index, value) {
-    // forward to default object indexer
-    if (typeof index === 'string') {
-      // read only
-      return typeof proto[index] === 'undefined' ? null : proto[index]
-    } else if (typeof index !== 'number') {
-      return null
-    }
-    // try to retrieve value by field offset.
-    if (arguments.length < 1) {
-      return null
-    }
-    if (arguments.length === 1) {
-      switch (index) {
-        case 0:
-          return this.getFullYear()
-        case 1:
-          return this.getMonth()
-        case 2:
-          return this.getDate()
-        case 3:
-          return this.getHours()
-        case 4:
-          return this.getMinutes()
-        case 5:
-          return this.getSeconds()
-        case 6:
-          return this.getMilliseconds()
-        default:
-          return null
-      }
-    }
-    // try to set value by field offset
-    if (typeof value !== 'number') {
-      return this
-    }
-    switch (index) {
-      case 0:
-        this.setFullYear(value)
-        break
-      case 1:
-        this.setMonth(value)
-        break
-      case 2:
-        this.setDate(value)
-        break
-      case 3:
-        this.setHours(value)
-        break
-      case 4:
-        this.setMinutes(value)
-        break
-      case 5:
-        this.setSeconds(value)
-        break
-      case 6:
-        this.setMilliseconds(value)
-        break
-    }
-    return this
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
-  var type = $.Date
-  var readonly = $void.readonly
+  var Type = $.date
+  var $Number = $.number
+  var Integer$ = $void.Integer
+  var link = $void.link
   var copyProto = $void.copyProto
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var nativeIndexer = $void.nativeIndexer
+  var numberCompare = $Number.compare
 
-  // create a date value from a timestamp - milliseconds basing on 1970-1-1 0:0:0.
-  readonly(type, 'value-of', function Date$valueOf (time) {
-    if (typeof time === 'undefined') {
-      return new Date()
+  // empty value
+  link(Type, 'empty', new Date(0))
+
+  // get current time or the time as a string, a timestamp or data fields.
+  link(Type, 'of', function (a, b, c, d, e, f, g) {
+    switch (arguments.length) {
+      case 0: // now
+        return new Date()
+      case 1: // string or timestamp
+        return new Date(a)
+      default: // field values
+        return new Date(a, b, c, d, e, f, g)
     }
-    return typeof time === 'number' && !isNaN(time) ? new Date(time) : new Date(0)
   })
 
   // get current time as a date object.
-  readonly(type, 'now', function Date$now () {
+  link(Type, 'now', function () {
     return new Date()
   })
+
   // get current time as its timestamp value.
-  readonly(type, 'time', function Date$time () {
+  link(Type, 'time', function () {
     return (new Date()).getTime()
   })
 
-  // compose a date object with values of its fields
-  readonly(type, 'on', onDate())
-
   // compose a date object with utc values of its fields
-  readonly(type, 'utc', function Date$utc () {
-    var time = Date.UTC.apply(Date.UTC, arguments)
-    return new Date(typeof time === 'number' && !isNaN(time) ? time : 0)
+  link(Type, 'utc', function () {
+    return Date.UTC.apply(Date.UTC, arguments)
   })
 
   // parse a date/time string representation to a date object.
-  readonly(type, 'parse', function Date$parse (str) {
-    if (typeof str !== 'string') {
-      return new Date(0)
-    }
-    var date = new Date(str)
-    return isNaN(date.getTime()) ? new Date(0) : date
+  link(Type, 'parse', function (str) {
+    return typeof str !== 'string' ? new Date(NaN) : new Date(str)
   })
 
-  // date/time value manipulation.
-  var proto = type.proto
+  typeIndexer(Type)
 
-  // TODO - to be revised & remove some unnecessary functions.
-  copyProto(type, Date, function (date) {
+  var proto = Type.proto
+
+  // test if this is a valid date.
+  link(proto, 'is-valid', function () {
+    return this instanceof Date ? !isNaN(this.getTime()) : null
+  }, 'is-not-valid', function () {
+    return this instanceof Date ? isNaN(this.getTime()) : null
+  })
+
+  // TODO - refactoring to less functions.
+  copyProto(Type, Date, function (date) {
     return date instanceof Date
   }, {
     /* Chrome, IE, Firefox */
-    'getDate': 'get-day',
-    'getDay': 'get-week-day',
-    'getFullYear': 'get-year',
-    'getHours': 'get-hours',
-    'getMilliseconds': 'get-milliseconds',
-    'getMinutes': 'get-minutes',
-    'getMonth': 'get-month',
-    'getSeconds': 'get-seconds',
+    'getDate': 'day',
+    'getDay': 'week-day',
+    'getFullYear': 'year',
+    'getHours': 'hours',
+    'getMilliseconds': 'milliseconds',
+    'getMinutes': 'minutes',
+    'getMonth': 'month',
+    'getSeconds': 'seconds',
 
     'getTime': 'time',
-    'getTimezoneOffset': 'get-timezone-offset',
+    'getTimezoneOffset': 'timezone-offset',
 
-    'getUTCDate': 'get-utc-day',
-    'getUTCDay': 'get-utc-week-day',
-    'getUTCFullYear': 'get-utc-year',
-    'getUTCHours': 'get-utc-hours',
-    'getUTCMilliseconds': 'get-utc-milliseconds',
-    'getUTCMinutes': 'get-utc-minutes',
-    'getUTCMonth': 'get-utc-month',
-    'getUTCSeconds': 'get-utc-seconds',
-
-    'setDate': 'set-day',
-    'setFullYear': 'set-year',
-    'setHours': 'set-hours',
-    'setMilliseconds': 'set-milliseconds',
-    'setMinutes': 'set-minutes',
-    'setMonth': 'set-month',
-    'setSeconds': 'set-seconds',
-
-    'setTime': 'set-time',
-
-    'setUTCDate': 'set-utc-day',
-    'setUTCFullYear': 'set-utc-year',
-    'setUTCHours': 'set-utc-hours',
-    'setUTCMilliseconds': 'set-utc-milliseconds',
-    'setUTCMinutes': 'set-utc-minutes',
-    'setUTCMonth': 'set-utc-month',
-    'setUTCSeconds': 'set-utc-seconds',
+    'getUTCDate': 'utc-day',
+    'getUTCDay': 'utc-week-day',
+    'getUTCFullYear': 'utc-year',
+    'getUTCHours': 'utc-hours',
+    'getUTCMilliseconds': 'utc-milliseconds',
+    'getUTCMinutes': 'utc-minutes',
+    'getUTCMonth': 'utc-month',
+    'getUTCSeconds': 'utc-seconds',
 
     'toDateString': 'to-date-string',
-    'toISOString': 'to-iso-string', // IE9
-    'toJSON': 'to-json',
-
-    'toLocaleDateString': 'to-locale-date-string', // [options *]
-    'toLocaleString': 'to-locale-string', // [options *]
-    'toLocaleTimeString': 'to-locale-time-string', // [options *]
-
-    'toString': 'to-string',
     'toTimeString': 'to-time-string',
+    'toISOString': 'to-iso-string', // IE9
     'toUTCString': 'to-utc-string'
   })
 
-  // override copy function
-  readonly(proto, 'copy', function date$clone () {
-    return new Date(this.getTime())
-  })
-
   // support & override general operators
-  readonly(proto, '+', function date$oprCombine (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
+  link(proto, '+', function (milliseconds) {
+    if (milliseconds instanceof Integer$) {
+      milliseconds = milliseconds.number
     }
-    var time = this.getTime() + milliseconds
-    return new Date(time)
+    return this instanceof Date
+      ? typeof milliseconds !== 'number' ? this
+        : new Date(this.getTime() + milliseconds)
+      : null
   })
-  readonly(proto, '+=', function date$oprMerge (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
+  link(proto, '-', function (dateOrTime) {
+    if (dateOrTime instanceof Integer$) {
+      dateOrTime = dateOrTime.number
     }
-    var time = this.getTime() + milliseconds
-    this.setTime(time)
-    return this
-  })
-  readonly(proto, '-', function date$oprSubstract (dateOrTime) {
-    if (typeof dateOrTime === 'number') {
-      var time = this.getTime() - dateOrTime
-      return new Date(time)
-    } else if (dateOrTime instanceof Date) {
-      return this.getTime() - dateOrTime.getTime()
-    }
-    return this
-  })
-  readonly(proto, '-=', function date$oprDeduct (milliseconds) {
-    if (typeof milliseconds !== 'number') {
-      return this
-    }
-    var time = this.getTime() - milliseconds
-    this.setTime(time)
-    return this
+    return this instanceof Date
+      ? typeof dateOrTime === 'number'
+        ? new Date(this.getTime() - dateOrTime)
+        : dateOrTime instanceof Date
+          ? this.getTime() - dateOrTime.getTime() : this
+      : null
   })
 
-  // support ordering logic - comparable
-  readonly(proto, 'compare', function date$compare (another) {
-    var diff = this.getTime() - another.getTime()
-    return diff === 0 ? 0 : diff / Math.abs(diff)
+  // Ordering: date comparison
+  var compare = link(proto, 'compare', function (another) {
+    return this instanceof Date && another instanceof Date
+      ? numberCompare.call(this.getTime(), another.getTime())
+      : null // invalid type.
   })
 
-  // support ordering operators
-  readonly(proto, '>', function date$oprGT (another) {
-    if (!(another instanceof Date)) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time > another.getTime()
-  })
-  readonly(proto, '>=', function date$oprGE (another) {
-    if (!(another instanceof Date)) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time >= another.getTime()
-  })
-  readonly(proto, '<', function date$oprLT (another) {
-    if (!(another instanceof Date)) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time < another.getTime()
-  })
-  readonly(proto, '<=', function date$oprLE (another) {
-    if (!(another instanceof Date)) {
-      return false
-    }
-    var time = this.getTime()
-    return typeof time === 'number' && time <= another.getTime()
+  // override Identity and Equivalence logic to test by timestamp value
+  link(proto, ['is', 'equals', '=='], function (another) {
+    return this === another || compare.call(this, another) === 0
+  }, ['is-not', 'not-equals', '!='], function (another) {
+    return this !== another && compare.call(this, another) !== 0
   })
 
-  // override equivalence logic
-  readonly(proto, 'equals', equals())
-  readonly(proto, 'not-equals', notEquals())
+  // ordering operators for instance values
+  link(proto, '>', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order > 0 : null
+  })
+  link(proto, '>=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order >= 0 : null
+  })
+  link(proto, '<', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order < 0 : null
+  })
+  link(proto, '<=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order <= 0 : null
+  })
+
+  // Type Verification
+  typeVerifier(Type)
 
   // emptiness is defined to the 0 value of timestamp.
-  readonly(proto, 'is-empty', function date$isEmpty () {
-    return this.getTime() === 0
-  })
-  readonly(proto, 'not-empty', function date$notEmpty () {
-    return this.getTime() !== 0
-  })
-
-  // persistency
-  readonly(proto, 'to-code', function date$toCode () {
+  link(proto, 'is-empty', function () {
     if (this instanceof Date) {
-      var time = this.getTime()
-      if (typeof time === 'number') {
-        return '(date ' + time + ')'
-      }
+      var ts = this.getTime()
+      return ts === 0 || isNaN(ts)
     }
-    return '(date 0)'
+    return null
+  }, 'not-empty')
+
+  // Encoding
+  link(proto, 'to-code', function () {
+    return this instanceof Date ? this : null
   })
 
-  // indexer: overridding, interpret number value as field offset.
-  readonly(proto, ':', dateIndexer(proto))
+  // Representation for instance & description for proto itself.
+  link(proto, 'to-string', function (format) {
+    if (this instanceof Date) {
+      if (format) {
+        // TODO - for display
+        return this.toString()
+      }
+      // as source code
+      // TODO - revise to keep TZ & locale ? or use timestamp?
+      return '(date of ' + JSON.stringify(this) + ')'
+    }
+    return null
+  })
 
-  // override equivalence operators
-  readonly(proto, '==', equals())
-  readonly(proto, '!=', notEquals())
-
-  // export to system's prototype
-  $void.injectTo(Date, 'type', type)
-  $void.injectTo(Date, ':', proto[':'])
+  // Indexer for proto and instances
+  nativeIndexer(Type, Date, Date)
 }

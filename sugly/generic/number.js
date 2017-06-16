@@ -1,29 +1,37 @@
 'use strict'
 
-function createValueOf () {
-  return function Number$valueOf (input) {
+function createValueOf ($void, parse) {
+  var Integer$ = $void.Integer
+
+  return function (input, defaultValue) {
+    var value
     if (typeof input === 'string') {
-      var num = parseFloat(input)
-      return isNaN(num) ? 0 : num
+      value = parse(input)
+    } else if (input instanceof Integer$) {
+      value = input.number
+    } else if (typeof input === 'boolean') {
+      value = input ? 1 : 0
+    } else if (input instanceof Date) {
+      value = input.getTime()
+    } else if (typeof input === 'undefined' || input === null) {
+      value = 0
+    } else if (typeof input === 'number') {
+      value = input
+    } else {
+      value = NaN
     }
-    if (typeof input === 'undefined' || input === null) {
-      return 0
-    }
-    if (typeof input === 'boolean') {
-      return input ? 1 : 0
-    }
-    if (input instanceof Date) {
-      return input.getTime()
-    }
-    return typeof input === 'number' ? input : 0
+    return isNaN(value) && typeof defaultValue === 'number'
+      ? defaultValue : value
   }
 }
 
 function numberAnd (valueOf) {
-  return function number$and () {
-    var result = typeof this === 'number' ? this : valueOf(this)
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+  return function () {
+    if (typeof this !== 'number') {
+      return null
+    }
+    var result = this
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       result += typeof arg === 'number' ? arg : valueOf(arg)
     }
@@ -32,10 +40,12 @@ function numberAnd (valueOf) {
 }
 
 function numberSubtract (valueOf) {
-  return function number$substract () {
-    var result = typeof this === 'number' ? this : valueOf(this)
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+  return function () {
+    if (typeof this !== 'number') {
+      return null
+    }
+    var result = this
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       result -= typeof arg === 'number' ? arg : valueOf(arg)
     }
@@ -44,10 +54,12 @@ function numberSubtract (valueOf) {
 }
 
 function numberTimes (valueOf) {
-  return function number$times () {
-    var result = typeof this === 'number' ? this : valueOf(this)
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+  return function () {
+    if (typeof this !== 'number') {
+      return null
+    }
+    var result = this
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       result *= typeof arg === 'number' ? arg : valueOf(arg)
     }
@@ -56,10 +68,12 @@ function numberTimes (valueOf) {
 }
 
 function numberDivide (valueOf) {
-  return function number$divide () {
-    var result = typeof this === 'number' ? this : valueOf(this)
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+  return function () {
+    if (typeof this !== 'number') {
+      return null
+    }
+    var result = this
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       result /= typeof arg === 'number' ? arg : valueOf(arg)
     }
@@ -69,119 +83,150 @@ function numberDivide (valueOf) {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var type = $.Number
-  var readonly = $void.readonly
+  var Type = $.number
+  var $Range = $.range
+  var link = $void.link
+  var Integer$ = $void.Integer
   var copyObject = $void.copyObject
-  var copyProto = $void.copyProto
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var nativeIndexer = $void.nativeIndexer
 
-  copyObject(type, Number, {
-    MAX_VALUE: 'MAX_VALUE',
-    MIN_VALUE: 'MIN_VALUE',
-    NEGATIVE_INFINITY: 'NEGATIVE_INFINITY',
-    POSITIVE_INFINITY: 'POSITIVE_INFINITY'
+  // the value range and constant values.
+  copyObject(Type, Number, {
+    MAX_VALUE: 'max',
+    MIN_VALUE: 'min',
+    POSITIVE_INFINITY: 'infinity',
+    NEGATIVE_INFINITY: '-infinity'
+  })
+
+  // The empty value
+  link(Type, 'empty', 0)
+
+  // parse a string to its number value.
+  var parse = link(Type, 'parse', function (str) {
+    return str && typeof str === 'string' ? parseFloat(str) : NaN
   })
 
   // get a number value from the input
-  var valueOf = readonly(type, 'value-of', createValueOf())
+  var valueOf = link(Type, 'of', createValueOf($void, parse))
 
-  // parse a string to its number value.
-  readonly(type, 'parse', function Number$parse (value) {
-    return typeof value === 'undefined' || value === null ? 0 : parseFloat(value)
-  })
+  typeIndexer(Type)
 
-  var proto = type.proto
-  // test for special values of Nan and Infinity
-  readonly(proto, 'is-valid', function number$isValid () {
-    return typeof this === 'number' && !isNaN(this)
+  var proto = Type.proto
+  // test for special values
+  link(proto, 'is-valid', function () {
+    return typeof this === 'number' ? !isNaN(this) : null
+  }, 'is-not-valid', function () {
+    return typeof this === 'number' ? isNaN(this) : null
   })
-  readonly(proto, 'is-finite', function number$isFinite () {
-    return typeof this === 'number' && isFinite(this)
-  })
-
-  // TODO - remove unnecessary functions?
-  copyProto(type, Number, function (value) {
-    return typeof value === 'number'
-  }, {
-    'toExponential': 'to-exponential',
-    'toFixed': 'to-fixed',
-    'toLocaleString': 'to-locale-string',
-    'toPrecision': 'to-precision'
+  link(proto, 'is-finite', function () {
+    return typeof this === 'number' ? isFinite(this) : null
+  }, 'is-infinite', function () {
+    return typeof this === 'number' ? !isFinite(this) : null
   })
 
   // support basic arithmetic operations
-  readonly(proto, 'and', numberAnd(valueOf))
-  readonly(proto, 'subtract', numberSubtract(valueOf))
-  readonly(proto, 'times', numberTimes(valueOf))
-  readonly(proto, 'divide', numberDivide(valueOf))
-
-  // support arithmetic operators
-  readonly(proto, '+', numberAnd(valueOf))
-  readonly(proto, '-', numberSubtract(valueOf))
-  readonly(proto, '*', numberTimes(valueOf))
-  readonly(proto, '/', numberDivide(valueOf))
+  link(proto, ['and', '+'], numberAnd(valueOf))
+  link(proto, ['subtract', '-'], numberSubtract(valueOf))
+  link(proto, ['times', '*'], numberTimes(valueOf))
+  link(proto, ['divide', '/'], numberDivide(valueOf))
 
   // support ordering logic - comparable
-  readonly(proto, 'compare', function number$compare (another) {
-    var diff = this - another
-    return diff === 0 ? 0 : diff / Math.abs(diff)
+  // For uncomparable entities, comparison result is consistent with the Equivalence.
+  // Uncomparable state is indicated by a null and is taken as inequivalent.
+  // TODO: isNaN() vs. x !== x ?
+  var compare = link(proto, 'compare', function (another) {
+    if (another instanceof Integer$) {
+      another = another.number // number and integer are comparable.
+    }
+    return this === another ? 0
+      : typeof this !== 'number' || typeof another !== 'number' ? null
+        : !isNaN(this) && !isNaN(another)
+          ? this > another ? 1 : -1
+          : isNaN(this) || isNaN(another)
+            ? null // NaN is not comparable with a real number.
+            : 0    // NaN is equivalent with itself.
   })
 
-  // support ordering operators
-  readonly(proto, '>', function number$oprGT (another) {
-    return typeof another === 'number' ? this > another : false
+  // comparing operators for instance values
+  link(proto, '>', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order > 0 : null
   })
-  readonly(proto, '>=', function number$oprGE (another) {
-    return typeof another === 'number' ? this >= another : false
+  link(proto, '>=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order >= 0 : null
   })
-  readonly(proto, '<', function number$oprLT (another) {
-    return typeof another === 'number' ? this < another : false
+  link(proto, '<', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order < 0 : null
   })
-  readonly(proto, '<=', function number$oprLE (another) {
-    return typeof another === 'number' ? this <= another : false
+  link(proto, '<=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order <= 0 : null
+  })
+
+  // override equivalence logic since 0 != -0 != +0 by identity-base test.
+  link(proto, ['equals', '=='], function (another) {
+    return this === another || compare.call(this, another) === 0
+  }, ['not-equals', '!='], function (another) {
+    return this !== another && compare.call(this, another) !== 0
   })
 
   // support common math operations
-  readonly(proto, 'abs', function number$abs () {
-    return Math.abs(this)
+  link(proto, 'abs', function () {
+    return typeof this === 'number' ? Math.abs(this) : null
   })
-  readonly(proto, 'ceil', function number$ceil () {
-    return Math.ceil(this)
+  link(proto, 'ceil', function () {
+    return typeof this === 'number' ? Math.ceil(this) : null
   })
-  readonly(proto, 'floor', function number$floor () {
-    return Math.floor(this)
+  link(proto, 'floor', function () {
+    return typeof this === 'number' ? Math.floor(this) : null
   })
-  readonly(proto, 'round', function number$floor () {
-    return Math.round(this)
+  link(proto, 'round', function () {
+    return typeof this === 'number' ? Math.round(this) : null
   })
+  link(proto, 'trunc', function () {
+    return typeof this === 'number' ? Math.trunc(this) : null
+  })
+
+  typeVerifier(Type)
 
   // O and NaN are defined as empty.
-  readonly(proto, 'is-empty', function number$isEmpty () {
-    return this === 0 || isNaN(this)
-  })
-  readonly(proto, 'not-empty', function number$notEmpty () {
-    return this !== 0 && !isNaN(this)
-  })
-
-  // persistency & describing
-  readonly(proto, 'to-code', function number$toCode () {
-    return typeof this === 'number' ? this.toString() : 'NaN'
-  })
-  readonly(proto, 'to-string', function number$toString () {
-    return typeof this === 'number' ? this.toString() : 'NaN'
+  link(proto, 'is-empty', function () {
+    return typeof this === 'number' ? this === 0 || isNaN(this) : null
+  }, 'not-empty', function () {
+    return typeof this === 'number' ? this !== 0 && !isNaN(this) : null
   })
 
-  // override indexer to expose number properties and methods
-  readonly(proto, ':', function number$indexer (name) {
-    if (typeof name === 'string') {
-      if (name === 'type') {
-        return Number.isInteger(this) ? $.Int : $.Float
-      }
-      return typeof proto[name] !== 'undefined' ? proto[name] : null
+  // Encoding
+  link(proto, 'to-code', function () {
+    return typeof this === 'number' ? this : null
+  })
+
+  // Representation & Description
+  link(proto, 'to-string', function (format) {
+    return typeof this === 'number' ? this.toString() : null
+  })
+
+  // Indexer
+  nativeIndexer(Type, Number, 'number', function (index, value) {
+    if (typeof this !== 'number') {
+      return null
     }
-    return null
+    // getting properties
+    if (typeof index === 'string') {
+      return index === ':' ? null
+        : index === 'type' ? Type // fake field
+          : typeof proto[index] === 'undefined' ? null : proto[index]
+    }
+    // create a range by this as Begin, index as End and value as Step.
+    if (index instanceof Integer$) {
+      index = index.number
+    }
+    return typeof index !== 'number' ? null
+      : $Range.of(this, index, typeof value === 'number' ? value
+        : value instanceof Integer$ ? value.number : null)
   })
-
-  // export to system's prototype
-  $void.injectTo(Number, 'type', type)
-  $void.injectTo(Number, ':', proto[':'])
 }

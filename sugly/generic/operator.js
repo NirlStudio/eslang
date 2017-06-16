@@ -3,7 +3,7 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Type = $.function
+  var Type = $.operator
   var $Tuple = $.tuple
   var $Symbol = $.symbol
   var link = $void.link
@@ -14,17 +14,23 @@ module.exports = function ($void) {
   link(Type, 'empty', $void.function(function () {
     return null
   }, new Tuple$( // (= () )
-    [$Symbol.lambda, $Tuple.empty, new Tuple$([], true)]
+    [$Symbol.operator, $Tuple.empty, new Tuple$([], true)]
   )))
 
   // prepare common type implementation.
   prepareOperation(Type)
 
-  // Encoding: downgrade to a lambda.
-  // Desccription
-  link(Type.proto, 'to-string', function () {
+  var proto = Type.proto
+  // Encoding: convert this operator to a tuple.
+  link(proto, 'to-code', function () {
     return typeof this !== 'function' ? null
-      : (this.name || '?function') + $Tuple.of($Symbol.function,
+      : this.code instanceof Tuple$ ? this.code : $Tuple.operator
+  })
+
+  // Desccription
+  link(proto, 'to-string', function () {
+    return typeof this !== 'function' ? null
+      : (this.name || '?lambda') + $Tuple.of($Symbol.operator,
         this.code instanceof Tuple$ ? this.code.$[1] : $Tuple.unknown,
         $Symbol.etc)['to-string']()
   })

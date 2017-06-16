@@ -1,88 +1,89 @@
 'use strict'
 
-var SpecialSymbol = /^[$`@:]{1}$/
-var InvalidSymbol = /[$`@:()'"#,;\\\s]/
-
-function isSame (Symbol$) {
-  return function symbol$isSame (another) {
-    return this === another ||
-      (this.key === another.key && this instanceof Symbol$ && another instanceof Symbol$)
-  }
-}
-
-function notSame (Symbol$) {
-  return function symbol$notSame (another) {
-    return this !== another &&
-      (this.key !== another.key || !(this instanceof Symbol$) || !(another instanceof Symbol$))
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
+  var Type = $.symbol
+  var link = $void.link
   var Symbol$ = $void.Symbol
-  var readonly = $void.readonly
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var managedIndexer = $void.managedIndexer
 
-  // regex to test invalid symbol
-  $void.InvalidSymbol = InvalidSymbol
+  // symbol key validators
+  var SpecialSymbol = $void.SpecialSymbol
+  var InvalidSymbol = $void.InvalidSymbol
+
   // common symbol repository
-  var sharedSymbols = $void.SharedSymbols = Object.create(null)
+  var sharedSymbols = $void.sharedSymbols
+  var sharedSymbolOf = $void.sharedSymbolOf
 
-  // Symbol is a value type derived from Null.
-  var type = $.Symbol
-  // const nothing object.
-  var nothing = type.Nothing = sharedSymbols[''] = new Symbol$('')
+  // the empty symbol.
+  var empty = link(Type, 'empty', sharedSymbolOf(''))
+
+  // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
+  link($, '...', null)
+  link(Type, 'etc', sharedSymbolOf('...'))
+
+  // symbols for common operators
+  link(Type, 'lambda', sharedSymbolOf('='))
+  link(Type, 'function', sharedSymbolOf('=>'))
+  link(Type, 'operator', sharedSymbolOf('=='))
+
+  link(Type, 'var', sharedSymbolOf('var'))
+  link(Type, 'let', sharedSymbolOf('let'))
+
+  // symbols for common punctuations
+  link(Type, 'object', sharedSymbolOf('@'))
+  link(Type, 'pairing', sharedSymbolOf(':'))
 
   // check whether a string is a valid symbol key.
-  var isValid = readonly(type, 'is-valid', function Symbol$isValid (key) {
-    return typeof key === 'string' && (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
+  var allows = link(Type, 'allows', function (key) {
+    return typeof key === 'string' &&
+      (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
   })
 
-  // a symbol can only be created from a valid symbol name (string).
-  readonly(type, 'value-of', function Symbol$valueOf (key) {
-    return !isValid(key) ? nothing
-      : typeof sharedSymbols[key] !== 'undefined'
-        ? sharedSymbols[key] : (sharedSymbols[key] = new Symbol$(key))
+  // create a symbol from a key.
+  link(Type, 'of', function (key) {
+    return allows(key) ? sharedSymbols[key] || new Symbol$(key) : empty
   })
 
-  var proto = type.proto
+  // Indexer for the type.
+  typeIndexer(Type)
 
-  readonly(proto, 'key', function symbol$key () {
-    return this.key
+  var proto = Type.proto
+
+  // Identity and Equivalence is determined by the key
+  link(proto, ['is', 'equals', '=='], function (another) {
+    return this === another || (
+      this instanceof Symbol$ && another instanceof Symbol$ &&
+      this.key.localeCompare(another.key))
+  }, ['is-not', 'not-equals', '!='])
+
+  // Ordering: to determine by the string value of key.
+  link(proto, 'compare', function (another) {
+    return this === another ? 0
+      : this instanceof Symbol$ && another instanceof Symbol$
+        ? this.key.localeCompare(another.key)
+        : null
   })
 
-  // a symbol behaves as a value entity.
-  readonly(proto, 'is', isSame(Symbol$))
-  readonly(proto, 'is-not', notSame(Symbol$))
+  // Type Verification
+  typeVerifier(Type)
 
-  readonly(proto, 'equals', isSame(Symbol$))
-  readonly(proto, 'not-equals', notSame(Symbol$))
-  readonly(proto, '==', isSame(Symbol$))
-  readonly(proto, '!=', notSame(Symbol$))
-
-  // persistency & description
-  readonly(proto, 'to-code', function symbol$toCode () {
-    return this instanceof Symbol$ ? this.key : ''
-  })
-  readonly(proto, 'to-string', function symbol$toString () {
-    return this instanceof Symbol$ ? '(` ' + this.key + ')' : ''
+  // Emptiness: The empty symbol's key is an empty string.
+  link(proto, 'is-empty', function () {
+    return this.key === ''
+  }, 'not-empty', function () {
+    return this.key !== ''
   })
 
-  // emptiness: nothing symbol is taken as the empty value.
-  readonly(proto, 'is-empty', function () {
-    return this.key.length < 1
-  })
-  readonly(proto, 'not-empty', function () {
-    return this.key.length > 0
+  // Representation
+  link(proto, 'to-string', function () {
+    return this instanceof Symbol$ ? this.key : null
   })
 
-  // indexer: general & primary predicate, readonly.
-  readonly(proto, ':', function (name) {
-    return typeof name !== 'string' ? null
-      : typeof proto[name] !== 'undefined' ? proto[name] : null
-  })
-
-  // override to boost - an object is always true
-  readonly(proto, '?', function object$boolTest (a, b) {
-    return typeof a === 'undefined' ? true : a
+  // add default implementation for missing methods.
+  managedIndexer(Type, Symbol$, {
+    key: 1 // public fields.
   })
 }

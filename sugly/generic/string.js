@@ -1,61 +1,62 @@
 'use strict'
 
-function ceateValueOf ($void) {
-  return function String$valueOf () {
-    var length = arguments.length
-    var result = ''
-    for (var i = 0; i < length; i++) {
-      var arg = arguments[i]
-      if (typeof arg === 'string') {
-        result += arg
-        continue
-      }
-      if (result.length > 0 && !result.endsWith(' ')) {
-        result += ' '
-      }
-      var toStr = $void.indexerOf(arg).call(arg, 'to-string')
-      result += typeof toStr === 'function' ? toStr.call(arg) : ''
-    }
-    return result
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
-  var type = $.String
-  var readonly = $void.readonly
-  var copyObject = $void.copyObject
+  var Type = $.string
+  var link = $void.link
+  var Integer$ = $void.Integer
   var copyProto = $void.copyProto
+  var copyObject = $void.copyObject
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var nativeIndexer = $void.nativeIndexer
 
-  // concatenate the to-string result of arguments
-  var valueOf = readonly(type, 'value-of', ceateValueOf($void))
+  // the empty value
+  link(Type, 'empty', '')
+
+  // generate a string from inputs.
+  link(Type, 'of', function (value) {
+    // return the empty value without argument.
+    if (typeof value === 'undefined') {
+      return ''
+    }
+    // returns the original string if there's only one string argument.
+    if (typeof value === 'string') {
+      return value
+    }
+    // concat the trimed values of strings and to-string results of non-strings.
+    var result = []
+    for (var i = 0; i < arguments.length; i++) {
+      var str = arguments[i]
+      if (typeof str !== 'string') {
+        str = $void.thisCall(str, 'to-string')
+        if (typeof str !== 'string') {
+          str = '()'
+        }
+      }
+      str = str.trim()
+      if (str) {
+        result.push(str)
+      }
+    }
+    return result.join(' ')
+  })
 
   // generate a string from a series of unicode values
-  copyObject(type, String, {
-    'fromCharCode': 'of-char-codes'
+  copyObject(Type, String, {
+    'fromCharCode': 'of-chars'
   })
 
-  var proto = type.proto
+  typeIndexer(Type)
 
-  // forward the length property.
-  readonly(proto, 'length', function string$length () {
-    return this.length
-  })
-
-  var verify = function string$verify (value) {
-    return typeof value === 'string'
-  }
-
+  var proto = Type.proto
   // generate sub-string from this string.
-  copyProto(type, String, verify, {
-    /* CH/FF/IE/OP/SF */
-    'slice': 'slice', // [start, end), supports negative values.
-    'substr': 'substring', // [start, start + length)
-    'substring': 'substring-in' // [start, end), only 0 or positive values.
+  copyProto(Type, String, 'string', {
+    'slice': 'substring' // [start, end), supports negative values.
   })
 
   // find & match substring in this string.
-  copyProto(type, String, verify, {
+  copyProto(Type, String, 'string', {
     /* CH/FF/IE/OP/SF */
     'indexOf': 'index-of',
     'lastIndexOf': 'last-index-of',
@@ -68,7 +69,7 @@ module.exports = function ($void) {
   })
 
   // value converting of this string.
-  copyProto(type, String, verify, {
+  copyProto(Type, String, 'string', {
     'toLocaleLowerCase': 'to-locale-lower',
     'toLocaleUpperCase': 'to-locale-upper',
 
@@ -80,98 +81,111 @@ module.exports = function ($void) {
   })
 
   // get a character or its unicode value by its offset in this string.
-  copyProto(type, String, verify, {
+  copyProto(Type, String, 'string', {
     /* CH/FF/IE/OP/SF */
     'charAt': 'char-at',
     'charCodeAt': 'chat-code-at'
   })
 
   // combination and splitting of strings
-  readonly(proto, 'concat', function string$concat () {
-    return valueOf.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
+  link(proto, ['concat', '+'], function () {
+    if (typeof this !== 'string') {
+      return null
+    }
+    var result = [this]
+    for (var i = 0; i < arguments.length; i++) {
+      var str = arguments[i]
+      if (typeof str === 'string') {
+        result.push(str)
+      } else {
+        str = $void.thisCall(str, 'to-string')
+        result.push(typeof str === 'string' ? str : '()')
+      }
+    }
+    return result.join('')
   })
-  copyProto(type, String, verify, {
+  copyProto(Type, String, 'string', {
     'split': 'split'
   })
 
-  // support general operators
-  readonly(proto, '+', function string$oprConcat () {
-    return valueOf.apply(null, [this].concat(Array.prototype.slice.call(arguments)))
-  })
-  readonly(proto, '-', function string$oprRemove (value) {
-    if (typeof value === 'string') {
-      // remove value by its last index in this string.
-      var offset = this.lastIndexOf(value)
-      return offset >= 0 ? this.substring(0, offset) : this
-    }
-    if (typeof value === 'number') {
-      // remove the trailing characters by the length of value.
-      if (value > this.length) {
-        return ''
-      } else if (value < 0) {
-        return this
-      }
-      return this.substring(0, this.length - value)
-    }
-    return this
+  // Equivalence: override to be consistent with comparison
+  link(proto, ['equals', '=='], function (another) {
+    return typeof this === 'string' &&
+      typeof another === 'string' &&
+      this.localeCompare(another) === 0
+  }, ['not-equals', '!='], function (another) {
+    return typeof this !== 'string' ||
+      typeof another !== 'string' ||
+      this.localeCompare(another) !== 0
   })
 
-  // support ordering logic - comparable
-  readonly(proto, 'compare', function string$compare (another) {
-    return this === another ? 0 : (this > another ? 1 : -1)
-  })
-  copyProto(type, String, verify, {
-    'localeCompare': 'locale-compare'
+  // Ordering: override general comparison logic.
+  var compare = link(proto, 'compare', function (another) {
+    return typeof this !== 'string' || typeof another !== 'string' ? null
+      : this.localeCompare(another)
   })
 
-  // support ordering operators
-  readonly(proto, '>', function string$oprGT (another) {
-    return typeof another === 'string' ? this > another : false
+  // comparing operators
+  link(proto, '>', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order > 0 : null
   })
-  readonly(proto, '>=', function string$oprGE (another) {
-    return typeof another === 'string' ? this >= another : false
+  link(proto, '>=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order >= 0 : null
   })
-  readonly(proto, '<', function string$oprLT (another) {
-    return typeof another === 'string' ? this < another : false
+  link(proto, '<', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order < 0 : null
   })
-  readonly(proto, '<=', function string$oprLE (another) {
-    return typeof another === 'string' ? this <= another : false
+  link(proto, '<=', function (another) {
+    var order = compare.call(this, another)
+    return typeof order === 'number' ? order <= 0 : null
   })
+
+  typeVerifier(Type)
 
   // the emptiness if string is determined by its length.
-  readonly(proto, 'is-empty', function string$isEmpty () {
-    return this.length < 1
-  })
-  readonly(proto, 'not-empty', function string$notEmpty () {
-    return this.length > 0
-  })
-
-  // persistency & describe
-  readonly(proto, 'to-code', function string$toCode () {
-    return JSON.stringify(typeof this === 'string' ? this : '')
-  })
-  readonly(proto, 'to-string', function string$toString () {
-    return this
+  link(proto, 'is-empty', function () {
+    return typeof this === 'string' ? this === '' : null
+  }, 'not-empty', function () {
+    return typeof this === 'string' ? this !== '' : null
   })
 
-  // indexer: override, interpret number as offset, readonly.
-  readonly(proto, ':', function string$indexer (index) {
-    if (typeof index === 'string') {
-      return typeof proto[index] !== 'undefined' ? proto[index] : null
+  // Encoding: standardize to a boolean value.
+  link(proto, 'to-code', function () {
+    return typeof this === 'string' ? this : null
+  })
+
+  // Representation
+  link(proto, 'to-string', function () {
+    return typeof this === 'string' ? JSON.stringify(this) : null
+  })
+
+  // Indexer
+  nativeIndexer(Type, String, 'string', function (index, value) {
+    if (typeof this !== 'string') {
+      return null
     }
-    // interpret a number a char offset
+    // getting properties
+    if (typeof index === 'string') {
+      return index === ':' ? null
+        : index === 'type' ? Type // fake field
+          : index === 'length' ? this.length // expose length
+            : typeof proto[index] === 'undefined' ? null : proto[index]
+    }
+    // read char(s)
+    if (index instanceof Integer$) {
+      index = index.number
+    }
     if (typeof index === 'number') {
-      return index >= 0 && index < this.length ? this.charAt(index) : ''
+      if (value instanceof Integer$) {
+        value = value.number
+      }
+      return typeof value === 'number'
+        ? this.substr(index, value) // chars in a range.
+        : this.substr(index, 1) // read a single character.
     }
     return null
   })
-
-  // override to boost - an object is always true
-  readonly(proto, '?', function string$boolTest (a, b) {
-    return typeof a === 'undefined' ? true : a
-  })
-
-  // export to system's prototype
-  $void.injectTo(String, 'type', type)
-  $void.injectTo(String, ':', proto[':'])
 }

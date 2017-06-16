@@ -9,7 +9,7 @@ module.exports = function operators$control ($void) {
   var Symbol$ = $void.Symbol
 
   var iterate = $void.$.iterate
-  var symbolValueOf = $void.$.Symbol['value-of']
+  var symbolValueOf = $void.$.symbol['of']
   var SymbolElse = symbolValueOf('else')
 
   operators['if'] = function (space, clause) {

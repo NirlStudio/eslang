@@ -1,65 +1,99 @@
 'use strict'
 
-function constructInstance ($void) {
-  var isPrototypeOf = $void.isPrototypeOf
-  var Class = $void.$.Class
-
-  return function Class$construct () {
-    var class_ = this === Class || (isPrototypeOf(Class, this) &&
-      isPrototypeOf(Class.proto, this.proto)) ? this : Class
-    if (!class_ || class_['abstract']) {
-      return null
-    }
-
-    var obj = Object.create(class_.proto)
-    var constructor = class_.proto.constructor
-    if (typeof constructor === 'function') {
-      constructor.apply(obj, arguments)
-    }
-    return obj
-  }
+// all the limitation may be removed later.
+var staticObjectFields = {
+  ':': 1,
+  'type': 1,
+  'to-code': 1
 }
-
-function deriveClass ($void) {
-  var createUserType = $void.createUserType
-  var isPrototypeOf = $void.isPrototypeOf
-  var Class = $void.$.Class
-
-  return function Class$of (proto) {
-    var parent = this === Class || (isPrototypeOf(Class, this) &&
-      isPrototypeOf(Class.proto, this.proto)) ? this : Class
-    if (!parent || parent['finalized']) {
-      return null
-    }
-
-    var class_ = createUserType(parent)
-    if (typeof proto !== 'object') {
-      return class_
-    }
-
-    if (typeof proto.constructor === 'function') {
-      proto.upper = parent.proto.constructor
-    } else {
-      delete proto.constructor
-    }
-
-    Object.assign(class_.proto, proto)
-    return class_
-  }
-}
+var staticClassFields = Object.assign(Object.create(staticObjectFields), {
+  'super': 1,
+  'of': 1,
+  'empty': 1
+})
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Class = $.Class
-  var readonly = $void.readonly
-  var virtual = $void.virtual
+  var Type = $.class
+  var link = $void.link
+  var Object$ = $void.Object
+  var typeOf = $void.typeOf
+  var thisCall = $void.thisCall
+  var ClassType$ = $void.ClassType$
+  var createType = $void.createType
+  var typeIndexer = $void.typeIndexer
 
-  // derive from this class to create a new class with its static & instance properties.
-  readonly(Class, 'define', deriveClass($void))
+  // define a new class.
+  link(Type, 'of', function (parent, type, proto) {
+    // ignore parent if it's not a class.
+    var class_ = createType(parent instanceof ClassType$ ? parent : Type)
 
-  // construct a new object by calling constructor with some arguments.
-  readonly(Class, 'construct', constructInstance($void))
+    // update type properties
+    Object.getOwnPropertyNames(type).forEach(function (field) {
+      if (!staticClassFields[field]) {
+        class_[field] = type[field]
+      }
+    })
 
-  // default constructor
-  virtual(Class.proto, 'constructor', function Class$constructor () {})
+    // update instance properties
+    Object.getOwnPropertyNames(proto).forEach(function (field) {
+      if (!staticObjectFields[field]) {
+        class_.proto[field] = proto[field]
+      }
+    })
+
+    // override empty function to create an empty instance
+    var init = class_.proto.init
+    link(class_, 'empty', function () {
+      var obj = Object.create(class_.proto)
+      if (init) {
+        init.apply(obj, arguments)
+      }
+      return obj
+    })
+
+    // override of function to create instance
+    var construct = class_.proto.construct
+    link(class_, 'of', function () {
+      var obj = Object.create(class_.proto)
+      if (init) {
+        init.apply(obj, arguments)
+      }
+      if (construct) {
+        construct.apply(obj, arguments)
+      }
+      return obj
+    })
+
+    // override type indexer for the new class.
+    typeIndexer(class_)
+    return class_
+  })
+
+  // check if this class' instance complys to a template object.
+  link(Type, 'as', function (template) {
+    if (!(this instanceof ClassType$) || !(template instanceof Object$)) {
+      return false
+    }
+    var fields = Object.getOwnPropertyNames(template)
+    for (var i = 0; i < fields.length; i++) {
+      var field = fields[i]
+      var value = this.proto[field]
+      if (typeof value === 'undefined' || value === null) {
+        return false
+      }
+      var tvalue = template[field]
+      if (tvalue !== null) {
+        var type = typeOf(value)
+        if (!thisCall(type, 'is-of', tvalue) &&
+          !thisCall(type, 'is-of', typeOf(tvalue))) {
+          return false
+        }
+      }
+    }
+    return true
+  })
+
+  // Type Indexer for global class itself.
+  typeIndexer(Type)
 }

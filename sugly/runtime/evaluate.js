@@ -82,7 +82,7 @@ module.exports = function evaluate ($void) {
     }
 
     // evaluate arguments.
-    var max = predicate['fixed-args'] ? predicate.parameters.length : 1024
+    var max = predicate['fixed-args'] ? predicate.code.$[1].$.length : 1024
     for (; offset < length && args.length < max; offset++) {
       args.push(evaluate(clause[offset], space))
     }

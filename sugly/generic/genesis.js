@@ -1,302 +1,261 @@
 'use strict'
 
-// Publish an enumerable value to a container.
-function publish (container, key, value, overridable) {
-  Object.defineProperty(container, key, {
-    enumerable: true,
-    configurable: false,
-    writable: overridable === true,
-    value: value
-  })
-}
-
-// Define a readonly property for an object or a function.
-function define (obj, prop, value) {
-  Object.defineProperty(obj, prop, {
-    enumerable: false,
-    configurable: false,
-    writable: false, // It may be true according to security context.
-    value: value
-  })
-}
-
-// Assemble a global entity into its container by a name.
-function assemble (container, name, entity, overridable) {
-  publish(container, name, entity, overridable)
-  if (entity && (typeof entity === 'object' || typeof entity === 'function') &&
-    !Object.prototype.hasOwnProperty.call(entity, 'to-string')) {
-    // overrride to-code function
-    define(entity, 'to-code', function () {
-      return name
-    })
-    // overrride to-string function
-    define(entity, 'to-string', function () {
-      return name
-    })
-  }
-  return entity
-}
-
-// link a entity to its container by a name.
-function link (container, name, entity, overridable) {
-  publish(container, name, entity, overridable)
-  if (typeof entity === 'function') {
-    // give or override existing name.
-    if (!Object.prototype.hasOwnProperty.call(entity, 'name') || !entity.name) {
-      define(entity, 'name', container['to-string']() + ':' + name)
-    }
-  }
-  return entity
-}
-
-function copy (obj, src, mapping, linker, wrapper) {
-  Object.getOwnPropertyNames(mapping).forEach(function copy$map (name) {
-    var value = src[name]
-    if (typeof value === 'undefined') {
-      console.warn(src, 'missing required property:', name)
-    } else if (typeof value === 'function') {
-      linker(obj, mapping[name], wrapper(value))
-    } else {
-      linker(obj, mapping[name], value)
-    }
-  })
-  return obj
-}
-
 module.exports = function () {
   /*
     The Prologue.
   */
+  // The Void is out of the scope of the Being and cannot be analyzed in the
+  // scope of Being. Therefore, it cannot be described as either existent or
+  // nonexistent. Boolean logic is only part of the Being.
   var $void = {}
 
+  /*
+    The Beginning.
+  */
   /* In the beginning God created the heavens and the earth. */
   var Null = $void.null = Object.create(null)
   /* Now the earth was formless and empty, */
-  var $ = $void.$ = Object.create(null)
+  var $ = $void.$ = Object.create(null) /* 0. Generation */
 
   /* “Let there be light,” and there was light. */
   // The light is the laws, which are the foundation of all beings.
-  var Prototype = Object.create(Null)
-  var Type$ = $void.Type = function Type$ () {
-    // In both theory and reality, this function should be executed once,
-    // and can only be executed once.
-    // The primitive type is derived from the supreme prototype.
-    define(this, 'proto', Prototype)
-    // Type is the type of itself.
+  var Prototype = Object.create(Null) /* 1. Derivation */
+  var Type$ = $void.Type = function Type$ () { /* 2. Separation & Aggregation */
+    // This function should be executed once, and only once.
+    // The primal type is derived from the supreme prototype.
+    publish(this, 'proto', Prototype)
+    // The primal type is the container type of the supreme prototype.
     define(Prototype, 'type', this)
   }
   Type$.prototype = Prototype
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
+  function naming (type, name) {
+    publish($, name, type)
+    publish(type, 'name', name)
+    define(type, 'module', null)
+    return type
+  }
+
   /* ... he separated the light from the darkness, */
   var Type = new Type$()
-
   /* ... called the light “day,”  */
-  assemble($, 'Type', Type)
-
+  naming(Type, 'type')
   /* ... and the darkness he called “night.” */
   $.null = null
 
   // The logical noumenon of null is not accessible directly, otherwise it will
   // cause some confusion in evalution process.
-  // P.S, so is our fate either?
+  // P.S, so is our fate too?
+
+  /* It's ready to create primitive types, */
+  function create (name, superType, asMeta) {
+    if (!superType) {
+      superType = Type
+    }
+    var type = Object.create(superType)
+    if (!asMeta) { // a meta type is used to create more types and has not a proto.
+      // a new type should have a new nature.
+      publish(type, 'proto', Object.create(superType.proto))
+      // a proto always intrinsically knows its container type.
+      define(type.proto, 'type', type)
+      // give a name to the new type.
+    }
+    naming(type, name)
+  }
 
   /* And there was evening, and there was morning — the first day. */
   /*   - from Bible and Dao Te Ching */
 
   /*
-    Start to build generic type system.
+    The Creating.
   */
-  function create (name, superType) {
-    superType = superType || Type
-    var type = Object.create(superType)
-    define(type, 'name', name)
-    // a new type should have a new prototype.
-    define(type, 'proto', Object.create(superType.proto))
-    // the prototype links back to the type.
-    define(type.proto, 'type', type)
-    // assemble the new type to runtime space.
-    assemble($, name, type)
-  }
+  /* Static Value Types */
+  /* All static values are fixed points of evaluation function. */
+  /* All static values can be fully encoded and recovered by evaluation. */
 
-  /*
-    Create primitive generic types
-  */
   // A boolean type is not a prerequisite to implement boolean logic, but it
-  // may help to avoid ambiguity in some cases.
-  // All Bool values are fixed points of evaluation function.
-  create('Bool')
+  // may help to avoid ambiguity in many cases.
+  create('bool')
 
-  // Number is a substance type in Javascript VM. But it may be a abstract type
-  // in other interpreter implementation.
-  // All Number values are fixed points of evaluation function.
-  create('Number')
+  // A string is a piece of free form text.
+  create('string')
 
-  // The type of date and time values. It's a special object in Javascript VM.
-  // But it's necessary at all. A Double value of seconds or milliseconds should
-  // be enough.
-  // All Date values are fixed points of evaluation function.
-  create('Date')
+  // A number may have a real number value in the proper range.
+  create('number')
 
-  // String is a piece of free form text.
-  // All string values are fixed points of  evaluation function.
-  create('String')
-
-  // Symbol is a semantic element so its key must comply with some lexical rules.
-  // A symbol will be evaluated to its associated value or null. So it may not
-  // be a fixed point.
-  create('Symbol')
-  // the constructor function is used to test a symbol instance with instanceof.
-  var Symbol$ = $void.Symbol = function Symbol$ (key) {
-    publish(this, 'key', typeof key === 'string' ? key : '')
+  // An integer value is a special number which keeps its type in calculation.
+  create('integer', $.number)
+  var Integer$ = $void.Integer = function Integer$ (number) {
+    publish(this, 'number', number)
   }
-  Symbol$.prototype = $.Symbol.proto
+  Integer$.prototype = $.integer.proto
 
-  // Object is a compound entity which may hold fields.
-  // All objects are fixed points of evaluation funtion.
-  create('Object')
+  // A date value is a combination of a timestamp and a associated locale string.
+  create('date')
+  $void.Date = Date
 
-  // A function may dynamically produce an entity other than itself when it's
-  // called. So it may not be a fixed piont.
-  create('Function')
+  // A range value represents a descrete sequence of numbers in the interval of
+  // [begin, end) and a step value.
+  create('range')
+  var Range$ = $void.Range = function Range$ (begin, end, step) {
+    publish(this, 'begin', begin)
+    publish(this, 'end', end)
+    publish(this, 'step', step)
+  }
+  Range$.prototype = $.range.proto
 
-  /*
-    Define more fundamental generic types.
-  */
-  // The type of integer values.
-  create('Int', $.Number)
+  /* Expression Types */
+  /* An expression entity may produce another entity after evaluation. */
+  /* An expression value can be fully encoded and recevered. */
+  /* A static value can also be a part of an expression. */
 
-  // The type of real numbers.
-  create('Float', $.Number)
+  // A symbol is an identifer of a semantic element, so the string value of its
+  // key must comply with some fundamental exical rules.
+  // A symbol will be resolved to the associated value under current context or
+  // null by the evaluation function.
+  create('symbol')
+  var Symbol$ = $void.Symbol = function Symbol$ (key) {
+    publish(this, 'key', key)
+  }
+  Symbol$.prototype = $.symbol.proto
 
-  // The type of a number value set which select values in the range of
-  // [begin, end) with a step.
-  create('Range', $.Object)
+  // A tuple is a list of other static values, symbols and tuples.
+  // A tuple will be interpreted as a statement under current context to produce
+  // an output value by the evaluation function.
+  // The name 'list' is left to be used for more common scenarios.
+  create('tuple')
+  var Tuple$ = $void.Tuple = function Tuple$ (list, plain, source) {
+    define(this, '$', list) // hidden native data
+    define(this, 'plain', plain === true) // as code block.
+    if (source) { // reserved for source map and other debug information.
+      define(this, 'source', source)
+    }
+  }
+  Tuple$.prototype = $.tuple.proto
 
-  /*
-    Basic Data Structures
-  */
+  /* Operation Types */
+  /* All operations will be evaluated to the output of its invocation. */
+
+  // An operator is an operation which accepts raw argument expressions, which
+  // means no evaluation happens to arguments before the invocation, to allow
+  // more syntax structures can be defined.
+  // An operator is an immutable entity and can be fully encoded.
+  create('operator')
+  $void.operator = function operator$ (impl, code) {
+    define(impl, 'type', $.operator)
+    define(impl, 'code', code)
+    return impl
+  }
+
+  // A lambda is another type of operation which wants the values of its arguments
+  // as input, so the runtime helps to evaluate all them before invocation.
+  // A lambda is an immutable entity and can be fully encoded.
+  create('lambda')
+  $void.lambda = function lambda$ (impl, code) {
+    define(impl, 'type', $.lambda)
+    define(impl, 'code', code)
+    return impl
+  }
+
+  // A function is an operation which works like a Closure. Its behaviour depends
+  // on both the values of arguments and current values in its outer context.
+  // A function is not explicitly alterable but its implicit context is dynamic
+  // and persistent in running. So its overall state is mutable.
+  // For the existence of the context, a function cannot be fully encoded. But
+  // it may be automatically downgraded to a lambda when the encoding is required.
+  create('function', $.lambda)
+  $void.function = function function$ (impl, code) {
+    define(impl, 'type', $.function)
+    define(impl, 'code', code)
+    return impl
+  }
+
+  /* Compound Types */
+  /* Generally, all compound entities are mutable. */
+  /* All compound entities are also fixed points of evaluation funtion. */
+
+  // The object is the fundamental type of all compound entities.
+  create('object')
+  var Object$ = $void.Object = function Object$ () {}
+  Object$.prototype = $.object.proto
+
+  // A fake constructor for instanceof type checking.
+  var ObjectType$ = $void.ObjectType = function ObjectType$ () {}
+  ObjectType$.prototype = $.object
+
+  // A module is a special object which is the unit to organize programs and may
+  // export some entities. It's also a shared context for its inner functions.
+  // A module is identified by the value of the field :source
+  create('module', $.object)
+  var Module$ = $void.Module = function Module$ (uri) {
+    publish(this, 'module-uri', uri)
+  }
+  Module$.prototype = $.module.proto
+
+  /* Basic Data Structures */
+  /* A fundamental data structure is mutable as a collection. */
+
   // A collection of values indexed by zero-based continuous integers.
-  create('Array', $.Object)
+  create('array', $.object)
   // A collection of distinctive values indexed by themselves.
-  create('Set', $.Object) // TODO
+  create('set', $.object)
   // A collection of values indexed by a set of distinctive values.
-  create('Map', $.Object) // TODO
+  create('map', $.object)
 
-  // A type to create user types which have enumerable instances based on a set
-  // of names and optional values. The value part may be a zero-based integerr
-  // by default, or any other type of value explicitly given.
-  create('Enum', $.Object)
+  /* Extensible Data Type */
+  /* A extensible data type can facilitate complexity by type inheritance. */
 
-  // A type to create user types which creates instances based on integer values.
-  // An instance of a Flags type can be resolved to its predefined flags by
-  // bitwise logic.
-  create('Flags', $.Object)
+  // Class is a meta type to create types that can be extended by inheritance.
+  // All instances of all classes can be downgraded to a common object.
+  create('class', $.object, true)
+  // A fake constructor for instanceof type checking.
+  var ClassType$ = $void.ClassType = function ClassType$ () {}
+  ClassType$.prototype = $.class
 
-  // The type of a description of a object structure. It can be used to define
-  // expectation and test an object strictly before accept it.
-  create('Interface', $.Object)
+  /* Boundary Sentinel Type */
+  /* This type of instances work as I/O channels to external autonomous entities. */
 
-  // A type to create extensible user types which support a build-in constructor
-  // logic. Its 'define' function is different with other sub-types of Object.
-  // It support derivation from callee class.
-  create('Class', $.Object)
+  // Device is a meta type to create a instantiable type for an entity that works
+  // as an communication interface between the program and an external hardware
+  // or an event source.
+  // By the nature of a device, it cannot be encoded or transfered directly.
+  create('device', $.object, true)
+  // A fake constructor for instanceof type checking.
+  var DeviceType$ = $void.DeviceType = function DeviceType$ () {}
+  DeviceType$.prototype = $.device
 
-  // expose a static edition of isPrototypeOf.
-  $void.isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
-
-  // expose a static edition of hasOwnProperty.
-  $void.ownsProperty = Function.prototype.call.bind(Object.prototype.hasOwnProperty)
-
-  // add a method to create user types.
-  $void.createUserType = function $createUserType (superType) {
+  /*
+    The Evoluation.
+  */
+  // export the ability of creation to enable an autonomous process.
+  $void.createType = function createType (superType) {
     var type = Object.create(superType)
-    publish(type, 'name', '', true)
-    define(type, 'proto', Object.create(superType.proto))
+    publish(type, 'proto', Object.create(superType.proto))
     define(type.proto, 'type', type)
+    // the new type is left unnamed.
     return type
   }
 
-  // add a method to inject properties to system prototypes.
-  $void.injectTo = function injectTo (type, name, value) {
-    define(type.prototype, name, value)
-  }
-
-  // safely get managed type from an object.
-  $void.typeOf = function typeOf (value) {
-    if (typeof value === 'undefined' || value === null) {
-      return null
-    }
-    if (typeof value === 'number') {
-      return Number.isInteger(value) ? $.Int : $.Float
-    } else {
-      return value.type || Type // unknown & not-null
-    }
-  }
-
-  // safely test a value with a type.
-  $void.instanceOf = function instanceOf (value, type) {
-    var isA = typeof value === 'undefined' || value === null
-      ? Null['is-a'] : value['is-a'] ||
-        (value.type && value.type.proto && value.type.proto['is-a'])
-    return typeof isA === 'function' ? isA.call(value, type) : false
-  }
-
-  // safely test the equivalency of two values.
-  $void.isEqual = function isEqual (left, right) {
-    if (left === right) {
-      return true // shortcut for most of cases.
-    }
-    if (typeof left === 'undefined') {
-      left = null
-    }
-    var equals = left.equals ||
-      (left.type && left.type.proto && left.type.proto.equals)
-    if (typeof equals === 'function') {
-      return equals.call(left, right) === true
-    }
-    return false
-  }
-
-  // export an entity as a constant field in a contaier.
-  $void.constant = function $constant (container, name, entity) {
-    return assemble(container, name, entity)
-  }
-
-  // export an entity as a constant field in a contaier.
-  $void.variable = function $variable (container, name, entity) {
-    return assemble(container, name, entity, true)
-  }
-
-  // define an entity as a readonly property of container.
-  $void.readonly = function $readonly (container, name, entity) {
-    return link(container, name, entity)
-  }
-
-  // define an entity as a overridable property of container.
-  $void.virtual = function $virtual (container, name, entity) {
-    return link(container, name, entity, true)
-  }
-
-  $void.copyObject = function $copyObject (obj, src, mapping) {
-    return copy(obj, src, mapping, $void.readonly,
-      function funcWrapper (func) {
-        return function () {
-          return func.apply(src, arguments)
-        }
-      }
-    )
-  }
-
-  $void.copyProto = function $copyProto (obj, src, verify, mapping) {
-    return copy(obj.proto, src.prototype, mapping, $void.readonly,
-      function methodWrapper (method) {
-        return function () {
-          return verify(this) ? method.apply(this, arguments) : null
-        }
-      }
-    )
-  }
-
   return $void
+}
+
+// Publish a value to its owner by a key.
+function publish (owner, key, value) {
+  Object.defineProperty(owner, key, {
+    enumerable: true,
+    configurable: false,
+    writable: false,
+    value: value
+  })
+}
+
+// Define a value as a property of an entity.
+function define (entity, prop, value) {
+  Object.defineProperty(entity, prop, {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: value
+  })
 }

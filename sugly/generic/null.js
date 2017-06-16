@@ -2,88 +2,92 @@
 
 module.exports = function ($void) {
   var Null = $void.null
-  var virtual = $void.virtual
-  var readonly = $void.readonly
+  var link = $void.link
 
-  // Identity: to recognize two different values.
-  virtual(Null, 'is', function null$is (another) {
-    return Object.is(this, typeof another === 'undefined' ? null : another)
-  })
-  virtual(Null, 'is-not', function null$isNot (another) {
-    return !Object.is(this, typeof another === 'undefined' ? null : another)
+  // Fundamental Entity Relationships: Identity, Equivalence and Ordering
+  // Identity, Equivalence and Ordering logics must be symmetrical.
+  // An identity must be equivalent with itself.
+  // Ordering Equal must comply with Equivalence Equal.
+
+  link(Null, [
+    // Identity: to recognize two different entities.
+    'is',
+    // Equivalence: to test if two entities are equivalent in effect.
+    // Equivalence logic should be implemented symmetrically.
+    // So it's different with the behaviour of NaN in JS, since an identity must be
+    // equivalent in effect with itself, or as an identity's behaviour cannot be
+    // defined by any property that's unrelevant with its effect to its environment.
+    'equals', '=='
+  ], function (another) {
+    return Object.is(typeof this === 'undefined' ? null : this,
+      typeof another === 'undefined' ? null : another)
+  }, [
+    // the negative method of Identity test.
+    'is-not',
+    // the negative method of Equivalence test.
+    'not-equals', '!='
+  ], function (another) {
+    return !Object.is(typeof this === 'undefined' ? null : this,
+      typeof another === 'undefined' ? null : another)
   })
 
-  // Equivalence: to test if two entities are equivalent in effect.
-  // any known type can implement its own equivalence logic.
-  // NaN is not equivalent with itself since it means a invalid state.
-  virtual(Null, 'equals', function null$equals (another) {
-    return this === (typeof another === 'undefined' ? null : another)
-  })
-  virtual(Null, 'not-equals', function null$notEquals (another) {
-    return this !== (typeof another === 'undefined' ? null : another)
-  })
-
-  // support equivalence operators. The behaviour of operators '==' and '!='
-  // should always be consistent with 'equals' and 'not-equals'
-  virtual(Null, '==', function null$oprEquals (another) {
-    return this === (typeof another === 'undefined' ? null : another)
-  })
-  virtual(Null, '!=', function null$oprNotEquals (another) {
-    return this !== (typeof another === 'undefined' ? null : another)
+  // Ordering: general comparison
+  //     0 - identical
+  //     1 - from this to another is descending.
+  //    -1 - from this to another is ascending.
+  //  null - not-sortable
+  link(Null, 'compare', function (another) {
+    return Object.is(typeof this === 'undefined' ? null : this,
+      typeof another === 'undefined' ? null : another) ? 0 : null
   })
 
-  // Type Hierarchy: all generic type should override these methods.
   // Type Verification: to test if an entity is an instance of a type.
-  virtual(Null, 'is-a', function null$isA (type) {
-    // null is a null.
+  link(Null, 'is-a', function (type) {
+    // null is null and null is a null.
+    // type.proto is not null but is a null.
     return typeof type === 'undefined' || type === null
-  })
-  virtual(Null, 'is-not-a', function null$isNotA (type) {
-    // and the null is nothing except null.
+  }, 'is-not-a', function (type) {
     return typeof type !== 'undefined' && type !== null
   })
-  // Generalization: the super type is determined by the proto field.
-  virtual(Null, 'super', function null$super () {
-    // from being's point of view, null has no superior.
-    return null
-  })
 
-  // null is taken as empty
-  virtual(Null, 'is-empty', function null$isEmpty () {
+  // Emptiness: null, type.proto and all protos are empty.
+  link(Null, 'is-empty', function () {
     return true
-  })
-  virtual(Null, 'not-empty', function null$notEmpty () {
+  }, 'not-empty', function () {
     return false
   })
 
-  // persistency
-  readonly(Null, 'to-code', function null$toCode (context) {
-    return 'null'
+  // Encoding
+  link(Null, 'to-code', function () {
+    return null
   })
-  // readable description
-  virtual(Null, 'to-string', function null$toString (format) {
+
+  // Representation (static values) or Description (non-static values)
+  link(Null, 'to-string', function () {
     return 'null'
   })
 
-  // the indexer function for null. It's virtual since null is virtual.
-  readonly(Null, ':', function Null$indexer (name) {
-    return typeof name !== 'string' ? null
-      : (typeof Null[name] !== 'undefined' ? Null[name] : null)
+  // Indexer
+  link(Null, ':', function (name) {
+    return typeof name !== 'string' || name === ':' ? null
+      : name === 'type' ? Null // fake field
+        : (typeof Null[name] !== 'undefined' ? Null[name] : null)
   })
-  // null's type is null
-  readonly(Null, 'type', null)
 
-  // common logical predicates.
-  // A boolean logical test operator.
+  // Boolean Test: only for null.
   // - (x ?) returns true or false.
-  // - (x ? y) returns y if x is evaluated to false.
-  // - (x ? y z) return y if x is evaluated to true, z otherwise.
-  virtual(Null, '?', function Null$boolTest (a, b) {
+  // - (x ? y) returns y if x is equivalent to false.
+  // - (x ? y z) return y if x is equivalent to true, returns z otherwise.
+  // TODO - convert to an operator
+  link(Null, '?', function (a, b) {
+    // null is always false
     return typeof a === 'undefined' ? false : typeof b === 'undefined' ? a : b
   })
-  // null fallback.
+
+  // Null Fallback: only for null.
   // (x ?? y) returns y if and only if x is null.
-  virtual(Null, '??', function Null$nullFallback (alternative) {
+  // TODO - convert to an operator
+  link(Null, '??', function (alternative) {
     // for null, always returns the alternative value.
     if (arguments.length < 1) {
       return null

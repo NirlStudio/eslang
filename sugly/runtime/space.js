@@ -57,7 +57,7 @@ module.exports = function space ($void) {
 
   var initializeModuleSpace = $void.initializeModuleSpace = function $initializeModuleSpace (space, attachExport) {
     if (attachExport) {
-      // overridding parent.export
+      // overriding parent.export
       exportTo(space)
     }
 

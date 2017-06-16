@@ -1,9 +1,25 @@
 'use strict'
 
-function boolAnd (valueOf) {
-  return function Bool$and () {
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+module.exports = function ($void) {
+  var $ = $void.$
+  var Type = $.bool
+  var link = $void.link
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var nativeIndexer = $void.nativeIndexer
+
+  // the empty value of bool is the false.
+  link(Type, 'empty', false)
+
+  // booleanize
+  var valueOf = $void.boolValueOf = link(Type, 'of', function (value) {
+    return typeof value !== 'undefined' && value !== null && value !== 0 && value !== false
+  })
+
+  // static boolean operations
+  // TODO - convert to operators
+  var and = link(Type, ['and', '&&'], function () {
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       if (typeof arg !== 'boolean') {
         arg = valueOf(arg)
@@ -13,13 +29,9 @@ function boolAnd (valueOf) {
       }
     }
     return true
-  }
-}
-
-function boolOr (valueOf) {
-  return function Bool$or () {
-    var length = arguments.length
-    for (var i = 0; i < length; i++) {
+  })
+  var or = link(Type, ['or', '||'], function () {
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       if (typeof arg !== 'boolean') {
         arg = valueOf(arg)
@@ -29,78 +41,51 @@ function boolOr (valueOf) {
       }
     }
     return false
-  }
-}
-
-module.exports = function ($void) {
-  var $ = $void.$
-  var type = $.Bool
-  var readonly = $void.readonly
-
-  // evaluation & conversion logic
-  var valueOf = readonly(type, 'value-of', function Bool$valueOf (input) {
-    return typeof input !== 'undefined' && input !== null && input !== 0 && input !== false
+  })
+  link(Type, ['not', '!'], function (value) {
+    return !(typeof value === 'boolean' ? value : valueOf(value))
   })
 
-  // static boolean logic operations
-  var and = readonly(type, 'and', boolAnd(valueOf))
-  var or = readonly(type, 'or', boolOr(valueOf))
-  readonly(type, 'not', function Bool$not (value) {
-    return typeof value === 'boolean' ? !value : !valueOf(value)
-  })
+  // override type's indexer
+  typeIndexer(Type)
 
-  // the virtual class of boolean type
-  var proto = type.proto
-
+  var proto = Type.proto
   // function form logical operations
-  readonly(proto, 'and', function bool$and (value) {
-    return this && (arguments.length > 1 ? and.apply(null, arguments)
-      : (typeof value === 'undefined' ? true : valueOf(value)))
+  // TODO - convert to operators
+  link(proto, ['and', '&&'], function (value) {
+    return typeof this !== 'boolean' ? null
+      : this && (arguments.length > 1
+        ? and.apply(null, arguments) : valueOf(value))
   })
-  readonly(proto, 'or', function bool$or (value) {
-    return this || (arguments.length > 1 ? or.apply(null, arguments)
-      : (typeof value === 'undefined' ? false : valueOf(value)))
+  link(proto, ['or', '||'], function (value) {
+    return typeof this !== 'boolean' ? null
+      : this || (arguments.length > 1
+        ? or.apply(null, arguments) : valueOf(value))
   })
-  readonly(proto, 'not', function bool$not () {
-    return !this
-  })
-
-  // operator form logical operations
-  readonly(proto, '&&', function bool$oprAND (value) {
-    return this && (arguments.length > 1 ? and.apply(null, arguments)
-      : (typeof value === 'undefined' ? true : valueOf(value)))
-  })
-  readonly(proto, '||', function bool$oprOR (value) {
-    return this || (arguments.length > 1 ? or.apply(null, arguments)
-      : (typeof value === 'undefined' ? false : valueOf(value)))
-  })
-  readonly(proto, '!', function bool$oprNOT () {
-    return !this
+  link(proto, ['not', '!'], function () {
+    return typeof this === 'boolean' ? !this : null
   })
 
-  // persistency & description
-  readonly(proto, 'to-code', function bool$toCode () {
-    return this === true ? 'true' : 'false'
-  })
-  readonly(proto, 'to-string', function bool$toString () {
-    return this === true ? 'true' : 'false'
+  typeVerifier(Type)
+
+  // Emptiness - false is the empty value
+  link(proto, 'is-empty', function () {
+    return typeof this === 'boolean' ? !this : null
+  }, 'not-empty', function bool$notEmpty () {
+    return typeof this === 'boolean' ? this : null
   })
 
-  // emptiness - false is the empty value
-  readonly(proto, 'is-empty', function bool$isEmpty () {
-    return !this
-  })
-  readonly(proto, 'not-empty', function bool$notEmpty () {
-    return this
+  // Encoding: standardize to a boolean value.
+  link(proto, 'to-code', function () {
+    return typeof this === 'boolean' ? this : null
   })
 
-  // support native boolean values
-  readonly(proto, ':', function entity$indexer (name) {
-    return typeof name !== 'string' ? null
-      : (typeof proto[name] !== 'undefined' ? proto[name] : null)
+  // Representation
+  link(proto, 'to-string', function () {
+    return typeof this === 'boolean'
+      ? this ? 'true' : 'false'
+      : null
   })
 
-  // export to system's prototype
-  $void.injectTo(Boolean, 'type', type)
-  $void.injectTo(Boolean, ':', proto[':'])
+  nativeIndexer(Type, Boolean, 'boolean')
 }

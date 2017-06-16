@@ -13,7 +13,7 @@ var keywords = Object.assign(Object.create(null), {
 function createTokenizer ($void) {
   var InvalidSymbol = $void.InvalidSymbol
   var $ = $void.$
-  var symbolValueOf = $.Symbol['value-of']
+  var symbolValueOf = $.symbol['of']
 
   return function tokenizer (lines, source) {
     var lineNo = 0

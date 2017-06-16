@@ -1,31 +1,112 @@
 'use strict'
 
+function iterator ($void) {
+  var Range$ = $void.Range
+  return function (counting) {
+    if (!(this instanceof Range$)) {
+      return null
+    }
+    var range = this
+    var value = this.begin
+    return function (inSitu) {
+      if (range.step > 0 ? value >= range.end : value <= range.end) {
+        return null
+      }
+      if (typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0) {
+        return value
+      }
+      var v = value; value += range.step
+      return v
+    }
+  }
+}
+
 module.exports = function ($void) {
   var $ = $void.$
-  var Range = $.Range
-  var readonly = $void.readonly
+  var Type = $.range
+  var Range$ = $void.Range
+  var Integer$ = $void.Integer
+  var link = $void.link
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var managedIndexer = $void.managedIndexer
 
-  readonly(Range, 'create', function Range$create (begin, end, step) {
-    if (typeof begin !== 'number' || isNaN(begin)) {
+  // the empty value
+  link(Type, 'empty', new Range$(0, 0, 1))
+
+  // create a range
+  link(Type, 'of', function (begin, end, step) {
+    // begin: must be a finite value.
+    if (begin instanceof Integer$) {
+      begin = begin.number
+    }
+    if (typeof begin !== 'number' || isNaN(begin) || !isFinite(begin)) {
       begin = 0
     }
-    if (typeof end !== 'number' || isNaN(end)) {
+    // end: must be a finite value.
+    if (end instanceof Integer$) {
+      end = end.number
+    }
+    if (typeof end === 'undefined') {
       end = begin
       begin = 0
+    } else if (typeof end !== 'number' || isNaN(end) || !isFinite(end)) {
+      end = 0
     }
-    if (typeof step !== 'number' || isNaN(step) || step === 0) {
-      step = end >= begin ? 1 : -1
+    // step: must be non-zero and finite.
+    if (step instanceof Integer$) {
+      step = step.number
     }
-
-    var range = Object.create(Range.proto)
-    range.begin = begin
-    range.end = end
-    range.step = step
-    return range
+    if (typeof step !== 'number' || isNaN(step) || !isFinite(step)) {
+      step = 0
+    }
+    return new Range$(begin, end, step || begin <= end ? 1 : -1)
   })
 
-  var proto = Range.proto
-  proto.begin = 0
-  proto.end = 0
-  proto.step = 1
+  typeIndexer(Type)
+
+  var proto = Type.proto
+  // generate an iterator function
+  link(proto, 'iterate', iterator($void))
+
+  // Identity and Equivalence: to be determined by field values.
+  var equals = link(proto, ['is', 'equals', '=='], function (another) {
+    return this === another || (
+      this instanceof Range$ && another instanceof Range$ &&
+      this.begin === another.begin &&
+      this.end === another.end &&
+      this.step === another.step)
+  }, ['is-not', 'not-equals', '!='])
+
+  // override comparison logic to keep consistent with Identity & Equivalence.
+  link(proto, 'compare', function (another) {
+    return equals.call(this, another) ? 0 : null
+  })
+
+  // Type Verification
+  typeVerifier(Type)
+
+  // range is empty if it cannot iterate at least once.
+  link(proto, 'is-empty', function () {
+    return this instanceof Range$
+      ? (this.step > 0 ? this.begin >= this.end : this.begin <= this.end)
+      : null
+  }, 'not-empty')
+
+  // Encoding
+  link(proto, 'to-code', function () {
+    return this instanceof Range$ ? this : null
+  })
+
+  // Representation
+  link(proto, 'to-string', function () {
+    return this instanceof Range$
+      ? '(' + [this.begin, this.end, this.step].join(' ') + ')'
+      : null
+  })
+
+  // Indexer for proto and instance values
+  managedIndexer(Type, Range$, {
+    begin: 1, end: 1, step: 1 // public fields
+  })
 }

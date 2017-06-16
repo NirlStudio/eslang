@@ -2,80 +2,46 @@
 
 var JS = global || window
 
-function exportConstants ($void) {
-  var $ = $void.$
-  $void.constant($, '', null)
-  $void.constant($, 'true', true)
-  $void.constant($, 'false', false)
-  $void.constant($, 'NaN', NaN)
-  $void.constant($, 'Infinity', Infinity)
-}
-
 function initializeSpace ($void) {
-  // populating
+  require('./generic/void')($void)
+
   require('./generic/null')($void)
   require('./generic/type')($void)
 
-  var $ = $void.$
-  var constant = $void.constant
+  require('./generic/bool')($void)
+  require('./generic/string')($void)
+  require('./generic/number')($void)
+  require('./generic/integer')($void)
+  require('./generic/date')($void)
+  require('./generic/range')($void)
 
   require('./generic/symbol')($void)
-  constant($, 'symbol', $.Symbol['value-of'])
+  require('./generic/tuple')($void)
 
-  require('./generic/bool')($void)
-  constant($, 'bool', $.Bool['value-of'])
-
-  require('./generic/number')($void)
-  constant($, 'number', $.Number['value-of'])
-
-  require('./generic/int')($void)
-  constant($, 'int', $.Int['value-of'])
-
-  require('./generic/float')($void)
-  constant($, 'float', $.Float['value-of'])
-
-  require('./generic/date')($void)
-  constant($, 'date', $.Date['value-of'])
-
-  require('./generic/string')($void)
-  constant($, 'string', $.String['value-of'])
-
+  require('./generic/operator')($void)
+  require('./generic/lambda')($void)
   require('./generic/function')($void)
-  constant($, 'call', $.Function['call'])
-  constant($, 'apply', $.Function['apply'])
 
   require('./generic/object')($void)
-  constant($, 'object', $.Object['create'])
+  require('./generic/module')($void)
 
   require('./generic/array')($void)
-  constant($, 'array', $.Array['create'])
+  require('./generic/set')($void)
+  require('./generic/map')($void)
 
   require('./generic/range')($void)
-  constant($, 'range', $.Range['create'])
-
-  require('./generic/enum')($void)
-  constant($, 'enum', $.Enum['define'])
-
-  require('./generic/flags')($void)
-  constant($, 'flags', $.Flags['define'])
-
-  require('./generic/interface')($void)
-  constant($, 'interface', $.Interface['create'])
 
   require('./generic/class')($void)
-  constant($, 'class', $.Class['define'])
+  require('./generic/device')($void)
 
-  // iterate all field names and values
-  require('./generic/object-iterator')($void)
-  // iterate all offsets and values
-  require('./generic/array-iterator')($void)
-  // iterate all values in the range
-  require('./generic/range-iterator')($void)
+  require('./generic/global')($void)
+
   require('./generic/iterate')($void)
 
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
   require('./lib/json')($void, JS)
+  require('./lib/timer')($void, JS)
 }
 
 function initializeRuntime ($void) {
@@ -91,18 +57,16 @@ function initializeRuntime ($void) {
 module.exports = function start () {
   // Hello, world.
   var $void = require('./generic/genesis')()
-  var $ = $void.$
-  var constant = $void.constant
-
-  // export global constant values.
-  exportConstants($void)
 
   // create generic type system
-  require('./coding')($void)
   initializeSpace($void)
 
   // prepare runtime functions
   initializeRuntime($void)
+
+  var $export = function (name, value) {
+    $void.export($void.$, name, value)
+  }
 
   require('./operators/all')($void)
 
@@ -116,7 +80,7 @@ module.exports = function start () {
   require('./compiler')($void)
 
   // compile a piece of code to program/clauses: [[]].
-  constant($, 'compile', function (code, src) {
+  $export('compile', function (code, src) {
     return $void.compiler()(code, src)
   })
 
@@ -126,8 +90,10 @@ module.exports = function start () {
   require('./runtime/space')($void)
   // real program executors
   require('./runtime/execute')($void)
+
   // export function executors as global functions
-  constant($, 'execute', $.Function['execute'])
+  // TODO - to be removed?
+  $export('execute', $.function['execute'])
 
   require('./runtime/meta')($void)
   return $void

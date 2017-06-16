@@ -1,7 +1,7 @@
 'use strict'
 
-function create () {
-  return function Array$create (x, y, z) {
+function createArrayOf () {
+  return function (x, y, z) {
     switch (arguments.length) {
       case 0:
         return []
@@ -17,305 +17,350 @@ function create () {
   }
 }
 
-function fromSource () {
-  return function Array$from (source, mapFunc, thisArg) {
-    var result = []
-    if (typeof source.iterate === 'function') {
-      if (typeof mapFunc !== 'function') {
-        mapFunc = null
+function createMerge ($void) {
+  var thisCall = $void.thisCall
+
+  return function () {
+    if (!Array.isArray(this)) {
+      return null
+    }
+    for (var i = 0; i < arguments.length; i++) {
+      var source = arguments[i]
+      if (Array.isArray(source)) {
+        this.push.apply(this, source)
+        continue
       }
-      if (typeof thisArg === 'undefined' || thisArg === null) {
-        thisArg = result
+      var next = typeof source === 'function'
+        ? source : thisCall(source, 'iterate')
+      if (typeof next !== 'function') {
+        this.push(source)
+        continue
       }
-      var iter = source.iterate()
-      if (typeof iter.next === 'function') {
-        while (iter.next()) {
-          if (mapFunc) {
-            result.push(mapFunc.call(thisArg, iter.value))
-          } else {
-            result.push(iter.value)
+      var item = next()
+      while (typeof item !== 'undefined' && item !== null) {
+        if (Array.isArray(item)) {
+          if (item.length > 0) {
+            this.push(item[0])
           }
+        } else {
+          this.push(item)
         }
+        item = next()
       }
     }
-    return result
+    return this
   }
 }
 
-function toCodeAsRoot (array, ctx) {
-  analyzeArray(array, ctx)
-  ctx.analyzed = true
-
-  // update status for this object.
-  var status = ctx.generating(array)
-  var code = arrayToCode(array, ctx)
-  if (ctx.count() > 0) { // use ctx result
-    if (status.key) {
-      return ctx.end('(' + status.key + ' += ' + code + ')') // update
-    } else {
-      return ctx.end(code)
+function iterator ($void) {
+  return function () {
+    if (!Array.isArray(this)) {
+      return null
     }
-  } else {
-    return code // no nested object, return code directly
-  }
-}
-
-function toCodeAsChild (array, ctx) {
-  if (!ctx.analyzed) { // in analyzing
-    switch (ctx.analyze(array)) {
-      case 0: // not repeated yet.
-        return analyzeArray(array, ctx)
-      case 1: // repeated once
-        return ctx.create(array, '(@)')
-      default: // more than once
-        return // do nothing
+    var list = this
+    var index = 0
+    return function (inSitu) {
+      return (index >= list.length) ? null
+        : typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
+          ? [list[index]] : [list[index++]]
     }
   }
-
-  // generating code
-  var status = ctx.generating(array)
-  if (!status.key) { // single occurrence
-    return arrayToCode(array, ctx)
-  }
-  if (status.stage === 1) { // repeated first time.
-    ctx.update('(' + status.key + ' += ' + arrayToCode(array, ctx) + ')')
-  }
-  // generated before, so here returns variable name only.
-  return status.key
-}
-
-function analyzeArray (array, ctx) {
-  array.forEach(function analyzeField (value) {
-    if (value !== null && (typeof value === 'object' ||
-      typeof value === 'function')) {
-      ctx.toCode(value)
-    }
-  })
-}
-
-function arrayToCode (array, ctx) {
-  var code = ['(@']
-  array.forEach(function printItem (value) {
-    code.push(ctx.toCode(value, '()'))
-  })
-  code.push(')')
-  return code.join(ctx.asCompat ? ' ' : '\n')
 }
 
 module.exports = function ($void) {
   var $ = $void.$
-  var type = $.Array
-  var readonly = $void.readonly
-  var virtual = $void.virtual
+  var Type = $.array
+  var $Tuple = $.tuple
+  var $Symbol = $.symbol
+  var $Object = $.object
+  var boolOf = $.bool.of
+  var link = $void.link
+  var typeOf = $void.typeOf
+  var Tuple$ = $void.Tuple
+  var Integer$ = $void.Integer
+  var thisCall = $void.thisCall
   var copyProto = $void.copyProto
-
-  // create an array with its elements
-  readonly(type, 'create', create())
+  var ObjectType$ = $void.ObjectType
+  var CodingContext$ = $void.CodingContext
+  var typeIndexer = $void.typeIndexer
+  var typeVerifier = $void.typeVerifier
+  var nativeIndexer = $void.nativeIndexer
 
   // create an empty array.
-  readonly(type, 'empty', function Array$empty () {
+  link(Type, 'empty', function () {
     return []
   })
 
-  // create an array by concat arguments
-  readonly(type, 'concat', function Array$of () {
-    return arguments.length < 1 ? [] : Array.prototype.concat.apply([], arguments)
-  })
+  // create an array with its elements
+  link(Type, 'of', createArrayOf())
 
   // convert any iterable object to an array.
-  readonly(type, 'from', fromSource())
+  link(Type, 'from', function () {
+    return merge.apply([], arguments)
+  })
 
-  var proto = type.proto
+  // Type Indexer
+  typeIndexer(Type)
+
+  var proto = Type.proto
+  // generate a new object by comine this object and other objects.
+  var merge = link(proto, '+=', createMerge($void))
+
+  // to create a shallow copy of this instance with the same type.
+  link(proto, 'copy', function () {
+    return Array.isArray(this) ? this.slice(0) : null
+  })
+
+  // generate an iterator function
+  link(proto, 'iterate', iterator($void))
 
   // forward the length property.
-  virtual(proto, 'length', function array$length () {
-    return this.length
+  link(proto, 'length', function () {
+    return Array.isArray(this) ? this.length : null
   })
 
   // array element accessors
-  virtual(proto, 'get', function array$get (offset) {
-    return typeof offset === 'number' && offset >= 0 && offset < this.length
-      ? this[offset] : null
-  })
-  virtual(proto, 'set', function array$set (offset, value) {
-    if (typeof offset !== 'number' || offset >= this.length) {
+  link(proto, 'get', function (offset) {
+    if (offset instanceof Integer$) {
+      offset = offset.number
+    }
+    if (!Array.isArray(this) || typeof offset !== 'number') {
       return null
     }
-    return typeof offset === 'number' && offset >= 0 && offset < this.length
-      ? (this[offset] = typeof value === 'undefined' ? null : value) : null
+    var value = this[offset]
+    return typeof value === 'undefined' ? null : value
   })
-  virtual(proto, 'first', function array$first () {
-    return this.length > 0 ? this[0] : null
+  link(proto, 'set', function (offset, value) {
+    if (offset instanceof Integer$) {
+      offset = offset.number
+    }
+    if (!Array.isArray(this) || typeof offset !== 'number') {
+      return null
+    }
+    var current = this[offset]
+    this[offset] = typeof value === 'undefined' ? null : value
+    return typeof current === 'undefined' ? null : current
   })
-  virtual(proto, 'last', function array$last () {
-    return this.length > 0 ? this[this.length - 1] : null
-  })
-
-  var verify = Array.isArray.bind(Array)
-
-  // standard array operations to produce a new array
-  copyProto(type, Array, verify, {
-    // index-based subset generation
-    'slice': 'slice',
-    'concat': 'concat' /* IE5.5 */
-  })
-
-  // override operations for a container.
-  // revesed indexer: find offset by value
-  copyProto(type, Array, verify, {
-    /* CH/FF/SF, IE9+ */
-    'indexOf': 'index-of',
-    'lastIndexOf': 'last-index-of'
-  })
-
-  // array data structure manipulation.
-  virtual(proto, 'swap', function array$swap (x, y) {
-    var tmp
-    var length = this.length
-    if (x >= 0 && x < length) {
-      tmp = this[x]
-      if (y >= 0 && y < length) {
-        this[x] = this[y]
-        this[y] = tmp
-      } else {
-        this[x] = null
-      }
+  link(proto, 'clear', function () {
+    if (Array.isArray(this)) {
+      this.splice(0)
+      return this
     } else {
-      tmp = null
-      if (y >= 0 && y < length) {
-        this[y] = null
+      return null
+    }
+  })
+  // sawp two value by offsets.
+  link(proto, 'swap', function (x, y) {
+    if (!Array.isArray(this)) {
+      return false
+    }
+    if (x instanceof Integer$) {
+      x = x.number
+    }
+    if (typeof x !== 'number' || x < 0) {
+      x = 0
+    }
+    if (y instanceof Integer$) {
+      y = y.number
+    }
+    if (typeof y !== 'number' || y >= this.length) {
+      y = this.length - 1
+    }
+    if (x === y) {
+      return false
+    }
+    var tmp = this[x]
+    this[x] = this[y]
+    this[y] = tmp
+    return true
+  })
+
+  // merge this tuple and argument values to create a new one.
+  link(proto, 'concat', function () {
+    return Array.isArray(this) ? this.concat.apply(this, arguments) : null
+  })
+
+  // generate a new object by comine this object and other objects.
+  link(proto, ['merge', '+'], function () {
+    return Array.isArray(this) ? merge.apply(this.slice(0), arguments) : null
+  })
+  link(proto, 'first', function (value) {
+    if (!Array.isArray(this) || this.length < 1) {
+      return null
+    }
+    if (typeof value === 'undefined') {
+      return this[0]
+    }
+    for (var i = 0; i < this.length; i++) {
+      var v = this[i]
+      if (v === value || Object.is(v, value) || thisCall(v, 'equals', value)) {
+        return i
       }
     }
-    return tmp
+    return null
   })
-  copyProto(type, Array, verify, {
-    /* IE5.5 */
-    'splice': 'splice',
-    'shift': 'shift',
-    'unshift': 'unshift'
-  })
-  // re-ordering by its values
-  copyProto(type, Array, verify, {
-    /* CH/FF/SF, IE9+ */
-    'reverse': 'reverse',
-    'sort': 'sort'
-  })
-  // use an array as a stack data structure
-  copyProto(type, Array, verify, {
-    /* IE5.5 */
-    'pop': 'pop',
-    'push': 'push'
-  })
-
-  // generate a new collection by a customized logic.
-  // TODO - generalized it to for-in loop or an interace?
-  copyProto(type, Array, verify, {
-    /* IE9 */
-    'map': 'map',
-    'filter': 'filter'
-  })
-
-  // support comparison operators to test length
-  virtual(proto, '>', function array$oprGT (length) {
-    return typeof length === 'number' ? this.length > length : false
-  })
-  virtual(proto, '>=', function array$oprGE (length) {
-    return typeof length === 'number' ? this.length >= length : false
-  })
-  virtual(proto, '<', function array$oprLT (length) {
-    return typeof length === 'number' ? this.length < length : false
-  })
-  virtual(proto, '<=', function array$oprLE (length) {
-    return typeof length === 'number' ? this.length <= length : false
-  })
-
-  // override copy function
-  copyProto(type, Array, verify, {
-    'slice': 'copy'
-  })
-
-  // override general operators
-  copyProto(type, Array, verify, {
-    'concat': '+' /* IE5.5 */
-  })
-  virtual(proto, '+=', function array$oprMerge () {
-    Array.prototype.concat.apply(this, arguments)
-  })
-
-  // default object persistency & describing logic
-  var coding = $void.coding
-  readonly(proto, 'to-code', function array$toCode (asCompat) {
-    if (!Array.isArray(this)) {
-      return '(@)'
+  link(proto, 'last', function (value) {
+    if (!Array.isArray(this) || this.length < 1) {
+      return null
     }
-    return coding.is(asCompat) ? toCodeAsChild(this, asCompat)
-      : toCodeAsRoot(this, coding.start(this, asCompat))
-  })
-  readonly(proto, 'to-clause', function array$toString (asCompat) {
-    if (!Array.isArray(this)) {
-      return '()'
+    if (typeof value === 'undefined') {
+      return this[this.length - 1]
     }
-    var ctx = coding.start(this, asCompat)
-    var code = []
-    ctx.decompile(this, code)
-    return '(' + code.join(' ') + ')'
-  })
-  readonly(proto, 'to-program', function array$toString (asCompat) {
-    if (!Array.isArray(this)) {
-      return '()'
-    }
-    var ctx = coding.start(this, asCompat)
-    var code = ctx.decompile(this)
-    return code.join('\n')
-  })
-  readonly(proto, 'to-string', function array$toString (separator) {
-    if (!Array.isArray(this)) {
-      return '(@)'
-    }
-    var items = []
-    this.forEach(function printField (value) {
-      if (value === null) {
-        items.push('null')
-      } else if (typeof value !== 'object' || value instanceof Date) {
-        items.push(coding.toString(value))
-      } else {
-        if (value.type && value.type.name) {
-          items.push('(' + value.type.name.toLowerCase() + ' )')
-        } else {
-          items.push('(@:)')
-        }
-      }
-    }, this)
-    return items.join(separator || ' ')
-  })
-
-  // determine emptiness by array's length
-  readonly(proto, 'is-empty', function array$isEmpty () {
-    return this.length < 1
-  })
-  readonly(proto, 'not-empty', function array$notEmpty () {
-    return this.length > 0
-  })
-
-  // indexer: overridding, interpret number value as offset.
-  readonly(proto, ':', function array$indexer (index, value) {
-    if (arguments.length === 1) {
-      if (typeof index === 'number') {
-        return index < 0 || index >= this.length ? null : this[index]
-      } else {
-        return typeof proto[index] === 'undefined' ? null : proto[index]
-      }
-    } else if (arguments.length > 1) {
-      if (typeof index === 'number') {
-        return index < 0 || index >= this.length ? null : (this[index] = value)
-      } else {
-        // prevent give a managed array extra properties
+    for (var i = this.length - 1; i >= 0; i--) {
+      var v = this[i]
+      if (v === value || Object.is(v, value) || thisCall(v, 'equals', value)) {
+        return i
       }
     }
     return null
   })
 
-  // export to system's prototype
-  $void.injectTo(Array, 'type', type)
-  $void.injectTo(Array, ':', proto[':'])
+  // create a slice of the original tuple
+  link(proto, 'slice', function (begin, end) {
+    if (!Array.isArray(this)) {
+      return null
+    }
+    if (begin instanceof Integer$) {
+      begin = begin.number
+    } else if (typeof begin !== 'number') {
+      begin = 0
+    }
+    if (end instanceof Integer$) {
+      end = end.number
+    }
+    return typeof end === 'number' ? this.slice(begin, end) : this.slice(begin)
+  })
+
+  var verify = Array.isArray.bind(Array)
+  // standard array operations to produce a new array
+  copyProto(Type, Array, verify, {
+    'splice': 'splice'
+  })
+
+  // use an array as a stack.
+  copyProto(Type, Array, verify, {
+    /* IE5.5 */
+    'pop': 'pop',
+    'push': 'push'
+  })
+
+  // reverse
+  link(proto, 'reverse', function (copy) {
+    return !Array.isArray(this) ? null
+      : boolOf(copy) ? this.slice(0).reverse() : this.reverse()
+  })
+
+  // sort
+  link(proto, 'sort', function (comparer, copy) {
+    if (!Array.isArray(this) || this.length < 1) {
+      return this
+    }
+    if (typeof comparer === 'boolean') {
+      copy = comparer
+      comparer = null
+    } else if (typeof comparer !== 'function') {
+      comparer = null
+    }
+    var comparing = comparer ? function (a, b) {
+      var order = comparer(a, b)
+      return order !== -1 && order !== 1 ? 0 : order
+    } : function (a, b) {
+      var order = thisCall(a, 'compare', b)
+      return order !== -1 && order !== 1 ? 0 : order
+    }
+    return !Array.isArray(this) ? null
+      : boolOf(copy) ? this.slice(0).sort(comparing) : this.sort(comparing)
+  })
+
+  // Type Verification
+  typeVerifier(Type)
+
+  // determine emptiness by array's length
+  link(proto, 'is-empty', function () {
+    return Array.isArray(this) ? this.length < 1 : null
+  }, 'not-empty', function () {
+    return Array.isArray(this) ? this.length > 0 : null
+  })
+
+  // default object persistency & describing logic
+  var toCode = link(proto, 'to-code', function (ctx) {
+    if (!Array.isArray(this)) {
+      return null // illegal call.
+    }
+    // an empty object.
+    if (this.length < 1) {
+      return $Tuple.array
+    }
+    // not empty
+    if (ctx instanceof CodingContext$) {
+      var sym = ctx.touch(this, Type)
+      if (sym) {
+        return sym
+      }
+      return encode(ctx, this)
+    } else { // as root
+      ctx = new CodingContext$()
+      ctx.touch(this, Type)
+      var code = encode(ctx, this)
+      return ctx.final(code)
+    }
+  })
+
+  function encode (ctx, array) {
+    var list = [$Symbol.object] // (@ ...
+    for (var i = 0; i < array.length; i++) {
+      var value = array[i]
+      var vtype = typeOf(value)
+      list.push(
+        vtype === Type || vtype instanceof ObjectType$
+          ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code')
+      )
+    }
+    return ctx.complete(array, new Tuple$(list))
+  }
+
+  // Description
+  link(proto, 'to-string', function (separator) {
+    if (!Array.isArray(this)) {
+      return null
+    }
+    var items = ['(@']
+    for (var i = 0; i < this.length; i++) {
+      var value = this[i]
+      var valueType = typeOf(value)
+      if (valueType === $Object || valueType instanceof ObjectType$) {
+        // prevent recursive call.
+        items.push('(@:' + valueType['to-string']() + ' ... )')
+      } else {
+        items.push(thisCall(value, 'to-string'))
+      }
+    }
+    items.push(')')
+    return items.join(separator || ' ')
+  })
+
+  // Indexer
+  nativeIndexer(Type, Array, null, function (name, value) {
+    if (!Array.isArray(this) || name === ':') {
+      return null
+    }
+    // global static properties.
+    if (name === 'type') {
+      return Type
+    } else if (name === 'to-code') {
+      return toCode // to keep the to-code mechanisim consistent.
+    }
+    if (name instanceof Integer$) {
+      name = name.number
+    }
+    return typeof name === 'string' // read properties
+      ? name && typeof proto[name] !== 'undefined' ? proto[name] : null
+      : typeof name !== 'number' ? null
+        : typeof value === 'undefined'
+          ? typeof this[name] === 'undefined' ? null : this[name]
+            : (function (list, i, v) {
+              var t = list[i]; list[i] = v
+              return typeof t === 'undefined' ? null : t
+            })(this, name, value)
+  })
 }
