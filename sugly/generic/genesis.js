@@ -184,14 +184,17 @@ module.exports = function () {
   var ObjectType$ = $void.ObjectType = function ObjectType$ () {}
   ObjectType$.prototype = $.object
 
-  // A module is a special object which is the unit to organize programs and may
-  // export some entities. It's also a shared context for its inner functions.
-  // A module is identified by the value of the field :source
+  // A module is a special object which is a descriptor of a module. It's not the
+  // module itself.
   create('module', $.object)
   var Module$ = $void.Module = function Module$ (uri) {
-    publish(this, 'module-uri', uri)
+    publish(this, 'uri', uri)
+    define(this, 'is-readonly', true)
   }
   Module$.prototype = $.module.proto
+
+  // define a placeholder module for global context.
+  define($, '-module', new Module$('$'))
 
   /* Basic Data Structures */
   /* A fundamental data structure is mutable as a collection. */

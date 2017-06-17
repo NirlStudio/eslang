@@ -270,14 +270,10 @@ module.exports = function ($void) {
     while ((item = entries.next())) {
       // key : value
       var key = item[0]
-      var ktype = typeOf(key)
-      list.push(ktype === $Object || ktype instanceof ObjectType$
-        ? thisCall(key, 'to-code', ctx) : thisCall(key, 'to-code'))
+      list.push(thisCall(key, 'to-code', ctx))
       list.push($Symbol.pairing)
       var value = item[1]
-      var vtype = typeOf(value)
-      list.push(vtype === $Object || vtype instanceof ObjectType$
-        ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code'))
+      list.push(thisCall(value, 'to-code', ctx))
     }
     return ctx.complete(map, new Tuple$(list))
   }

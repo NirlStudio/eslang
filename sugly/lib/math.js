@@ -6,7 +6,9 @@ module.exports = function ($void, JS) {
   var $export = $void.export
   var copyObject = $void.copyObject
 
-  var math = $export($, 'math', object.empty())
+  var math = $export($, 'math', object.of({
+    'is-readonly': true
+  }))
   // TODO: naming & removing?
   copyObject(math, JS.Math, {
     /* basic */

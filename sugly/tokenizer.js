@@ -2,7 +2,7 @@
 
 var RegexNumber = /^-?\d+\.?\d*$/
 
-var keywords = Object.assign(Object.create(null), {
+var Constants = Object.assign(Object.create(null), {
   'null': null,
   'true': true,
   'false': false,
@@ -10,216 +10,287 @@ var keywords = Object.assign(Object.create(null), {
   'Infinity': Infinity
 })
 
-function createTokenizer ($void) {
+module.exports = function ($void) {
   var InvalidSymbol = $void.InvalidSymbol
   var $ = $void.$
-  var symbolValueOf = $.symbol['of']
+  var integerOf = $.integer.of
+  var symbolOf = $.symbol.of
+  var $export = $void.export
 
-  return function tokenizer (lines, source) {
+  var tokenizer = $export($, 'tokenizer', function (compiler) {
+    var raiseToken = compiler || printToken
+
     var lineNo = 0
-    var offset = 0
-    var indent = 0
-    var current = null
+    var lineOffset = 0
+    var waiter = null
+    var spacing = false
+    var indenting = 0
+    var lastChar = null
+    var escaping = false
+    var pendingIndent = -1
+    var pendingLine = 0
+    var pendingOffset = 0
+    var pendingText = ''
 
-    function nextChar () {
-      if (current) {
-        return current
-      }
+    var singleQuoteWaiter = createStringWaiter("'")
+    var doubleQuoteWaiter = createStringWaiter('"')
 
-      if (lineNo >= lines.length) {
-        return null
-      }
-
-      var line = lines[lineNo]
-      if (offset < line.length) {
-        current = line[offset]
-        offset += 1
-      } else {
-        lineNo += 1
-        offset = 0
-        current = '\n' // insert a virtual new-line
-      }
-      return current
-    }
-
-    function createToken (type) {
-      var t = {
-        type: type,
-        source: source,
-        indent: indent,
-        startLine: lineNo,
-        startOffset: offset - 1
-      }
-      indent = -1 // clear indent for the first non-whitespace.
-      return t
-    }
-
-    function finalizeToken (token, value, type) {
-      token.value = value
-      token.endLine = lineNo
-      token.endOffset = offset
-      if (type) {
-        token.type = type
-      }
-      return token
-    }
-
-    function readString () {
-      var token = createToken('value')
-      var str = '"'
-      var index = offset
-
-      var line = lines[lineNo]
-      while (index < line.length) {
-        var c = line[index]
-        index += 1
-        if (c === '"') {
-          str += '"'; break
+    var reseting = false
+    return function tokenizing (text) {
+      if (typeof text !== 'string') { // stopping
+        if (!reseting && waiter) {
+          waiter() // finalize pending action
         }
-        if (c !== '\\') {
-          str += c; continue
+        if (!reseting) {
+          reseting = true // update state
         }
-
-        if (index >= line.length) {
-          str += '\\n'
-        } else if (line[index] === '\r') {
-          str += '\\r\\n'
-        } else {
-          str += '\\' + line[index]
-          index += 1; continue
+        // reseting: wating next piece of source code to continue
+        return false
+      }
+      if (reseting) { // resume parsing
+        resumeParsing() // clear parsing context
+      }
+      // start parsing
+      for (var i = 0; i < text.length; i++) {
+        if (pushChar(text[i])) {
+          return false // reseting
         }
-
-        lineNo += 1
-        line = lineNo >= lines.length ? '' : lines[lineNo]
-        index = 0
       }
-
-      try {
-        offset = index
-        return finalizeToken(token, JSON.parse(str))
-      } catch (err) {
-        $.warn({
-          from: '$/sugly/tokenizer',
-          message: 'Invalid string input: ' + str,
-          source: source,
-          line: lineNo,
-          offset: offset,
-          inner: err
-        })
-        finalizeToken(token, '', 'error')
-        return token
-      }
+      return true // keep waiting more code
     }
 
-    function readComment () {
-      var line = lines[lineNo]
-      var comment = line.substring(offset)
-      offset = line.length
-      return comment
+    function resumeParsing () {
+      lineNo = 0
+      lineOffset = 0
+      waiter = null
+      spacing = false
+      indenting = 0
+      lastChar = null
+      escaping = false
+      pendingIndent = -1
+      pendingLine = 0
+      pendingOffset = 0
+      pendingText = ''
+      reseting = false
     }
 
-    function readSymbolOrValue (s) {
-      var token = createToken('symbol')
-
-      var n = nextChar()
-      while (n) {
-        if (InvalidSymbol.test(n)) {
-          break
-        }
-        s += n
-        current = null
-        n = nextChar()
+    function pushChar (c) {
+      if (waiter && waiter(c)) {
+        nextChar(c)
+        return reseting
       }
-
-      if (typeof keywords[s] !== 'undefined') {
-        return finalizeToken(token, keywords[s], 'value')
-      }
-      if (RegexNumber.test(s)) {
-        return finalizeToken(token, Number.parseFloat(s), 'value')
-      }
-      return finalizeToken(token, symbolValueOf(s))
-    }
-
-    return function nextToken () {
-      var c = nextChar()
-      if (c === null) {
-        return null // no more
-      }
-
-      if (c === '\n') {
-        indent = 0 // reset indent status.
-      } else if (c === ' ' && indent >= 0) {
-        indent += 1 // count leading whitespaces.
-      }
-
-      current = null
       switch (c) {
         case '(':
-          return finalizeToken(createToken('punctuation'), c)
-
         case ')':
-          var n = nextChar()
-          if (n === ',') {
-            current = null
-            return finalizeToken(createToken('punctuation'), c + n)
-          }
-          if (n === '.') {
-            current = null
-            return finalizeToken(createToken('punctuation'), c + n)
-          }
-          return finalizeToken(createToken('punctuation'), c)
-
-        case '$':
+        case ',': // reserved as punctuation
+        case ';': // reserved as punctuation
+        case '\\': // reserved as punctuation
+          raiseToken('punctuation', c, [indenting, lineNo, lineOffset])
+          break
         case '`':
         case '@':
         case ':':
-          // single character symbols.
-          return finalizeToken(createToken('symbol'), symbolValueOf(c))
-
-        case "'": // reserved as a punctuation.
-          return nextToken()
-
+        case '$':
+          raiseToken('symbol', c, [indenting, lineNo, lineOffset])
+          break
+        case "'":
+          beginWaiting("'", singleQuoteWaiter)
+          break
         case '"':
-          return readString()
-
-        case ' ':
-        case '\r':
-        case '\n':
-          // skipping free whitespaces.
-          return nextToken()
-
+          beginWaiting('"', doubleQuoteWaiter)
+          break
         case '#':
-          // comment to end of the line.
-          return finalizeToken(createToken('comment'), readComment())
-
-        case '\t': // The world would be more peceaful now.
-          if (indent < 0) {
-            return nextToken()
+          beginWaiting('', commentWaiter)
+          break
+        case ' ':
+          if (indenting >= 0) {
+            indenting += 1
+          } else {
+            raiseSpace(c)
           }
-          $.warn({
-            from: '$/sugly/tokenizer',
-            message: 'TAB is not allowed to be used as an indent character in source code.',
-            source: source,
-            line: lineNo,
-            offset: offset
-          })
-          return finalizeToken(createToken('error'))
-
+          break
+        case '\t': // The world would be more peceaful now.
+          if (indenting >= 0) {
+            raiseToken('error', c, [indenting, lineNo, lineOffset],
+              'tab-indent', 'TAB cannot be used as indent character.')
+            reseting = true
+            return true // ending
+          } else {
+            raiseSpace(c)
+          }
+          break
         default:
-          return readSymbolOrValue(c)
+          beginSymbol(c)
+          break
+      }
+      nextChar(c)
+      return reseting
+    }
+
+    function nextChar (c) {
+      lastChar = c
+      if (c !== ' ') {
+        indenting = -1
+      }
+      if (c === '\n') {
+        lineNo += 1
+        lineOffset = 0
+        indenting = 0
+      } else {
+        lineOffset += 1
       }
     }
-  }
+
+    function beginWaiting (c, stateWaiter) {
+      pendingText = c
+      pendingLine = lineNo
+      pendingOffset = lineOffset
+      pendingIndent = indenting
+      waiter = stateWaiter
+    }
+
+    function createStringWaiter (quote) {
+      return function (c) {
+        if (!c) {
+          raiseToken('error', pendingText,
+            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
+            'missing-quote: ' + quote, 'the format of string is invalid.')
+          reseting = true
+          return true
+        }
+
+        if (escaping) {
+          pendingText += c
+          escaping = false
+          return true
+        }
+        if (c !== quote) {
+          pendingText += c
+          if (c === '\\') {
+            escaping = true
+          }
+          return true
+        }
+        // string reseting
+        pendingText += quote
+        var value = JSON.parse(pendingText)
+        if (typeof value === 'string') {
+          raiseToken('value', value,
+            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
+          waiter = null
+          return true
+        }
+        // invalid string.
+        raiseToken('error', pendingText,
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
+          'invalid-string:' + quote, 'the format of string is invalid.')
+        reseting = true
+        return true
+      }
+    }
+
+    function raiseSpace (c) {
+      if (!spacing) {
+        spacing = true
+        raiseToken('space', c, [indenting, lineNo, lineOffset])
+      }
+    }
+
+    function commentWaiter (c) {
+      if (c !== '\n') {
+        if (pendingText.length < 1 && c === '(') {
+          waiter = blockCommentWaiter
+          return true
+        } else if (c) {
+          pendingText += c
+          return true
+        }
+      }
+      raiseToken('comment', pendingText,
+        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset]
+      )
+      waiter = null
+      return true
+    }
+
+    function blockCommentWaiter (c) {
+      if (c) {
+        if (lastChar !== ')' || c !== '#') {
+          pendingText += c
+          return true
+        }
+      }
+      raiseToken('comment', pendingText,
+        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset]
+      )
+      waiter = null
+      return true
+    }
+
+    function beginSymbol (c) {
+      if (/[\s]/.test(c)) {
+        raiseSpace(c) // report space once.
+      } else {
+        beginWaiting(c, symbolWaiter)
+      }
+    }
+
+    function symbolWaiter (c) {
+      if (c && !InvalidSymbol.test(c)) {
+        pendingText += c
+        return true
+      }
+      finalizeSymbol()
+      waiter = null
+      return false
+    }
+
+    function finalizeSymbol () {
+      if (RegexNumber.test(pendingText)) {
+        // try float number
+        var fvalue = parseFloat(pendingText)
+        raiseToken('value', Number.isSafeInteger(fvalue) ? integerOf(fvalue) : fvalue,
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
+      } else if (pendingText.startsWith('0')) {
+        // try integer number
+        var ivalue = parseInt(pendingText)
+        if (Number.isSafeInteger(ivalue)) {
+          raiseToken('value', integerOf(ivalue),
+            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
+        } else {
+          raiseToken('error', pendingText,
+            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
+            'invalid-integer:', 'the format of the value is not recognizable.')
+          reseting = true
+        }
+      } else if (typeof Constants[pendingText] !== 'undefined') {
+        // check if a constant value
+        raiseToken('value', Constants[pendingText],
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
+      } else {
+        // as a common symbol
+        raiseToken('symbol', symbolOf(pendingText),
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
+      }
+    }
+  })
+
+  // a helper function to tokenize a piece of text.
+  $export($, 'tokenize', function (text) {
+    var tokens = []
+    var tokenizing = tokenizer(function collector () {
+      tokens.push(Array.prototype.slice.call(arguments))
+    })
+    tokenizing(text)
+    tokenizing() // notify the end of stream.
+    return tokens
+  })
 }
 
-module.exports = function ($void) {
-  var tokenizer = createTokenizer($void)
-
-  $void.tokenize = function (code, source) {
-    if (typeof code !== 'string') {
-      code = '()'
-    }
-    var lines = code.split('\n')
-    return tokenizer(lines, source)
+function printToken (type, value, source, errCode, errMessage) {
+  if (type === 'error') {
+    console.warn('tokenizing >', type, value, source, errCode, errMessage)
+  } else {
+    console.log('tokenizing > token:', type, value, source, errCode, errMessage)
   }
 }

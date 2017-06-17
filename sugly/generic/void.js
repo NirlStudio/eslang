@@ -28,8 +28,8 @@ module.exports = function ($void) {
   $void.ownsProperty = ownsProperty
 
   // to retrieve or create a shared symbol.
-  var SpecialSymbol = $void.SpecialSymbol = /^[(`@:"#,)'$;]{1}$/
-  var InvalidSymbol = $void.InvalidSymbol = /[(`@:"#,)'$;\\\s]/
+  var SpecialSymbol = $void.SpecialSymbol = /^[(`@:$"#)',;\\]{1}$/
+  var InvalidSymbol = $void.InvalidSymbol = /[(`@:$"#)',;\\\s]/
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
   function sharedSymbolOf (key) {
     return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(
@@ -87,10 +87,11 @@ module.exports = function ($void) {
   }
   $void.encodingTypeOf = encodingTypeOf
 
-  $void.thisCall = function thisCall (subject, methodName, args) {
+  function thisCall (subject, methodName, args) {
     var method = indexerOf(subject).call(subject, methodName)
     return typeof method === 'function' ? method.apply(subject, args) : method
   }
+  $void.thisCall = thisCall
 
   // to test if an entity can be named and exported.
   function isFormal (entity) {
@@ -100,14 +101,14 @@ module.exports = function ($void) {
   }
 
   // to export an entity to a module.
-  $void.export = function $export (mod, name, entity) {
-    publish(mod, name, entity)
+  $void.export = function $export (space, name, entity) {
+    publish(space, name, entity)
     if (isFormal(entity) &&
       !Object.prototype.hasOwnProperty.call(entity, 'module')) {
       // the public name overrides the inner name.
       publish(entity, 'name', name)
       // An exported entity is aware of its module.
-      define(entity, 'module', mod === $ ? null : mod)
+      define(entity, 'module', space['-module'] || null)
     }
     return entity
   }
@@ -269,7 +270,7 @@ module.exports = function ($void) {
     })
   }
 
-  $void.prepareOperation = function prepareOperation (type) {
+  $void.prepareOperation = function prepareOperation (type, code) {
     var proto = type.proto
 
     // override indexer for the operation type.
@@ -295,6 +296,33 @@ module.exports = function ($void) {
       return typeof this !== 'function' ? null
         : !(this.code instanceof Tuple$ && this.code.$[2] && this.code.$[2].$.length < 1)
     })
+
+    if (code) {
+      link(proto, 'to-code', function (ctx) {
+        if (typeof this !== 'function') {
+          return null
+        }
+        if (this.module) {
+          if (this.module.uri === '$') {
+            return sharedSymbolOf(this.name) // exported as a global lambda
+          }
+          var mod = thisCall(this.module, 'to-code', ctx)
+          if (mod) { // as a public member of a module
+            // pass name as string to ensure getting instead of calling.
+            return $Tuple.of(mod, this.name)
+          }
+        }
+        if (this.code instanceof Tuple$) {
+          // try to reuse in encoding
+          if (ctx instanceof CodingContext$) {
+            ctx.touch(this, type)
+            return ctx.complete(this, this.code)
+          }
+          return this.code // no encoding context.
+        }
+        return code // returns an empty placeholder for native function.
+      })
+    }
 
     // Indexer: no injection of indexer into Function.prototype
     var protoIndexer = createProtoIndexer(type)

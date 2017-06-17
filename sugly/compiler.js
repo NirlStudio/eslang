@@ -2,134 +2,212 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var tokenize = $void.tokenize
+  var $Symbol = $.symbol
+  var Tuple$ = $void.Tuple
+  var $export = $void.export
+  var tokenizer = $.tokenizer
 
-  $void.compiler = function () {
+  var compiler = $export($, 'compiler', function (evaluater) {
+    var raiseExpression = evaluater || printExpression
+
     var stack = [[]]
+    var sourceStack = [[[]]]
+    var waiter = null
+    var lastToken = null
 
-    function beginClause (t) {
-      var clause = []
-      clause.lineNo = t.startLine
-      clause.indent = t.indent
-
-      stack.push(clause)
-      return null
-    }
-
-    function endClause (t) {
-      if (stack.length < 2) {
-        return null // tolerate extra closing parentheses.
+    var tokenizing = tokenizer(compileToken)
+    return function compiling (text) {
+      if (tokenizing(text)) {
+        return true
       }
-
-      var top = stack.pop()
-      delete top.lineNo
-      delete top.indent
-
-      stack[stack.length - 1].push(top)
-      return null
+      // reset compiling context.
+      resetContext()
+      return false
     }
 
-    function endLine (t) {
-      var top = stack[stack.length - 1]
-      do {
-        endClause(t)
-        if (stack.length < 2) {
-          return
-        }
-        top = stack[stack.length - 1]
-      } while (top.lineNo === t.startLine)
-    }
-
-    function endIndent (t) {
-      var depth = 1
-      for (; depth < stack.length; depth++) {
-        if (stack[depth].indent >= t.indent) {
-          break
-        }
+    function compileToken (type, value, source, errCode, errMessage) {
+      if (type === 'error') {
+        raiseExpression(stack[0], sourceStack[0], 'error:tokenizer:' + errCode, errMessage,
+          [type, value, source])
+        resetContext()
+        return
       }
-
-      while (depth < stack.length) {
-        endClause(t)
+      if (waiter && waiter(type, value, source)) {
+        lastToken = [type, value, source]
+        return
       }
-    }
-
-    function endAll (t) {
-      while (stack.length > 1) {
-        endClause(t)
-      }
-    }
-
-    function pushPunctuation (t) {
-      switch (t.value) {
-        case '(':
-          beginClause(t)
+      switch (type) {
+        case 'value':
+          pushValue(value, source)
           break
-
-        case ')':
-          endClause(t)
+        case 'symbol':
+          pushValue($Symbol.of(value), source)
           break
-
-        case '),':
-          t.indent >= 0 ? endIndent(t) : endLine(t)
+        case 'comment':
+          // TODO: comment as embedded code, e.g. document, html, js.
+          pushValue(new Tuple$([$Symbol.comment, null/* render */, value], true), source)
           break
-
-        case ').':
-          endAll(t)
+        case 'punctuation':
+          pushPunctuation(value, source)
           break
-
-        default:
+        default: // do nothing for free space.
           break
       }
+      lastToken = [type, value, source]
     }
 
-    function pushValue (t) {
-      stack[stack.length - 1].push(t.value)
+    function resetContext () {
+      stack = [[]]; sourceStack = [[[]]]
+      waiter = null
+      lastToken = null
+      raiseExpression(null, 'reseting',
+        'reseting tokenizer and compiler context.')
     }
 
-    function pushSymbol (t) {
-      stack[stack.length - 1].push(t.value)
-    }
-
-    return function compile (code, src/*, options */) {
-      var nextToken = tokenize(code, src)
-      var t = nextToken()
-
-      while (t) {
-        switch (t.type) {
-          case 'error':
-            // only try to describe the on-site problem.
-            $.warn({
-              from: '$/sugly/compiler',
-              message: 'compiling cancelled for the last tokenizer error.'
-            })
-            return [[]]
-
-          case 'punctuation':
-            pushPunctuation(t)
-            break
-
-          case 'value':
-            pushValue(t)
-            break
-
-          case 'symbol':
-            pushSymbol(t)
-            break
-
-          case 'comment':
-            // TODO - comment-based code annotation.
-            break
-
-          default:
-            break
-        }
-        t = nextToken()
-      }
-
+    function tryToRaise () {
       if (stack.length > 1) {
-        endAll(null) // automatically close all open parentheses.
+        return
       }
-      return stack[0]
+      var expr = new Tuple$(stack[0], false, sourceStack[0])
+      stack = [[]]; sourceStack = [[]]
+      waiter = null
+      raiseExpression(expr)
     }
+
+    function pushValue (value, source) {
+      stack[stack.length - 1].push(value)
+      sourceStack[stack.length - 1].push(source)
+      tryToRaise()
+    }
+
+    function pushPunctuation (value, source) {
+      switch (value) {
+        case '(': // begin a new clause
+          stack.push([])
+          sourceStack.push([[source]])
+          break
+        case ')':
+          // wait for next token to decide
+          waiter = endingWaiter
+          break
+        default: // just skip unknow punctuations as some placeholders.
+          break
+      }
+    }
+
+    function endingWaiter (type, value, source) {
+      waiter = null // wait only once.
+      if (type !== 'symbol') {
+        endClause()
+        return false // stop waiting
+      }
+      switch (value) {
+        case ',':
+          endMatched(value, source)
+          return true
+        case '.':
+          endAll(value, source)
+          return true
+        default:
+          endClause()
+          return false
+      }
+    }
+
+    function endClause () {
+      if (stack.length < 2) {
+        raiseExpression(null, 'warning',
+          'extra enclosing parentheses is found and ignored.', [lastToken])
+        return // allow & ignore extra enclosing parentheses
+      }
+      // record the ending symbol
+      sourceStack[sourceStack.length - 1][0].push(lastToken[2])
+      var top = stack.pop()
+      stack[stack.length - 1].push(top)
+      var sourceTop = sourceStack.pop()
+      sourceStack[stack.length - 1].push(sourceTop)
+      tryToRaise()
+    }
+
+    function endMatched (value, source) {
+      if (stack.length < 2) {
+        raiseExpression(null, 'warning',
+          'extra enclosing parentheses is found and ignored.',
+          [lastToken, ['symbol', value, source]])
+        return // allow & ignore extra enclosing parentheses
+      }
+      lastToken[2][0] >= 0 // the indent value of ')'
+        ? endLine(value, source) : endIndent(value, source)
+    }
+
+    function endLine (value, source) {
+      var depth = stack.length - 1
+      while (depth > 1) {
+        var startSource = sourceStack[depth][0][0] // start source.
+        if (startSource[1] >= source[1]) { // comparing line numbers.
+          var top = stack.pop()
+          stack[depth].push(top)
+          // ending with ),'
+          var sourceTop = sourceStack.pop()
+          sourceTop[0].push(lastToken[2])
+          sourceTop[0].push(source)
+          sourceStack[depth].push(sourceTop)
+        }
+        depth -= 1
+      }
+      tryToRaise()
+    }
+
+    function endIndent (value, source) {
+      var depth = stack.length - 1
+      while (depth > 1) {
+        var startSource = sourceStack[depth][0][0] // start source.
+        var lastSource = lastToken[2]
+        if (startSource[2] >= lastSource[2]) { // line offset
+          var top = stack.pop()
+          stack[depth].push(top)
+          // ending with ),'
+          var sourceTop = sourceStack.pop()
+          sourceTop[0].push(lastSource)
+          sourceTop[0].push(source)
+          sourceStack[depth].push(sourceTop)
+        }
+        depth -= 1
+      }
+      tryToRaise()
+    }
+
+    function endAll (value, source) {
+      var depth = stack.length - 1
+      while (depth > 1) {
+        var top = stack.pop()
+        stack[depth].push(top)
+        // ending with ),'
+        var sourceTop = sourceStack.pop()
+        sourceTop[0].push(lastToken[2])
+        sourceTop[0].push(source)
+        sourceStack[depth].push(sourceTop)
+        depth -= 1
+      }
+    }
+  })
+
+  // a helper function to compile a piece of source code.
+  $export($, 'compile', function (text) {
+    var list = []
+    var compiling = compiler(function collector () {
+      list.push(Array.prototype.slice.call(arguments))
+    })
+    compiling(text)
+    compiling() // notify the end of stream.
+    return new Tuple$(list, true/* as code block */)
+  })
+}
+
+function printExpression (expr, status, message, info) {
+  if (status) {
+    console.log('compiling >', status, ':', message, expr ? expr.$ : '', info || '')
+  } else {
+    console.log('compiling > expression:', expr)
   }
 }

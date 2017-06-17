@@ -18,17 +18,10 @@ module.exports = function ($void) {
   )))
 
   // prepare common type implementation.
-  prepareOperation(Type)
-
-  var proto = Type.proto
-  // Encoding: convert this operator to a tuple.
-  link(proto, 'to-code', function () {
-    return typeof this !== 'function' ? null
-      : this.code instanceof Tuple$ ? this.code : $Tuple.operator
-  })
+  prepareOperation(Type, $Tuple.operator)
 
   // Desccription
-  link(proto, 'to-string', function () {
+  link(Type.proto, 'to-string', function () {
     return typeof this !== 'function' ? null
       : (this.name || '?lambda') + $Tuple.of($Symbol.operator,
         this.code instanceof Tuple$ ? this.code.$[1] : $Tuple.unknown,

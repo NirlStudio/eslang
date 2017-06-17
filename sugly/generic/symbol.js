@@ -35,6 +35,7 @@ module.exports = function ($void) {
   // symbols for common punctuations
   link(Type, 'object', sharedSymbolOf('@'))
   link(Type, 'pairing', sharedSymbolOf(':'))
+  link(Type, 'comment', sharedSymbolOf('#'))
 
   // check whether a string is a valid symbol key.
   var allows = link(Type, 'allows', function (key) {

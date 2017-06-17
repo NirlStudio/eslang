@@ -197,11 +197,7 @@ module.exports = function ($void) {
   function encode (ctx, set) {
     var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('set')] // (@:set ...
     for (var value in set) {
-      var vtype = typeOf(value)
-      list.push(
-        vtype === Type || vtype instanceof ObjectType$
-          ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code')
-      )
+      list.push(thisCall(value, 'to-code', ctx))
     }
     return ctx.complete(set, new Tuple$(list))
   }

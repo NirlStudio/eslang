@@ -310,11 +310,7 @@ module.exports = function ($void) {
     var list = [$Symbol.object] // (@ ...
     for (var i = 0; i < array.length; i++) {
       var value = array[i]
-      var vtype = typeOf(value)
-      list.push(
-        vtype === Type || vtype instanceof ObjectType$
-          ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code')
-      )
+      list.push(thisCall(value, 'to-code', ctx))
     }
     return ctx.complete(array, new Tuple$(list))
   }

@@ -6,7 +6,9 @@ module.exports = function ($void, JS) {
   var $export = $void.export
   var copyObject = $void.copyObject
 
-  var uri = $export($, 'uri', object.empty())
+  var uri = $export($, 'uri', object.of({
+    'is-readonly': true
+  }))
   copyObject(uri, JS, {
     'encodeURI': 'encode',
     'decodeURI': 'decode',

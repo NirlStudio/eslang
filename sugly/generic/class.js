@@ -15,6 +15,7 @@ var staticClassFields = Object.assign(Object.create(staticObjectFields), {
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.class
+  var $Tuple = $.tuple
   var link = $void.link
   var Object$ = $void.Object
   var typeOf = $void.typeOf
@@ -22,6 +23,7 @@ module.exports = function ($void) {
   var ClassType$ = $void.ClassType$
   var createType = $void.createType
   var typeIndexer = $void.typeIndexer
+  var sharedSymbolOf = $void.sharedSymbolOf
 
   // define a new class.
   link(Type, 'of', function (parent, type, proto) {
@@ -92,6 +94,33 @@ module.exports = function ($void) {
       }
     }
     return true
+  })
+
+  // Encoding: a class can be encoded if it has been exported to module.
+  link(Type, 'to-code', function (ctx) {
+    if (this === Type) {
+      return sharedSymbolOf('class') // the $.class itself.
+    }
+    if (!(this instanceof ClassType$)) {
+      return null
+    }
+    if (this.module) {
+      if (this.module.uri === '$') {
+        return sharedSymbolOf(this.name) // exported as a global class.
+      }
+      var mod = thisCall(this.module, 'to-code', ctx)
+      if (mod) { // as a public member of a module
+        return $Tuple.of(mod, sharedSymbolOf(this.name))
+      }
+    }
+    // an annoymous class is not portable. Its instance will be downgraded to a
+    // nearest exported type or a common object.
+    return null
+  })
+
+  // Description: shared for all global types.
+  link(Type, 'to-string', function () {
+    return this && typeof this.name === 'string' ? this.name : null
   })
 
   // Type Indexer for global class itself.

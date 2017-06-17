@@ -23,8 +23,8 @@ function removeField ($void) {
   var ownsProperty = $void.ownsProperty
 
   return function (name) {
-    if (name && typeof name === 'string' &&
-        this instanceof Object$ && ownsProperty(this, name)) {
+    if (name && typeof name === 'string' && this instanceof Object$ &&
+        this['is-readonly'] !== true && ownsProperty(this, name)) {
       var value = this[name]
       delete this[name]
       return typeof value === 'undefined' ? null : value
@@ -150,7 +150,7 @@ module.exports = function ($void) {
   // set the value of a field
   var setField = link(proto, 'set-field', function (name, value) {
     return this instanceof Object$ && typeof name === 'string' &&
-        name && name !== ':' && name !== 'type' && name !== 'to-code'
+        name && name !== ':' && name !== 'type' && name !== 'to-code' && this['is-readonly'] !== true
       ? (this[name] = (typeof value === 'undefined' ? null : value))
       : null
   })
@@ -295,9 +295,7 @@ module.exports = function ($void) {
     for (var i = 0; i < fields.length; i++) {
       var name = fields[i]
       var value = obj[name]
-      var vtype = typeOf(value)
-      var code = vtype === Type || vtype instanceof ObjectType$
-        ? thisCall(value, 'to-code', ctx) : thisCall(value, 'to-code')
+      var code = thisCall(value, 'to-code', ctx)
       list.push($Symbol.of(name), $Symbol.pairing, code)
     }
     return ctx.complete(obj, new Tuple$(list))
@@ -340,6 +338,9 @@ module.exports = function ($void) {
       return this.type
     } else if (name === 'to-code') {
       return this.type.proto['to-code'] // to keep the to-code mechanisim consistent.
+    }
+    if (this['is-readonly'] === true) {
+      value === undefined
     }
     // try to forward to user's indexer
     if (typeof this.indexer === 'function') {

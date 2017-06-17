@@ -5,11 +5,11 @@ module.exports = function ($void, JS) {
   var $export = $void.export
   var thisCall = $void.thisCall
 
-  $export($, 'print', function print () {
+  $export($, 'print', function () {
     console.log.apply(console, toStrings.apply(null, arguments))
   })
 
-  $export($, 'warn', function warn () {
+  $export($, 'warn', function () {
     console.log.apply(console, toStrings.apply(null, arguments))
   })
 

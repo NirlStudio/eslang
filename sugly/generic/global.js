@@ -15,8 +15,12 @@ module.exports = function ($void) {
   $export($, 'Infinity', Infinity)
 
   // Experimental: Pure Symbols
+  $export($, '`', sharedSymbolOf('`'))
   $export($, '@', sharedSymbolOf('@'))
   $export($, ':', sharedSymbolOf(':'))
+  $export($, '$', sharedSymbolOf('$'))
+  $export($, '#', sharedSymbolOf('#'))
+
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
   $export($, 'super', sharedSymbolOf('super'))

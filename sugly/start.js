@@ -64,10 +64,6 @@ module.exports = function start () {
   // prepare runtime functions
   initializeRuntime($void)
 
-  var $export = function (name, value) {
-    $void.export($void.$, name, value)
-  }
-
   require('./operators/all')($void)
 
   // encode a value or an array to a piece of program
@@ -79,11 +75,6 @@ module.exports = function start () {
   require('./tokenizer')($void)
   require('./compiler')($void)
 
-  // compile a piece of code to program/clauses: [[]].
-  $export('compile', function (code, src) {
-    return $void.compiler()(code, src)
-  })
-
   // program executor generators
   require('./runtime/run')($void)
   // space/module manipulation functions.
@@ -91,10 +82,6 @@ module.exports = function start () {
   // real program executors
   require('./runtime/execute')($void)
 
-  // export function executors as global functions
-  // TODO - to be removed?
-  $export('execute', $.function['execute'])
-
-  require('./runtime/meta')($void)
+  require('./runtime/runtime')($void)
   return $void
 }

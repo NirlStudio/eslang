@@ -16,7 +16,7 @@ module.exports = function module ($void) {
     return new Module$(null)
   })
 
-  // create an array with its elements
+  // a helper function of load
   link(Type, 'of', function (uri) {
     return typeof $.load === 'function' ? $.load(uri) : null
   })
@@ -31,11 +31,11 @@ module.exports = function module ($void) {
   // determine emptiness by module uri.
   link(proto, 'is-empty', function () {
     return this instanceof Module$
-      ? typeof this['module-uri'] === 'undefined' || this['module-uri'] === null
+      ? typeof this['uri'] === 'undefined' || this['uri'] === null
       : null
   }, 'not-empty', function () {
     return this instanceof Module$
-      ? typeof this['module-uri'] !== 'undefined' && this['module-uri'] === null
+      ? typeof this['uri'] !== 'undefined' && this['uri'] === null
       : null
   })
 
@@ -44,13 +44,13 @@ module.exports = function module ($void) {
     if (!(this instanceof Module$)) {
       return null
     }
-    var uri = this['module-uri']
+    var uri = this['uri']
     if (typeof uri !== 'string' || !uri) {
       return null
     }
     if (ctx instanceof CodingContext$) {
       ctx.touch(this, Type) // to be reused if required.
-      return ctx.complete($Tuple.of($Symbol.of('load'), uri))
+      return ctx.complete(this, $Tuple.of($Symbol.of('load'), uri))
     } else {
       return $Tuple.of($Symbol.of('load'), uri)
     }
@@ -59,7 +59,7 @@ module.exports = function module ($void) {
   // Description
   link(proto, 'to-string', function () {
     return this instanceof Module$
-      ? '(module of "' + (this['module-uri'] || '<unkown>') + '")'
+      ? '(module of "' + (this['uri'] || '<unkown>') + '")'
       : null
   })
 }
