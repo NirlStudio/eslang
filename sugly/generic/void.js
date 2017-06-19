@@ -100,7 +100,21 @@ module.exports = function ($void) {
       (entity instanceof Module$) // or a module
   }
 
-  // to export an entity to a module.
+  // TODO: all the namiing limitation will be removed later.
+  var staticObjectFields = Object.create(null)
+  $void.staticObjectFields = Object.assign(staticObjectFields, {
+    ':': 1,
+    'type': 1,
+    'to-code': 1
+  })
+
+  $void.staticClassFields = Object.assign(Object.create(staticObjectFields), {
+    'super': 1,
+    'of': 1,
+    'empty': 1
+  })
+
+// to export an entity to a module.
   $void.export = function $export (space, name, entity) {
     publish(space, name, entity)
     if (isFormal(entity) &&
@@ -313,14 +327,14 @@ module.exports = function ($void) {
           }
         }
         if (this.code instanceof Tuple$) {
-          // try to reuse in encoding
+          // allow to be reused in encoding
           if (ctx instanceof CodingContext$) {
             ctx.touch(this, type)
             return ctx.complete(this, this.code)
           }
           return this.code // no encoding context.
         }
-        return code // returns an empty placeholder for native function.
+        return code // returns the empty placeholder for native function.
       })
     }
 
@@ -346,7 +360,8 @@ module.exports = function ($void) {
   function CodingContext$ () {
     this.map = new Map()
     this.code = []
-    this.counter = 0
+    this.counter = -1
+    this.symbol = null
   }
   CodingContext$.prototype = {
     touch: function (obj, type) {
@@ -361,38 +376,49 @@ module.exports = function ($void) {
       }
       // allocate a new key
       this.counter += 1
-      var sym = record[0] = $Symbol.of('X' + this.counter)
+      var ref = record[0] = new Tuple$([this.symbol, this.counter]) // (_ i)
       // check if it's the first variable.
       if (this.code.length < 1) {
-        this.codeBlock = [] // function body
-        // instant function call: (=():() ...)
-        this.code.push($Symbol.lambda, $Tuple.empty, $Symbol.pairing, $Tuple.empty,
-          new Tuple$(this.codeBlock, true))
+        this.symbol = $Symbol.of('_') // use an array as a cache.
+        this.codeBlock = [ // function body: (var _ (@))
+          $Symbol.var, this.symbol, $Tuple.array
+        ]
+        this.code = [ // instant function call: (=():() ...)
+          $Symbol.lambda, $Tuple.empty, $Symbol.pairing, $Tuple.empty,
+          new Tuple$(this.codeBlock, true)
+        ]
       }
       // push local variable
       if (record[1]) {
         var code = record[1]
-        if (code instanceof Tuple$) {
-          var tmp = new Tuple$(code.$, code.plain)
-          code.$ = [sym]; code.plain = true // skip parentheses.
+        if (code instanceof Tuple$) { // for safety.
+          // change declaration to a reference.
+          var tmp = new Tuple$(code.$)
+          code.$ = ref.$
           code = tmp
         }
-        this.codeBlock.push($Tuple.of($Symbol.var, sym, code))
+        this.codeBlock.push( // (_ i (...))
+          $Tuple.of(this.symbol, this.counter, code))
       } else {
-        this.codeBlock.push($Tuple.of($Symbol.var, sym, // (var key ...
+        this.codeBlock.push($Tuple.of(this.symbol, this.counter, // (_ i ...
           type === $Object ? $Tuple.object // (@:)
             : type === $Array ? $Tuple.array // (@)
               : $Tuple.of($Symbol.object, $Symbol.pairing, type['to-code']()) // (@:type)
         ))
       }
-      return sym
+      return ref
+    },
+    isReferred: function (obj) {
+      var record = this.map.get(obj)
+      return record && record[0]
     },
     complete: function (obj, code) {
       var record = this.map.get(obj)
-      var sym = record[0]
-      if (sym) { // reused already, e.g. a nest reference.
-        this.codeBlock.push($Tuple.of(sym, sharedSymbolOf('+='), code))
-      } else { // save it for potential being referenced again later.
+      var ref = record[0]
+      if (ref) { // reused already, e.g. a nest reference.
+        // updating: ((_ i) = (...))
+        this.codeBlock.push($Tuple.of(ref, sharedSymbolOf('='), code))
+      } else { // save it for possible future reference.
         record[1] = code
       }
       return code

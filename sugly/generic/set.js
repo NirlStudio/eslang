@@ -1,33 +1,26 @@
 'use strict'
 
-function createMerge ($void) {
+function createSetFrom ($void) {
   var thisCall = $void.thisCall
 
   return function () {
-    if (!(this instanceof Set)) {
-      return null
-    }
+    var collection = new Set()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       var next = typeof source === 'function'
         ? source : thisCall(source, 'iterate')
       if (typeof next !== 'function') {
-        this.push(source)
+        collection.add(source)
         continue
       }
       var item = next()
       while (typeof item !== 'undefined' && item !== null) {
-        if (Array.isArray(item)) {
-          if (item.length > 0) {
-            this.push(item[0])
-          }
-        } else {
-          this.push(item)
-        }
+        collection.add(!Array.isArray(item) ? item
+          : item.length > 0 ? item[0] : null)
         item = next()
       }
     }
-    return this
+    return collection
   }
 }
 
@@ -74,54 +67,81 @@ module.exports = function ($void) {
   var typeVerifier = $void.typeVerifier
   var nativeIndexer = $void.nativeIndexer
 
-  // create an empty array.
+  // create an empty set.
   link(Type, 'empty', function () {
     return new Set()
   })
 
-  // create an array with its elements
+  // create a set with unique argument values.
   link(Type, 'of', function () {
-    return new Set(arguments)
+    return new Set(Array.prototype.slice.call(arguments))
   })
 
-  // convert any iterable object to an array.
-  link(Type, 'from', function () {
-    switch (arguments.length) {
-      case 0:
-        return new Set()
-      case 1:
-        return new Set(arguments[0])
-      default:
-        return merge.apply(new Set(), arguments)
-    }
-  })
+  // create a set with values from iterable arguments or the argument value
+  // itself if it's not iterable.
+  link(Type, 'from', createSetFrom($void))
 
   // Type Indexer
   typeIndexer(Type)
 
   var proto = Type.proto
-  // generate a new object by comine this object and other objects.
-  var merge = link(proto, '+=', createMerge($void))
-
-  // to create a shallow copy of this instance with the same type.
-  link(proto, 'copy', function () {
-    return this instanceof Set ? new Set(this) : null
-  })
-
-  // generate an iterator function
+  // generate an iterator function to traverse all values in this set.
   link(proto, 'iterate', iterator($void))
 
-  // generate a new object by comine this object and other objects.
-  link(proto, ['merge', '+'], function () {
-    return Array.isArray(this) ? merge.apply(this.slice(0), arguments) : null
-  })
-
-  // forward the length property.
+  // the current count of values.
   link(proto, 'count', function () {
     return this instanceof Set ? this.size : null
   })
 
-  // add a new item into this set.
+  // override common object's copy-from to copy data only.
+  link(proto, ['copy-from', '='], function (source) {
+    if (!(this instanceof Set)) {
+      return null
+    }
+    // allow an array as source to enble the type downgrading in encoding.
+    if (Array.isArray(source) && source.length > 0) {
+      for (var item in source) {
+        this.add(item)
+      }
+    } else if (source instanceof Set) {
+      var next = source.entries()
+      var cursor
+      while ((cursor = next())) {
+        this.add(cursor.value[0])
+      }
+    }
+    return this
+  })
+
+  // create a shallow copy of this set.
+  link(proto, 'copy', function () {
+    return this instanceof Set ? new Set(this) : null
+  })
+
+  // add values into this set from the argument sets.
+  var addFrom = link(proto, '+=', function () {
+    if (!(this instanceof Set)) {
+      return null
+    }
+    for (var i = 0; i < arguments.length; i++) {
+      var src = arguments[i]
+      if (src instanceof Set) {
+        var next = src.entries()
+        var cursor
+        while ((cursor = next())) {
+          this.add(cursor.value[0])
+        }
+      }
+    }
+    return this
+  })
+
+  // create a new set with the values in this set and argument values.
+  link(proto, ['merge', '+'], function () {
+    return this instanceof Set ? addFrom.apply(new Set(this), arguments) : null
+  })
+
+  // add a new value into this set.
   link(proto, 'add', function (item) {
     if (this instanceof Set) {
       for (var i = 0; i < arguments.length; i++) {
@@ -132,32 +152,34 @@ module.exports = function ($void) {
       return null
     }
   })
-  // check if this has an item
-  link(proto, 'has', function (item) {
-    return this instanceof Set ? this.has(item) : null
+  // check if this has an value
+  link(proto, 'has', function (value) {
+    return this instanceof Set ? this.has(value) : null
   })
-  link(proto, 'remove', function (item) {
+  // remove one or more values from this set.
+  link(proto, 'remove', function (value) {
+    if (!(this instanceof Set)) {
+      return null
+    }
     var counter = 0
-    if (this instanceof Set) {
-      for (var i = 0; i < arguments.length; i++) {
-        counter += this.delete(arguments[i]) ? 1 : 0
-      }
-      return counter
-    } else {
-      return null
+    for (var i = 0; i < arguments.length; i++) {
+      counter += this.delete(arguments[i]) ? 1 : 0
     }
+    return counter
   })
+  // remove all values from this set.
   link(proto, 'clear', function () {
-    if (this instanceof Set) {
-      if (typeof this.clear === 'function') {
-        this.clear()
-      } else {
-        for (var item in this) { this.delete(item) }
-      }
-      return this
-    } else {
+    if (!(this instanceof Set)) {
       return null
     }
+    if (typeof this.clear === 'function') {
+      this.clear()
+    } else {
+      for (var item in this) {
+        this.delete(item)
+      }
+    }
+    return this
   })
 
   // Type Verification

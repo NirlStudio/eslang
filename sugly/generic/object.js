@@ -1,73 +1,39 @@
 'use strict'
 
 function createObjectOf ($void) {
-  var Type = $void.$.object
   var Object$ = $void.Object
-  var ObjectType$ = $void.ObjectType
+  var thisCall = $void.thisCall
+  var staticObjectFields = $void.staticObjectFields
 
   return function () {
-    var type = this === Type || this instanceof ObjectType$ ? this : Type
-    var obj = Object.create(type.proto)
+    var obj = new Object$()
     for (var i = 0; i < arguments.length; i++) {
-      var src = arguments[i]
-      if (src instanceof Object$) {
-        Object.assign(obj, src)
+      var source = arguments[i]
+      var next = typeof source === 'function'
+        ? source : thisCall(source, 'iterate')
+      if (typeof next === 'function') {
+        var item = next()
+        while (typeof item !== 'undefined' && item !== null) {
+          if (Array.isArray(item) && item.length > 0) {
+            var key = item[0]
+            var value
+            if (item.length > 1) {
+              value = item[1]
+            } else if (Array.isArray(key) && key.length > 1) {
+              value = key[1]
+              key = key[0]
+            } else {
+              key = null
+            }
+            if (typeof key === 'string' && !staticObjectFields[key]) {
+              obj[key] = value // only accept string keys.
+            }
+          }
+          item = next()
+        }
       }
     }
     return obj
-  }
-}
-
-function removeField ($void) {
-  var Object$ = $void.Object
-  var ownsProperty = $void.ownsProperty
-
-  return function (name) {
-    if (name && typeof name === 'string' && this instanceof Object$ &&
-        this['is-readonly'] !== true && ownsProperty(this, name)) {
-      var value = this[name]
-      delete this[name]
-      return typeof value === 'undefined' ? null : value
-    }
-    return null
-  }
-}
-
-function combine (objectOf) {
-  return function () {
-    var objs = [this]
-    Array.prototype.push.apply(objs, arguments)
-    return objectOf.apply(null, objs)
-  }
-}
-
-function merge ($void) {
-  var Object$ = $void.Object
-
-  return function () {
-    if (this instanceof Object$) {
-      for (var i = 0; i < arguments.length; i++) {
-        var obj = arguments[i]
-        if (obj instanceof Object$) {
-          Object.assign(this, obj)
-        }
-      }
-      return this
-    }
-    return null
-  }
-}
-
-function copy ($void) {
-  var Object$ = $void.Object
-
-  return function () {
-    if (this instanceof Object$) {
-      var obj = Object.create(Object.getPrototypeOf(this))
-      Object.assign(obj, this)
-      return obj
-    }
-    return null
   }
 }
 
@@ -87,6 +53,21 @@ function iterator ($void) {
       return typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
         ? fields[index] : fields[index++]
     }
+  }
+}
+
+function removeField ($void) {
+  var Object$ = $void.Object
+  var ownsProperty = $void.ownsProperty
+
+  return function (name) {
+    if (name && typeof name === 'string' && this instanceof Object$ &&
+        this['is-readonly'] !== true && ownsProperty(this, name)) {
+      var value = this[name]
+      delete this[name]
+      return typeof value === 'undefined' ? null : value
+    }
+    return null
   }
 }
 
@@ -112,24 +93,82 @@ module.exports = function ($void) {
     return new Object$()
   })
 
-  // create a new object and copy properties from source objects.
-  var objectOf = link(Type, 'of', createObjectOf($void))
+  // create a new object with the name/value pairs from iterable arguments.
+  link(Type, 'of', createObjectOf($void))
 
-  // Indexer for object type itself.
+  // Indexer for the object type itself.
   typeIndexer(Type)
 
   var proto = Type.proto
-  // to create a shallow copy of this instance with the same type.
-  link(proto, 'copy', copy($void))
-
-  // generate an iterator function
+  // generate an iterator function to traverse all fields as [name, value].
   link(proto, 'iterate', iterator($void))
 
-  // generate a new object by comine this object and other objects.
-  link(proto, '+', combine(objectOf))
+  // restore this object with the fields from the source object.
+  var copyFrom = link(proto, [
+    'copy-from', '='
+  ], function (source, names, excluding) {
+    if (!(this instanceof Object$)) {
+      return null
+    }
+    if (!(source instanceof Object$)) {
+      return this
+    }
+    // by default, copy all fields.
+    if (!Array.isArray(names)) {
+      Object.assign(this, source)
+    } else { // or, copy selected fields or nothing.
+      for (var name in names) {
+        if (typeof name === 'string' && ownsProperty(source, name)) {
+          this[name] = source[name]
+        }
+      }
+    }
+    // remove excluded fields.
+    if (Array.isArray(excluding) && excluding.length > 0) {
+      for (name in excluding) {
+        if (typeof name === 'string') {
+          delete this[name]
+        }
+      }
+    }
+    // trigger copied event.
+    if (typeof this.copied === 'function') {
+      this.copied(source)
+    }
+    return this
+  })
 
-  // shallowly copy fields from other objects to this object.
-  link(proto, '+=', merge($void))
+  // to create a shallow copy of this instance of all or selected fields.
+  var makeCopy = link(proto, 'copy', function (names, excluding) {
+    if (this instanceof Object$) {
+      // keep the same type
+      return copyFrom.apply(Object.ceate(Object.getPrototypeOf(this)),
+        [this, names, excluding])
+    }
+    return null
+  })
+
+  // copy fields from argument objects to this object.
+  var includeFrom = link(proto, '+=', function () {
+    if (this instanceof Object$) {
+      for (var i = 0; i < arguments.length; i++) {
+        var src = arguments[i]
+        if (src instanceof Object$) {
+          Object.assign(this, src)
+        }
+      }
+      return this
+    }
+    return null
+  })
+
+  // generate a new object by combine of this object and argument objects.
+  link(proto, '+', function () {
+    // copy this object.
+    var copy = makeCopy.call(this)
+    // include fields from argument objects.
+    return copy ? includeFrom.apply(copy, arguments) : null
+  })
 
   // object property & field (owned property) manipulation
   // retrieve field names
@@ -249,8 +288,6 @@ module.exports = function ($void) {
   // null: to be encoded to as null.
   //   []: an empty arrry indicates to be encoded to an empty object.
   link(proto, 'resolve', null)
-  // an overriable method to report the expected encoding type.
-  link(proto, 'encoding-type', null)
   // encoding logic for all object instances.
   link(proto, 'to-code', function (ctx) {
     if (!(this instanceof Object$)) {
@@ -262,11 +299,7 @@ module.exports = function ($void) {
     if (!Array.isArray(fields)) {
       return null // this is an volatile entity.
     }
-    // customized objects can replace its type in encoding.
-    var type = encodingTypeOf(
-      typeof this['encoding-type'] === 'function'
-        ? this['encoding-type']() : this.type
-    )
+    var type = encodingTypeOf(this.type)
     // an empty object.
     if (fields.length < 1) {
       return type === Type ? $Tuple.object
@@ -288,15 +321,20 @@ module.exports = function ($void) {
   })
 
   function encodeObject (ctx, obj, type, fields) {
-    var list = [$Symbol.object, $Symbol.pairing] // (@: ...
+    var list = [$Symbol.object] // (@ ...
+    var typed = false
     if (type !== Type) { // a special object
-      list.push(type['to-code']()) // (@:type)
+      typed = true
+      list.push($Symbol.pairing, type['to-code']()) // (@:type ...)
     }
     for (var i = 0; i < fields.length; i++) {
       var name = fields[i]
       var value = obj[name]
       var code = thisCall(value, 'to-code', ctx)
       list.push($Symbol.of(name), $Symbol.pairing, code)
+    }
+    if (typed && ctx.isReferred(obj)) { // nested referred.
+      list.splice(1, 2) // downgrade to a common data object.
     }
     return ctx.complete(obj, new Tuple$(list))
   }

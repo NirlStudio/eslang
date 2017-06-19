@@ -177,7 +177,11 @@ module.exports = function () {
 
   // The object is the fundamental type of all compound entities.
   create('object')
-  var Object$ = $void.Object = function Object$ () {}
+  var Object$ = $void.Object = function Object$ (src) {
+    if (src) {
+      Object.assign(this, src)
+    }
+  }
   Object$.prototype = $.object.proto
 
   // A fake constructor for instanceof type checking.

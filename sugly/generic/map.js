@@ -1,12 +1,10 @@
 'use strict'
 
-function createMerge ($void) {
+function createMapOf ($void) {
   var thisCall = $void.thisCall
 
   return function () {
-    if (!(this instanceof Map)) {
-      return null
-    }
+    var map = new Map()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       var next = typeof source === 'function'
@@ -14,25 +12,20 @@ function createMerge ($void) {
       if (typeof next === 'function') {
         var item = next()
         while (typeof item !== 'undefined' && item !== null) {
+          // looking for key/value pairs
           if (Array.isArray(item) && item.length > 0) {
             var key = item[0]
             if (item.length > 1) {
-              this.set(key, item[1])
-            } else {
-              if (Array.isArray(key) && key.length > 0) {
-                if (key.length > 1) {
-                  this.set(key[0], key[1])
-                } else {
-                  this.set(key, key)
-                }
-              }
+              map.set(key, item[1])
+            } else if (Array.isArray(key) && key.length > 1) {
+              map.set(key[0], key[1])
             }
           }
           item = next()
         }
       }
     }
-    return this
+    return map
   }
 }
 
@@ -133,57 +126,84 @@ module.exports = function ($void) {
   var typeVerifier = $void.typeVerifier
   var nativeIndexer = $void.nativeIndexer
 
-  // create an empty array.
+  // create an empty map.
   link(Type, 'empty', function () {
     return new Map()
   })
 
-  // create an array with its elements
-  link(Type, 'of', function () {
-    return new Map(arguments)
-  })
-
-  // convert any iterable object to an array.
-  link(Type, 'from', function () {
-    switch (arguments.length) {
-      case 0:
-        return new Map()
-      case 1:
-        return new Map(arguments[0])
-      default:
-        return merge.apply(new Map(), arguments)
-    }
-  })
+  // create an map of the key/value pairs returned by iterable arguments.
+  link(Type, 'of', createMapOf($void))
 
   // Type Indexer
   typeIndexer(Type)
 
   var proto = Type.proto
-  // generate a new object by comine this object and other objects.
-  var merge = link(proto, '+=', createMerge($void))
+  // generate an iterator function to traverse all entries as [key, value]
+  link(proto, 'iterate', iterator($void))
 
-  // to create a shallow copy of this instance with the same type.
+  // generate an iterator function to traverse all keys.
+  link(proto, 'keys', iteratorKeys($void))
+
+  // generate an iterator function to traverse all values.
+  link(proto, 'values', iteratorValues($void))
+
+  // the current count of entries.
+  link(proto, 'count', function () {
+    return this instanceof Map ? this.size : null
+  })
+
+  // override common object's copy-from to copy data only.
+  // allow an array as source to enble the type downgrading in encoding.
+  link(proto, ['copy-from', '='], function (source) {
+    if (!(this instanceof Map)) {
+      return null
+    }
+    // allow an array as source to enble the type downgrading in encoding.
+    if (Array.isArray(source) && source.length > 0) {
+      for (var item in source) {
+        if (Array.isArray(item) && item.length > 1) {
+          this.set(item[0], item[1])
+        }
+      }
+      this.push.apply(this, source)
+    } else if (source instanceof Map) {
+      var next = source.entries()
+      var cursor
+      while ((cursor = next())) {
+        this.set(cursor.value[0], cursor.value[1])
+      }
+    }
+    return this
+  })
+
+  // to create a shallow copy of this map.
   link(proto, 'copy', function () {
     return this instanceof Map ? new Map(this) : null
   })
 
-  // generate an iterator function
-  link(proto, 'iterate', iterator($void))
+  // include the entris from argument maps.
+  var includeFrom = link(proto, '+=', function () {
+    if (!(this instanceof Map)) {
+      return null
+    }
+    for (var i = 0; i < arguments.length; i++) {
+      var src = arguments[i]
+      if (src instanceof Map) {
+        var next = src.entries()
+        var cursor
+        while ((cursor = next())) {
+          this.set(cursor.value[0], cursor.value[1])
+        }
+      }
+    }
 
-  // generate an iterator function
-  link(proto, 'keys', iteratorKeys($void))
-
-  // generate an iterator function
-  link(proto, 'values', iteratorValues($void))
-
-  // generate a new object by comine this object and other objects.
-  link(proto, ['merge', '+'], function () {
-    return this instanceof Map ? merge.apply(new Map(this), arguments) : null
+    return this
   })
 
-  // forward the length property.
-  link(proto, 'count', function () {
-    return this instanceof Map ? this.size : null
+  // create a new map with the entries of this map and argument maps.
+  link(proto, ['merge', '+'], function () {
+    return this instanceof Map
+      ? includeFrom.apply(new Map(this), arguments) : null
   })
 
   // retrieve the value by a key
@@ -200,15 +220,14 @@ module.exports = function ($void) {
       var cur = this.get(key)
       this.set(key, value)
       return typeof cur === 'undefined' ? null : cur
-    } else {
-      return null
     }
+    return null
   })
   // check if this has an item
   link(proto, 'has', function (key) {
     return this instanceof Map ? this.has(key) : null
   })
-  // remove an entry by key.
+  // remove one or more entries by key or keys.
   link(proto, 'remove', function (key) {
     var counter = 0
     if (this instanceof Map) {
@@ -220,6 +239,7 @@ module.exports = function ($void) {
       return null
     }
   })
+  // remove all entries from this map.
   link(proto, 'clear', function () {
     if (this instanceof Map) {
       this.clear()
@@ -264,16 +284,27 @@ module.exports = function ($void) {
   })
 
   function encode (ctx, map) {
-    var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')] // (@:map ...
+    var pairs = []
     var entries = map.entries()
     var item
     while ((item = entries.next())) {
-      // key : value
-      var key = item[0]
-      list.push(thisCall(key, 'to-code', ctx))
-      list.push($Symbol.pairing)
-      var value = item[1]
-      list.push(thisCall(value, 'to-code', ctx))
+      pairs.push([
+        thisCall(item[0], 'to-code', ctx),
+        thisCall(item[1], 'to-code', ctx)
+      ])
+    }
+    var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')] // (@:map ...
+    if (ctx.isReferred(map)) { // nested referred.
+      // downgrade to an data array of key/value pairs: (@ (@key value) ...)
+      list = [$Symbol.object]
+      for (item in pairs) {
+        list.push(new Tuple$([$Symbol.object, item[0], item[1]]))
+      }
+    } else { // an instance map object: (@:map key : value ...)
+      list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')]
+      for (item in pairs) {
+        list.push(item[0], $Symbol.pairing, item[1])
+      }
     }
     return ctx.complete(map, new Tuple$(list))
   }

@@ -1,17 +1,5 @@
 'use strict'
 
-// all the limitation may be removed later.
-var staticObjectFields = {
-  ':': 1,
-  'type': 1,
-  'to-code': 1
-}
-var staticClassFields = Object.assign(Object.create(staticObjectFields), {
-  'super': 1,
-  'of': 1,
-  'empty': 1
-})
-
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.class
@@ -24,6 +12,8 @@ module.exports = function ($void) {
   var createType = $void.createType
   var typeIndexer = $void.typeIndexer
   var sharedSymbolOf = $void.sharedSymbolOf
+  var staticClassFields = $void.staticClassFields
+  var staticObjectFields = $void.staticObjectFields
 
   // define a new class.
   link(Type, 'of', function (parent, type, proto) {
@@ -45,24 +35,18 @@ module.exports = function ($void) {
     })
 
     // override empty function to create an empty instance
-    var init = class_.proto.init
     link(class_, 'empty', function () {
-      var obj = Object.create(class_.proto)
-      if (init) {
-        init.apply(obj, arguments)
-      }
-      return obj
+      return Object.create(_proto)
     })
 
     // override of function to create instance
-    var construct = class_.proto.construct
-    link(class_, 'of', function () {
-      var obj = Object.create(class_.proto)
-      if (init) {
-        init.apply(obj, arguments)
-      }
-      if (construct) {
-        construct.apply(obj, arguments)
+    var _proto = class_.proto
+    link(class_, 'of', function (source) {
+      var obj = Object.create(_proto)
+      if (typeof _proto.of === 'function') {
+        _proto.of.apply(obj, arguments)
+      } else if (typeof obj['='] === 'function' && source instanceof Object$) {
+        obj['='](source)
       }
       return obj
     })

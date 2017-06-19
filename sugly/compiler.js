@@ -45,7 +45,7 @@ module.exports = function ($void) {
           break
         case 'comment':
           // TODO: comment as embedded code, e.g. document, html, js.
-          pushValue(new Tuple$([$Symbol.comment, null/* render */, value], true), source)
+          // pushValue(new Tuple$([$Symbol.comment, null/* render */, value], true), source)
           break
         case 'punctuation':
           pushPunctuation(value, source)
@@ -114,18 +114,21 @@ module.exports = function ($void) {
       }
     }
 
+    function endTopWith (ending) {
+      var top = stack.pop()
+      stack[stack.length - 1].push(top)
+      var srcTop = sourceStack.pop()
+      Array.prototype.push(srcTop[0], arguments)
+      sourceStack[sourceStack.length - 1].push(srcTop)
+    }
+
     function endClause () {
       if (stack.length < 2) {
         raiseExpression(null, 'warning',
           'extra enclosing parentheses is found and ignored.', [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
-      // record the ending symbol
-      sourceStack[sourceStack.length - 1][0].push(lastToken[2])
-      var top = stack.pop()
-      stack[stack.length - 1].push(top)
-      var sourceTop = sourceStack.pop()
-      sourceStack[stack.length - 1].push(sourceTop)
+      endTopWith(lastToken[2])
       tryToRaise()
     }
 
@@ -145,13 +148,7 @@ module.exports = function ($void) {
       while (depth > 1) {
         var startSource = sourceStack[depth][0][0] // start source.
         if (startSource[1] >= source[1]) { // comparing line numbers.
-          var top = stack.pop()
-          stack[depth].push(top)
-          // ending with ),'
-          var sourceTop = sourceStack.pop()
-          sourceTop[0].push(lastToken[2])
-          sourceTop[0].push(source)
-          sourceStack[depth].push(sourceTop)
+          endTopWith(lastToken[2], source)
         }
         depth -= 1
       }
@@ -164,13 +161,7 @@ module.exports = function ($void) {
         var startSource = sourceStack[depth][0][0] // start source.
         var lastSource = lastToken[2]
         if (startSource[2] >= lastSource[2]) { // line offset
-          var top = stack.pop()
-          stack[depth].push(top)
-          // ending with ),'
-          var sourceTop = sourceStack.pop()
-          sourceTop[0].push(lastSource)
-          sourceTop[0].push(source)
-          sourceStack[depth].push(sourceTop)
+          endTopWith(lastSource, source)
         }
         depth -= 1
       }
@@ -178,16 +169,8 @@ module.exports = function ($void) {
     }
 
     function endAll (value, source) {
-      var depth = stack.length - 1
-      while (depth > 1) {
-        var top = stack.pop()
-        stack[depth].push(top)
-        // ending with ),'
-        var sourceTop = sourceStack.pop()
-        sourceTop[0].push(lastToken[2])
-        sourceTop[0].push(source)
-        sourceStack[depth].push(sourceTop)
-        depth -= 1
+      while (stack.length > 1) {
+        endTopWith(lastToken[2], source)
       }
     }
   })

@@ -38,15 +38,17 @@ function initializeSpace ($void) {
 
   require('./generic/iterate')($void)
 
+  require('./lib/encode')($void, JS)
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
   require('./lib/json')($void, JS)
   require('./lib/timer')($void, JS)
+  require('./lib/print')($void, JS)
 }
 
 function initializeRuntime ($void) {
+  require('./runtime/runtime')($void)
   require('./runtime/signal')($void)
-  require('./runtime/indexer')($void)
   require('./runtime/assign')($void)
   require('./runtime/resolve')($void)
   require('./runtime/evaluate')($void)
@@ -66,11 +68,6 @@ module.exports = function start () {
 
   require('./operators/all')($void)
 
-  // encode a value or an array to a piece of program
-  require('./lib/encode')($void, JS)
-  // default output function. depending on $.encode
-  require('./lib/print')($void, JS)
-
   // prepare tokenizer & compiler
   require('./tokenizer')($void)
   require('./compiler')($void)
@@ -82,6 +79,5 @@ module.exports = function start () {
   // real program executors
   require('./runtime/execute')($void)
 
-  require('./runtime/runtime')($void)
   return $void
 }

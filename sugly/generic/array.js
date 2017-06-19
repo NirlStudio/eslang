@@ -17,38 +17,31 @@ function createArrayOf () {
   }
 }
 
-function createMerge ($void) {
+function createArrayFrom ($void) {
   var thisCall = $void.thisCall
 
   return function () {
-    if (!Array.isArray(this)) {
-      return null
-    }
+    var list = []
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       if (Array.isArray(source)) {
-        this.push.apply(this, source)
+        Array.prototype.push.apply(list, source)
         continue
       }
       var next = typeof source === 'function'
         ? source : thisCall(source, 'iterate')
       if (typeof next !== 'function') {
-        this.push(source)
+        list.push(source)
         continue
       }
       var item = next()
       while (typeof item !== 'undefined' && item !== null) {
-        if (Array.isArray(item)) {
-          if (item.length > 0) {
-            this.push(item[0])
-          }
-        } else {
-          this.push(item)
-        }
+        list.push(!Array.isArray(item) ? item
+          : item.length > 0 ? item[0] : null)
         item = next()
       }
     }
-    return this
+    return list
   }
 }
 
@@ -91,35 +84,78 @@ module.exports = function ($void) {
     return []
   })
 
-  // create an array with its elements
+  // create an array of the arguments
   link(Type, 'of', createArrayOf())
 
-  // convert any iterable object to an array.
-  link(Type, 'from', function () {
-    return merge.apply([], arguments)
-  })
+  // create an array with items from iterable arguments, or the argument itself
+  // if its value is not iterable.
+  link(Type, 'from', createArrayFrom())
 
   // Type Indexer
   typeIndexer(Type)
 
   var proto = Type.proto
-  // generate a new object by comine this object and other objects.
-  var merge = link(proto, '+=', createMerge($void))
-
-  // to create a shallow copy of this instance with the same type.
-  link(proto, 'copy', function () {
-    return Array.isArray(this) ? this.slice(0) : null
-  })
-
-  // generate an iterator function
+  // generate an iterator function to traverse all array items.
   link(proto, 'iterate', iterator($void))
 
-  // forward the length property.
+  // the current length of this array.
   link(proto, 'length', function () {
     return Array.isArray(this) ? this.length : null
   })
 
-  // array element accessors
+  // override common object's copy-from to copy data only.
+  link(proto, ['copy-from', '='], function (source) {
+    if (Array.isArray(this)) {
+      if (Array.isArray(source) && source.length > 0) {
+        this.push.apply(this, source)
+      }
+      return this
+    }
+    return null
+  })
+
+  // to create a shallow copy of this instance with all items,
+  // or selected items in a range.
+  link(proto, 'copy', function (begin, end) {
+    if (!Array.isArray(this)) {
+      return null
+    }
+    if (begin instanceof Integer$) {
+      begin = begin.number
+    } else if (typeof begin !== 'number') {
+      begin = 0
+    }
+    if (end instanceof Integer$) {
+      end = end.number
+    }
+    return typeof end === 'number' ? this.slice(begin, end) : this.slice(begin)
+  })
+
+  // append more items to the end of this array
+  var appendFrom = link(proto, '+=', function () {
+    if (!(Array.isArray(this))) {
+      return null
+    }
+    for (var i = arguments.length; i < arguments.length; i++) {
+      var src = arguments[i]
+      if (Array.isArray(src)) {
+        Array.prototype.push.apply(this, src)
+      }
+    }
+    return this
+  })
+
+  // create a new array with items in this array and argument values.
+  link(proto, 'concat', function () {
+    return Array.isArray(this) ? this.concat.apply(this, arguments) : null
+  })
+
+  // create a new array with items in this array and argument arrays.
+  link(proto, ['merge', '+'], function () {
+    return Array.isArray(this) ? appendFrom.apply(this.slice(0), arguments) : null
+  })
+
+  // array item accessors
   link(proto, 'get', function (offset) {
     if (offset instanceof Integer$) {
       offset = offset.number
@@ -175,15 +211,6 @@ module.exports = function ($void) {
     return true
   })
 
-  // merge this tuple and argument values to create a new one.
-  link(proto, 'concat', function () {
-    return Array.isArray(this) ? this.concat.apply(this, arguments) : null
-  })
-
-  // generate a new object by comine this object and other objects.
-  link(proto, ['merge', '+'], function () {
-    return Array.isArray(this) ? merge.apply(this.slice(0), arguments) : null
-  })
   link(proto, 'first', function (value) {
     if (!Array.isArray(this) || this.length < 1) {
       return null
@@ -213,22 +240,6 @@ module.exports = function ($void) {
       }
     }
     return null
-  })
-
-  // create a slice of the original tuple
-  link(proto, 'slice', function (begin, end) {
-    if (!Array.isArray(this)) {
-      return null
-    }
-    if (begin instanceof Integer$) {
-      begin = begin.number
-    } else if (typeof begin !== 'number') {
-      begin = 0
-    }
-    if (end instanceof Integer$) {
-      end = end.number
-    }
-    return typeof end === 'number' ? this.slice(begin, end) : this.slice(begin)
   })
 
   var verify = Array.isArray.bind(Array)
