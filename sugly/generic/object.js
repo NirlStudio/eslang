@@ -229,7 +229,7 @@ module.exports = function ($void) {
       ? this.is(another) : !Object.is(this, another)
   })
   // Equivalence: override the operator to use current equals function.
-  link(proto, '==', function object$oprEquals (another) {
+  link(proto, '==', function (another) {
     return this && typeof this.equals === 'function'
       ? this.equals(another) : Object.is(this, another)
   })

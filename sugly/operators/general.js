@@ -1,6 +1,13 @@
 'use strict'
 
 module.exports = function operators$general ($void) {
+  var $ = $void.$
+  var $Tuple = $.tuple
+  var $String = $.string
+  var link = $void.link
+  var Space$ = $void.Space
+  var Symbol$ = $void.Symbol
+  var operator = $void.operator
   var thisCall = $void.thisCall
   var evaluate = $void.evaluate
   var numberValueOf = $void.$.number.of
@@ -41,4 +48,54 @@ module.exports = function operators$general ($void) {
     }
     return num
   }
+
+  // (str += str ... )
+  link($String.proto, '+=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'string') {
+      operant = ''
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'string') {
+        operant += value
+      } else {
+        operant += thisCall(value, 'to-string')
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
+
+  // (str -= str ... ) or (str -= num)
+  link($String.proto, '+=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'string') {
+      operant = ''
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'string') {
+        operant = operant.replace(value, '')
+      } else if (typeof value === 'number') {
+        operant = operant.substring(0, operant.length - value)
+      } else {
+        operant = operant.replace(thisCall(value, 'to-string'), '')
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
 }

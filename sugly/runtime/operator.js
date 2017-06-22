@@ -43,9 +43,7 @@ module.exports = function operators$operator ($void) {
         scope.context[params[i]] = j < list.length ? list[j] : $Symbol.empty
       }
       scope.context['operands'] = clause
-      if (offset > 1) { // subject value exists.
-        scope.context['operant'] = operant
-      }
+      scope.context['operant'] = typeof operant !== 'undefined' ? operant : null
       // execution
       var result = null
       for (var expr in body) {

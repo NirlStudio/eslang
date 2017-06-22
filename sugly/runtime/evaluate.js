@@ -65,8 +65,8 @@ module.exports = function evaluate ($void) {
     }
 
     // with only subject, apply evaluation to it.
-    if (length <= offset && predicate === null) {
-      return evaluate(subject, space)
+    if (offset >= length && predicate === null) {
+      return evaluate(subject, space) // explicitly calling this function.
     }
 
     var args = []

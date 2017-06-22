@@ -39,8 +39,11 @@ module.exports = function run ($void) {
     // space uri > app uri > runtime uri
     var loader = $void.loader
     var baseUri = moduleUri ? loader.dir(moduleUri) : null
-    var dirs = baseUri ? [baseUri] : []
-    dirs.push($.env('uri'), $void.runtime('uri'))
+    var dirs = baseUri ? [baseUri, // under the same directory
+      baseUri + '/modules'] : [] // local modules directory
+    dirs.push($.env('uri') + '/modules', // app shared modules
+      $void.runtime('uri') + '/modules' // runtime shared modules
+    )
     // try to locate the source in dirs.
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {

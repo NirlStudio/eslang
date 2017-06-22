@@ -72,4 +72,92 @@ module.exports = function operators$arithmetic ($void) {
     }
     return operant
   }, $Tuple.operator))
+
+  // (num += num ... )
+  link($Number.proto, '+=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'number') {
+        operant += value
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
+
+  // (num -= num ... )
+  link($Number.proto, '-=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'number') {
+        operant -= value
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
+
+  // (num *= num ... )
+  link($Number.proto, '*=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'number') {
+        operant *= value
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
+
+  // (num /= num ...)
+  link($Number.proto, '/=', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var clist = clause.$
+    for (var i = 2; i < clist.length; i++) {
+      var value = evaluate(clist[i], space)
+      if (typeof value === 'number') {
+        operant /= value
+      }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, operant)
+    }
+    return operant
+  }, $Tuple.operator))
 }

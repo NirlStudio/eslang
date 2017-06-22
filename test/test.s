@@ -1,45 +1,49 @@
 (let C (import "../lib/colors" "js").
 
-(let cases (@).
-(let current null).
+(let cases (@). # to store all test cases.
+(let current null). # the stack top
 
-(export "define" (= (feature define-it)
-   (let pre current)
-   (let current (let spec (@ feature),
-   ((|| pre cases) push spec),
-   (define-it)
-   (let current pre)
+(export define (=> (feature describe-it)
+   (var top current) # save current context
+   (let current (var spec (@ feature), # create the spec object as an array.
+   ((top ?? cases) push spec), # save the spec into stack top.
+   (describe-it) # extract the description
+   (let current top) # recover the stack top.
    (return spec)
 ).
 
-(export "should" (= (subject predicate action)
-  (if (action is null)
+(export should (=> (subject predicate action)
+  (if (action is null) # as (predicate action)
     (let action predicate)
     (let predicate subject)
     (let subject "")
+  else
+    (if (subject is-not-a string)
+      (let subject (subject to-string),
   ),
   (if (subject not-empty)
-    (+= subject " ")
+    (subject += " ")
   ),
   (current push (@
-    behaviour: (+ subject "should " predicate)
+    behaviour: (subject + "should " predicate)
     action: action
 ).
 
-(operator export assert # (expr) or (expected expr) or (expected expr note)
-  (if (%C < 2)
-    (let (%1 %0) (%0 true),
+(export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
+  (if (!expr)
+    (let "expr" expected)
+    (let "expected" true)
   ),
-  (++ %assert-step)
-  (let %9 (eval %1),
-  (if (%0 != %9)
-    (exit (@
-      is-failure: true
-      step: %assert-step
-      expected: %0
-      expr: %1
-      note: %2
-      real: %9),
+  (++ assert-step)
+  (var "value" (expr),
+  (if (value != expected)
+    (return (@
+      failed: true
+      step: assert-step
+      expected: expected
+      expr: expr
+      note: note
+      real: value
   ),
 ).
 
@@ -50,57 +54,58 @@
 (let indent "  ")
 
 (let passing 0)
-(let succeeded (= behaviour
+(let succeeded (=> behaviour
   (++ passing)
   (print indent (C passed) (C gray behaviour),
   (summary push (@ (path copy) true behaviour),
 ).
 
 (let failing 0)
-(let failed (= (behaviour failure)
+(let failed (=> (behaviour failure)
   (++ failing)
   (print indent (C failed) (C red (+ "(" failing ") " behaviour),
   (summary push (@ (path copy) false behaviour),
   (failures push (@ failing (path copy) behaviour failure ),
 ).
 
-(let test (= (case)
+(let test-a (=> (case)
   (print indent (case first),
   (path push (case first),
-  (+= indent "  ")
+  (indent += "  ")
 
   (for i in (1:(case length))
-    (let task (case:i),
-    (if (task is-a Array)
+    (var task (case:i),
+    (if (task is-a array)
       (do task)
     else
-      (let result (execute (task "action"),
-      (if (result is-failure)
-        (failed (task "behaviour") result)
+      (var testing (task action),
+      (if (testing failed)
+        (failed (task behaviour) result)
       else
-        (succeeded (task "behaviour")
+        (succeeded (task behaviour)
   ),
 
   (path pop)
   (-= indent 2),
 ).
 
-(let print- (= f
+(let print- (=> f
   (print (+ "  " (f 0) ") [" ((f 1) to-string " / ") "] " (f 2),
   (let r (f 3),
   (print (+
     (C red (+ "     step-" (r step) " is expecting "),
-    (C green (C underline ((r "expected") to-code),
-    (C red (+ " instead of " (C underline ((r "real") to-code),
+    (C green (C underline ((r expected) to-string),
+    (C red (+ " instead of " (C underline ((r real) to-string),
   ),
   (print (C gray (+ "     when asserting "
-    (C underline (encode clause (r "expr"),
+    (C underline ((r expr) to-string),
     (((r note) is-empty) ? "" (", for " + (r note),
     "\n"
 ).
 
-(= (*)
-  (for module in argv
+(export test (=> ()
+  (clear-context )
+  (for module in arguments
     (let loader (run module),
     (if (loader is-a Function) (loader ),
   ),
@@ -108,9 +113,9 @@
   (if (cases is-empty) (exit),
 
   (print "  Start to run sugly test suite ...\n")
-  (let t1 (date ),
-  (for case in cases (test case),
-  (let t2 (date ),
+  (let t1 (date now),
+  (for case in cases (test-a case),
+  (let t2 (date now),
 
   (print (+
     (C green (+ "\n  passing: " passing),
@@ -120,7 +125,7 @@
     (print (C red (+ "  failing: " failing "\n"),
     (for failure in failures
       (print- failure)
-    ), else do-nothing
+    ),
   ),
   (if (C is null)
     (print "\n  P.S. To prettify output, please run 'npm install'.\n")

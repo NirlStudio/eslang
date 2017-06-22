@@ -12,13 +12,20 @@ module.exports = function operators$let ($void) {
   // (export symbol value)
   staticOperator('export', function (space, clause) {
     var clist = clause.$
-    if (clist.length >= 3) {
-      var sym = space.inop // in operator context, export works like a function
-        ? evaluate(clist[1], space) : clist[1]
-      return sym instanceof Symbol$
-        ? space.export(sym.key, evaluate(clist[2], space)) : null
+    if (clist.length < 3) {
+      return null
     }
-    return null
+    var sym
+    if (space.inop) { // in operator context, export works like a function
+      sym = evaluate(clist[1], space)
+      var key = typeof sym === 'string' ? sym
+        : sym instanceof Symbol$ ? sym.key : null
+      return key ? space.export(key, evaluate(clist[2], space)) : null
+    }
+    // in normal context, the symbol part can only be a symbol
+    sym = clist[1]
+    return sym instanceof Symbol$
+      ? space.export(sym.key, evaluate(clist[2], space)) : null
   })
 
   // 'let' update the variable in most recent context.
@@ -41,11 +48,12 @@ module.exports = function operators$let ($void) {
         return null
       }
       var sym = clist[1]
-      if (space.inop) { // in operator context, var works like a function
+      if (space.inop) { // in operator context, let & var works like a function
         sym = evaluate(sym, space)
-        return sym instanceof Symbol$
-          ? space[method](sym.key, length < 3 ? null
-            : tryToUpdateName(sym.key, evaluate(clist[2], space)))
+        var key = typeof sym === 'string' ? sym
+          : sym instanceof Symbol$ ? sym.key : null
+        return key ? space[method](key,
+          length < 3 ? null : tryToUpdateName(key, evaluate(clist[2], space)))
           : null
       }
       // (var symbol value)

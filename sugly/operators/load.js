@@ -36,7 +36,8 @@ module.exports = function run ($void) {
     // space uri > app uri.
     var loader = $void.loader
     var baseUri = loader.dir(moduleUri)
-    var dirs = baseUri ? [baseUri, $.env('uri')] : [$.env('uri')]
+    var dirs = baseUri ? [baseUri, // under the same directory
+      $.env('uri')] : [$.env('uri')] // the app directory
     // try to locate the source
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {

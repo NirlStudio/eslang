@@ -29,7 +29,7 @@ module.exports = function ($void) {
 
   link(Type, 'lambda', sharedSymbolOf('='))
   link(Type, 'function', sharedSymbolOf('=>'))
-  link(Type, 'operator', sharedSymbolOf('=='))
+  link(Type, 'operator', sharedSymbolOf('=?'))
 
   link(Type, 'let', sharedSymbolOf('let'))
   link(Type, 'var', sharedSymbolOf('var'))

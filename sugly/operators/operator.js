@@ -7,7 +7,7 @@ module.exports = function ($void) {
   var staticOperator = $void.staticOperator
 
   // create the operator to define an operator
-  staticOperator('==', function (space, clause) {
+  staticOperator('=?', function (space, clause) {
     return clause.$.length < 2 ? $Operator.empty : operatorOf(space, clause)
   })
 }

@@ -29,9 +29,11 @@ module.exports = function space ($void) {
       if (typeof this.local[key] !== 'undefined' || !this.locals) {
         return (this.local[key] = value)
       }
-      for (var i = this.locals.length - 1; i >= 0; i--) {
-        if (typeof this.locals[i][key] !== 'undefined') {
-          return (this.locals[i][key] = value)
+      if (this.locals) {
+        for (var i = this.locals.length - 1; i >= 0; i--) {
+          if (typeof this.locals[i][key] !== 'undefined') {
+            return (this.locals[i][key] = value)
+          }
         }
       }
       return (this.local[key] = value)
@@ -60,11 +62,45 @@ module.exports = function space ($void) {
       : new Space$(Object.create($))
   }
 
+  // customized the behaviour of the space of an operator
+  function OperatorSpace$ (parent) {
+     // save the real function context for embedded operator calls.
+    this.fnContext = parent.fnContext || parent.context
+    // ensure the calling function's context is accessible for this operator.
+    this.context = Object.create(this.fnContext)
+    // use the same local with calling function.
+    this.local = parent.local
+    if (parent.locals) {
+      this.locals = parent.locals
+    }
+  }
+  OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {
+    inop: true, // indicates this is an operator space.
+    var: function (key, value) {
+      // to make explicit vars restricted in the operator's scope.
+      return (this.context[key] = value)
+    },
+    let: function (key, value) {
+      // try to update context first, but finally it still fall back to local.
+      if (typeof this.context[key] !== 'undefined' &&
+          key !== 'operands' && key !== 'operant') {
+        return (this.context[key] = value)
+      }
+      if (typeof this.local[key] !== 'undefined' || !this.locals) {
+        return (this.local[key] = value)
+      }
+      if (this.locals) {
+        for (var i = this.locals.length - 1; i >= 0; i--) {
+          if (typeof this.locals[i][key] !== 'undefined') {
+            return (this.locals[i][key] = value)
+          }
+        }
+      }
+      return (this.local[key] = value)
+    }
+  })
+
   $void.createOperatorSpace = function (parent) {
-    var space = parent
-      ? new Space$(parent.local, parent.locals, Object.create(parent.context))
-      : new Space$(Object.create($))
-    space.inop = true
-    return space
+    return new OperatorSpace$(parent)
   }
 }
