@@ -4,7 +4,6 @@ module.exports = function run ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
-  var setEnv = $void.setEnv
   var $export = $void.export
   var execute = $void.execute
 
@@ -41,7 +40,7 @@ module.exports = function run ($void) {
       return null
     }
     // save base uri into environment.
-    setEnv('uri', baseUri)
+    $void.env('uri', baseUri)
     if (!Array.isArray(args)) {
       args = []
     }

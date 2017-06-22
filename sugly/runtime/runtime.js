@@ -5,7 +5,7 @@ module.exports = function runtime ($void) {
   var object = $.object
   var $export = $void.export
 
-  $export($, '-runtime', object.of({
+  var runtime = $export($, '-runtime', object.of({
     'core': 'js', // native implementation.
     'is-readonly': true,
 
@@ -27,7 +27,13 @@ module.exports = function runtime ($void) {
       ? environment[name] : typeof defaulue === 'undefined' ? null : defaulue
   })
 
-  $void.setEnv = function (name, value) {
-    environment[name] = value
+  $void.env = function (name, value) {
+    return typeof value === 'undefined'
+      ? environment[name] : (environment[name] = value)
+  }
+
+  $void.runtime = function (name, value) {
+    return typeof value === 'undefined'
+      ? runtime[name] : (runtime[name] = value)
   }
 }

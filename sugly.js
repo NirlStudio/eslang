@@ -3,11 +3,13 @@
 require('./lib/polyfill')
 
 module.exports = function sugly (loader/*, more options */) {
+  // create the void.
   var start = require('./sugly/start')
   var $void = start()
-
-  $void.dir = __dirname
-  $void.load = loader($void.$)
-  $void.initializeModuleSpace($void, true)
+  // create the source loader
+  $void.loader = loader($void.$)
+  // set the location of the runtime
+  $void.runtime('uri', __dirname)
+  // now we got a complete runtime.
   return $void
 }

@@ -25,6 +25,9 @@ module.exports = function iterate ($void) {
     if (typeof filter !== 'function') {
       return next // no filter
     }
+    if (typeof subject === 'undefined') {
+      subject = null
+    }
     return function () {
       var item = next()
       if (typeof item === 'undefined' || item === null) {

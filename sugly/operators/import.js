@@ -40,7 +40,7 @@ module.exports = function run ($void) {
     var loader = $void.loader
     var baseUri = moduleUri ? loader.dir(moduleUri) : null
     var dirs = baseUri ? [baseUri] : []
-    dirs.push($.env('uri'), $['-runtime'].uri)
+    dirs.push($.env('uri'), $void.runtime('uri'))
     // try to locate the source in dirs.
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {

@@ -51,16 +51,18 @@ module.exports = function function_ ($void) {
           return result
         } catch (signal) {
           if (signal instanceof Signal$) {
-            if (signal.id === 'return') {
-              return signal.value
-            }
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createLambdaSpace(),
                 me, this, params, signal.value, signal.count)
               continue
+            } else if (signal.id !== 'exit') {
+              // return, break & continue if they're not in loop.
+              return signal.value
             }
+            throw signal
           }
-          throw signal
+          console.warn('lambda > unexpected error:', signal)
+          return null
         }
       }
     }
@@ -111,16 +113,18 @@ module.exports = function function_ ($void) {
           return result
         } catch (signal) {
           if (signal instanceof Signal$) {
-            if (signal.id === 'return') {
-              return signal.value
-            }
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createFunctionSpace(parent),
                 me, this, params, signal.value, signal.count)
               continue
+            } else if (signal.id !== 'exit') {
+              // return, break & continue if they're not in loop.
+              return signal.value
             }
-          }
-          throw signal
+            throw signal
+          } // for unexpected errors
+          console.warn('function > unexpected error:', signal)
+          return null
         }
       }
     }

@@ -5,7 +5,6 @@ module.exports = function operators$arithmetic ($void) {
   var $Tuple = $.tuple
   var $Number = $.number
   var link = $void.link
-  var Tuple$ = $void.Tuple
   var Space$ = $void.Space
   var Symbol$ = $void.Symbol
   var operator = $void.operator
@@ -46,12 +45,13 @@ module.exports = function operators$arithmetic ($void) {
 
   // increment a value by one and assign it back to the same variable
   link($Number.proto, '++', operator(function (space, clause, operant) {
-    var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
-        typeof operant !== 'number' || clist.length < 2) {
+    if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    var sym = clist[0]
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var sym = clause.$[0]
     if (sym instanceof Symbol$) {
       space.let(sym.key, operant + 1)
     }
@@ -60,12 +60,13 @@ module.exports = function operators$arithmetic ($void) {
 
   // increment a value by one and assign it back to the same variable
   link($Number.proto, '--', operator(function (space, clause, operant) {
-    var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
-        typeof operant !== 'number' || clist.length < 2) {
+    if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    var sym = clist[0]
+    if (typeof operant !== 'number') {
+      operant = 0
+    }
+    var sym = clause.$[0]
     if (sym instanceof Symbol$) {
       space.let(sym.key, operant - 1)
     }

@@ -5,7 +5,6 @@ module.exports = function operators$logical ($void) {
   var $Tuple = $.tuple
   var Null = $void.null
   var link = $void.link
-  var Tuple$ = $void.Tuple
   var Space$ = $void.Space
   var operator = $void.operator
   var evaluate = $void.evaluate
@@ -22,7 +21,7 @@ module.exports = function operators$logical ($void) {
   // global logical AND operators
   link(Null, '&&', operator(function (space, clause, operant) {
     var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
+    if (!(space instanceof Space$) ||
         typeof operant === 'undefined' || clist.length < 2) {
       return true // The value of AND is defined as true.
     }
@@ -41,7 +40,7 @@ module.exports = function operators$logical ($void) {
   // global logical AND operators
   link(Null, '||', operator(function (space, clause, operant) {
     var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
+    if (!(space instanceof Space$) ||
         typeof operant === 'undefined' || clist.length < 2) {
       return false // the value of OR is defined as False
     }
@@ -63,7 +62,7 @@ module.exports = function operators$logical ($void) {
   // - (x ? y z) returns y if x is equivalent to true, returns z otherwise.
   link(Null, '?', operator(function (space, clause, operant) {
     var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
+    if (!(space instanceof Space$) ||
         typeof operant === 'undefined' || clist.length < 2) {
       return null // the value of OR is defined as False
     }
@@ -93,11 +92,10 @@ module.exports = function operators$logical ($void) {
     if (operant !== null) {
       return typeof operant !== 'undefined' ? null : operant // shortcut
     }
-    var clist = clause.$
-    if (!(space instanceof Space$) || !(clause instanceof Tuple$) ||
-        typeof operant === 'undefined' || clist.length < 2) {
+    if (!(space instanceof Space$)) {
       return null // the value of OR is defined as False
     }
+    var clist = clause.$
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (value !== null) {

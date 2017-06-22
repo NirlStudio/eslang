@@ -3,7 +3,6 @@
 module.exports = function run ($void) {
   var $ = $void.$
   var compiler = $.compiler
-  var setEnv = $void.setEnv
   var Signal$ = $void.Signal
   var $export = $void.export
   var evaluate = $void.evaluate
@@ -19,8 +18,8 @@ module.exports = function run ($void) {
     } else {
       baseUri = null
     }
-    setEnv('uri', baseUri)
-
+    // save the base uri into environment.
+    $void.env('uri', baseUri)
     // create a module space.
     var scope = createModuleSpace(baseUri)
     if (Array.isArray(args)) {
@@ -28,7 +27,7 @@ module.exports = function run ($void) {
     } else { // interpreting is always taken as in an application.
       scope.context.arguments = []
     }
-
+    // create compiler.
     var compile = compiler(function (expr, status) {
       if (status) {
         shell.apply(null, [null, 'compiler:' + status].concat(
