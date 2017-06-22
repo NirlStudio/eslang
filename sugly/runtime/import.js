@@ -30,8 +30,7 @@ module.exports = function run ($void) {
       return null
     }
     if (type === 'js') {
-      // TODO: wrap native objects
-      // return importJSModule($, source)
+      return importJSModule(source)
     }
     if (!source.endsWith('.s')) {
       source += '.s'
@@ -79,6 +78,49 @@ module.exports = function run ($void) {
     } catch (signal) {
       console.warn('import > invalid call to', signal.id,
         'in', code, 'from', uri, 'on', moduleUri)
+      return null
+    }
+  }
+
+  function importJSModule (source) {
+    var loader = $void.loader
+    if (loader.isAbsolute(source)) {
+      console.warn("import > It's forbidden to load a native module",
+        'from a absolute uri.')
+      return null
+    }
+    var dirs = [
+      $.env('uri') + '/modules', // app shared modules
+      $void.runtime('uri') + '/modules' // runtime shared modules
+    ]
+    var uri = loader.resolve(source, dirs)
+    if (!uri) {
+      console.warn('import > fialed to resolve source for', source, 'in', dirs)
+      return null
+    }
+    // look up it in cache.
+    if (modules[uri]) {
+      return modules[uri].export
+    }
+    try {
+      var importing = require(uri) // the JS module must export a loader function.
+      if (typeof importing !== 'function') {
+        console.warn('import > invalid JS module', source, 'at', uri)
+        return null
+      }
+      var scope = $void.createModuleSpace()
+      var status = importing(scope.export, scope.context)
+      if (status !== true) { // the loader can report error details
+        console.warn('import > failed to import JS module of', source,
+          'for', status, 'at', uri)
+        return null
+      }
+      scope.time = new Date()
+      modules[uri] = scope
+      return scope.export
+    } catch (err) {
+      console.warn('import > fialed to import JS module of', source,
+        'for', err, 'from', uri)
       return null
     }
   }

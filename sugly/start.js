@@ -55,9 +55,14 @@ function initializeRuntime ($void) {
   require('./runtime/operator')($void)
 
   require('./runtime/execute')($void)
-  require('./runtime/interpreter')($void)
-  require('./runtime/eval')($void)
+
+  require('./runtime/load')($void)
+  require('./runtime/import')($void)
+  require('./runtime/include')($void)
+
   require('./runtime/run')($void)
+  require('./runtime/eval')($void)
+  require('./runtime/interpreter')($void)
 }
 
 module.exports = function start () {

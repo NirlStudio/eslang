@@ -29,11 +29,6 @@ module.exports = function operators ($void) {
   require('./function')($void)
   require('./operator')($void)
 
-  // generic runtime operators
-  require('./load')($void)
-  require('./import')($void)
-  require('./include')($void)
-
   function staticOperator (name, impl) {
     // make the symbol a pure symbol.
     $[name] = sharedSymbolOf(name)
