@@ -201,9 +201,6 @@ module.exports = function ($void) {
   link(proto, '^', function (value) {
     return this instanceof Integer$ ? integerOf(this.number ^ value) : null
   })
-  link(proto, '~', function () {
-    return this instanceof Integer$ ? integerOf(~(this.number)) : null
-  })
   link(proto, '<<', function (offset) {
     return this instanceof Integer$ ? integerOf(this.number << offset) : null
   })
