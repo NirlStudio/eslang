@@ -70,7 +70,6 @@ module.exports = function ($void) {
   var link = $void.link
   var typeOf = $void.typeOf
   var Tuple$ = $void.Tuple
-  var Integer$ = $void.Integer
   var thisCall = $void.thisCall
   var copyProto = $void.copyProto
   var ObjectType$ = $void.ObjectType
@@ -120,13 +119,8 @@ module.exports = function ($void) {
     if (!Array.isArray(this)) {
       return null
     }
-    if (begin instanceof Integer$) {
-      begin = begin.number
-    } else if (typeof begin !== 'number') {
+    if (typeof begin !== 'number') {
       begin = 0
-    }
-    if (end instanceof Integer$) {
-      end = end.number
     }
     return typeof end === 'number' ? this.slice(begin, end) : this.slice(begin)
   })
@@ -140,6 +134,8 @@ module.exports = function ($void) {
       var src = arguments[i]
       if (Array.isArray(src)) {
         Array.prototype.push.apply(this, src)
+      } else {
+        this.push(src)
       }
     }
     return this
@@ -157,9 +153,6 @@ module.exports = function ($void) {
 
   // array item accessors
   link(proto, 'get', function (offset) {
-    if (offset instanceof Integer$) {
-      offset = offset.number
-    }
     if (!Array.isArray(this) || typeof offset !== 'number') {
       return null
     }
@@ -167,9 +160,6 @@ module.exports = function ($void) {
     return typeof value === 'undefined' ? null : value
   })
   link(proto, 'set', function (offset, value) {
-    if (offset instanceof Integer$) {
-      offset = offset.number
-    }
     if (!Array.isArray(this) || typeof offset !== 'number') {
       return null
     }
@@ -190,14 +180,8 @@ module.exports = function ($void) {
     if (!Array.isArray(this)) {
       return false
     }
-    if (x instanceof Integer$) {
-      x = x.number
-    }
     if (typeof x !== 'number' || x < 0) {
       x = 0
-    }
-    if (y instanceof Integer$) {
-      y = y.number
     }
     if (typeof y !== 'number' || y >= this.length) {
       y = this.length - 1
@@ -356,9 +340,6 @@ module.exports = function ($void) {
       return Type
     } else if (name === 'to-code') {
       return toCode // to keep the to-code mechanisim consistent.
-    }
-    if (name instanceof Integer$) {
-      name = name.number
     }
     return typeof name === 'string' // read properties
       ? name && typeof proto[name] !== 'undefined' ? proto[name] : null

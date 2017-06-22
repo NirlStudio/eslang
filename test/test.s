@@ -13,7 +13,7 @@
 ).
 
 (export "should" (= (subject predicate action)
-  (if action is-missing
+  (if (action is null)
     (let action predicate)
     (let predicate subject)
     (let subject "")
@@ -122,7 +122,7 @@
       (print- failure)
     ), else do-nothing
   ),
-  (if (C is-missing)
+  (if (C is null)
     (print "\n  P.S. To prettify output, please run 'npm install'.\n")
   ),
   (return (@ summary: summary failures: failures)

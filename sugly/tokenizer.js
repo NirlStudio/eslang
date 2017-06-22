@@ -13,7 +13,6 @@ var Constants = Object.assign(Object.create(null), {
 module.exports = function ($void) {
   var InvalidSymbol = $void.InvalidSymbol
   var $ = $void.$
-  var integerOf = $.integer.of
   var symbolOf = $.symbol.of
   var $export = $void.export
 
@@ -248,21 +247,12 @@ module.exports = function ($void) {
     function finalizeSymbol () {
       if (RegexNumber.test(pendingText)) {
         // try float number
-        var fvalue = parseFloat(pendingText)
-        raiseToken('value', Number.isSafeInteger(fvalue) ? integerOf(fvalue) : fvalue,
+        raiseToken('value', parseFloat(pendingText),
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
       } else if (pendingText.startsWith('0')) {
         // try integer number
-        var ivalue = parseInt(pendingText)
-        if (Number.isSafeInteger(ivalue)) {
-          raiseToken('value', integerOf(ivalue),
-            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
-        } else {
-          raiseToken('error', pendingText,
-            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
-            'invalid-integer:', 'the format of the value is not recognizable.')
-          reseting = true
-        }
+        raiseToken('value', parseInt(pendingText),
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
       } else if (typeof Constants[pendingText] !== 'undefined') {
         // check if a constant value
         raiseToken('value', Constants[pendingText],

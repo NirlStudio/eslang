@@ -25,12 +25,15 @@ module.exports = function ($void) {
   link(Type, 'etc', sharedSymbolOf('...'))
 
   // symbols for common operators
+  link(Type, 'quote', sharedSymbolOf('`'))
+
   link(Type, 'lambda', sharedSymbolOf('='))
   link(Type, 'function', sharedSymbolOf('=>'))
   link(Type, 'operator', sharedSymbolOf('=='))
 
-  link(Type, 'var', sharedSymbolOf('var'))
   link(Type, 'let', sharedSymbolOf('let'))
+  link(Type, 'var', sharedSymbolOf('var'))
+  link(Type, 'export', sharedSymbolOf('export'))
 
   // symbols for common punctuations
   link(Type, 'object', sharedSymbolOf('@'))

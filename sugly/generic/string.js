@@ -4,7 +4,6 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.string
   var link = $void.link
-  var Integer$ = $void.Integer
   var copyProto = $void.copyProto
   var copyObject = $void.copyObject
   var typeIndexer = $void.typeIndexer
@@ -175,13 +174,7 @@ module.exports = function ($void) {
             : typeof proto[index] === 'undefined' ? null : proto[index]
     }
     // read char(s)
-    if (index instanceof Integer$) {
-      index = index.number
-    }
     if (typeof index === 'number') {
-      if (value instanceof Integer$) {
-        value = value.number
-      }
       return typeof value === 'number'
         ? this.substr(index, value) // chars in a range.
         : this.substr(index, 1) // read a single character.

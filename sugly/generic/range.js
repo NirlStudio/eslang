@@ -25,7 +25,6 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.range
   var Range$ = $void.Range
-  var Integer$ = $void.Integer
   var link = $void.link
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
@@ -37,16 +36,10 @@ module.exports = function ($void) {
   // create a range
   link(Type, 'of', function (begin, end, step) {
     // begin: must be a finite value.
-    if (begin instanceof Integer$) {
-      begin = begin.number
-    }
     if (typeof begin !== 'number' || isNaN(begin) || !isFinite(begin)) {
       begin = 0
     }
     // end: must be a finite value.
-    if (end instanceof Integer$) {
-      end = end.number
-    }
     if (typeof end === 'undefined') {
       end = begin
       begin = 0
@@ -54,9 +47,6 @@ module.exports = function ($void) {
       end = 0
     }
     // step: must be non-zero and finite.
-    if (step instanceof Integer$) {
-      step = step.number
-    }
     if (typeof step !== 'number' || isNaN(step) || !isFinite(step)) {
       step = 0
     }

@@ -73,34 +73,4 @@ module.exports = function ($void) {
       : name === 'type' ? Null // fake field
         : (typeof Null[name] !== 'undefined' ? Null[name] : null)
   })
-
-  // Boolean Test: only for null.
-  // - (x ?) returns true or false.
-  // - (x ? y) returns y if x is equivalent to false.
-  // - (x ? y z) return y if x is equivalent to true, returns z otherwise.
-  // TODO - convert to an operator
-  link(Null, '?', function (a, b) {
-    // null is always false
-    return typeof a === 'undefined' ? false : typeof b === 'undefined' ? a : b
-  })
-
-  // Null Fallback: only for null.
-  // (x ?? y) returns y if and only if x is null.
-  // TODO - convert to an operator
-  link(Null, '??', function (alternative) {
-    // for null, always returns the alternative value.
-    if (arguments.length < 1) {
-      return null
-    }
-    if (arguments.length === 1) {
-      return typeof alternative === 'undefined' ? null : alternative
-    }
-    for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i]
-      if (typeof arg !== 'undefined' && arg !== null) {
-        return arg
-      }
-    }
-    return null
-  })
 }

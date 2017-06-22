@@ -1,11 +1,14 @@
 'use strict'
 
 module.exports = function operators$bitwise ($void) {
-  var operators = $void.operators
   var evaluate = $void.evaluate
+  var staticOperator = $void.staticOperator
 
-  operators['~'] = function (space, clause) {
-    var length = clause.length
-    return length > 1 ? ~evaluate(clause[1], space) : ~0
-  }
+  staticOperator('~', function (space, clause) {
+    if (clause.$.length > 1) {
+      var value = evaluate(clause.$[1], space)
+      return typeof value === 'number' ? ~value : ~0
+    }
+    return ~0
+  })
 }

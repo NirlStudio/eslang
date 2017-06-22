@@ -7,6 +7,7 @@ module.exports = function encode ($void, JS) {
 
   // TODO - refactoring of to-code mechanisim.
   $export($, 'encode', function (value) {
-    return thisCall(value, 'to-code')
+    var code = thisCall(value, 'to-code')
+    return thisCall(code, 'to-string')
   })
 }

@@ -19,32 +19,36 @@ module.exports = function ($void) {
   link(Type, 'of', function (parent, type, proto) {
     // ignore parent if it's not a class.
     var class_ = createType(parent instanceof ClassType$ ? parent : Type)
+    var proto_ = class_.proto
 
     // update type properties
-    Object.getOwnPropertyNames(type).forEach(function (field) {
-      if (!staticClassFields[field]) {
-        class_[field] = type[field]
-      }
-    })
+    if (type instanceof Object$) {
+      Object.getOwnPropertyNames(type).forEach(function (field) {
+        if (!staticClassFields[field]) {
+          class_[field] = type[field]
+        }
+      })
+    }
 
     // update instance properties
-    Object.getOwnPropertyNames(proto).forEach(function (field) {
-      if (!staticObjectFields[field]) {
-        class_.proto[field] = proto[field]
-      }
-    })
+    if (proto instanceof Object$) {
+      Object.getOwnPropertyNames(proto).forEach(function (field) {
+        if (!staticObjectFields[field]) {
+          class_.proto[field] = proto[field]
+        }
+      })
+    }
 
     // override empty function to create an empty instance
     link(class_, 'empty', function () {
-      return Object.create(_proto)
+      return Object.create(proto_)
     })
 
     // override of function to create instance
-    var _proto = class_.proto
     link(class_, 'of', function (source) {
-      var obj = Object.create(_proto)
-      if (typeof _proto.of === 'function') {
-        _proto.of.apply(obj, arguments)
+      var obj = Object.create(proto_)
+      if (typeof proto_.of === 'function') {
+        proto_.of.apply(obj, arguments)
       } else if (typeof obj['='] === 'function' && source instanceof Object$) {
         obj['='](source)
       }

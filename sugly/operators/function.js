@@ -1,88 +1,69 @@
 'use strict'
 
-module.exports = function operators$function ($void) {
-  var Symbol$ = $void.Symbol
-  var operators = $void.operators
-  var resolve = $void.resolve
+module.exports = function ($void) {
+  var $ = $void.$
+  var $Symbol = $.symbol
+  var $Lambda = $.lambda
+  var $Function = $.function
+  var Tuple$ = $void.Tuple
   var evaluate = $void.evaluate
   var signalOf = $void.signalOf
+  var lambdaOf = $void.lambdaOf
+  var functionOf = $void.functionOf
+  var staticOperator = $void.staticOperator
 
-  // (= symbols > params body ...)
-  // symbols can be symbol or (symbol ...) or (@ prop: value ...)
-  function lambdaCreate (space, symbols, params, body) {
-    var enclosing = Object.create(null)
-    if (symbols instanceof Symbol$) {
-      enclosing[symbols.key] = resolve(space, symbols)
-      return space.$.lambda(enclosing, params, body)
-    }
+  // create lambda operator
+  staticOperator('=', createOperator(lambdaOf, $Lambda.empty))
 
-    if (!Array.isArray(symbols)) {
-      return null // invalid expression
-    }
+  // create function operator
+  staticOperator('=>', createOperator(functionOf, $Function.empty))
 
-    if (symbols.length < 1) {
-      return space.$.lambda(enclosing, params, body)
-    }
-
-    // enclosing context values.
-    if (symbols[0] instanceof Symbol$ && symbols[0].key === '@') {
-      // it should be an object expression: (@ prop: value ...)
-      var obj = evaluate(symbols, space)
-      if (typeof obj === 'object' && obj !== null) {
-        enclosing = obj
-      }
-    } else {
-      // it should be an symbol list: (sym ...)
-      for (var i = 0; i < symbols.length; i++) {
-        var s = symbols[i]
-        if (s instanceof Symbol$) {
-          enclosing[s.key] = resolve(space, s)
-        }
-      }
-    }
-
-    return space.$.lambda(enclosing, params, body)
-  }
-
-  operators['='] = function (space, clause) {
-    if (clause.length < 3) {
-      return null
-    }
-
-    var c1 = clause[1]
-    if (c1 instanceof Symbol$ && c1.key === '>') {
-      // (= > params body)
-      if (clause.length < 4) {
-        return null
-      }
-      return lambdaCreate(space, [], clause[2], clause.slice(3))
-    }
-
-    var c2 = clause[2]
-    if (c2 instanceof Symbol$ && c2.key === '>') {
-      // (= enclosing > params body)
-      if (clause.length < 5) {
-        return null
-      }
-      return lambdaCreate(space, c1, clause[3], clause.slice(4))
-    }
-
-    // (= param body ...)
-    return space.$.function(c1, clause.slice(2))
-  }
-
-  // (=> params body)
-  operators['=>'] = function (space, clause) {
-    if (clause.length < 3) {
-      return null
-    }
-    return lambdaCreate(space, [], clause[1], clause.slice(2))
-  }
+  // call this function by tail-recursion (elimination)
+  staticOperator('redo', signalOf('redo'))
 
   // leave function or module.
-  operators['return'] = signalOf('return')
-  // leave a module or an event callback
-  operators['exit'] = signalOf('exit')
-  // request to quit the whole application.
-  operators['halt'] = signalOf('halt')
+  staticOperator('return', signalOf('return'))
+
+  // request to stop the execution of current module.
+  staticOperator('exit', signalOf('exit'))
+
+  // create the implementatio
+  function createOperator (funcOf, empty) {
+    return function (space, clause) {
+      var clist = clause.$
+      var length = clist.length
+      if (length < 2) {
+        return empty
+      }
+      var params
+      var offset
+      if (clist[1] === $Symbol.pairing) {
+        offset = 2
+      } else if (length > 2 && clist[2] === $Symbol.pairing) {
+        params = clist[1]
+        offset = 3
+      } else {
+        return funcOf(space, clause, 1)
+      }
+      // instant evaluation
+      if (length <= (offset + 1)) {
+        return null // no body
+      }
+      var func = funcOf(space, clause, offset)
+      if (params instanceof Tuple$) {
+        if (params.$.length < 1) {
+          return func()
+        }
+        var args = []
+        for (var expr in params.$) {
+          args.push(evaluate(expr, space))
+        }
+        return func.apply(null, args)
+      } else if (typeof params === 'undefined') {
+        return func()
+      } else {
+        return func(evaluate(params, space))
+      }
+    }
+  }
 }

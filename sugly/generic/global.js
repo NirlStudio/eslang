@@ -14,13 +14,10 @@ module.exports = function ($void) {
   $export($, 'NaN', NaN)
   $export($, 'Infinity', Infinity)
 
-  // Experimental: Pure Symbols
-  $export($, '`', sharedSymbolOf('`'))
-  $export($, '@', sharedSymbolOf('@'))
-  $export($, ':', sharedSymbolOf(':'))
-  $export($, '$', sharedSymbolOf('$'))
-  $export($, '#', sharedSymbolOf('#'))
+  // special empty symbols
+  $export($, '*', null) // as a common placeholder for null or empty statement.
 
+  // Experimental: Pure Symbols
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
   $export($, 'super', sharedSymbolOf('super'))

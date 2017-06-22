@@ -333,7 +333,7 @@ module.exports = function ($void) {
       var code = thisCall(value, 'to-code', ctx)
       list.push($Symbol.of(name), $Symbol.pairing, code)
     }
-    if (typed && ctx.isReferred(obj)) { // nested referred.
+    if (typed && ctx.isReferred(obj)) { // nested reference.
       list.splice(1, 2) // downgrade to a common data object.
     }
     return ctx.complete(obj, new Tuple$(list))

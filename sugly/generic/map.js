@@ -294,7 +294,7 @@ module.exports = function ($void) {
       ])
     }
     var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')] // (@:map ...
-    if (ctx.isReferred(map)) { // nested referred.
+    if (ctx.isReferred(map)) { // nested reference.
       // downgrade to an data array of key/value pairs: (@ (@key value) ...)
       list = [$Symbol.object]
       for (item in pairs) {

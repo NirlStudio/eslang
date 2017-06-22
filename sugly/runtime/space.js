@@ -1,85 +1,70 @@
 'use strict'
 
 module.exports = function space ($void) {
-  var functionIn = $void.functionIn
-  var runIn = $void.runIn
-  var constant = $void.constant
+  var $ = $void.$
+  var $Object = $.object
+  var Module$ = $void.Module
+  var $export = $void.export
 
-  $void.spaceCounter = 0
-  $void.spaceIdentifier = 'void'
-  $void.moduleIdentifier = $void.spaceIdentifier
-
-  // prepare void as a module space.
-  $void.modules = {}
-  $void.spaceStack = {
-    scopes: [],
-    frames: [],
-    push: function (scope, func, args) {
-      this.scopes.push(scope)
-      this.frames.push('' + func.name || func)
-      if (this.frames.length > 1000) {
-        console.log(this.frames.slice(-3))
-        throw new RangeError('dead loop?', this.frames)
-      }
+  $void.Space = Space$
+  function Space$ (local, locals, context, export_) {
+    this.local = local
+    this.context = context || Object.create(local)
+    if (locals) {
+      this.locals = locals
+    }
+    if (export_) {
+      this.export = export_
+    }
+  }
+  Space$.prototype = Object.assign(Object.create(null), {
+    resolve: function (key) {
+      var value = this.context[key]
+      return typeof value === 'undefined' ? null : this.context[key]
     },
-    pop: function () {
-      this.scopes.pop()
-      this.frames.pop()
+    var: function (key, value) {
+      return (this.local[key] = value)
     },
-    current: function () {
-      return this.scopes.length > 0 ? this.scopes[this.scopes.length - 1] : null
-    }
-  }
-
-  function exportTo (space) {
-    constant(space.$, 'export', function export_ (key, value) {
-      if (typeof key !== 'string') {
-        return null
+    let: function (key, value) {
+      if (typeof this.local[key] !== 'undefined' || !this.locals) {
+        return (this.local[key] = value)
       }
-      return (space.$[key] = typeof value === 'undefined' ? null : value)
-    })
+      for (var i = this.locals.length - 1; i >= 0; i--) {
+        if (typeof this.locals[i][key] !== 'undefined') {
+          return (this.locals[i][key] = value)
+        }
+      }
+      return (this.local[key] = value)
+    },
+    export: function (key, value) {
+      return this.export && typeof this.export[key] === 'undefined'
+        ? $export(this.export, key, (this.local[key] = value)) : null
+    }
+  })
+
+  $void.createModuleSpace = function (uri) {
+    var local = Object.create($)
+    var export_ = Object.create($Object.proto)
+    local['-module'] = export_['-module'] = new Module$(uri)
+    return new Space$(local, null, null, export_)
   }
 
-  var createSpace = $void.createSpace = function $createSpace (parent) {
-    $void.spaceCounter += 1
-    var space = {
-      parent: parent,
-      spaceIdentifier: 'space-' + $void.spaceCounter,
-       // new stack objects
-      loops: [],
-      oprStack: [],
-      // new app space
-      $: Object.create(parent.$)
-    }
-    space.$.spaceIdentifier = space.spaceIdentifier
-    return space
+  $void.createLambdaSpace = function () {
+    return new Space$(Object.create($))
   }
 
-  var initializeModuleSpace = $void.initializeModuleSpace = function $initializeModuleSpace (space, attachExport) {
-    if (attachExport) {
-      // overriding parent.export
-      exportTo(space)
-    }
-
-    functionIn(space)
-    runIn(space)
+  $void.createFunctionSpace = function (parent) {
+    return parent
+      ? new Space$(Object.create(parent.local),
+          parent.locals ? parent.locals.concat(parent.local) : [parent.local])
+      : new Space$(Object.create($))
   }
 
-  $void.createModuleSpace = function $createModuleSpace (sealing, dir) {
-    var space = createSpace($void)
-    space.sealing = sealing
-    space.moduleIdentifier = space.spaceIdentifier
-    space.$.moduleIdentifier = space.spaceIdentifier
-    space.operators = {}
-
-    if (dir && dir !== space.dir) {
-      space.dir = dir // save base dir if it is changing for this space.
-    }
-    if (sealing) {
-      space.modules = {} // separate module cache
-    }
-
-    initializeModuleSpace(space, sealing)
+  $void.createOperatorSpace = function (parent) {
+    var space = parent
+      ? new Space$(parent.local, parent.locals, Object.create(parent.context))
+      : new Space$(Object.create($))
+    space.inop = true
     return space
   }
 }

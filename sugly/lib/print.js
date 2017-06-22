@@ -10,7 +10,7 @@ module.exports = function ($void, JS) {
   })
 
   $export($, 'warn', function () {
-    console.log.apply(console, toStrings.apply(null, arguments))
+    console.warn.apply(console, toStrings.apply(null, arguments))
   })
 
   function toStrings () {

@@ -1,99 +1,121 @@
 'use strict'
 
 module.exports = function evaluate ($void) {
-  var resolve = $void.resolve
+  var $ = $void.$
+  var $Operator = $.operator
+  var Tuple$ = $void.Tuple
+  var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
   var indexerOf = $void.indexerOf
+  var staticOperators = $void.staticOperators
 
   $void.evaluate = function evaluate (clause, space) {
-    if (!Array.isArray(clause)) {
-      // not a clause.
-      return clause instanceof Symbol$ ? resolve(space, clause) : clause
+    if (!(clause instanceof Tuple$)) {
+      return clause instanceof Symbol$ ? space.resolve(clause.key) : clause
     }
     var length = clause.length
-    if (length < 1) {
-      return null // empty clause
+    if (length < 1) { // empty clause
+      return null
     }
-
-    var subject = clause[0]
-    // check sentence mode: implicit (auto-test) or explicit (S P O).
-    var implicitMode, offset
-    if (subject instanceof Symbol$ && subject.key === ':') {
-      if (length < 2) {
-        return null
+    if (clause.plain) { // a plain expression list (code block)
+      var last = null
+      for (var expr in clause.$) {
+        last = evaluate(expr, space)
       }
-      implicitMode = false
-      subject = clause[1]
-      offset = 2
-    } else {
-      implicitMode = true
-      offset = 1
+      return last
     }
-
-    // intercept subject
+    // The subject and evaluation mode:
+    //  implicit: the subject will be invoked if it's a function
+    //  explicit: the subject keeps as a subject even it's a function.
+    var subject = clause.$[0]
+    var offset = 1
+    var implicitMode = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
       var key = subject.key
-      var localOperators = space.operators || space.parent.operators
-      if (typeof localOperators[key] !== 'undefined') {
-        return localOperators[key](space, clause)
-      } else if (typeof $void.operators[key] !== 'undefined') {
-        return $void.operators[key](space, clause)
+      if (key === ':') { // switching to explicit mode.
+        if (length < 2) {
+          return null // no subject.
+        }
+        subject = evaluate(clause.$[1], space)
+        if (length === 2) {
+          // side effect: no more evaluation if only subject exists
+          return subject
+        }
+        offset = 2
+        implicitMode = false // explicit mode
+      } else if (staticOperators[subject.key]) { // static operators
+        return staticOperators[subject.key](space, clause)
+      } else { // a common symbol
+        subject = space.resolve(key)
       }
-      subject = resolve(space, subject)
-    } else if (Array.isArray(subject)) {
+    } else if (subject instanceof Tuple$) { // a statment
       subject = evaluate(subject, space)
-    }
+    } // else, the subject is a common value.
 
+    // swith subject to predicate if it's apppliable.
     var predicate
-    if (implicitMode && typeof subject === 'function') {
+    if (typeof subject === 'function' && implicitMode) {
+      if (subject.type === $Operator) {
+        return subject(space, clause)
+      }
       predicate = subject
       subject = null
     } else {
       predicate = null
     }
 
-    // with only subject, take the value of subject as another clause.
+    // with only subject, apply evaluation to it.
     if (length <= offset && predicate === null) {
       return evaluate(subject, space)
     }
 
     var args = []
-    if (predicate === null) {
-      // resolve the predicate
-      predicate = clause[offset]
-      offset += 1
-      if (Array.isArray(predicate)) {
-        // nested clause
+    if (predicate === null) { // resolve the predicate if there is not.
+      predicate = clause.$[offset++]
+      if (predicate instanceof Tuple$) { // nested clause
         predicate = evaluate(predicate, space)
       }
       // try to find a function as verb
       if (predicate instanceof Symbol$) {
-        predicate = predicate.key === ':' ? indexerOf(subject)
-          : indexerOf(subject).call(subject, predicate.key)
-        if (typeof predicate !== 'function') {
-          return predicate // interpret to getter if result is not a function.
+        if (predicate.key === ':') {
+          predicate = indexerOf(subject) // explicitly calling the indexer
+        } else { // implicitly call the indexer
+          predicate = indexerOf(subject).call(subject, predicate.key)
+          if (typeof predicate !== 'function') {
+            return predicate // interpret to getter if the result is not a function.
+          }
         }
       } else if (typeof predicate === 'string' || typeof predicate === 'number') {
+        // implicitly calling the indexer with index value(s)
         args.push(predicate)
         predicate = indexerOf(subject)
       } else if (typeof predicate !== 'function') {
-        return null // invalid predicate
+        return subject // do nothing with the subject.
       }
     }
 
-    // evaluate arguments.
-    var max = predicate['fixed-args'] ? predicate.code.$[1].$.length : 1024
-    for (; offset < length && args.length < max; offset++) {
-      args.push(evaluate(clause[offset], space))
+    // pass the original clause if the predicate is an operator.
+    if (typeof predicate === $Operator) {
+      return predicate(space, clause, subject)
     }
 
-    // execute the clause.
+    // evaluate arguments.
+    for (; offset < length; offset++) {
+      args.push(evaluate(clause.$[offset], space))
+    }
+
+    // evaluate the statement.
     try {
       var result = predicate.apply(subject, args)
       return typeof result === 'undefined' ? null : result
     } catch (signal) {
-      // TODO - filter native errors
-      throw signal
+      if (signal instanceof Signal$) {
+        throw signal
+      } else {
+        console.warn('evaluating > unknow signal:', signal,
+          'when evaluating', clause, 'with', args)
+        return null
+      }
     }
   }
 }

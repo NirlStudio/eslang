@@ -6,7 +6,6 @@ module.exports = function ($void) {
   var Type$ = $void.Type
   var Module$ = $void.Module
   var Symbol$ = $void.Symbol
-  var Integer$ = $void.Integer
   var Tuple$ = $void.Tuple
   var $Type = $.type
   var $Tuple = $.tuple
@@ -37,21 +36,6 @@ module.exports = function ($void) {
         (SpecialSymbol.test(key) || !InvalidSymbol.test(key)) ? key : ''))
   }
   $void.sharedSymbolOf = sharedSymbolOf
-
-  // cached small integer values
-  var integerMax = new Integer$(Number.MAX_SAFE_INTEGER)
-  var integerMin = new Integer$(Number.MIN_SAFE_INTEGER)
-  var integerValues = []
-  for (var i = 0; i < 256; i++) {
-    integerValues.push(new Integer$(i))
-  }
-  $void.integerOf = function (value) {
-    return typeof value !== 'number' || isNaN(value) ? integerValues[0]
-      : value >= Number.MAX_SAFE_INTEGER ? integerMax
-        : value <= Number.MIN_SAFE_INTEGER ? integerMin
-          : value >= 0 && value < 256 ? integerValues[Math.trunc(value)]
-            : new Integer$(Math.trunc(value))
-  }
 
   // get the correct indexer for an entity.
   function indexerOf (entity) {

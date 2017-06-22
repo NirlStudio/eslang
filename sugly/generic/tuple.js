@@ -75,7 +75,6 @@ module.exports = function ($void) {
   var Tuple$ = $void.Tuple
   var Range$ = $void.Range
   var Symbol$ = $void.Symbol
-  var Integer$ = $void.Integer
   var link = $void.link
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
@@ -104,7 +103,6 @@ module.exports = function ($void) {
       typeof value === 'boolean' ||
       typeof value === 'string' ||
       typeof value === 'number' ||
-      value instanceof Integer$ ||
       value instanceof Symbol$ ||
       value instanceof Tuple$ ||
       value instanceof Range$ ||
@@ -267,14 +265,8 @@ module.exports = function ($void) {
             : typeof proto[index] === 'undefined' ? null : proto[index]
     }
     // read items
-    if (index instanceof Integer$) {
-      index = index.number
-    }
     if (typeof index === 'number') {
       index = Math.trunc(index)
-      if (length instanceof Integer$) {
-        length = Math.trunc(length.number)
-      }
       var list = this.$
       return typeof length === 'number' && length > 0
         ? new Tuple$(list.slice(index, index + length)) // slice to create a new tuple.

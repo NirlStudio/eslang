@@ -4,12 +4,12 @@ module.exports = function module ($void) {
   var $ = $void.$
   var Type = $.module
   var $Tuple = $.tuple
-  var $Symbol = $.symbol
   var link = $void.link
   var Module$ = $void.Module
-  var CodingContext$ = $void.CodingContext
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
+  var CodingContext$ = $void.CodingContext
+  var sharedSymbolOf = $void.sharedSymbolOf
 
   // create an empty module.
   link(Type, 'empty', function () {
@@ -50,9 +50,9 @@ module.exports = function module ($void) {
     }
     if (ctx instanceof CodingContext$) {
       ctx.touch(this, Type) // to be reused if required.
-      return ctx.complete(this, $Tuple.of($Symbol.of('load'), uri))
+      return ctx.complete(this, $Tuple.of(sharedSymbolOf('import'), uri))
     } else {
-      return $Tuple.of($Symbol.of('load'), uri)
+      return $Tuple.of(sharedSymbolOf('import'), uri)
     }
   })
 

@@ -6,7 +6,6 @@ module.exports = function ($void) {
   var proto = Type.proto
   var Type$ = $void.Type
   var link = $void.link
-  var ownsProperty = $void.ownsProperty
   var sharedSymbolOf = $void.sharedSymbolOf
   var isPrototypeOf = $void.isPrototypeOf
 
@@ -41,26 +40,6 @@ module.exports = function ($void) {
     return typeof name !== 'string' || name === ':' ? null
       : name === 'type' ? null // fake field
         : (typeof proto[name] !== 'undefined' ? proto[name] : null)
-  })
-
-  // Boolean Test: shared for all non-null values.
-  // TODO - convert to an operator
-  link(proto, '?', function (a, b) {
-    if (typeof a === 'undefined') {
-      // booleanize
-      a = true; b = false
-    } else if (typeof b === 'undefined') {
-      // logical fallback
-      b = a; a = this
-    }
-    // A-B test
-    return this !== 0 && this !== false ? a : b
-  })
-
-  // Null Fallback: shared for non-null values.
-  // TODO - convert to an operator
-  link(proto, '??', function () {
-    return typeof this === 'undefined' ? null : this
   })
 
   /* The Primal Type */

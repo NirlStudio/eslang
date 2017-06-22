@@ -1,194 +1,196 @@
 'use strict'
 
 module.exports = function function_ ($void) {
-  var Signal = $void.Signal
+  var $Tuple = $void.$.tuple
+  var $Symbol = $void.$.symbol
+  var Tuple$ = $void.Tuple
+  var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
-  var constant = $void.constant
-  var readonly = $void.readonly
-  var virtual = $void.virtual
+  var lambda = $void.lambda
+  var evaluate = $void.evaluate
+  var function_ = $void.function
+  var createLambdaSpace = $void.createLambdaSpace
+  var createFunctionSpace = $void.createFunctionSpace
 
-  // param or (param ...) or ((param value) ...)
-  function formatParameters (params) {
-    var formatted = [true] // eliminate unwanted arguments.
-    if (typeof params === 'undefined' || params === null) {
-      return formatted
+  $void.lambdaOf = function lambdaOf (space, clause, offset) {
+    // compile code
+    var code = [$Symbol.lambda]
+    var params = formatParameters(clause.$[offset++], space)
+    code.push(params[1])
+    params = params[0]
+    var body = clause.$.slice(offset) || []
+    if (body.length > 0) {
+      code.push(new Tuple$(body, true))
+      return lambda(createLambda(params, body), code)
+    } else {
+      code.push($Tuple.plain) // empty body
+      return lambda(function () { // use an empty function
+        return null
+      }, code)
     }
-
-    if (params instanceof Symbol$) {
-      params = [params] // single parameter
-    } else if (!Array.isArray(params)) {
-      return formatted
-    }
-
-    for (var i = 0; i < params.length; i++) {
-      var p = params[i]
-      if (p instanceof Symbol$) {
-        if (p.key === '*') {
-          formatted[0] = false // variant arguments
-          break // the repeat indicator is always the last one
-        }
-        formatted.push([p, null])
-      } else if (Array.isArray(p)) {
-        if (p.length < 1) {
-          continue
-        }
-        var sym = p[0]
-        if (sym instanceof Symbol$) {
-          formatted.push([sym, p.length > 1 ? p[1] : null]) // no evaluation.
-        }
-      }
-    }
-    return formatted
   }
 
-  $void.functionIn = function $functionIn (space) {
-    var evaluate = $void.evaluate
-    var spaceStack = $void.spaceStack
-    var createSpace = $void.createSpace // createSpace depending on functionIn.
-    var $ = space.$
-
-    // body must be a list of clauses
-    constant($, 'function', function $function (params, body) {
-      if (!Array.isArray(body) || body.length < 1) {
-        return null // no function body
+  function createLambda (params, body) {
+    var me = function () {
+      var scope = createLambdaSpace()
+      // populate arguments
+      for (var i = 0; i < params.length; i++) {
+        var param = params[i]
+        scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
       }
-
-      params = formatParameters(params)
-      var fixedArgs = params.shift()
-
-      function $F () {
-        // new namespace
-        var scope = createSpace(space)
-        spaceStack.push(scope, $F)
-        var ns = scope.$
-        ns['do'] = $F
-        ns['this'] = this
-        Object.assign(ns, $F.context)
-        var argc = ns['argc'] = arguments.length
-        if (fixedArgs) {
-          ns['argv'] = null
-        } else {
-          ns['argv'] = Array.prototype.slice.apply(arguments)
-        }
-
-        // binding arguments with default values
-        var i = 0
-        var length = params.length
-        for (; i < length; i++) {
-          var p = params[i]
-          ns[p[0].key] = argc > i ? arguments[i] : p[1]
-        }
-
+      scope.context['do'] = me
+      scope.context['this'] = typeof this === 'undefined' ? null : this
+      scope.context['arguments'] = Array.prototype.slice.call(arguments)
+      // execution
+      while (true) { // redo
         try {
           var result = null
-          length = body.length
-          for (i = 0; i < length; i++) {
-            result = evaluate(body[i], scope)
+          for (var expr in body) {
+            result = evaluate(expr, scope)
           }
-          spaceStack.pop()
           return result
         } catch (signal) {
-          spaceStack.pop()
-          if (signal instanceof Signal && signal.id === 'return') {
-            return signal.value
+          if (signal instanceof Signal$) {
+            if (signal.id === 'return') {
+              return signal.value
+            }
+            if (signal.id === 'redo') { // clear space context
+              scope = prepareToRedo(createLambdaSpace(),
+                me, this, params, signal.value, signal.count)
+              continue
+            }
           }
           throw signal
         }
       }
+    }
+    return me
+  }
 
-      readonly($F, 'context', null)
-      readonly($F, 'fixed-args', fixedArgs)
-      readonly($F, 'parameters', params)
-      readonly($F, 'body', body)
-      return $F
-    })
+  $void.functionOf = function functionOf (space, clause, offset) {
+    // compile code
+    var code = [$Symbol.lambda] // a function wil be encoded to a lambda too.
+    var params = formatParameters(clause.$[offset++], space)
+    code.push(params[1])
+    params = params[0]
+    var body = clause.$.slice(offset) || []
+    if (body.length > 0) {
+      code.push(new Tuple$(body, true))
+      return function_(createFunction(params, body, space.local, space.locals),
+        code)
+    } else {
+      code.push($Tuple.plain) // empty body
+      return function_(function () { // use an empty function
+        return null
+      }, code)
+    }
+  }
 
-    function createClosure (enclosing, params, fixedArgs, body) {
-      function $C () {
-        // new namespace
-        var scope = createSpace(space)
-        spaceStack.push(scope, $C)
-        var ns = scope.$
-        ns['do'] = $C
-        ns['this'] = this
-        Object.assign(ns, $C.context)
-        var argc = ns['argc'] = arguments.length
-        if (fixedArgs) {
-          ns['argv'] = null
-        } else {
-          ns['argv'] = Array.prototype.slice.apply(arguments)
-        }
-
-        // aguments or parameter default values can overrride enclosed values.
-        var i = 0
-        var length = params.length
-        for (; i < length; i++) {
-          var p = params[i]
-          ns[p[0].key] = argc > i ? arguments[i] : p[1]
-        }
-
+  function createFunction (params, body, local, locals) {
+    var parent = {
+      local: local,
+      locals: locals
+    }
+    var me = function () {
+      var scope = createFunctionSpace(parent)
+      // populate arguments
+      for (var i = 0; i < params.length; i++) {
+        var param = params[i]
+        scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
+      }
+      scope.context['do'] = me
+      scope.context['this'] = typeof this === 'undefined' ? null : this
+      scope.context['arguments'] = Array.prototype.slice.call(arguments)
+      // execution
+      while (true) { // redo
         try {
           var result = null
-          length = body.length
-          for (i = 0; i < length; i++) {
-            result = evaluate(body[i], scope)
+          for (var expr in body) {
+            result = evaluate(expr, scope)
           }
-          spaceStack.pop()
           return result
         } catch (signal) {
-          spaceStack.pop()
-          if (signal instanceof Signal && signal.id === 'return') {
-            return signal.value
+          if (signal instanceof Signal$) {
+            if (signal.id === 'return') {
+              return signal.value
+            }
+            if (signal.id === 'redo') { // clear space context
+              scope = prepareToRedo(createFunctionSpace(parent),
+                me, this, params, signal.value, signal.count)
+              continue
+            }
           }
           throw signal
         }
       }
-
-      virtual($C, 'context', enclosing)
-      readonly($C, 'fixed-args', fixedArgs)
-      readonly($C, 'parameters', params)
-      readonly($C, 'body', body)
-      return $C
     }
+    return me
+  }
 
-    function createLambda (enclosing, params, body) {
-      function $L () {
-        var args = Array.prototype.slice.apply(arguments)
+  // to prepare a new context for redo
+  function prepareToRedo (scope, me, t, params, value, count) {
+    scope.context['do'] = me
+    scope.context['this'] = typeof t === 'undefined' ? null : t
+    var args = scope.context['arguments'] = count === 0 ? []
+      : count === 1 ? [value] : value
+    for (var i = 0; i < params.length; i++) {
+      var param = params[i]
+      scope.local[param[0]] = i < args.length ? args[i] : param[1]
+    }
+    return scope
+  }
 
-        enclosing = Object.assign(Object.create(null), enclosing)
-        for (var i = 0; i < params.length; i++) {
-          var p = params[i]
-          enclosing[p[0].key] = args.length > i ? args[i] : p[1]
+  // accepts param, (param ...) or ((param default-value) ...)
+  // returns [params-list, code]
+  function formatParameters (params, space) {
+    if (params instanceof Symbol$) {
+      return [[[params.key, null]], params]
+    }
+    if (!(params instanceof Tuple$) || params.$.length < 1) {
+      return [[], $Tuple.empty]
+    }
+    var args = []
+    var code = []
+    var hasDefault = false
+    var counter = 0
+    params = params.$
+    for (var i = 0; i < params.length; i++) {
+      var param = params[i]
+      if (param instanceof Symbol$) {
+        args.push([param.key, null])
+        code.push([param, null])
+        counter++
+      } else if (param instanceof Tuple$ && param.length > 0) {
+        var sym = param.$[0]
+        if (sym instanceof Symbol$) {
+          if (param.length < 2) {
+            args.push([sym.key, null])
+            code.push([sym, null])
+            counter++
+          } else {
+            var value = evaluate(param.$[1], space)
+            hasDefault = $Tuple.accepts(value) && value !== null
+            args.push([sym.key, hasDefault ? value : null])
+            code.push([sym, hasDefault ? value : null])
+            counter++
+          }
         }
-
-        return $.lambda(enclosing, body[1], body.slice(2))
       }
-
-      virtual($L, 'context', enclosing)
-      readonly($L, 'fixed-args', true)
-      readonly($L, 'parameters', params)
-      readonly($L, 'body', body)
-      return $L
     }
-
-    constant($, 'lambda', function $lambda (enclosing, params, body) {
-      if (!Array.isArray(body) || body.length < 1) {
-        return null // no function body
-      }
-
-      if (typeof enclosing !== 'object' || enclosing === null) {
-        enclosing = Object.create(null)
-      }
-
-      params = formatParameters(params)
-      var fixedArgs = params.shift()
-
-      var first = body[0]
-      if (first instanceof Symbol$ && first.key === '>') {
-        return createLambda(enclosing, params, body)
+    if (counter === 0) {
+      return [[], $Tuple.empty]
+    }
+    if (counter === 1 && !hasDefault) {
+      return [args, code[0][0]]
+    }
+    var list = []
+    for (var pair in code) {
+      if (pair[1] === null) {
+        list.push(pair[0])
       } else {
-        return createClosure(enclosing, params, fixedArgs, body)
+        list.push(new Tuple$(pair))
       }
-    })
+    }
+    return [args, new Tuple$(list)]
   }
 }

@@ -1,14 +1,10 @@
 'use strict'
 
 function createValueOf ($void, parse) {
-  var Integer$ = $void.Integer
-
   return function (input, defaultValue) {
     var value
     if (typeof input === 'string') {
       value = parse(input)
-    } else if (input instanceof Integer$) {
-      value = input.number
     } else if (typeof input === 'boolean') {
       value = input ? 1 : 0
     } else if (input instanceof Date) {
@@ -22,6 +18,44 @@ function createValueOf ($void, parse) {
     }
     return isNaN(value) && typeof defaultValue === 'number'
       ? defaultValue : value
+  }
+}
+
+function createIntValueOf ($void, parse) {
+  return function (input, radix) {
+    if (typeof input === 'string') {
+      return parse(input, radix)
+    }
+    if (typeof input === 'number') {
+      return input.trunc()
+    }
+    if (typeof input === 'boolean') {
+      return input ? 1 : 0
+    }
+    return 0
+  }
+}
+
+function createIntParser ($void) {
+  return function (input, radix) {
+    if (typeof input !== 'string') {
+      return 0
+    }
+    if (typeof radix !== 'number' || radix < 2) {
+      if (input.startsWith('0x')) {
+        radix = 16
+        input = input.substring(2)
+      } else if (input.startsWith('0b')) {
+        radix = 2
+        input = input.substring(2)
+      } else if (input.startsWith('0')) {
+        radix = 8
+        input = input.substring(1)
+      } else {
+        radix = 10
+      }
+    }
+    return parseInt(input, radix)
   }
 }
 
@@ -86,7 +120,6 @@ module.exports = function ($void) {
   var Type = $.number
   var $Range = $.range
   var link = $void.link
-  var Integer$ = $void.Integer
   var copyObject = $void.copyObject
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
@@ -100,6 +133,15 @@ module.exports = function ($void) {
     NEGATIVE_INFINITY: '-infinity'
   })
 
+  // the safe (valid) integer value range
+  link(Type, 'max-int', Number.MAX_SAFE_INTEGER)
+  link(Type, 'min-int', Number.MIN_SAFE_INTEGER)
+
+  // support bitwise operations for 32-bit integer values.
+  link(Type, 'bits', 32)
+  link(Type, 'max-bits', Math.pow(2, 31) - 1)
+  link(Type, 'min-bits', -Math.pow(2, 31))
+
   // The empty value
   link(Type, 'empty', 0)
 
@@ -108,8 +150,14 @@ module.exports = function ($void) {
     return str && typeof str === 'string' ? parseFloat(str) : NaN
   })
 
+  // parse a string as an integer value.
+  var parseInteger = link(Type, 'parse-int', createIntParser($void))
+
   // get a number value from the input
   var valueOf = link(Type, 'of', createValueOf($void, parse))
+
+  // get an integer value from the input
+  link(Type, 'of-int', createIntValueOf($void, parseInteger))
 
   typeIndexer(Type)
 
@@ -119,6 +167,11 @@ module.exports = function ($void) {
     return typeof this === 'number' ? !isNaN(this) : null
   }, 'is-not-valid', function () {
     return typeof this === 'number' ? isNaN(this) : null
+  })
+  link(proto, 'is-int', function () {
+    return Number.isSafeInteger(this)
+  }, 'is-not-int', function () {
+    return !Number.isSafeInteger(this)
   })
   link(proto, 'is-finite', function () {
     return typeof this === 'number' ? isFinite(this) : null
@@ -132,14 +185,37 @@ module.exports = function ($void) {
   link(proto, ['times', '*'], numberTimes(valueOf))
   link(proto, ['divide', '/'], numberDivide(valueOf))
 
+  // bitwise operations
+  link(proto, '&', function (value) {
+    return typeof this === 'number' ? this.number & value : null
+  })
+  link(proto, '|', function (value) {
+    return typeof this === 'number' ? this.number | value : null
+  })
+  link(proto, '^', function (value) {
+    return typeof this === 'number' ? this.number ^ value : null
+  })
+  link(proto, '<<', function (offset) {
+    return typeof this === 'number' ? this.number << offset : null
+  })
+  link(proto, '>>', function (offset) {
+    return typeof this === 'number' ? this.number >> offset : null
+  })
+  link(proto, '>>>', function (offset) {
+    return typeof this === 'number' ? this.number >>> offset : null
+  })
+
+  // TODO: operators
+  // ++
+  // --
+  // +=
+  // -=
+
   // support ordering logic - comparable
   // For uncomparable entities, comparison result is consistent with the Equivalence.
   // Uncomparable state is indicated by a null and is taken as inequivalent.
   // TODO: isNaN() vs. x !== x ?
   var compare = link(proto, 'compare', function (another) {
-    if (another instanceof Integer$) {
-      another = another.number // number and integer are comparable.
-    }
     return this === another ? 0
       : typeof this !== 'number' || typeof another !== 'number' ? null
         : !isNaN(this) && !isNaN(another)
@@ -222,11 +298,7 @@ module.exports = function ($void) {
           : typeof proto[index] === 'undefined' ? null : proto[index]
     }
     // create a range by this as Begin, index as End and value as Step.
-    if (index instanceof Integer$) {
-      index = index.number
-    }
     return typeof index !== 'number' ? null
-      : $Range.of(this, index, typeof value === 'number' ? value
-        : value instanceof Integer$ ? value.number : null)
+      : $Range.of(this, index, typeof value === 'number' ? value : null)
   })
 }

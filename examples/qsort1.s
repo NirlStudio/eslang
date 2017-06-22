@@ -23,7 +23,7 @@
     (++ left)
   ),
   (do start (left - 1),
-  (do (left + 1) end)
+  (redo (left + 1) end)
 ).
 
 (sort 0 ((data length) - 1).

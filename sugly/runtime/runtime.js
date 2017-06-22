@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function meta ($void) {
+module.exports = function runtime ($void) {
   var $ = $void.$
   var object = $.object
   var $export = $void.export
@@ -20,4 +20,14 @@ module.exports = function meta ($void) {
       'debugging': false
     })
   }))
+
+  var environment = $['-runtime']['environment']
+  $export($, 'env', function (name, defaulue) {
+    return typeof name === 'string' && typeof environment[name] !== 'undefined'
+      ? environment[name] : typeof defaulue === 'undefined' ? null : defaulue
+  })
+
+  $void.setEnv = function (name, value) {
+    environment[name] = value
+  }
 }

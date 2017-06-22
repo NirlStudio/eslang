@@ -221,6 +221,9 @@ module.exports = function ($void) {
     for (var value in set) {
       list.push(thisCall(value, 'to-code', ctx))
     }
+    if (ctx.isReferred(set)) { // nested reference.
+      list.splice(1, 2) // downgrade to an array.
+    }
     return ctx.complete(set, new Tuple$(list))
   }
 

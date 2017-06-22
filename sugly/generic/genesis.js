@@ -84,13 +84,6 @@ module.exports = function () {
   // A number may have a real number value in the proper range.
   create('number')
 
-  // An integer value is a special number which keeps its type in calculation.
-  create('integer', $.number)
-  var Integer$ = $void.Integer = function Integer$ (number) {
-    publish(this, 'number', number)
-  }
-  Integer$.prototype = $.integer.proto
-
   // A date value is a combination of a timestamp and a associated locale string.
   create('date')
   $void.Date = Date
@@ -147,6 +140,10 @@ module.exports = function () {
     define(impl, 'code', code)
     return impl
   }
+
+  // the contaier for static operators. Static operators are taken as an
+  // essential part of the language itself. They cannot be overridden.
+  $void.staticOperators = Object.create(null)
 
   // A lambda is another type of operation which wants the values of its arguments
   // as input, so the runtime helps to evaluate all them before invocation.

@@ -27,7 +27,7 @@ module.exports = function ($void) {
 
     function compileToken (type, value, source, errCode, errMessage) {
       if (type === 'error') {
-        raiseExpression(stack[0], sourceStack[0], 'error:tokenizer:' + errCode, errMessage,
+        raiseExpression([stack[0], sourceStack[0]], 'tokenizer:' + errCode, errMessage,
           [type, value, source])
         resetContext()
         return
@@ -178,12 +178,22 @@ module.exports = function ($void) {
   // a helper function to compile a piece of source code.
   $export($, 'compile', function (text) {
     var list = []
-    var compiling = compiler(function collector () {
-      list.push(Array.prototype.slice.call(arguments))
+    var warnings = null
+    var compiling = compiler(function collector (expr, status) {
+      if (status) {
+        if (status !== 'reseting') { // restting is ignored for sync compiling.
+          if (!warnings) {
+            warnings = [list]
+          }
+          warnings.push(Array.prototype.slice.call(arguments))
+        }
+      } else {
+        list.push(expr)
+      }
     })
     compiling(text)
     compiling() // notify the end of stream.
-    return new Tuple$(list, true/* as code block */)
+    return warnings || new Tuple$(list, true/* as code block */)
   })
 }
 

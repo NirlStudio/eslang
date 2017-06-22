@@ -4,7 +4,6 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.date
   var $Number = $.number
-  var Integer$ = $void.Integer
   var link = $void.link
   var copyProto = $void.copyProto
   var typeIndexer = $void.typeIndexer
@@ -92,18 +91,12 @@ module.exports = function ($void) {
 
   // support & override general operators
   link(proto, '+', function (milliseconds) {
-    if (milliseconds instanceof Integer$) {
-      milliseconds = milliseconds.number
-    }
     return this instanceof Date
       ? typeof milliseconds !== 'number' ? this
         : new Date(this.getTime() + milliseconds)
       : null
   })
   link(proto, '-', function (dateOrTime) {
-    if (dateOrTime instanceof Integer$) {
-      dateOrTime = dateOrTime.number
-    }
     return this instanceof Date
       ? typeof dateOrTime === 'number'
         ? new Date(this.getTime() - dateOrTime)

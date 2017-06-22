@@ -1,106 +1,118 @@
 'use strict'
 
 module.exports = function operators$control ($void) {
-  var operators = $void.operators
-  var evaluate = $void.evaluate
-  var resolve = $void.resolve
-  var Signal = $void.Signal
-  var signalOf = $void.signalOf
+  var Tuple$ = $void.Tuple
+  var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
+  var evaluate = $void.evaluate
+  var signalOf = $void.signalOf
+  var thisCall = $void.thisCall
+  var sharedSymbolOf = $void.sharedSymbolOf
+  var staticOperator = $void.staticOperator
+  var symbolElse = sharedSymbolOf('else')
+  var symbolIn = sharedSymbolOf('in')
 
-  var iterate = $void.$.iterate
-  var symbolValueOf = $void.$.symbol['of']
-  var SymbolElse = symbolValueOf('else')
+  // (? cond true-branch false-branch)
+  staticOperator('?', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
+    if (length < 3) {
+      return null // short circuit - the result will be null anyway.
+    }
+    var cond = evaluate(clist[1])
+    if (cond === true ||
+      cond !== false && cond !== null && cond !== 0) {
+      return evaluate(clist[2])
+    }
+    return length > 3 ? evaluate(clist[3], space) : null
+  })
 
-  operators['if'] = function (space, clause) {
-    var length = clause.length
+  // (if cond true-branch else false-branch)
+  staticOperator('if', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
     if (length < 3) {
       return null // short circuit - the result will be null anyway.
     }
 
-    // look for else
-    var offset = clause.indexOf(SymbolElse, 1)
-    if (offset === 1) {
-      return null // short circuit - the cond is required.
-    }
-
-    var cond = evaluate(clause[1], space)
-    var tb, fb
-    if (offset > 0) {
-      tb = clause.slice(2, offset)
-      fb = clause.slice(offset + 1)
-    } else {
-      tb = length > 2 ? [clause[2]] : []
-      fb = length > 3 ? clause.slice(3) : []
-    }
-
-    var option = cond !== false && cond !== null && cond !== 0 ? tb : fb
-    if (option.length < 1) {
-      return null
-    }
-
-    var result
-    for (var i = 0; i < option.length; i++) {
-      result = evaluate(option[i], space)
-    }
-    return result
-  }
-
-  function createLoopSignal (type) {
-    var signal = signalOf(type)
-    return function loopSignal ($, clause) {
-      if ($.loops.length > 0) {
-        signal($, clause)
+    var result, i, expr
+    var cond = evaluate(clist[1], space)
+    if (cond === true || // would more people prefer true?
+        cond !== false && cond !== null && cond !== 0) { //
+      expr = clist[2]
+      if (expr === symbolElse) {
+        return null // no true branch.
       }
-      return null // not in loop.
+      // otherwise this expr is always taken as part of the true branch.
+      result = evaluate(expr, space)
+      for (i = 3; i < length; i++) {
+        expr = clist[i]
+        if (expr === symbolElse) {
+          return result
+        }
+        result = evaluate(expr, space)
+      }
+      return result
     }
-  }
+    // else, cond is false
+    // skip true branch
+    for (i = 2; i < length; i++) {
+      if (clist[i] === symbolElse) {
+        break
+      }
+    }
+    if (i >= length) { // no else
+      return null // no false branch
+    }
+    result = null // in case of the else is the ending expression.
+    for (i += 1; i < length; i++) {
+      result = evaluate(clist[i], space)
+    }
+    return
+  })
 
-  operators['break'] = createLoopSignal('break')
-  operators['continue'] = createLoopSignal('continue')
+  // break current loop and use the argument(s) as result
+  staticOperator('break', signalOf('break'))
+  // skip the rest expressions in this round of loop.
+  staticOperator('continue', signalOf('continue'))
 
   function loopTest (space, cond) {
-    // loop test function returns a BREAK flag
     if (cond instanceof Symbol$) {
-      return function loopTestOfSymbol () {
-        var value = resolve(space, cond)
-        return value === false || value === null || value === 0
-      }
+      return space.resolve.bind(space, cond.key)
     }
-
-    if (Array.isArray(cond)) {
-      return function loopTestOfClause () {
-        var value = evaluate(cond, space)
-        return value === false || value === null || value === 0
-      }
+    if (cond instanceof Tuple$) {
+      return evaluate.bind(null, cond, space)
     }
-
     return cond === false || cond === null || cond === 0
   }
 
-  operators['while'] = function (space, clause) {
-    var length = clause.length
-    if (length < 3) {
-      return null // short circuit - no loop body
+  // (while cond ... )
+  staticOperator('while', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
+    if (length < 2) {
+      return null // no condition
     }
 
-    var test = loopTest(space, clause[1])
-    var dynamicTest = typeof test === 'function'
-
-    var body = clause.slice(2)
+    var test = loopTest(space, clist[1])
+    var staticCond = typeof test !== 'function'
     var result = null
-    space.loops.push(test)
     while (true) {
-      try { // break/continue can be used in condition expression.
-        if (dynamicTest ? test() : test) {
-          break
+      try {
+        if (staticCond) {
+          if (test) { return null }
+        } else { // break/continue can be used in condition expression.
+          var cond = test()
+          if (cond !== true && // it most likely is true when loop
+              cond === false || cond === null || cond === 0) {
+            break
+          }
         }
-        length = body.length
-        for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], space)
+        for (var i = 2; i < length; i++) {
+          result = evaluate(clist[i], space)
         }
       } catch (signal) {
-        if (signal instanceof Signal) {
+        if (signal instanceof Signal$) {
           if (signal.id === 'continue') {
             result = signal.value
             continue
@@ -110,69 +122,57 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        space.loops.pop()
         throw signal
       }
     }
-    space.loops.pop()
     return result
-  }
+  })
 
   // (for value in iterable body) OR
   // (for (value) in iterable body) OR
   // (for (key value) in iterable body)
   function forEach (space, clause) {
-    var length = clause.length
-    if (length < 5) {
-      return null // short circuit - no loop body
-    }
-
-    var keySymbol, valueSymbol
-    var fields = clause[1]
+    var clist = clause.$
+    var length = clist.length
+    // find out vars
+    var vars
+    var fields = clist[1]
     if (fields instanceof Symbol$) {
-      keySymbol = null
-      valueSymbol = fields
-    } else if (Array.isArray(fields)) {
-      if (fields.length > 1) {
-        keySymbol = fields[0]
-        valueSymbol = fields[1]
-        if (!(keySymbol instanceof Symbol$) || !(valueSymbol instanceof Symbol$)) {
-          return null // invalid fields expresion
+      vars = [fields.key]
+    } else if (fields instanceof Tuple$) {
+      vars = []
+      for (var v in fields.$) {
+        if (v instanceof Symbol$) {
+          vars.push(v.key)
         }
-      } else if (fields.length > 0) {
-        keySymbol = null
-        valueSymbol = fields[0]
-        if (!(valueSymbol instanceof Symbol$)) {
-          return null // invalid fields expresion
-        }
-      } else {
-        return null // missing fields expression
       }
     } else {
-      return null // invalid field(s) expression
+      vars = [] // the value is not being caught.
     }
-
-    var iterable = evaluate(clause[3], space)
-    var iterator = iterate(iterable)
-    if (iterator === null || typeof iterator.next !== 'function') {
-      return null // not an iterable object.
+    // evaluate the iterator
+    var next = evaluate(clist[3], space)
+    if (typeof next !== 'function') {
+      next = thisCall(next, 'iterate')
+      if (typeof next !== 'function') {
+        return null // no iterator.
+      }
     }
-
-    var body = clause.slice(4)
+    // start to loop
     var result = null
-    space.loops.push(iterator)
-    while (iterator.next()) {
-      space.$[valueSymbol.key] = typeof iterator.value !== 'undefined' ? iterator.value : null
-      if (keySymbol) {
-        space.$[keySymbol.key] = typeof iterator.key !== 'undefined' ? iterator.key : null
+    var values = next()
+    while (typeof values !== 'undefined' && values !== null) {
+      if (!Array.isArray(values)) {
+        values = [values]
+      }
+      for (var i = 0; i < vars.length; i++) {
+        space.var(vars[i], i < values.length ? values[i] : null)
       }
       try {
-        length = body.length
-        for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], space)
+        for (var j = 4; j < length; j++) {
+          result = evaluate(clist[j], space)
         }
       } catch (signal) {
-        if (signal instanceof Signal) {
+        if (signal instanceof Signal$) {
           if (signal.id === 'continue') {
             result = signal.value
             continue
@@ -182,50 +182,57 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        space.loops.pop()
         throw signal
       }
     }
-    space.loops.pop()
     return result
   }
 
-  // (for condition incremental body)
-  operators['for'] = function (space, clause) {
-    var length = clause.length
-    if (length < 4) {
+  // (for init test incremental body)
+  staticOperator('for', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
+    if (length < 5) {
       return null // short circuit - no loop body
     }
-
-    var step = clause[2]
-    if (step instanceof Symbol$ && step.key === 'in') {
+    // prepare test
+    var test = clist[2]
+    if (test === symbolIn) {
       return forEach(space, clause)
     }
-    var runStep = Array.isArray(step)
-
-    var test = loopTest(space, clause[1])
-    var dynamicTest = typeof test === 'function'
-
-    var body = clause.slice(3)
-    var result = null
-    space.loops.push(test)
+    test = loopTest(space, test)
+    var staticCond = typeof test !== 'function'
+    // prepare incremental
+    var step = clist[3]
+    // execute init expression
+    var result = evaluate(clist[1], space)
+    var cflag
     while (true) {
-      try { // break/continue can be used in condition expression.
-        if (dynamicTest ? test() : test) {
-          break
+      try { // test condition
+        cflag = false
+        if (staticCond) {
+          if (test) { return result }
+        } else { // break/continue can be used in condition expression.
+          var cond = test()
+          if (cond !== true && // it most likely is true when loop
+              cond === false || cond === null || cond === 0) {
+            break
+          }
         }
-        length = body.length
-        for (var i = 0; i < length; i++) {
-          result = evaluate(body[i], space)
+        // body
+        for (var i = 4; i < length; i++) {
+          result = evaluate(clist[i], space)
         }
-        if (runStep) {
-          evaluate(step, space)
-        }
+        // incremental
+        cflag = true
+        evaluate(step, space)
       } catch (signal) {
-        if (signal instanceof Signal) {
+        if (signal instanceof Signal$) {
           if (signal.id === 'continue') {
             result = signal.value
-            if (runStep) {
+            if (!cflag) {
+              // continue can be used in step and incremental. But it will not
+              // trigger incremental again even the loop indeed continues.
               evaluate(step, space)
             }
             continue
@@ -235,11 +242,9 @@ module.exports = function operators$control ($void) {
             break
           }
         }
-        space.loops.pop()
         throw signal
       }
     }
-    space.loops.pop()
     return result
-  }
+  })
 }
