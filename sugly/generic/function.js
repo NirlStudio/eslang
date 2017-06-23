@@ -9,7 +9,9 @@ module.exports = function ($void) {
   var $Operator = $.operator
   var link = $void.link
   var Tuple$ = $void.Tuple
+  var Symbol$ = $void.Symbol
   var $export = $void.export
+  var thisCall = $void.thisCall
   var prepareOperation = $void.prepareOperation
 
   // the empty function
@@ -29,6 +31,27 @@ module.exports = function ($void) {
       : (this.name || '?function') + $Tuple.of($Symbol.function,
         this.code instanceof Tuple$ ? this.code.$[1] : $Tuple.unknown,
         $Symbol.etc)['to-string']()
+  })
+
+  // explicitly call a function on subject with arguments.
+  $export($, 'call', function (subject, func) {
+    if (typeof subject === 'undefined') {
+      return null
+    }
+    var args = Array.prototype.slice.call(arguments, 2)
+    if (typeof func === 'function') {
+      return func.type === $Operator ? null : func.apply(subject, args)
+    }
+    var name
+    if (typeof func === 'string') {
+      name = func
+    } else if (func instanceof Symbol$) {
+      name = func.key
+    } else {
+      return subject
+    }
+    args.splice(0, 0, subject, name)
+    return thisCall.apply(null, args)
   })
 
   // apply a function and expand arguments from an array.
@@ -56,7 +79,18 @@ module.exports = function ($void) {
     if (!Array.isArray(args)) {
       args = []
     }
-    return typeof func === 'function' && func.type !== $Operator
-      ? func.apply(subject, args) : null
+    if (typeof func === 'function') {
+      return func.type === $Operator ? null : func.apply(subject, args)
+    }
+    var name
+    if (typeof func === 'string') {
+      name = func
+    } else if (func instanceof Symbol$) {
+      name = func.key
+    } else {
+      return subject
+    }
+    args.splice(0, 0, subject, name)
+    return thisCall.apply(null, args)
   })
 }

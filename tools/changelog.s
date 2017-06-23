@@ -1,15 +1,16 @@
-(let C (import "../lib/colors" "js").
+(let color-of (import "colors" "js").
 
-(let display (=> (color) > (feature comment)
-  (let color (:color ?? (= (*) (argv to-string " "),
-  (print (color "[" ((:do name) to-upper) "] ") feature (comment ? (" - " + comment) ""),
+(let display-as (=> (color)
+  (=> (feature comment)
+    (let color (:color ?? (= (text) text),
+    (print (color (+ "[" ((:do name) to-upper) "] ") feature (comment ? (" - " + comment) ""),
 ).
 
-(let featured (display (C "green").
-(let new (display (C "green").
-(let modified (display (C "gray").
-(let removed (display (C "red").
-(let todo (display).
+(let featured (display-as (color-of "green").
+(let new (display-as (color-of "green").
+(let modified (display-as (color-of "gray").
+(let removed (display-as (color-of "red").
+(let todo (display-as ).
 
 (print "---- Feb 6, 2017 ----")
 (featured "New Object/Class/Interface logics")

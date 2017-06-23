@@ -1,6 +1,16 @@
-(let C (import "../lib/colors" "js").
+# import rendering
+(let C (import "colors" "js").
+(let
+  (sign-passed (C passed),
+  (sign-failed (C failed),
+  (gray (C "gray"),
+  (green (C "green"),
+  (red (C "red"),
+  (underline (C "underline"),
+).
 
-(let cases (@). # to store all test cases.
+# to store all test cases.
+(let cases (@).
 (let current null). # the stack top
 
 (export define (=> (feature describe-it)
@@ -41,94 +51,127 @@
       failed: true
       step: assert-step
       expected: expected
+      real: value
       expr: expr
       note: note
-      real: value
   ),
 ).
 
+# test results
 (let summary (@).
 (let failures (@).
 
+# testing status
 (let path (@).
 (let indent "  ")
 
 (let passing 0)
-(let succeeded (=> behaviour
+(let pass (=> behaviour
   (++ passing)
-  (print indent (C passed) (C gray behaviour),
-  (summary push (@ (path copy) true behaviour),
+  (print indent sign-passed (gray behaviour),
+  (summary push (@
+    path: (path copy)
+    behaviour: behaviour
+    passed: true
+  ),
 ).
 
 (let failing 0)
-(let failed (=> (behaviour failure)
+(let fail (=> (behaviour assertion)
   (++ failing)
-  (print indent (C failed) (C red (+ "(" failing ") " behaviour),
-  (summary push (@ (path copy) false behaviour),
-  (failures push (@ failing (path copy) behaviour failure ),
+  (print indent sign-failed (red "(" failing ") " behaviour),
+  (summary push (@
+    path: (path copy)
+    behaviour: behaviour
+    passed: false
+  ),
+  (failures push (@
+    no.: failing
+    path: (path copy)
+    behaviour: behaviour
+    assertion: assertion
+  ),
 ).
 
 (let test-a (=> (case)
+  # print headline
   (print indent (case first),
   (path push (case first),
   (indent += "  ")
-
-  (for i in (1:(case length))
+  # run test case or run into child cases.
+  (for i in (1 (case length))
     (var task (case:i),
     (if (task is-a array)
       (do task)
     else
-      (var testing (task action),
-      (if (testing failed)
-        (failed (task behaviour) result)
+      (var assertion (task action),
+      (if (assertion failed)
+        (fail (task behaviour) assertion)
       else
-        (succeeded (task behaviour)
+        (pass (task behaviour)
   ),
-
+  # recover status
   (path pop)
-  (-= indent 2),
+  (indent -= 2),
 ).
 
-(let print- (=> f
-  (print (+ "  " (f 0) ") [" ((f 1) to-string " / ") "] " (f 2),
-  (let r (f 3),
-  (print (+
-    (C red (+ "     step-" (r step) " is expecting "),
-    (C green (C underline ((r expected) to-string),
-    (C red (+ " instead of " (C underline ((r real) to-string),
+(let print-a (=> failure
+  (print (+ "  " (failure no.) ") "
+    "[" ((failure path) to-string " / ") "]" (failure behaviour),
   ),
-  (print (C gray (+ "     when asserting "
-    (C underline ((r expr) to-string),
-    (((r note) is-empty) ? "" (", for " + (r note),
+  (let assertion (failure assertion),
+  (print (+
+    (red "     step-" (assertion step) " is expecting "),
+    (green (underline ((assertion expected) to-string),
+    (red " instead of " (underline ((assertion real) to-string),
+  ),
+  (print (gray "     when asserting "
+    (underline ((assertion expr) to-string),
+    (((assertion note) is-empty) ? "" (", for " + (assertion note),
     "\n"
 ).
 
+(let clear (=>
+  # targets
+  (let cases (@)
+  (let current null)
+  # result
+  (let summary (@).
+  (let failures (@).
+  # progress
+  (let path (@).
+  (let indent "  ")
+  # counters
+  (let passing 0)
+  (let failing 0)
+).
+
 (export test (=> ()
-  (clear-context )
-  (for module in arguments
-    (let loader (run module),
-    (if (loader is-a Function) (loader ),
+  (for suite in arguments (load suite),
+  (if (cases is-empty)
+    (return ),
   ),
-
-  (if (cases is-empty) (exit),
-
-  (print "  Start to run sugly test suite ...\n")
+  (print "  Start to run sugly test suites ...\n")
   (let t1 (date now),
   (for case in cases (test-a case),
   (let t2 (date now),
 
-  (print (+
-    (C green (+ "\n  passing: " passing),
-    (C gray (+ " (" (t2 - t1) "ms)"),
+  (print
+    (green "\n  passing: " passing),
+    (gray " (" (t2 - t1) "ms)"),
   ),
-  (if (failing > 0)
-    (print (C red (+ "  failing: " failing "\n"),
+  (if failing
+    (print (red "  failing: " failing "\n"),
     (for failure in failures
-      (print- failure)
+      (print-a failure)
     ),
   ),
-  (if (C is null)
+  (if (C is-missing)
     (print "\n  P.S. To prettify output, please run 'npm install'.\n")
   ),
-  (return (@ summary: summary failures: failures)
+  (var report (@
+    summary: summary
+    failures: failures),
+  (clear )
+  (return report)
 ).

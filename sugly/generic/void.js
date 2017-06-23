@@ -71,8 +71,10 @@ module.exports = function ($void) {
   }
   $void.encodingTypeOf = encodingTypeOf
 
-  function thisCall (subject, methodName, args) {
+  function thisCall (subject, methodName) {
     var method = indexerOf(subject).call(subject, methodName)
+    var args = arguments.length < 3 ? []
+      : Array.prototype.slice.call(arguments, 2)
     return typeof method === 'function' ? method.apply(subject, args) : method
   }
   $void.thisCall = thisCall

@@ -1,3 +1,2 @@
-(= (field)
-  (let ver (runtime version),
-  (print ((ver : field) ?? ver).
+(let ver (runtime version).
+(print ((ver (arguments 0)) ?? ver).

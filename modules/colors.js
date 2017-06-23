@@ -9,7 +9,7 @@ module.exports = function importing (exporting) {
   try { // to load native module
     var colors = require('colors/safe')
     for (var color in exportingColors) {
-      exporting[color] = colors[color]
+      exporting[color] = concatWith(colors[color])
     }
   } catch (err) { // create a mock interface if it's missing
     mockColors(exporting)
@@ -37,11 +37,16 @@ module.exports = function importing (exporting) {
   return true
 }
 
+function concatWith (color) {
+  return function () {
+    return color(Array.prototype.slice.call(arguments).join(''))
+  }
+}
 // create a mocking interface to coloring text.
 function mockColors (exporting) {
   for (var color in exportingColors) {
-    exporting[color] = function (text) {
-      return text
+    exporting[color] = function () {
+      return Array.prototype.slice.call(arguments).join('')
     }
   }
 }

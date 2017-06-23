@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function run ($void) {
+module.exports = function include ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple

@@ -1,0 +1,8 @@
+(print "sugly app usage")
+(print "  - sugly, use sugly interactively.")
+(print "  - sugly sugly-file [options ...], execute a sugly file.")
+(print "  - sugly test [[test-file] ...], run one or more test suites.")
+(print "  - sugly selftest [[spec] ...], run all or given spec cases.")
+(print "  - sugly version, display sugly version.")
+(print "  - sugly changelog, display sugly changelog.")
+(print "  - sugly help, display this help information.")

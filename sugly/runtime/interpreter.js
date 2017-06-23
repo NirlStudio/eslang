@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function run ($void) {
+module.exports = function interpreter ($void) {
   var $ = $void.$
   var compiler = $.compiler
   var Signal$ = $void.Signal
