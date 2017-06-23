@@ -7,6 +7,7 @@ module.exports = function run ($void) {
   var $export = $void.export
   var evaluate = $void.evaluate
   var createModuleSpace = $void.createModuleSpace
+  var populateArguments = $void.populateArguments
 
   // interactively feed & evaluate
   $export($, 'interpreter', function (shell, args, baseUri) {
@@ -22,11 +23,7 @@ module.exports = function run ($void) {
     $void.env('uri', baseUri)
     // create a module space.
     var scope = createModuleSpace(baseUri)
-    if (Array.isArray(args)) {
-      scope.context.arguments = args
-    } else { // interpreting is always taken as in an application.
-      scope.context.arguments = []
-    }
+    populateArguments(scope, args, true)
     // create compiler.
     var compile = compiler(function (expr, status) {
       if (status) {

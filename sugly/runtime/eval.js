@@ -9,7 +9,7 @@ module.exports = function run ($void) {
   var execute = $void.execute
 
   // evaluate: a string, a symbol or a tuple in a separate space.
-  $export($, 'eval', function (expr) {
+  $export($, 'eval', function (expr, args) {
     var code
     if (typeof expr === 'string') {
       // try to compile & evaluate
@@ -29,7 +29,7 @@ module.exports = function run ($void) {
       return expr
     }
     try {
-      return execute(code)[0]
+      return args ? execute(code, null, args)[0] : execute(code)[0]
     } catch (signal) { // any unexpected signal
       if (code === expr) {
         console.warn('eval > invalid call to', signal.id, 'for', code)

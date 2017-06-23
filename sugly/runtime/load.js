@@ -21,6 +21,9 @@ module.exports = function run ($void) {
     )
   })
 
+  // expose to be called by native code
+  $void.loadData = loadData
+
   function loadData (moduleUri, source, type) {
     if (typeof source !== 'string') {
       console.warn('load > invalid source:', source)

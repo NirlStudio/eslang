@@ -21,6 +21,9 @@ module.exports = function run ($void) {
     )
   })
 
+  // expose to be called by native code.
+  $void.importModule = importModule
+
   // the cached modules
   var modules = $void.modules = Object.create(null)
 

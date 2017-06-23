@@ -41,11 +41,8 @@ module.exports = function run ($void) {
     }
     // save base uri into environment.
     $void.env('uri', baseUri)
-    if (!Array.isArray(args)) {
-      args = []
-    }
     try {
-      return execute(code, uri, args)[0]
+      return execute(code, uri, args, true)[0]
     } catch (signal) {
       console.warn('run > invalid call to', signal.id,
         'in', text, 'from', uri, 'with', args)
