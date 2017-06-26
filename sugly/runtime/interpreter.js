@@ -12,11 +12,7 @@ module.exports = function interpreter ($void) {
   // interactively feed & evaluate
   $export($, 'interpreter', function (shell, args, baseUri) {
     // save the base uri of whole application.
-    if (typeof baseUri === 'string') {
-      if (!baseUri.endsWith('/')) {
-        baseUri += '/'
-      }
-    } else {
+    if (typeof baseUri !== 'string') {
       baseUri = null
     }
     // save the base uri into environment.
@@ -31,17 +27,21 @@ module.exports = function interpreter ($void) {
           Array.prototype.slice.call(arguments, 2)))
         return
       }
+      var value = expr[0]
+      var src = expr[1]
       try {
-        shell(evaluate(expr, scope))
+        shell(evaluate(value, scope))
       } catch (signal) {
         if (signal instanceof Signal$) {
-          if (signal.id === 'exit' || signal.id === 'return') {
+          if (signal.id === 'return') {
             shell(signal.value)
+          } else if (signal.id === 'exit') {
+            shell(signal.value, 'exiting')
           } else {
-            shell(null, 'warning', 'invalid call to ' + signal.id, [expr])
+            shell(null, 'warning', 'invalid call to ' + signal.id, [value, src])
           }
         } else {
-          shell(null, 'warning', 'unexpected error in evaluation', [signal, expr])
+          shell(null, 'warning', 'unexpected error in evaluation', [signal, value, src])
         }
       }
     })

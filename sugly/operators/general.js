@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$general ($void) {
+module.exports = function general ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var $String = $.string
@@ -74,7 +74,7 @@ module.exports = function operators$general ($void) {
   }, $Tuple.operator))
 
   // (str -= str ... ) or (str -= num)
-  link($String.proto, '+=', operator(function (space, clause, operant) {
+  link($String.proto, '-=', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }

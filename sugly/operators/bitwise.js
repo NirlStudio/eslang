@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$bitwise ($void) {
+module.exports = function bitwise ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var $Number = $.number
@@ -77,7 +77,7 @@ module.exports = function operators$bitwise ($void) {
   }, $Tuple.operator))
 
   // bitwise left-shift and assign it back to the same variable
-  link($Number.proto, '<<', operator(function (space, clause, operant) {
+  link($Number.proto, '<<=', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
@@ -96,7 +96,7 @@ module.exports = function operators$bitwise ($void) {
   }, $Tuple.operator))
 
   // bitwise right-shift and assign it back to the same variable
-  link($Number.proto, '>>', operator(function (space, clause, operant) {
+  link($Number.proto, '>>=', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
@@ -115,7 +115,7 @@ module.exports = function operators$bitwise ($void) {
   }, $Tuple.operator))
 
   // bitwise zero-fill right-shift and assign it back to the same variable
-  link($Number.proto, '>>>', operator(function (space, clause, operant) {
+  link($Number.proto, '>>>=', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }

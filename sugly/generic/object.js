@@ -117,7 +117,8 @@ module.exports = function ($void) {
     if (!Array.isArray(names)) {
       Object.assign(this, source)
     } else { // or, copy selected fields or nothing.
-      for (var name in names) {
+      for (var i = 0; i < names.length; i++) {
+        var name = names[i]
         if (typeof name === 'string' && ownsProperty(source, name)) {
           this[name] = source[name]
         }
@@ -125,7 +126,8 @@ module.exports = function ($void) {
     }
     // remove excluded fields.
     if (Array.isArray(excluding) && excluding.length > 0) {
-      for (name in excluding) {
+      for (i = 0; i < excluding.length; i++) {
+        name = excluding[i]
         if (typeof name === 'string') {
           delete this[name]
         }
@@ -359,7 +361,7 @@ module.exports = function ($void) {
       } else {
         fields.push('  ' + name + ': ' + thisCall(value, 'to-string'))
       }
-    })
+    }, this)
     fields.push(')')
     return fields.join('\n')
   })

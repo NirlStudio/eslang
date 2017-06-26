@@ -27,13 +27,9 @@ module.exports = function ($void) {
   $void.ownsProperty = ownsProperty
 
   // to retrieve or create a shared symbol.
-  var SpecialSymbol = $void.SpecialSymbol = /^[(`@:$"#)',;\\]{1}$/
-  var InvalidSymbol = $void.InvalidSymbol = /[(`@:$"#)',;\\\s]/
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
   function sharedSymbolOf (key) {
-    return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(
-      typeof key === 'string' &&
-        (SpecialSymbol.test(key) || !InvalidSymbol.test(key)) ? key : ''))
+    return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
   }
   $void.sharedSymbolOf = sharedSymbolOf
 
@@ -226,8 +222,8 @@ module.exports = function ($void) {
       fields = null
     }
     // default readonly indexer for managed static values.
-    return link(type, ':', function (name, value) {
-      return this === proto ? protoIndexer(name, value) // forwarding
+    return link(proto, ':', function (name, value) {
+      return this === proto ? protoIndexer.call(proto, name, value) // forwarding
         : typeof name !== 'string' || name === ':' ? null
           : name === 'type' ? type // fake field
             : this instanceof typeConstructor
@@ -245,8 +241,8 @@ module.exports = function ($void) {
         : name === 'type' ? type // fake field
           : typeof this !== typeId && !(this instanceof typeId) ? null // not-matched type.
             : fields[name] === 1
-              ? typeof proto[name] === 'undefined' ? null : proto[name]
-              : typeof this[name] === 'undefined' ? null : this[name]
+              ? typeof this[name] === 'undefined' ? null : this[name]
+              : typeof proto[name] === 'undefined' ? null : proto[name]
     }
   }
 
@@ -254,7 +250,7 @@ module.exports = function ($void) {
   // to native prototype.
   $void.nativeIndexer = function nativeIndexer (type, nativeType, typeId, fieldsOrIndexer) {
     var indexer = typeof fieldsOrIndexer === 'function' ? fieldsOrIndexer
-      : createIntanceIndexer(type, nativeType, typeId, fieldsOrIndexer || null)
+      : createIntanceIndexer(type, nativeType, typeId, fieldsOrIndexer || {})
 
     var proto = type.proto
     var protoIndexer = createProtoIndexer(type)
@@ -262,11 +258,11 @@ module.exports = function ($void) {
     // inject the instance indexer
     define(nativeType.prototype, ':', indexer)
     // create the indexer to serve both proto and instances.
-    return link(type, ':', function (name, value) {
-      return this === proto ? protoIndexer(name, value)
+    return link(proto, ':', function (name, value) {
+      return this === proto ? protoIndexer.call(proto, name, value)
         // most invocations will go to the injected version directly.
         // here is to keep the logic consistent.
-        : indexer(name, value)
+        : indexer.call(this, name, value)
     })
   }
 

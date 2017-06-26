@@ -4,8 +4,8 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.string
   var link = $void.link
+  var copyType = $void.copyType
   var copyProto = $void.copyProto
-  var copyObject = $void.copyObject
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
   var nativeIndexer = $void.nativeIndexer
@@ -20,12 +20,12 @@ module.exports = function ($void) {
       return ''
     }
     // returns the original string if there's only one string argument.
-    if (typeof value === 'string') {
+    if (typeof value === 'string' && arguments.length < 2) {
       return value
     }
     // concat the trimed values of strings and to-string results of non-strings.
-    var result = []
-    for (var i = 0; i < arguments.length; i++) {
+    var result = [value]
+    for (var i = 1; i < arguments.length; i++) {
       var str = arguments[i]
       if (typeof str !== 'string') {
         str = $void.thisCall(str, 'to-string')
@@ -42,7 +42,7 @@ module.exports = function ($void) {
   })
 
   // generate a string from a series of unicode values
-  copyObject(Type, String, {
+  copyType(Type, String, {
     'fromCharCode': 'of-chars'
   })
 

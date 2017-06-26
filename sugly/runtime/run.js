@@ -16,6 +16,9 @@ module.exports = function run ($void) {
     if (typeof baseUri !== 'string') {
       baseUri = null
     }
+    if (!source.endsWith('.s')) {
+      source += '.s'
+    }
     // try to resolve the uri for source
     var loader = $void.loader
     var uri = loader.resolve(source,

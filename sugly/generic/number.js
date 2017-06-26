@@ -120,13 +120,13 @@ module.exports = function ($void) {
   var Type = $.number
   var $Range = $.range
   var link = $void.link
-  var copyObject = $void.copyObject
+  var copyType = $void.copyType
   var typeIndexer = $void.typeIndexer
   var typeVerifier = $void.typeVerifier
   var nativeIndexer = $void.nativeIndexer
 
   // the value range and constant values.
-  copyObject(Type, Number, {
+  copyType(Type, Number, {
     MAX_VALUE: 'max',
     MIN_VALUE: 'min',
     POSITIVE_INFINITY: 'infinity',

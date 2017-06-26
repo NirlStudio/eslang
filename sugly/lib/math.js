@@ -2,15 +2,15 @@
 
 module.exports = function ($void, JS) {
   var $ = $void.$
-  var object = $.object
+  var Object$ = $void.Object
   var $export = $void.export
-  var copyObject = $void.copyObject
+  var copyType = $void.copyType
 
-  var math = $export($, 'math', object.of({
+  var math = $export($, 'math', new Object$({
     'is-readonly': true
   }))
   // TODO: naming & removing?
-  copyObject(math, JS.Math, {
+  copyType(math, JS.Math, {
     /* basic */
     'E': 'E',
     'LN10': 'LN10',

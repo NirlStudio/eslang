@@ -28,8 +28,6 @@ function initializeSpace ($void) {
   require('./generic/set')($void)
   require('./generic/map')($void)
 
-  require('./generic/range')($void)
-
   require('./generic/class')($void)
   require('./generic/device')($void)
 
@@ -55,10 +53,6 @@ function initializeRuntime ($void) {
   require('./runtime/operator')($void)
 
   require('./runtime/execute')($void)
-
-  require('./runtime/load')($void)
-  require('./runtime/import')($void)
-  require('./runtime/include')($void)
 
   require('./runtime/run')($void)
   require('./runtime/eval')($void)

@@ -2,7 +2,6 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var $export = $void.export
   var tokenizer = $.tokenizer
@@ -11,7 +10,7 @@ module.exports = function ($void) {
     var raiseExpression = evaluater || printExpression
 
     var stack = [[]]
-    var sourceStack = [[[]]]
+    var sourceStack = [[]]
     var waiter = null
     var lastToken = null
 
@@ -27,7 +26,7 @@ module.exports = function ($void) {
 
     function compileToken (type, value, source, errCode, errMessage) {
       if (type === 'error') {
-        raiseExpression([stack[0], sourceStack[0]], 'tokenizer:' + errCode, errMessage,
+        raiseExpression([stack, sourceStack], 'tokenizer:' + errCode, errMessage,
           [type, value, source])
         resetContext()
         return
@@ -41,7 +40,7 @@ module.exports = function ($void) {
           pushValue(value, source)
           break
         case 'symbol':
-          pushValue($Symbol.of(value), source)
+          pushValue(value, source)
           break
         case 'comment':
           // TODO: comment as embedded code, e.g. document, html, js.
@@ -57,7 +56,8 @@ module.exports = function ($void) {
     }
 
     function resetContext () {
-      stack = [[]]; sourceStack = [[[]]]
+      stack = [[]]
+      sourceStack = [[]]
       waiter = null
       lastToken = null
       raiseExpression(null, 'reseting',
@@ -65,13 +65,9 @@ module.exports = function ($void) {
     }
 
     function tryToRaise () {
-      if (stack.length > 1) {
-        return
+      while (stack[0].length > 0) {
+        raiseExpression([stack[0].shift(), sourceStack[0].shift()])
       }
-      var expr = new Tuple$(stack[0], false, sourceStack[0])
-      stack = [[]]; sourceStack = [[]]
-      waiter = null
-      raiseExpression(expr)
     }
 
     function pushValue (value, source) {
@@ -101,7 +97,7 @@ module.exports = function ($void) {
         endClause()
         return false // stop waiting
       }
-      switch (value) {
+      switch (value.key) {
         case ',':
           endMatched(value, source)
           return true
@@ -114,12 +110,16 @@ module.exports = function ($void) {
       }
     }
 
-    function endTopWith (ending) {
-      var top = stack.pop()
-      stack[stack.length - 1].push(top)
+    function endTopWith (ending, /* ... */) {
       var srcTop = sourceStack.pop()
-      Array.prototype.push(srcTop[0], arguments)
-      sourceStack[sourceStack.length - 1].push(srcTop)
+      // append ending token(s)' source info.
+      Array.prototype.push.apply(srcTop[0], arguments)
+      // create a tuple for the top clause, and
+      var top = new Tuple$(stack.pop(), false, srcTop)
+      // push it to the end of container clause.
+      stack[stack.length - 1].push(top)
+      // since the source has been saved into the tuple, only left a placeholder here
+      sourceStack[sourceStack.length - 1].push([])
     }
 
     function endClause () {
@@ -140,44 +140,47 @@ module.exports = function ($void) {
         return // allow & ignore extra enclosing parentheses
       }
       lastToken[2][0] >= 0 // the indent value of ')'
-        ? endLine(value, source) : endIndent(value, source)
+        ? endIndent(value, source) : endLine(value, source)
+      tryToRaise()
     }
 
     function endLine (value, source) {
       var depth = stack.length - 1
-      while (depth > 1) {
+      while (depth > 0) {
         var startSource = sourceStack[depth][0][0] // start source.
-        if (startSource[1] >= source[1]) { // comparing line numbers.
-          endTopWith(lastToken[2], source)
+        if (startSource[1] < source[1]) { // comparing line numbers.
+          break
         }
-        depth -= 1
+        endTopWith(lastToken[2], source)
+        depth = stack.length - 1
       }
-      tryToRaise()
     }
 
     function endIndent (value, source) {
       var depth = stack.length - 1
-      while (depth > 1) {
+      while (depth > 0) {
         var startSource = sourceStack[depth][0][0] // start source.
         var lastSource = lastToken[2]
-        if (startSource[2] >= lastSource[2]) { // line offset
-          endTopWith(lastSource, source)
+        if (startSource[2] < lastSource[2]) { // line offset
+          break
         }
-        depth -= 1
+        endTopWith(lastSource, source)
+        depth = stack.length - 1
       }
-      tryToRaise()
     }
 
     function endAll (value, source) {
       while (stack.length > 1) {
         endTopWith(lastToken[2], source)
       }
+      tryToRaise()
     }
   })
 
   // a helper function to compile a piece of source code.
   $export($, 'compile', function (text) {
     var list = []
+    var src = [[0, 0, 0]]
     var warnings = null
     var compiling = compiler(function collector (expr, status) {
       if (status) {
@@ -188,19 +191,20 @@ module.exports = function ($void) {
           warnings.push(Array.prototype.slice.call(arguments))
         }
       } else {
-        list.push(expr)
+        list.push(expr[0])
+        src.push(expr[1])
       }
     })
     compiling(text)
     compiling() // notify the end of stream.
-    return warnings || new Tuple$(list, true/* as code block */)
+    return warnings || new Tuple$(list, true, src)
   })
 }
 
 function printExpression (expr, status, message, info) {
   if (status) {
-    console.log('compiling >', status, ':', message, expr ? expr.$ : '', info || '')
+    console.log('compiling >', status, ':', message, expr || '', info || '')
   } else {
-    console.log('compiling > expression:', expr)
+    console.log('compiling > expression:', expr[0], expr[1])
   }
 }

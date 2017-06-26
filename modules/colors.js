@@ -1,6 +1,6 @@
 'use strict'
 
-var proc = require('process')
+var proc = global.process
 var os = proc.platform
 
 var exportingColors = ['red', 'gray', 'green', 'underline']
@@ -8,7 +8,8 @@ var exportingColors = ['red', 'gray', 'green', 'underline']
 module.exports = function importing (exporting) {
   try { // to load native module
     var colors = require('colors/safe')
-    for (var color in exportingColors) {
+    for (var i = 0; i < exportingColors.length; i++) {
+      var color = exportingColors[i]
       exporting[color] = concatWith(colors[color])
     }
   } catch (err) { // create a mock interface if it's missing
@@ -31,8 +32,8 @@ module.exports = function importing (exporting) {
     exporting.underline = function (text) { return text }
   }
   // render special characters
-  exporting.passed = exporting.green(colors.passed)
-  exporting.failed = exporting.red(colors.failed)
+  exporting.passed = exporting.green(exporting.passed)
+  exporting.failed = exporting.red(exporting.failed)
   // it always succeeds.
   return true
 }
@@ -44,8 +45,8 @@ function concatWith (color) {
 }
 // create a mocking interface to coloring text.
 function mockColors (exporting) {
-  for (var color in exportingColors) {
-    exporting[color] = function () {
+  for (var i = 0; i < exportingColors.length; i++) {
+    exporting[exportingColors[i]] = function () {
       return Array.prototype.slice.call(arguments).join('')
     }
   }

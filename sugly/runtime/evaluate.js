@@ -13,21 +13,22 @@ module.exports = function evaluate ($void) {
     if (!(clause instanceof Tuple$)) {
       return clause instanceof Symbol$ ? space.resolve(clause.key) : clause
     }
-    var length = clause.length
+    var clist = clause.$
+    var length = clist.length
     if (length < 1) { // empty clause
       return null
     }
     if (clause.plain) { // a plain expression list (code block)
       var last = null
-      for (var expr in clause.$) {
-        last = evaluate(expr, space)
+      for (var i = 0; i < clist.length; i++) {
+        last = evaluate(clist[i], space)
       }
       return last
     }
     // The subject and evaluation mode:
     //  implicit: the subject will be invoked if it's a function
     //  explicit: the subject keeps as a subject even it's a function.
-    var subject = clause.$[0]
+    var subject = clist[0]
     var offset = 1
     var implicitMode = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
@@ -36,7 +37,7 @@ module.exports = function evaluate ($void) {
         if (length < 2) {
           return null // no subject.
         }
-        subject = evaluate(clause.$[1], space)
+        subject = evaluate(clist[1], space)
         if (length === 2) {
           // side effect: no more evaluation if only subject exists
           return subject
@@ -71,7 +72,7 @@ module.exports = function evaluate ($void) {
 
     var args = []
     if (predicate === null) { // resolve the predicate if there is not.
-      predicate = clause.$[offset++]
+      predicate = clist[offset++]
       if (predicate instanceof Tuple$) { // nested clause
         predicate = evaluate(predicate, space)
       }
@@ -95,13 +96,13 @@ module.exports = function evaluate ($void) {
     }
 
     // pass the original clause if the predicate is an operator.
-    if (typeof predicate === $Operator) {
+    if (predicate.type === $Operator) {
       return predicate(space, clause, subject)
     }
 
     // evaluate arguments.
     for (; offset < length; offset++) {
-      args.push(evaluate(clause.$[offset], space))
+      args.push(evaluate(clist[offset], space))
     }
 
     // evaluate the statement.

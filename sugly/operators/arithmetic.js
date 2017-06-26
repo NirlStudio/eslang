@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$arithmetic ($void) {
+module.exports = function arithmetic ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var $Number = $.number

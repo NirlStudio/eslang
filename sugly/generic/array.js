@@ -88,7 +88,7 @@ module.exports = function ($void) {
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
-  link(Type, 'from', createArrayFrom())
+  link(Type, 'from', createArrayFrom($void))
 
   // Type Indexer
   typeIndexer(Type)

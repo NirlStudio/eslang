@@ -31,8 +31,10 @@ function iterator ($void) {
     }
     var iter = this.entries()
     var current = iter.next()
-    if (current) {
+    if (current.value) {
       current = [current.value[0]]
+    } else {
+      current = null
     }
     return function (inSitu) {
       inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
@@ -42,8 +44,10 @@ function iterator ($void) {
       } else {
         var cur = current
         current = iter.next()
-        if (current) {
+        if (current.value) {
           current = [current.value[0]]
+        } else {
+          current = null
         }
         return cur
       }
@@ -100,14 +104,14 @@ module.exports = function ($void) {
     }
     // allow an array as source to enble the type downgrading in encoding.
     if (Array.isArray(source) && source.length > 0) {
-      for (var item in source) {
-        this.add(item)
+      for (var i = 0; i < source.length; i++) {
+        this.add(source[i])
       }
     } else if (source instanceof Set) {
-      var next = source.entries()
-      var cursor
-      while ((cursor = next())) {
-        this.add(cursor.value[0])
+      var iter = source.entries()
+      var value
+      while ((value = iter.next().value)) {
+        this.add(value[0])
       }
     }
     return this
@@ -126,10 +130,10 @@ module.exports = function ($void) {
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
       if (src instanceof Set) {
-        var next = src.entries()
-        var cursor
-        while ((cursor = next())) {
-          this.add(cursor.value[0])
+        var iter = src.entries()
+        var value
+        while ((value = iter.next().value)) {
+          this.add(value[0])
         }
       }
     }
@@ -169,17 +173,11 @@ module.exports = function ($void) {
   })
   // remove all values from this set.
   link(proto, 'clear', function () {
-    if (!(this instanceof Set)) {
-      return null
-    }
-    if (typeof this.clear === 'function') {
+    if (this instanceof Set) {
       this.clear()
-    } else {
-      for (var item in this) {
-        this.delete(item)
-      }
+      return this
     }
-    return this
+    return null
   })
 
   // Type Verification
@@ -218,8 +216,10 @@ module.exports = function ($void) {
 
   function encode (ctx, set) {
     var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('set')] // (@:set ...
-    for (var value in set) {
-      list.push(thisCall(value, 'to-code', ctx))
+    var iter = set.entries()
+    var value
+    while ((value = iter.next().value)) {
+      list.push(thisCall(value[0], 'to-code', ctx))
     }
     if (ctx.isReferred(set)) { // nested reference.
       list.splice(1, 2) // downgrade to an array.
@@ -233,13 +233,15 @@ module.exports = function ($void) {
       return null
     }
     var items = ['(@:set']
-    for (var value in this) {
-      var valueType = typeOf(value)
+    var iter = this.entries()
+    var value
+    while ((value = iter.next().value)) {
+      var valueType = typeOf(value[0])
       if (valueType === $Object || valueType instanceof ObjectType$) {
         // prevent recursive call.
         items.push('(@:' + valueType['to-string']() + ' ... )')
       } else {
-        items.push(thisCall(value, 'to-string'))
+        items.push(thisCall(value[0], 'to-string'))
       }
     }
     items.push(')')

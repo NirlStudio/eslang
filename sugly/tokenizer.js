@@ -1,6 +1,7 @@
 'use strict'
 
-var RegexNumber = /^-?\d+\.?\d*$/
+var RegexNumber = /^[-+]?\d+\.?\d*$/
+var RegexSpecialSymbol = /[(`@:$"#)',;\\\s]/
 
 var Constants = Object.assign(Object.create(null), {
   'null': null,
@@ -11,7 +12,6 @@ var Constants = Object.assign(Object.create(null), {
 })
 
 module.exports = function ($void) {
-  var InvalidSymbol = $void.InvalidSymbol
   var $ = $void.$
   var symbolOf = $.symbol.of
   var $export = $void.export
@@ -81,16 +81,13 @@ module.exports = function ($void) {
       switch (c) {
         case '(':
         case ')':
-        case ',': // reserved as punctuation
-        case ';': // reserved as punctuation
-        case '\\': // reserved as punctuation
           raiseToken('punctuation', c, [indenting, lineNo, lineOffset])
           break
         case '`':
         case '@':
         case ':':
         case '$':
-          raiseToken('symbol', c, [indenting, lineNo, lineOffset])
+          raiseToken('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
         case "'":
           beginWaiting("'", singleQuoteWaiter)
@@ -118,6 +115,9 @@ module.exports = function ($void) {
             raiseSpace(c)
           }
           break
+        case ',': // reserved as punctuation
+        case ';': // reserved as punctuation
+        case '\\': // reserved as punctuation
         default:
           beginSymbol(c)
           break
@@ -127,6 +127,9 @@ module.exports = function ($void) {
     }
 
     function nextChar (c) {
+      if (!/[\s]/.test(c)) {
+        spacing = false
+      }
       lastChar = c
       if (c !== ' ') {
         indenting = -1
@@ -235,7 +238,7 @@ module.exports = function ($void) {
     }
 
     function symbolWaiter (c) {
-      if (c && !InvalidSymbol.test(c)) {
+      if (c && !RegexSpecialSymbol.test(c)) {
         pendingText += c
         return true
       }

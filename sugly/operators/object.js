@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$object ($void) {
+module.exports = function object ($void) {
   var $ = $void.$
   var $Class = $.class
   var $Object = $.object
@@ -132,13 +132,13 @@ module.exports = function operators$object ($void) {
         }
       }
       type = evaluate(clist[2], space)
-      if (type instanceof ClassType$) { // (@user-type )
+      if (type instanceof ClassType$) { // (@:user-type )
         return objectCreate(space, clist, type, 3)
       }
       return null // invalid type value.
     }
     if (length > 2 && clist[2] === $Symbol.pairing) { // (@ ? :)
-      return objectCreate(space, clist, $Object, 3)
+      return objectCreate(space, clist, $Object, 1)
     } else { // as array
       return arrayCreate(space, clist, 1)
     }

@@ -36,8 +36,10 @@ function iterator ($void) {
     }
     var iter = this.entries()
     var current = iter.next()
-    if (current) {
+    if (current.value) {
       current = current.value
+    } else {
+      current = null
     }
     return function (inSitu) {
       inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
@@ -47,8 +49,10 @@ function iterator ($void) {
       } else {
         var cur = current
         current = iter.next()
-        if (current) {
+        if (current.value) {
           current = current.value
+        } else {
+          current = null
         }
         return cur
       }
@@ -63,7 +67,9 @@ function iteratorKeys ($void) {
     }
     var iter = this.keys()
     var current = iter.next()
-    if (current) {
+    if (current.done) {
+      current = null
+    } else {
       current = [current.value]
     }
     return function (inSitu) {
@@ -74,7 +80,9 @@ function iteratorKeys ($void) {
       } else {
         var cur = current
         current = iter.next()
-        if (current) {
+        if (current.done) {
+          current = null
+        } else {
           current = [current.value]
         }
         return cur
@@ -90,7 +98,9 @@ function iteratorValues ($void) {
     }
     var iter = this.values()
     var current = iter.next()
-    if (current) {
+    if (current.done) {
+      current = null
+    } else {
       current = [current.value]
     }
     return function (inSitu) {
@@ -101,7 +111,9 @@ function iteratorValues ($void) {
       } else {
         var cur = current
         current = iter.next()
-        if (current) {
+        if (current.done) {
+          current = null
+        } else {
           current = [current.value]
         }
         return cur
@@ -160,17 +172,18 @@ module.exports = function ($void) {
     }
     // allow an array as source to enble the type downgrading in encoding.
     if (Array.isArray(source) && source.length > 0) {
-      for (var item in source) {
+      for (var i = 0; i < source.length; i++) {
+        var item = source[i]
         if (Array.isArray(item) && item.length > 1) {
           this.set(item[0], item[1])
         }
       }
       this.push.apply(this, source)
     } else if (source instanceof Map) {
-      var next = source.entries()
-      var cursor
-      while ((cursor = next())) {
-        this.set(cursor.value[0], cursor.value[1])
+      var iter = source.entries()
+      var value
+      while ((value = iter.next().value)) {
+        this.set(value[0], value[1])
       }
     }
     return this
@@ -189,10 +202,10 @@ module.exports = function ($void) {
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
       if (src instanceof Map) {
-        var next = src.entries()
-        var cursor
-        while ((cursor = next())) {
-          this.set(cursor.value[0], cursor.value[1])
+        var iter = src.entries()
+        var value
+        while ((value = iter.next().value)) {
+          this.set(value[0], value[1])
         }
       }
     }
@@ -285,24 +298,27 @@ module.exports = function ($void) {
 
   function encode (ctx, map) {
     var pairs = []
-    var entries = map.entries()
-    var item
-    while ((item = entries.next())) {
+    var iter = map.entries()
+    var value
+    while ((value = iter.next().value)) {
       pairs.push([
-        thisCall(item[0], 'to-code', ctx),
-        thisCall(item[1], 'to-code', ctx)
+        thisCall(value[0], 'to-code', ctx),
+        thisCall(value[1], 'to-code', ctx)
       ])
     }
     var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')] // (@:map ...
+    var i
     if (ctx.isReferred(map)) { // nested reference.
       // downgrade to an data array of key/value pairs: (@ (@key value) ...)
       list = [$Symbol.object]
-      for (item in pairs) {
+      for (i = 0; i < pairs.length; i++) {
+        item = pairs[i]
         list.push(new Tuple$([$Symbol.object, item[0], item[1]]))
       }
     } else { // an instance map object: (@:map key : value ...)
       list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')]
-      for (item in pairs) {
+      for (i = 0; i < pairs.length; i++) {
+        item = pairs[i]
         list.push(item[0], $Symbol.pairing, item[1])
       }
     }
@@ -315,10 +331,10 @@ module.exports = function ($void) {
       return null
     }
     var list = ['(@:map']
-    var entries = this.entries()
-    var item
-    while ((item = entries.next())) {
-      var key = item[0]
+    var iter = this.entries()
+    var pair
+    while ((pair = iter.next().value)) {
+      var key = pair[0]
       var ktype = typeOf(key)
       var line
       if (ktype === $Object || ktype instanceof ObjectType$) {
@@ -328,7 +344,7 @@ module.exports = function ($void) {
         line = thisCall(key, 'to-string')
       }
       line += ' : '
-      var value = item[1]
+      var value = pair[1]
       var vtype = typeOf(value)
       if (vtype === $Object || vtype instanceof ObjectType$) {
         // prevent recursive call.

@@ -50,7 +50,7 @@ module.exports = function ($void) {
     if (typeof step !== 'number' || isNaN(step) || !isFinite(step)) {
       step = 0
     }
-    return new Range$(begin, end, step || begin <= end ? 1 : -1)
+    return new Range$(begin, end, step || (begin <= end ? 1 : -1))
   })
 
   typeIndexer(Type)

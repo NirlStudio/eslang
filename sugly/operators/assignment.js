@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$let ($void) {
+module.exports = function assignment ($void) {
   var $ = $void.$
   var $Symbol = $.symbol
   var Tuple$ = $void.Tuple

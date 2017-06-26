@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$control ($void) {
+module.exports = function control ($void) {
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
@@ -141,9 +141,11 @@ module.exports = function operators$control ($void) {
       vars = [fields.key]
     } else if (fields instanceof Tuple$) {
       vars = []
-      for (var v in fields.$) {
-        if (v instanceof Symbol$) {
-          vars.push(v.key)
+      var flist = fields.$
+      for (var v = 0; v < flist.length; v++) {
+        var field = flist[v]
+        if (field instanceof Symbol$) {
+          vars.push(field.key)
         }
       }
     } else {

@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators ($void) {
+module.exports = function all ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var operator = $void.operator
@@ -28,6 +28,10 @@ module.exports = function operators ($void) {
   require('./object')($void)
   require('./function')($void)
   require('./operator')($void)
+
+  require('./load')($void)
+  require('./import')($void)
+  require('./include')($void)
 
   function staticOperator (name, impl) {
     // make the symbol a pure symbol.

@@ -20,7 +20,7 @@ module.exports = function () {
   /* “Let there be light,” and there was light. */
   // The light is the laws, which are the foundation of all beings.
   var Prototype = Object.create(Null) /* 1. Derivation */
-  var Type$ = $void.Type = function Type$ () { /* 2. Separation & Aggregation */
+  function Type$ () { /* 2. Separation & Aggregation */
     // This function should be executed once, and only once.
     // The primal type is derived from the supreme prototype.
     publish(this, 'proto', Prototype)
@@ -47,6 +47,10 @@ module.exports = function () {
   // The logical noumenon of null is not accessible directly, otherwise it will
   // cause some confusion in evalution process.
   // P.S, so is our fate too?
+
+  /* A placeholder constructor to test a type. */
+  $void.Type = function Type () {}
+  $void.Type.prototype = Type
 
   /* It's ready to create primitive types, */
   function create (name, superType, asMeta) {

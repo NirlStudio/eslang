@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$logical ($void) {
+module.exports = function logical ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var Null = $void.null
@@ -20,9 +20,11 @@ module.exports = function operators$logical ($void) {
 
   // global logical AND operators
   link(Null, '&&', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return null
+    }
     var clist = clause.$
-    if (!(space instanceof Space$) ||
-        typeof operant === 'undefined' || clist.length < 2) {
+    if (typeof operant === 'undefined' || clist.length < 2) {
       return true // The value of AND is defined as true.
     }
     if (operant === false || operant === null || operant === 0) {
@@ -39,9 +41,11 @@ module.exports = function operators$logical ($void) {
 
   // global logical AND operators
   link(Null, '||', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return null
+    }
     var clist = clause.$
-    if (!(space instanceof Space$) ||
-        typeof operant === 'undefined' || clist.length < 2) {
+    if (typeof operant === 'undefined' || clist.length < 2) {
       return false // the value of OR is defined as False
     }
     if (operant !== false && operant !== null && operant !== 0) {
@@ -61,9 +65,11 @@ module.exports = function operators$logical ($void) {
   // - (x ? y) returns x itself or returns y if x is equivalent to false.
   // - (x ? y z) returns y if x is equivalent to true, returns z otherwise.
   link(Null, '?', operator(function (space, clause, operant) {
+    if (!(space instanceof Space$)) {
+      return null
+    }
     var clist = clause.$
-    if (!(space instanceof Space$) ||
-        typeof operant === 'undefined' || clist.length < 2) {
+    if (typeof operant === 'undefined' || clist.length < 2) {
       return null // the value of OR is defined as False
     }
     if (operant !== false && operant !== null && operant !== 0) {

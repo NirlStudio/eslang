@@ -2,15 +2,15 @@
 
 module.exports = function ($void, JS) {
   var $ = $void.$
-  var object = $.object
+  var Object$ = $void.Object
   var $export = $void.export
-  var copyObject = $void.copyObject
+  var copyType = $void.copyType
 
-  var json = $export($, 'json', object.of({
+  var json = $export($, 'json', new Object$({
     'is-readonly': true
   }))
   // TODO - type adaptation
-  copyObject(json, JS.JSON, {
+  copyType(json, JS.JSON, {
     'stringify': 'string-of',
     'parse': 'parse'
   })

@@ -53,10 +53,6 @@ module.exports = function include ($void) {
       return null
     }
     // to evaluate the code from source in current space.
-    var result = null
-    for (var expr in code.$) {
-      result = evaluate(expr, space)
-    }
-    return result
+    return evaluate(code, space)
   }
 }

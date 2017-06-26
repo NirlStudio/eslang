@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function operators$quote ($void) {
+module.exports = function quote ($void) {
   var staticOperator = $void.staticOperator
 
   // (` symbol) or (` (...))

@@ -22,7 +22,7 @@ module.exports = function module ($void) {
   })
 
   // type Indexer
-  typeIndexer(this)
+  typeIndexer(Type)
 
   // Type Verification
   typeVerifier(Type)

@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function function_ ($void) {
   var $ = $void.$
   var $Symbol = $.symbol
   var $Lambda = $.lambda
@@ -51,12 +51,13 @@ module.exports = function ($void) {
       }
       var func = funcOf(space, clause, offset)
       if (params instanceof Tuple$) {
-        if (params.$.length < 1) {
+        var plist = params.$
+        if (plist.length < 1) {
           return func()
         }
         var args = []
-        for (var expr in params.$) {
-          args.push(evaluate(expr, space))
+        for (var i = 0; i < plist.length; i++) {
+          args.push(evaluate(plist[i], space))
         }
         return func.apply(null, args)
       } else if (typeof params === 'undefined') {

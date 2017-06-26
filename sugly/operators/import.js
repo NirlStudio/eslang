@@ -17,7 +17,7 @@ module.exports = function import_ ($void) {
     // look into current space to have the base uri.
     return importModule(space.local['-module'].uri,
       evaluate(clist[1], evaluate),
-      clause.length > 2 ? evaluate(clist[2], space) : null
+      clist.length > 2 ? evaluate(clist[2], space) : null
     )
   })
 
@@ -74,7 +74,7 @@ module.exports = function import_ ($void) {
       if (scope) { // try to cache it.
         scope.time = new Date()
         modules[uri] = scope
-        return scope.export
+        return scope.exporting
       }
       console.warn('import > failed when executing', code)
       return null
@@ -92,12 +92,15 @@ module.exports = function import_ ($void) {
         'from a absolute uri.')
       return null
     }
+    if (!source.endsWith('.js')) {
+      source += '.js'
+    }
     var dirs = [
       $.env('uri') + '/modules', // app shared modules
       $void.runtime('uri') + '/modules' // runtime shared modules
     ]
     var uri = loader.resolve(source, dirs)
-    if (!uri) {
+    if (typeof uri !== 'string') {
       console.warn('import > fialed to resolve source for', source, 'in', dirs)
       return null
     }
@@ -112,7 +115,7 @@ module.exports = function import_ ($void) {
         return null
       }
       var scope = $void.createModuleSpace()
-      var status = importing(scope.export, scope.context)
+      var status = importing(scope.exporting, scope.context)
       if (status !== true) { // the loader can report error details
         console.warn('import > failed to import JS module of', source,
           'for', status, 'at', uri)
@@ -120,7 +123,7 @@ module.exports = function import_ ($void) {
       }
       scope.time = new Date()
       modules[uri] = scope
-      return scope.export
+      return scope.exporting
     } catch (err) {
       console.warn('import > fialed to import JS module of', source,
         'for', err, 'from', uri)

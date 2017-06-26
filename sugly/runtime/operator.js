@@ -11,16 +11,17 @@ module.exports = function operators$operator ($void) {
   var operator = $void.operator
   var createOperatorSpace = $void.createOperatorSpace
 
-  $void.operatorOf = function operatorOf (space, clause, offset) {
+  $void.operatorOf = function operatorOf (space, clause) {
     // compile code
     var code = [$Symbol.operator]
-    var params = formatOperands(clause.$[offset++])
+    var params = formatOperands(clause.$[1])
     code.push(params[1])
     params = params[0]
-    var body = clause.$.slice(offset) || []
+    var body = clause.$.slice(2) || []
     if (body.length > 0) {
-      code.push(new Tuple$(body, true))
-      return operator(createOperator(params, body), code)
+      var tbody = new Tuple$(body, true)
+      code.push(tbody)
+      return operator(createOperator(params, tbody), code)
     } else {
       code.push($Tuple.plain) // empty body
       return lambda(function () { // use an empty function
@@ -29,27 +30,23 @@ module.exports = function operators$operator ($void) {
     }
   }
 
-  function createOperator (params, body) {
+  function createOperator (params, tbody) {
     return function (space, clause, operant) {
       if (!(space instanceof Space$)) {
         return null // invalid call.
       }
       var scope = createOperatorSpace(space)
       // populate operands
-      var list = clause.$
+      var clist = clause.$
       var offset = typeof operant !== 'undefined' ? 2 : 1
       for (var i = 0; i < params.length; i++) {
         var j = i + offset
-        scope.context[params[i]] = j < list.length ? list[j] : $Symbol.empty
+        scope.context[params[i]] = j < clist.length ? clist[j] : $Symbol.empty
       }
       scope.context['operands'] = clause
       scope.context['operant'] = typeof operant !== 'undefined' ? operant : null
       // execution
-      var result = null
-      for (var expr in body) {
-        result = evaluate(expr, scope)
-      }
-      return result
+      return evaluate(tbody, scope)
     }
   }
 

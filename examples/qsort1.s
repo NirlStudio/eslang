@@ -1,4 +1,4 @@
-(let data (import "sort-data").
+(let data (load "sort-data").
 (warn data)
 
 (let sort (= (start end)

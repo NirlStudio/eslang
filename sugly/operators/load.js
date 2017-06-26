@@ -17,7 +17,7 @@ module.exports = function load ($void) {
     // look into current space to have the base uri.
     return loadData(space.local['-module'].uri,
       evaluate(clist[1], evaluate),
-      clause.length > 2 ? evaluate(clist[2], space) : null
+      clist.length > 2 ? evaluate(clist[2], space) : null
     )
   })
 

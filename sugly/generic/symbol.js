@@ -9,16 +9,12 @@ module.exports = function ($void) {
   var typeVerifier = $void.typeVerifier
   var managedIndexer = $void.managedIndexer
 
-  // symbol key validators
-  var SpecialSymbol = $void.SpecialSymbol
-  var InvalidSymbol = $void.InvalidSymbol
-
   // common symbol repository
   var sharedSymbols = $void.sharedSymbols
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty symbol.
-  var empty = link(Type, 'empty', sharedSymbolOf(''))
+  link(Type, 'empty', sharedSymbolOf(''))
 
   // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
   link($, '...', null)
@@ -40,15 +36,9 @@ module.exports = function ($void) {
   link(Type, 'pairing', sharedSymbolOf(':'))
   link(Type, 'comment', sharedSymbolOf('#'))
 
-  // check whether a string is a valid symbol key.
-  var allows = link(Type, 'allows', function (key) {
-    return typeof key === 'string' &&
-      (SpecialSymbol.test(key) || !InvalidSymbol.test(key))
-  })
-
   // create a symbol from a key.
   link(Type, 'of', function (key) {
-    return allows(key) ? sharedSymbols[key] || new Symbol$(key) : empty
+    return sharedSymbols[key] || new Symbol$(key)
   })
 
   // Indexer for the type.

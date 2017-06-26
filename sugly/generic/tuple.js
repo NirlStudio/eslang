@@ -110,7 +110,7 @@ module.exports = function ($void) {
       typeof value === 'undefined'
   })
 
-  var append = createAppend($void, empty)
+  var append = createAppend(accepts, empty)
 
   // create a common tuple (statement) of the argument values.
   link(Type, 'of', function () {
@@ -126,7 +126,7 @@ module.exports = function ($void) {
 
   // create a tuple by elements from the iterable arguments or the argument
   // values itself if it's not iterable.
-  link(Type, 'from', createTupleFrom($void, true, accepts, empty))
+  link(Type, 'from', createTupleFrom($void, accepts, empty))
 
   typeIndexer(Type)
 

@@ -2,26 +2,26 @@
 
 module.exports = function runtime ($void) {
   var $ = $void.$
-  var object = $.object
+  var Object$ = $void.Object
   var $export = $void.export
 
-  var runtime = $export($, '-runtime', object.of({
+  var runtime = $export($, '-runtime', new Object$({
     'core': 'js', // native implementation.
     'is-readonly': true,
 
-    'version': object.of({
+    'version': new Object$({
       'major': 0,
       'minor': 3,
       'patch': 0,
       'is-readonly': true
     }),
 
-    'environment': object.of({
+    'environment': new Object$({
       'debugging': false
     })
   }))
 
-  var environment = $['-runtime']['environment']
+  var environment = runtime.environment
   $export($, 'env', function (name, defaulue) {
     return typeof name === 'string' && typeof environment[name] !== 'undefined'
       ? environment[name] : typeof defaulue === 'undefined' ? null : defaulue

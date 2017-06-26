@@ -1,23 +1,68 @@
 'use strict'
 
-var C = require('../lib/colors')
+var colors = Object.create(null)
+require('../modules/colors')(colors)
+
+var red = colors.red
+var gray = colors.gray
+var green = colors.green
+
 var JS, failing, passing
 
-function failed (feature) {
-  failing.push(feature)
-  console.log('    ' + C.failed + C.red('[FAILED] ' + feature))
-}
-
-function passed (feature) {
-  passing += 1
-  console.log('    ' + C.passed + C.gray('[PASSED] ' + feature))
-}
-
-function assert (feature, expected) {
-  if (typeof expected !== 'string') {
-    expected = 'function'
+module.exports = function ($void) {
+  if (!console || typeof console.log !== 'function') {
+    window.alert('The global console object is required.')
+    return false
   }
 
+  // reset report
+  passing = 0
+  failing = []
+  // check native environment
+  checkSystem()
+  // check types & gloal objects
+  checkNumber()
+  checkString()
+  checkObject()
+  checkArray()
+  checkMath()
+  checkConsole()
+  // try to check sugly runtime only if the native environment is ok.
+  if (failing.length < 1) {
+    checkSuglyRuntime($void)
+  }
+  // start to report result
+  console.log(green('\n  passing: ', passing))
+  if (failing.length < 1) {
+    console.log(green('\n  Sugly is ready to run.\n'))
+    return false // true
+  }
+  // print failures
+  console.log(red('  failing: ', failing.length))
+  console.log('\n  There might be some issues to prevent running sugly')
+  for (var i = 0; i < failing.length; i++) {
+    console.log(red('  - ' + failing[i]))
+  }
+  console.log()
+  return false
+}
+
+var signPassed = '    ' + colors.passed + gray('[PASSED]')
+function passed (feature) {
+  passing += 1
+  console.log(signPassed, gray(feature))
+}
+
+var signFailed = '    ' + colors.passed + red('[FAILED]')
+function failed (feature) {
+  failing.push(feature)
+  console.log(signFailed, red(feature))
+}
+
+function assert (feature, expectedType) {
+  if (typeof expectedType !== 'string') {
+    expectedType = 'function'
+  }
   var parts = feature.split('.')
   var last = JS
   for (var i = 0; i < parts.length; i++) {
@@ -26,11 +71,13 @@ function assert (feature, expected) {
       break
     }
   }
-  if (typeof last === expected) {
-    passed(feature)
-  } else {
-    failed(feature)
-  }
+  typeof last === expectedType ? passed(feature) : failed(feature)
+}
+
+function checkSystem () {
+  console.log('\n  Checking Javascript environment')
+  checkJavascript()
+  checkPolyfill()
 }
 
 function checkJavascript () {
@@ -45,33 +92,36 @@ function checkJavascript () {
 function checkPolyfill () {
   var polyfill = require('../lib/polyfill')
   if (polyfill.length > 0) {
-    passed('Sugly is using polyfill functions:')
+    passed('Sugly is using some polyfill functions:')
     var padding = '      - '
-    console.log(C.gray(padding + polyfill.join('\n' + padding)))
+    console.log(gray(padding, polyfill.join('\n' + padding)))
   } else {
-    passed('Sugly is not using any polyfill functions.')
+    passed('Congratulations! Sugly does not need any polyfill.')
   }
 }
 
-function checkSystem () {
-  console.log('\n  Checking Javascript environment')
-  checkJavascript()
-  checkPolyfill()
-}
-
-function checkObject () {
-  console.log('\n  - Object')
-  assert('Object.assign')
-  assert('Object.create')
-  assert('Object.is')
-  assert('Object.defineProperty')
-  assert('Object.getOwnPropertyNames')
+function checkNumber () {
+  console.log('\n  - Number')
+  assert('Number.isInteger')
+  assert('Number.isSafeInteger')
+  assert('Number.MAX_SAFE_INTEGER', 'number')
+  assert('Number.MIN_SAFE_INTEGER', 'number')
 }
 
 function checkString () {
   console.log('\n  - String')
+  assert('String.prototype.trim')
   assert('String.prototype.endsWith')
   assert('String.prototype.startsWith')
+}
+
+function checkObject () {
+  console.log('\n  - Object')
+  assert('Object.is')
+  assert('Object.assign')
+  assert('Object.create')
+  assert('Object.defineProperty')
+  assert('Object.getOwnPropertyNames')
 }
 
 function checkArray () {
@@ -79,45 +129,78 @@ function checkArray () {
   assert('Array.isArray')
 }
 
-function checkNumber () {
-  console.log('\n  - Array')
-  assert('Number.isInteger')
+function checkMath () {
+  console.log('\n  - Math')
+  assert('Math.trunc')
 }
 
-function checkEnvronment ($) {
-  failing = []
-  passing = 0
-
-  checkSystem()
-  checkObject()
-  checkString()
-  checkArray()
-  checkNumber()
-
-  if (failing.length < 1) {
-    checkSugly($)
-  }
-
-  console.log(C.green('\n  passing: ' + passing))
-  if (failing.length < 1) {
-    console.log(C.green('\n  Sugly is ready to run.\n'))
-    return true
-  }
-
-  console.log(C.red('  failing: ' + failing.length))
-  console.log('\n  There might be some issues to prevent running sugly')
-  for (var i = 0; i < failing.length; i++) {
-    console.log(C.red('  - ' + failing[i]))
-  }
-  console.log()
-  return false
+function checkConsole () {
+  console.log('\n  - console')
+  assert('console.warn')
 }
 
-function checkOperators ($, group, names) {
-  console.log('\n  - operators')
+function checkSuglyRuntime ($void) {
+  console.log('\n  Checking Sugly Runtime ...')
+  checkObjects($void, '[Void / Null] ', [
+    'null'
+  ])
+
+  checkFunctions($void, '[Void / constructors] ', [
+    // genesis
+    'Type', 'Range', 'Symbol', 'Tuple',
+    'Object', 'Module', 'ClassType', 'DeviceType',
+    // runtime
+    'Signal', 'Space'
+  ])
+
+  checkFunctions($void, '[Void / functions] ', [
+    // genesis
+    'operator', 'lambda', 'function', 'createType',
+    // runtime
+    'createLambdaSpace', 'createFunctionSpace',
+    'createOperatorSpace', 'createModuleSpace',
+    'evaluate', 'signalOf',
+    'lambdaOf', 'functionOf', 'operatorOf',
+    'execute'
+  ])
+
+  checkStaticOperators($void, '[void / operators] ', [
+    '`', 'export', 'let', 'var',
+    '?', 'if', 'while', 'for', 'break', 'continue',
+    '+', '++', '--', '!', '~',
+    '@', '=?', '=', '=>', 'redo', 'return', 'exit',
+    'load', 'import', 'include'
+  ])
+
+  checkObjects($void.$, '[Sugly / types] ', [
+    'bool', 'string', 'number', 'date', 'range', 'symbol', 'tuple',
+    'operator', 'lambda', 'function',
+    'object', 'module', 'class', 'device', 'array', 'set', 'map'
+  ])
+
+  checkObjects($void.$, '[Sugly / objects] ', [
+    '-runtime', 'uri', 'math', 'json' // TODO: 'timer'
+  ])
+
+  checkFunctions($void.$, '[Sugly / functions] ', [
+    // generic
+    'iterate', 'to', 'collect', 'call', 'apply',
+    // lib
+    'encode', 'print', 'warn',
+    // startup
+    'tokenizer', 'tokenize', 'compiler', 'compile',
+    // runtime
+    'eval', 'run', 'interpreter'
+  ])
+
+  checkInjections()
+}
+
+function checkStaticOperators ($void, group, names) {
+  console.log('\n  -', group)
   for (var i = 0; i < names.length; i++) {
     var name = names[i]
-    if (typeof $.operators[name] === 'function') {
+    if (typeof $void.staticOperators[name] === 'function') {
       passed(name)
     } else {
       failed(group + name)
@@ -126,7 +209,7 @@ function checkOperators ($, group, names) {
 }
 
 function checkFunctions ($, group, names) {
-  console.log('\n  - functions')
+  console.log('\n  -', group)
   for (var i = 0; i < names.length; i++) {
     var name = names[i]
     if (typeof $[name] === 'function') {
@@ -138,7 +221,7 @@ function checkFunctions ($, group, names) {
 }
 
 function checkObjects ($, group, names) {
-  console.log('\n  - objects')
+  console.log('\n  -', group)
   for (var i = 0; i < names.length; i++) {
     var name = names[i]
     if (typeof $[name] === 'object') {
@@ -151,80 +234,11 @@ function checkObjects ($, group, names) {
 
 function checkInjections () {
   console.log('\n  - Type Injections')
-  assert('Boolean.prototype.type', 'object')
   assert('Boolean.prototype.:')
-
-  assert('Number.prototype.type', 'object')
-  assert('Number.prototype.:')
-
-  assert('String.prototype.type', 'object')
   assert('String.prototype.:')
-
-  assert('Object.prototype.type', 'object')
-  assert('Object.prototype.:')
-
-  assert('Date.prototype.type', 'object')
+  assert('Number.prototype.:')
   assert('Date.prototype.:')
-
-  assert('Array.prototype.type', 'object')
+  assert('Object.prototype.:')
   assert('Array.prototype.:')
-
-  assert('Function.prototype.type', 'object')
   assert('Function.prototype.:')
-}
-
-function checkSugly ($void) {
-  if (typeof $void === 'undefined') {
-    $void = require('..')
-  }
-  console.log('\n  Checking Sugly runtime ...')
-
-  checkOperators($void, '[Void / operator] ', [
-    '`', 'quote', 'let', 'var', ':',
-    '@', '=', '=>', 'return', 'exit', 'halt',
-    'if', 'for', 'while', 'break', 'continue', 'operator',
-    '+', '+=', '-', '-=', '/=', '*=', '++', '--', '~',
-    '&&', '||', '!'
-  ])
-
-  checkFunctions($void, '[Void / function] ', [
-    'Type', 'Signal', 'signalOf', 'evaluate', 'execute',
-    'resolve', 'assign', 'load', 'createSpace', 'createModuleSpace'
-  ])
-
-  checkFunctions($void.$, '[Sugly / function] ', [
-    'bool', 'number', 'string', 'symbol', 'object', 'class', 'date', 'array',
-    'range', 'iterate', 'compile', 'export', 'function', 'lambda',
-    'eval', 'load', 'exec', 'run', 'import', 'require', 'retire',
-    'call', 'apply', 'execute', 'print'
-  ])
-
-  checkObjects($void.$, '[Sugly / object] ', [
-    'Type', 'Bool', 'Number', 'Int', 'Float', 'String', 'Symbol', 'Function',
-    'Class', 'Date', 'Array', 'uri', 'math', 'json', 'runtime', 'encode'
-  ])
-
-  checkInjections()
-}
-
-function check ($) {
-  if (typeof console.log === 'function') {
-    return checkEnvronment($)
-  } else {
-    window.alert('The global console object is required.')
-    return false
-  }
-}
-
-if (require.main === module) {
-  check()
-} else if (typeof describe === 'function' && typeof it === 'function') {
-  check()
-  /* global describe, it */
-  describe('P.S. Mocha is no longer required.', function () {
-    it('npm test: run all sugly test cases.', function () {})
-    it('npm run check: only check the environment prerequisites.', function () {})
-  })
-} else {
-  module.exports = check
 }

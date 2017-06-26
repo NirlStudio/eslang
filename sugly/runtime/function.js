@@ -20,8 +20,9 @@ module.exports = function function_ ($void) {
     params = params[0]
     var body = clause.$.slice(offset) || []
     if (body.length > 0) {
-      code.push(new Tuple$(body, true))
-      return lambda(createLambda(params, body), code)
+      var tbody = new Tuple$(body, true)
+      code.push(tbody)
+      return lambda(createLambda(params, tbody), code)
     } else {
       code.push($Tuple.plain) // empty body
       return lambda(function () { // use an empty function
@@ -30,8 +31,8 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createLambda (params, body) {
-    var me = function () {
+  function createLambda (params, tbody) {
+    var me = nop(function () {
       var scope = createLambdaSpace()
       // populate arguments
       for (var i = 0; i < params.length; i++) {
@@ -44,11 +45,7 @@ module.exports = function function_ ($void) {
       // execution
       while (true) { // redo
         try {
-          var result = null
-          for (var expr in body) {
-            result = evaluate(expr, scope)
-          }
-          return result
+          return evaluate(tbody, scope)
         } catch (signal) {
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
@@ -65,7 +62,7 @@ module.exports = function function_ ($void) {
           return null
         }
       }
-    }
+    })
     return me
   }
 
@@ -77,8 +74,9 @@ module.exports = function function_ ($void) {
     params = params[0]
     var body = clause.$.slice(offset) || []
     if (body.length > 0) {
-      code.push(new Tuple$(body, true))
-      return function_(createFunction(params, body, space.local, space.locals),
+      var tbody = new Tuple$(body, true)
+      code.push(tbody)
+      return function_(createFunction(params, tbody, space.local, space.locals),
         code)
     } else {
       code.push($Tuple.plain) // empty body
@@ -88,12 +86,12 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createFunction (params, body, local, locals) {
+  function createFunction (params, tbody, local, locals) {
     var parent = {
       local: local,
       locals: locals
     }
-    var me = function () {
+    var me = nop(function () {
       var scope = createFunctionSpace(parent)
       // populate arguments
       for (var i = 0; i < params.length; i++) {
@@ -106,11 +104,7 @@ module.exports = function function_ ($void) {
       // execution
       while (true) { // redo
         try {
-          var result = null
-          for (var expr in body) {
-            result = evaluate(expr, scope)
-          }
-          return result
+          return evaluate(tbody, scope)
         } catch (signal) {
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
@@ -127,7 +121,7 @@ module.exports = function function_ ($void) {
           return null
         }
       }
-    }
+    })
     return me
   }
 
@@ -188,7 +182,8 @@ module.exports = function function_ ($void) {
       return [args, code[0][0]]
     }
     var list = []
-    for (var pair in code) {
+    for (i = 0; i < code.length; i++) {
+      var pair = code[i]
       if (pair[1] === null) {
         list.push(pair[0])
       } else {
@@ -197,4 +192,8 @@ module.exports = function function_ ($void) {
     }
     return [args, new Tuple$(list)]
   }
+}
+
+function nop (x) {
+  return x
 }

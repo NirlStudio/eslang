@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function operator ($void) {
   var $ = $void.$
   var $Operator = $.operator
   var operatorOf = $void.operatorOf

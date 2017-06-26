@@ -9,14 +9,7 @@ module.exports = function execute ($void) {
     var scope = createModuleSpace(uri || null)
     populateArguments(scope, args, mainApp)
     try {
-      if (!code.plain) { // a single expression
-        return [evaluate(code, scope), scope]
-      }
-      var result = null
-      for (var expr in code.$) {
-        result = evaluate(expr, scope)
-      }
-      return [result, scope.export]
+      return [evaluate(code, scope), scope]
     } catch (signal) {
       if (signal instanceof Signal$) {
         if (signal.id === 'exit' || signal.id === 'return') {
@@ -46,7 +39,8 @@ module.exports = function execute ($void) {
     } else if (!args.arguments) {
       args.arguments = [] // ensure the existence of arguments.
     }
-    for (var key in args) {
+    for (var i = 0; i < args.length; i++) {
+      var key = args[i]
       if (key === 'arguments') {
         scope.context.arguments = args.arguments
       } else if (mainApp && key === 'env') {
@@ -58,7 +52,8 @@ module.exports = function execute ($void) {
   }
 
   function populateEnv (envs) {
-    for (var pair in envs) {
+    for (var i = 0; i < envs.length; i++) {
+      var pair = envs[i]
       var value = $void.env(pair[0])
       if (typeof value === 'string') {
         $void.env(pair[0], [value, pair[1]])
@@ -88,7 +83,8 @@ function parseArguments (args) {
   result.command = []
   result.arguments = args
   var values // current value collector
-  for (var arg in args) {
+  for (var i = 0; i < args.length; i++) {
+    var arg = args[i]
     if (typeof arg !== 'string') { // a typed value
       if (values) { // an argument is collecting values.
         values.push(arg)
