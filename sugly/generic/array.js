@@ -130,7 +130,7 @@ module.exports = function ($void) {
     if (!(Array.isArray(this))) {
       return null
     }
-    for (var i = arguments.length; i < arguments.length; i++) {
+    for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
       if (Array.isArray(src)) {
         Array.prototype.push.apply(this, src)
@@ -267,6 +267,24 @@ module.exports = function ($void) {
       : boolOf(copy) ? this.slice(0).sort(comparing) : this.sort(comparing)
   })
 
+  // comparing operators for instance values
+  link(proto, '>', function (length) {
+    return Array.isArray(this) && typeof length === 'number'
+      ? this.length > length : null
+  })
+  link(proto, '>=', function (length) {
+    return Array.isArray(this) && typeof length === 'number'
+      ? this.length >= length : null
+  })
+  link(proto, '<', function (length) {
+    return Array.isArray(this) && typeof length === 'number'
+      ? this.length < length : null
+  })
+  link(proto, '<=', function (length) {
+    return Array.isArray(this) && typeof length === 'number'
+      ? this.length <= length : null
+  })
+
   // Type Verification
   typeVerifier(Type)
 
@@ -329,6 +347,17 @@ module.exports = function ($void) {
     items.push(')')
     return items.join(separator || ' ')
   })
+  link(proto, 'join', function (separator) {
+    if (!Array.isArray(this)) {
+      return null
+    }
+    var items = []
+    for (var i = 0; i < this.length; i++) {
+      var value = this[i]
+      items.push(typeof value === 'string' ? value : thisCall(value, 'to-string'))
+    }
+    return items.join(separator || ' ')
+  })
 
   // Indexer
   nativeIndexer(Type, Array, null, function (name, value) {
@@ -342,13 +371,13 @@ module.exports = function ($void) {
       return toCode // to keep the to-code mechanisim consistent.
     }
     return typeof name === 'string' // read properties
-      ? name && typeof proto[name] !== 'undefined' ? proto[name] : null
+      ? name && (typeof proto[name] !== 'undefined') ? proto[name] : null
       : typeof name !== 'number' ? null
         : typeof value === 'undefined'
           ? typeof this[name] === 'undefined' ? null : this[name]
-            : (function (list, i, v) {
-              var t = list[i]; list[i] = v
-              return typeof t === 'undefined' ? null : t
-            })(this, name, value)
+          : (function (list, i, v) {
+            var t = list[i]; list[i] = v
+            return typeof t === 'undefined' ? null : t
+          })(this, name, value)
   })
 }

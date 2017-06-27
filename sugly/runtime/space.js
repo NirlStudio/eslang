@@ -5,6 +5,7 @@ module.exports = function space ($void) {
   var $Object = $.object
   var Module$ = $void.Module
   var $export = $void.export
+  var ownsProperty = $void.ownsProperty
 
   $void.Space = Space$
   function Space$ (local, locals, context, export_) {
@@ -26,12 +27,12 @@ module.exports = function space ($void) {
       return (this.local[key] = value)
     },
     let: function (key, value) {
-      if (typeof this.local[key] !== 'undefined' || !this.locals) {
+      if (ownsProperty(this.local, key) || !this.locals) {
         return (this.local[key] = value)
       }
       if (this.locals) {
         for (var i = this.locals.length - 1; i >= 0; i--) {
-          if (typeof this.locals[i][key] !== 'undefined') {
+          if (ownsProperty(this.locals[i], key)) {
             return (this.locals[i][key] = value)
           }
         }
@@ -88,16 +89,16 @@ module.exports = function space ($void) {
     },
     let: function (key, value) {
       // try to update context first, but finally it still fall back to local.
-      if (typeof this.context[key] !== 'undefined' &&
+      if (ownsProperty(this.context, key) &&
           key !== 'operands' && key !== 'operant') {
         return (this.context[key] = value)
       }
-      if (typeof this.local[key] !== 'undefined' || !this.locals) {
+      if (ownsProperty(this.local, key) || !this.locals) {
         return (this.local[key] = value)
       }
       if (this.locals) {
         for (var i = this.locals.length - 1; i >= 0; i--) {
-          if (typeof this.locals[i][key] !== 'undefined') {
+          if (ownsProperty(this.locals[i], key)) {
             return (this.locals[i][key] = value)
           }
         }

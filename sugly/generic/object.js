@@ -45,13 +45,15 @@ function iterator ($void) {
       return null
     }
     var fields = Object.getOwnPropertyNames(this)
+    var obj = this
     var index = 0
     return function (inSitu) {
       if (index >= fields.length) {
         return null
       }
-      return typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
+      var field = typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
         ? fields[index] : fields[index++]
+      return [field, obj[field]]
     }
   }
 }
@@ -78,6 +80,7 @@ module.exports = function ($void) {
   var $Symbol = $.symbol
   var link = $void.link
   var typeOf = $void.typeOf
+  var Type$ = $void.Type
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var thisCall = $void.thisCall
@@ -86,6 +89,7 @@ module.exports = function ($void) {
   var typeIndexer = $void.typeIndexer
   var ownsProperty = $void.ownsProperty
   var nativeIndexer = $void.nativeIndexer
+  var isPrototypeOf = $void.isPrototypeOf
   var encodingTypeOf = $void.encodingTypeOf
 
   // create an empty object.
@@ -144,7 +148,7 @@ module.exports = function ($void) {
   var makeCopy = link(proto, 'copy', function (names, excluding) {
     if (this instanceof Object$) {
       // keep the same type
-      return copyFrom.apply(Object.ceate(Object.getPrototypeOf(this)),
+      return copyFrom.apply(Object.create(Object.getPrototypeOf(this)),
         [this, names, excluding])
     }
     return null
@@ -244,13 +248,10 @@ module.exports = function ($void) {
   // Type Verification
   link(proto, 'is-a', function (t) {
     var type = typeOf(this)
-    return t === type || t === Type || (isPrototypeOf(Type, t) &&
-      isPrototypeOf(t, type) && ownsProperty(t, 'proto'))
-  }, 'is-not-a', function (t) {
-    var type = typeOf(this)
-    return t !== type && t !== Type && (!isPrototypeOf(Type, t) ||
-      !isPrototypeOf(t, type) || ownsProperty(t, 'proto'))
-  })
+    return t === type || t === Type ||
+      (t instanceof Type$ && isPrototypeOf(t, type))
+  }, 'is-not-a')
+
   // check if this object complys to a template object.
   link(proto, 'as', function (template) {
     if (!(this instanceof Object$) || !(template instanceof Object$)) {

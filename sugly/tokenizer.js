@@ -30,6 +30,7 @@ module.exports = function ($void) {
     var pendingLine = 0
     var pendingOffset = 0
     var pendingText = ''
+    var stringPadding = -1
 
     var singleQuoteWaiter = createStringWaiter("'")
     var doubleQuoteWaiter = createStringWaiter('"')
@@ -89,10 +90,12 @@ module.exports = function ($void) {
         case '$':
           raiseToken('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
-        case "'":
+        case "'": // TODO: static string?
+          stringPadding === -1
           beginWaiting("'", singleQuoteWaiter)
           break
-        case '"':
+        case '"': // TODO: format string?
+          stringPadding === -1
           beginWaiting('"', doubleQuoteWaiter)
           break
         case '#':
@@ -128,7 +131,7 @@ module.exports = function ($void) {
 
     function nextChar (c) {
       if (!/[\s]/.test(c)) {
-        spacing = false
+        spacing = false // continuous spacing will be ignored.
       }
       lastChar = c
       if (c !== ' ') {
@@ -153,15 +156,39 @@ module.exports = function ($void) {
 
     function createStringWaiter (quote) {
       return function (c) {
-        if (!c) {
+        if (!c) { // unexpecting ending
           raiseToken('error', pendingText,
             [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
             'missing-quote: ' + quote, 'the format of string is invalid.')
           reseting = true
           return true
         }
-
-        if (escaping) {
+        if (c === '\r') { // skip '\r' anyway
+          return true
+        }
+        if (c === '\n') { // multiline string.
+          if (escaping) { // trailing escaping char indicates to keep the '\n'
+            pendingText += 'n'
+            stringPadding = 1 // use the new-line as space padding.
+            escaping = false
+          } else if (stringPadding < 0) {
+            stringPadding = 0 // turn on space padding
+          }
+          return true
+        }
+        if (/[\s]/.test(c)) {
+          if (stringPadding >= 0) { // padding or padded
+            if (stringPadding === 0) { // pading
+              pendingText += c // keeps the first space character.
+              stringPadding = 1
+            }
+            return true
+          }
+          // fallback to common string logic
+        } else {
+          stringPadding = -1 // turn off string padding
+        }
+        if (escaping) { // common escaping
           pendingText += c
           escaping = false
           return true

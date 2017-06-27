@@ -21,12 +21,12 @@ module.exports = function operators$operator ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return operator(createOperator(params, tbody), code)
+      return operator(createOperator(params, tbody), new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
       return lambda(function () { // use an empty function
         return null
-      }, code)
+      }, new Tuple$(code))
     }
   }
 
@@ -41,7 +41,7 @@ module.exports = function operators$operator ($void) {
       var offset = typeof operant !== 'undefined' ? 2 : 1
       for (var i = 0; i < params.length; i++) {
         var j = i + offset
-        scope.context[params[i]] = j < clist.length ? clist[j] : $Symbol.empty
+        scope.context[params[i]] = j < clist.length ? clist[j] : null
       }
       scope.context['operands'] = clause
       scope.context['operant'] = typeof operant !== 'undefined' ? operant : null

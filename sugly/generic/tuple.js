@@ -204,7 +204,7 @@ module.exports = function ($void) {
     return this instanceof Tuple$ ? this : null
   })
   // expand to a string list as an enclosed expression or a series of expressions.
-  link(proto, 'to-list', function (indent, list) {
+  var toList = link(proto, 'to-list', function (indent, list) {
     if (!(this instanceof Tuple$)) {
       return null
     }
@@ -245,7 +245,7 @@ module.exports = function ($void) {
   // Representation: as an enclosed expression or a plain series of expression.
   link(proto, 'to-string', function (indent) {
     return this instanceof Tuple$
-      ? this['to-list'](indent).join('') : null
+      ? toList.call(this, indent).join(' ') : null
   })
 
   // Indexer
@@ -253,9 +253,6 @@ module.exports = function ($void) {
   link(proto, ':', function (index, length) {
     if (!(this instanceof Tuple$)) {
       return this === proto ? protoIndexer(index, length) : null
-    }
-    if (typeof this !== 'string') {
-      return null
     }
     // getting properties
     if (typeof index === 'string') {

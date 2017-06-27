@@ -1,17 +1,14 @@
-(var x 1)
-(++ x)
-(print x)
+(let x 123)
+(print "let x" x).
 
-(let increment (= ()
-  (++ x).
-(increment)
-(print x)
+(var y 123)
+(print "var y" y).
 
-(let increment (= ()
-  (var x 10)
-  (++ x),
-  (print x).
+(export z 123)
+(print "export z" z).
 
-(increment)
-(increment)
-(print x)
+(let (x 1) (y 2) (z 3).
+(print x y z).
+
+(var (x 1) (y 2) (z 3).
+(print x y z).

@@ -71,6 +71,11 @@ module.exports = function ($void) {
     return this.key !== ''
   })
 
+  // Encoding
+  link(proto, 'to-code', function () {
+    return this instanceof Symbol$ ? this : null
+  })
+
   // Representation
   link(proto, 'to-string', function () {
     return this instanceof Symbol$ ? this.key : null

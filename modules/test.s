@@ -22,25 +22,15 @@
    (return spec)
 ).
 
-(export should (=> (subject predicate action)
-  (if (action is null) # as (predicate action)
-    (let action predicate)
-    (let predicate subject)
-    (let subject "")
-  else
-    (if (subject is-not-a string)
-      (let subject (subject to-string),
-  ),
-  (if (subject not-empty)
-    (subject += " ")
-  ),
+(export should (=> (behaviour action)
   (current push (@
-    behaviour: (subject + "should " predicate)
+    behaviour: behaviour
     action: action
+  ),
 ).
 
 (export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
-  (if (!expr)
+  (if (expr is-empty)
     (let "expr" expected)
     (let "expected" true)
   ),
@@ -53,8 +43,7 @@
       expected: expected
       real: value
       expr: expr
-      note: note
-  ),
+      note: note)
 ).
 
 # test results
@@ -117,7 +106,7 @@
 
 (let print-a (=> failure
   (print (+ "  " (failure no.) ") "
-    "[" ((failure path) to-string " / ") "]" (failure behaviour),
+    "[ " ((failure path) join " / ") " ]" (failure behaviour),
   ),
   (let assertion (failure assertion),
   (print (+
@@ -153,7 +142,9 @@
   ),
   (print "  Start to run sugly test suites ...\n")
   (let t1 (date now),
-  (for case in cases (test-a case),
+  (for case in cases
+    (test-a case),
+  ),
   (let t2 (date now),
 
   (print

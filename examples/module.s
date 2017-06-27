@@ -1,14 +1,8 @@
-(let gVar null)
-(let lVar null)
-(var vVar 1)
-
-(let f1 (= (x)
-  (let gVar x)
-  (var lVar x)
-  (+= vVar 2)
+(let mod (import "module_").
+(if mod
+  (print "(mod x) is " (mod x),
+  (print "(mod l 10 20) is" (mod l 10 20),
+  (print "(mod f 10 20) is" (mod f 10 20),
+  else
+  (print "fialed to load the module"),
 ).
-
-(f1 123)
-(print gVar)
-(print lVar)
-(print vVar)

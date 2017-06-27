@@ -17,11 +17,11 @@ module.exports = function ($void) {
     var tokenizing = tokenizer(compileToken)
     return function compiling (text) {
       if (tokenizing(text)) {
-        return true
+        return stack.length
       }
       // reset compiling context.
       resetContext()
-      return false
+      return -1
     }
 
     function compileToken (type, value, source, errCode, errMessage) {
@@ -157,11 +157,17 @@ module.exports = function ($void) {
     }
 
     function endIndent (value, source) {
+      var lastSource = lastToken[2]
+      var endingIndent = lastSource[0]
       var depth = stack.length - 1
       while (depth > 0) {
-        var startSource = sourceStack[depth][0][0] // start source.
-        var lastSource = lastToken[2]
-        if (startSource[2] < lastSource[2]) { // line offset
+        var indent = sourceStack[depth][0][0][0]
+        // try to looking for and stop with the first matched indent.
+        if (indent >= 0 && indent <= endingIndent) {
+          if (indent === endingIndent) {
+            endTopWith(lastSource, source)
+          } // otherwise, no matched indent found. It is still tolerable but
+            // not a good practice.
           break
         }
         endTopWith(lastSource, source)

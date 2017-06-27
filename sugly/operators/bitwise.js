@@ -28,7 +28,7 @@ module.exports = function bitwise ($void) {
     if (typeof operant !== 'number' || clist.length < 3) {
       return 0
     }
-    var value = evaluate(clist[2])
+    var value = evaluate(clist[2], space)
     operant &= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
@@ -47,7 +47,7 @@ module.exports = function bitwise ($void) {
       return 0
     }
     var clist = clause.$
-    var value = clist.length > 2 ? evaluate(clist[2]) : 0
+    var value = clist.length > 2 ? evaluate(clist[2], space) : 0
     operant |= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
@@ -66,7 +66,7 @@ module.exports = function bitwise ($void) {
       return 0
     }
     var clist = clause.$
-    var value = clist.length > 2 ? evaluate(clist[2]) : 0
+    var value = clist.length > 2 ? evaluate(clist[2], space) : 0
     operant ^= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
@@ -85,7 +85,7 @@ module.exports = function bitwise ($void) {
       return 0
     }
     var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2]) : 0
+    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
     operant <<= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
@@ -104,7 +104,7 @@ module.exports = function bitwise ($void) {
       return 0
     }
     var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2]) : 0
+    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
     operant >>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
@@ -123,7 +123,7 @@ module.exports = function bitwise ($void) {
       return 0
     }
     var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2]) : 0
+    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
     operant >>>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]

@@ -22,12 +22,12 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return lambda(createLambda(params, tbody), code)
+      return lambda(createLambda(params, tbody), new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
       return lambda(function () { // use an empty function
         return null
-      }, code)
+      }, new Tuple$(code))
     }
   }
 
@@ -77,12 +77,12 @@ module.exports = function function_ ($void) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
       return function_(createFunction(params, tbody, space.local, space.locals),
-        code)
+        new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
       return function_(function () { // use an empty function
         return null
-      }, code)
+      }, new Tuple$(code))
     }
   }
 

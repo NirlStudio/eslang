@@ -19,10 +19,10 @@ module.exports = function control ($void) {
     if (length < 3) {
       return null // short circuit - the result will be null anyway.
     }
-    var cond = evaluate(clist[1])
+    var cond = evaluate(clist[1], space)
     if (cond === true ||
       cond !== false && cond !== null && cond !== 0) {
-      return evaluate(clist[2])
+      return evaluate(clist[2], space)
     }
     return length > 3 ? evaluate(clist[3], space) : null
   })
@@ -68,7 +68,7 @@ module.exports = function control ($void) {
     for (i += 1; i < length; i++) {
       result = evaluate(clist[i], space)
     }
-    return
+    return result
   })
 
   // break current loop and use the argument(s) as result
@@ -177,6 +177,7 @@ module.exports = function control ($void) {
         if (signal instanceof Signal$) {
           if (signal.id === 'continue') {
             result = signal.value
+            values = next()
             continue
           }
           if (signal.id === 'break') {
@@ -186,6 +187,7 @@ module.exports = function control ($void) {
         }
         throw signal
       }
+      values = next()
     }
     return result
   }

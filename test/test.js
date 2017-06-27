@@ -35,7 +35,7 @@ module.exports = function ($void) {
   console.log(green('\n  passing: ', passing))
   if (failing.length < 1) {
     console.log(green('\n  Sugly is ready to run.\n'))
-    return false // true
+    return true
   }
   // print failures
   console.log(red('  failing: ', failing.length))

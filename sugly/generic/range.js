@@ -2,7 +2,7 @@
 
 function iterator ($void) {
   var Range$ = $void.Range
-  return function (counting) {
+  return function () {
     if (!(this instanceof Range$)) {
       return null
     }

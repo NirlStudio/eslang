@@ -48,9 +48,9 @@ module.exports = function interpreter ($void) {
 
     return function interpret (text) {
       if (typeof text === 'string') {
-        compile(text) // push input into compiler
+        return compile(text) // push input into compiler
       } else {
-        compile() // reset status.
+        return compile() // reset status.
       }
     }
   })

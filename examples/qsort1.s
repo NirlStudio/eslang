@@ -1,7 +1,7 @@
 (let data (load "sort-data").
 (warn data)
 
-(let sort (= (start end)
+(let sort (=> (start end)
   (if (start >= end) (return),
 
   (let mid (data:end),
@@ -17,11 +17,7 @@
     ),
     (data swap left right)
   ),
-  (if
-    ((data:left) >= mid),
-    (data swap left end)
-    (++ left)
-  ),
+  (((data:left) >= mid) ? (data swap left end) (++ left),
   (do start (left - 1),
   (redo (left + 1) end)
 ).

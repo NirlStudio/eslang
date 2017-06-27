@@ -96,7 +96,7 @@ module.exports = function logical ($void) {
   // (x ?? y z ...) returns the first non-null value after it if x is null.
   link(Null, '??', operator(function (space, clause, operant) {
     if (operant !== null) {
-      return typeof operant !== 'undefined' ? null : operant // shortcut
+      return typeof operant === 'undefined' ? null : operant // shortcut
     }
     if (!(space instanceof Space$)) {
       return null // the value of OR is defined as False

@@ -1,33 +1,25 @@
-(operator add1
-  (print %0 " " %1 " " %2)
-  (++ counter)
-  (+ %0 %1).
+(let x 100)
+(let y 200)
+(let z 0)
 
-(print (add1 "xyz" 123).
+(let and (=? (a b c)
+  (print "a is a" (a type),
+  (print "b is a" (b type),
+  (print "c is a" (c type),
+  (print "z is a" (z type),
+  (print "a is" (a to-code),
+  (print "b is" (b to-code),
+  (print "c is" (c to-code),
+  (print "z is" (z to-code),
+  (print "the value of a is" (a),
+  (print "the value of b is" (y),
+  (print "the value of c is" (c),
+  (print "the value of z is" z),
+  (print "a and b and c with z is" (+ (a) (b) (c) z),
+  (let "x" 0)
+  (let "y" 100)
+  (var "z" 200).
 
-(operator export add2
-  (++ counter )
-  (+ %0 %1 (add1 %2 %3).
-
-(print (add2 1 10 100 1000 10000))
-(print counter)
-
-(operator export add3
-  (+ 100 %0 %1).
-(print (add3 10 1).
-
-(operator add3
-  (+ 10000 %0 %1).
-
-(operator add3
-  (+ 1000000 %0 %1).
-
-(print (add3 10 1).
-
-(operator opr5 # (operands)
-  (@ %C %V %0 %9)
-).
-
-(let r (opr5 10 11 12 13 14 15 16 17 18 19 20 21).
-(print r)
-(print (r:0).
+(let z 400)
+(and x y 300)
+(print x y z).
