@@ -28,8 +28,8 @@ module.exports = function importing (exporting) {
     exporting.passed = '= '
     exporting.failed = 'x '
     // mock them since they looks not working very well.
-    exporting.gray = function (text) { return text }
-    exporting.underline = function (text) { return text }
+    exporting.gray = concatWith(function (text) { return text })
+    exporting.underline = concatWith(function (text) { return text })
   }
   // render special characters
   exporting.passed = exporting.green(exporting.passed)

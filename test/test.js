@@ -184,7 +184,7 @@ function checkSuglyRuntime ($void) {
 
   checkFunctions($void.$, '[Sugly / functions] ', [
     // generic
-    'iterate', 'to', 'collect', 'call', 'apply',
+    'iterate', 'traverse', 'collect', 'call', 'apply',
     // lib
     'encode', 'print', 'warn',
     // startup

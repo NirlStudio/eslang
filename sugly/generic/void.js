@@ -178,12 +178,8 @@ module.exports = function ($void) {
   function typeVerifier (type) {
     var proto = type.proto
     link(proto, 'is-a', function (t) {
-      return t === type || (isPrototypeOf($Type, t) &&
-        isPrototypeOf(t, type) && ownsProperty(t, 'proto'))
-    }, 'is-not-a', function (t) {
-      return t !== type && (!isPrototypeOf($Type, t) ||
-        !isPrototypeOf(t, type) || !ownsProperty(t, 'proto'))
-    })
+      return t === type || (t instanceof Type$ && isPrototypeOf(t, type))
+    }, 'is-not-a')
   }
   $void.typeVerifier = typeVerifier
 
@@ -416,7 +412,7 @@ function publish (owner, key, value) {
   Object.defineProperty(owner, key, {
     enumerable: true,
     configurable: false,
-    writable: false,
+    writable: true,
     value: value
   })
 }

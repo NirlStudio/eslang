@@ -1,58 +1,128 @@
-(define "universal functions for values and objects" (= ()
-  (should "implement is/is-not" (= ()
-    (assert (` (null is null),
-    (assert (` (null is-not 0),
-    (assert (` (null is-not false),
-    (assert (` (null is-not ""),
+(define "Identity" (= ()
+  (should "null is only itself." (= ()
+    (assert (null is null),
+    (assert false (null is-not null),
+
+    (assert false (null is false),
+    (assert (null is-not false),
+
+    (assert false (null is 0),
+    (assert (null is-not 0),
+
+    (assert false (null is ""),
+    (assert (null is-not ""),
+
+    (assert false (null is (@:),
+    (assert (null is-not (@:),
+).
+
+(define "Equivalence" (= ()
+  (should "null is only equivalent with itself." (= ()
+    (assert (null equals null),
+    (assert false (null not-equals null),
+
+    (assert false (null equals false),
+    (assert (null not-equals false),
+
+    (assert false (null equals 0),
+    (assert (null not-equals 0),
+
+    (assert false (null equals ""),
+    (assert (null not-equals ""),
+
+    (assert false (null equals (= ),
+    (assert (null not-equals (= ),
+
+    (assert false (null equals (@:),
+    (assert (null not-equals (@:),
+).
+
+(define "Equivalence (operators)" (= ()
+  (should "null is only equivalent with itself." (= ()
+    (assert (null == null),
+    (assert false (null != null),
+
+    (assert false (null == false),
+    (assert (null != false),
+
+    (assert false (null == 0),
+    (assert (null != 0),
+
+    (assert false (null == ""),
+    (assert (null != ""),
+
+    (assert false (null == (@:),
+    (assert (null != (@:),
+).
+
+(define "Ordering" (= ()
+  (should "null is only comparable with itself." (= ()
+    (assert 0 (null compare null),
+    (assert null (null compare false),
+    (assert null (null compare 0),
+    (assert null (null compare ""),
+    (assert null (null compare (@:),
+).
+
+(define "Type Verification" (= ()
+  (should "null is the type of itself." (= ()
+    (assert (null is-a null),
+    (assert false (null is-not-a null),
+
+    (assert false (null is-a bool),
+    (assert (null is-not-a bool),
+
+    (assert false (null is-a number),
+    (assert (null is-not-a number),
+
+    (assert false (null is-a string),
+    (assert (null is-not-a string),
+
+    (assert false (null is-a date),
+    (assert (null is-not-a date),
+
+    (assert false (null is-a range),
+    (assert (null is-not-a range),
+
+    (assert false (null is-a symbol),
+    (assert (null is-not-a symbol),
+
+    (assert false (null is-a tuple),
+    (assert (null is-not-a tuple),
+
+    (assert false (null is-a operator),
+    (assert (null is-not-a operator),
+
+    (assert false (null is-a lambda),
+    (assert (null is-not-a lambda),
+
+    (assert false (null is-a function),
+    (assert (null is-not-a function),
+
+    (assert false (null is-a object),
+    (assert (null is-not-a object),
+).
+
+(define "Emptiness" (= ()
+  (should "null is an empty value." (= ()
+    (assert (null is-empty),
+    (assert false (null not-empty),
+).
+
+(define "Encoding" (= ()
+  (should "null is encoded to itself." (= ()
+    (assert null (null to-code),
+).
+
+(define "Representation" (= ()
+  (should "null is represented as 'null'." (= ()
+    (assert "null" (null to-string),
+).
+
+(define "Indexer" (= ()
+  (should "the indexer is not readable directly." (= ()
+    (assert null (null ":"),
   ),
-  (should "implement equals/not-equals" (= ()
-    (assert (` (null equals null),
-    (assert (` (null not-equals 0),
-    (assert (` (null not-equals false),
-    (assert (` (null not-equals ""),
-  ),
-  (should "implement equals/not-equals operators" (= ()
-    (assert (` (null == null),
-    (assert (` (null != 0),
-    (assert (` (null != false),
-    (assert (` (null != ""),
-  ),
-  (should "implement is-a/is-not-a" (= ()
-    (assert (` (null is-a null),
-    (assert (` (null is-not-a 0),
-    (assert (` (null is-not-a false),
-    (assert (` (null is-not-a ""),
-    (assert (` (null is-not-a Type),
-    (assert (` (null is-not-a String),
-  ),
-  (should "implement type" (= ()
-    (assert (` ((null type) is null),
-    (assert (` ((null type) is-not Type),
-    (assert (` ((null "type") is null),
-    (assert (` ((null "type") is-not Type),
-  ),
-  (should "implement super" (= ()
-    (assert (` ((null super) is null),
-  ),
-  (should "implement is-empty/not-empty" (= ()
-    (assert (` (null is-empty),
-    (assert false (` (null not-empty),
-  ),
-  (should "implement to-code/to-string" (= ()
-    (assert (` ((null to-code) == "null"),
-    (assert (` ((null to-string) == "null"),
-  ),
-  (should "implement common indexer (:)" (= ()
-    (assert (` (:(null ":") is-a Function),
-  ),
-  (should "implement bool test" (= ()
-    (assert false (` (null ?),
-    (assert 1 (` (null ? 1 ),
-    (assert 2 (` (null ? 1 2),
-  ),
-  (should "implement null fallback" (= ()
-    (assert null (` (null ??),
-    (assert 1 (` (null ?? 1 ),
-    (assert "str" (` (null ?? "str"),
-  ),
+  (should "null's type is null." (= ()
+    (assert null (null "type"),
 ).

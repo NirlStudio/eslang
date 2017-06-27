@@ -38,7 +38,7 @@ module.exports = function iterate ($void) {
     }
   })
   // to exhaust an iterator function.
-  $export($, 'to', function (next) {
+  $export($, 'traverse', function (next) {
     if (typeof next !== 'function') {
       return 0
     }
