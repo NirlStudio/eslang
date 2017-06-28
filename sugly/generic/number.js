@@ -22,38 +22,39 @@ function createValueOf ($void, parse) {
 }
 
 function createIntValueOf ($void, parse) {
-  return function (input, radix) {
+  return function (input, defaultValue) {
+    var result
     if (typeof input === 'string') {
-      return parse(input, radix)
+      result = parse(input)
     }
     if (typeof input === 'number') {
-      return input.trunc()
+      result = Math.trunc(input)
     }
     if (typeof input === 'boolean') {
       return input ? 1 : 0
     }
-    return 0
+    return Number.isSafeInteger(result) ? result
+      : Number.isSafeInteger(defaultValue) ? defaultValue : 0
   }
 }
 
 function createIntParser ($void) {
-  return function (input, radix) {
+  return function (input) {
     if (typeof input !== 'string') {
-      return 0
+      return NaN
     }
-    if (typeof radix !== 'number' || radix < 2) {
-      if (input.startsWith('0x')) {
-        radix = 16
-        input = input.substring(2)
-      } else if (input.startsWith('0b')) {
-        radix = 2
-        input = input.substring(2)
-      } else if (input.startsWith('0')) {
-        radix = 8
-        input = input.substring(1)
-      } else {
-        radix = 10
-      }
+    var radix
+    if (input.startsWith('0x')) {
+      radix = 16
+      input = input.substring(2)
+    } else if (input.startsWith('0b')) {
+      radix = 2
+      input = input.substring(2)
+    } else if (input.startsWith('0') && input.length > 1) {
+      radix = 8
+      input = input.substring(1)
+    } else {
+      radix = 10
     }
     return parseInt(input, radix)
   }
@@ -139,8 +140,8 @@ module.exports = function ($void) {
 
   // support bitwise operations for 32-bit integer values.
   link(Type, 'bits', 32)
-  link(Type, 'max-bits', Math.pow(2, 31) - 1)
-  link(Type, 'min-bits', -Math.pow(2, 31))
+  var maxBits = link(Type, 'max-bits', Math.pow(2, 31) - 1)
+  var minBits = link(Type, 'min-bits', -Math.pow(2, 31))
 
   // The empty value
   link(Type, 'empty', 0)
@@ -157,7 +158,13 @@ module.exports = function ($void) {
   var valueOf = link(Type, 'of', createValueOf($void, parse))
 
   // get an integer value from the input
-  link(Type, 'of-int', createIntValueOf($void, parseInteger))
+  var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger))
+
+  // get an signed integer value which is stable with bitwise operation.
+  link(Type, 'of-bits', function (input, defaultValue) {
+    var int = intOf(input, defaultValue)
+    return int >> 0
+  })
 
   typeIndexer(Type)
 
@@ -173,6 +180,11 @@ module.exports = function ($void) {
   }, 'is-not-int', function () {
     return !Number.isSafeInteger(this)
   })
+  link(proto, 'is-bits', function () {
+    return typeof this === 'number' ? this >= minBits && this <= maxBits : null
+  }, 'is-not-bits', function () {
+    return typeof this === 'number' ? this < minBits || this > maxBits : null
+  })
   link(proto, 'is-finite', function () {
     return typeof this === 'number' ? isFinite(this) : null
   }, 'is-infinite', function () {
@@ -180,36 +192,32 @@ module.exports = function ($void) {
   })
 
   // support basic arithmetic operations
-  link(proto, ['and', '+'], numberAnd(valueOf))
-  link(proto, ['subtract', '-'], numberSubtract(valueOf))
-  link(proto, ['times', '*'], numberTimes(valueOf))
-  link(proto, ['divide', '/'], numberDivide(valueOf))
+  link(proto, ['+', 'and'], numberAnd(valueOf))
+  link(proto, ['-', 'subtract'], numberSubtract(valueOf))
+  link(proto, ['*', 'times'], numberTimes(valueOf))
+  link(proto, ['/', 'divide'], numberDivide(valueOf))
 
   // bitwise operations
   link(proto, '&', function (value) {
-    return typeof this === 'number' ? this.number & value : null
+    return typeof this === 'number' ? this & value : null
   })
   link(proto, '|', function (value) {
-    return typeof this === 'number' ? this.number | value : null
+    return typeof this === 'number' ? this | value : null
   })
   link(proto, '^', function (value) {
-    return typeof this === 'number' ? this.number ^ value : null
+    return typeof this === 'number' ? this ^ value : null
   })
   link(proto, '<<', function (offset) {
-    return typeof this === 'number' ? this.number << offset : null
+    return typeof this === 'number' ? this << offset : null
   })
+  // use zero-based shift by default since signed shift may cause an implicit conversion.
   link(proto, '>>', function (offset) {
-    return typeof this === 'number' ? this.number >> offset : null
+    return typeof this === 'number' ? this >>> offset : null
   })
+  // signed right-shift.
   link(proto, '>>>', function (offset) {
-    return typeof this === 'number' ? this.number >>> offset : null
+    return typeof this === 'number' ? this >> offset : null
   })
-
-  // TODO: operators
-  // ++
-  // --
-  // +=
-  // -=
 
   // support ordering logic - comparable
   // For uncomparable entities, comparison result is consistent with the Equivalence.
@@ -220,9 +228,9 @@ module.exports = function ($void) {
       : typeof this !== 'number' || typeof another !== 'number' ? null
         : !isNaN(this) && !isNaN(another)
           ? this > another ? 1 : -1
-          : isNaN(this) || isNaN(another)
-            ? null // NaN is not comparable with a real number.
-            : 0    // NaN is equivalent with itself.
+          : isNaN(this) && isNaN(another)
+            ? 0    // NaN is equivalent with itself.
+            : null // NaN is not comparable with a real number.
   })
 
   // comparing operators for instance values
@@ -247,7 +255,7 @@ module.exports = function ($void) {
   link(proto, ['equals', '=='], function (another) {
     return this === another || compare.call(this, another) === 0
   }, ['not-equals', '!='], function (another) {
-    return this !== another && compare.call(this, another) !== 0
+    return compare.call(this, another) !== 0
   })
 
   // support common math operations

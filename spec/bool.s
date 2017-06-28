@@ -36,20 +36,19 @@
   ),
 
   (define "Equivalence (operators)" (=> ()
-    (should "type is equivalent with itself" (=> ()
-      (should "true is equivalent with true" (=> ()
-        (assert (true == true),
-        (assert false (true != true),
+    (should "true is equivalent with true" (=> ()
+      (assert (true == true),
+      (assert false (true != true),
 
-        (assert (true != false),
-        (assert false (true == false),
-      ),
-      (should "false is equivalent with false" (=> ()
-        (assert (false == false),
-        (assert false (false != false),
+      (assert (true != false),
+      (assert false (true == false),
+    ),
+    (should "false is equivalent with false" (=> ()
+      (assert (false == false),
+      (assert false (false != false),
 
-        (assert (false != true),
-        (assert false (false == true),
+      (assert (false != true),
+      (assert false (false == true),
   ),
 
   (define "Ordering" (=> ()

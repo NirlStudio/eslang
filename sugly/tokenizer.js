@@ -8,12 +8,14 @@ var Constants = Object.assign(Object.create(null), {
   'true': true,
   'false': false,
   'NaN': NaN,
-  'Infinity': Infinity
+  'Infinity': Infinity,
+  '-Infinity': -Infinity
 })
 
 module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
+  var intValueOf = $.number['of-int']
   var $export = $void.export
 
   var tokenizer = $export($, 'tokenizer', function (compiler) {
@@ -281,7 +283,7 @@ module.exports = function ($void) {
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
       } else if (pendingText.startsWith('0')) {
         // try integer number
-        raiseToken('value', parseInt(pendingText),
+        raiseToken('value', intValueOf(pendingText),
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
       } else if (typeof Constants[pendingText] !== 'undefined') {
         // check if a constant value
