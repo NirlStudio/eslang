@@ -6,7 +6,7 @@
 
 (define "tokenize" (= ()
   (should "(tokenize ...) return an array of tokens." (= ()
-    (let tokens (tokenize "x y z"),
+    (let tokens (tokenize "x y   z"),
     (assert (tokens is-a array),
-    (assert ((tokens length) is 3),
+    (assert ((tokens length) is 5),
 ).

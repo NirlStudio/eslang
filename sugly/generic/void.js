@@ -11,6 +11,7 @@ module.exports = function ($void) {
   var $Tuple = $.tuple
   var $Array = $.array
   var $Lambda = $.lambda
+  var $Function = $.function
   var $Object = $.object
   var $Symbol = $.symbol
   var Prototype = $Type.proto
@@ -36,7 +37,7 @@ module.exports = function ($void) {
   // get the correct indexer for an entity.
   function indexerOf (entity) {
     return typeof entity === 'undefined' || entity === null ? Null[':']
-      : typeof entity === 'function' ? (entity.type || $Lambda).proto[':']
+      : typeof entity === 'function' ? (entity.type || $Function).proto[':']
         : typeof entity[':'] === 'function' ? entity[':'] // managed (unsafe for native entities)
           : typeof entity === 'object' ? $Object // native object created from null
             : Null[':'] // unknown native type
@@ -325,7 +326,7 @@ module.exports = function ($void) {
       if (typeof index === 'string') {
         return index === ':' ? null
           : index === 'type' ? type // fake field
-            : index === 'name' ? this.name || '?lambda'
+            : index === 'name' ? this.name || ('?' + type.name)
               : typeof proto[index] !== 'undefined' ? proto[index]
                 : !(this.code instanceof Tuple$) ? null
                   : index === 'parameters' ? this.code.$[1]

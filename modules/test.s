@@ -35,6 +35,7 @@
     (let "expected" true)
   ),
   (++ assert-step)
+  (let "expected" (expected),
   (var "value" (expr),
   (if (value != expected)
     (return (@
@@ -106,7 +107,7 @@
 
 (let print-a (=> failure
   (print (+ "  " (failure no.) ") "
-    "[ " ((failure path) join " / ") " ]" (failure behaviour),
+    "[ " ((failure path) join " / ") " ] " (failure behaviour),
   ),
   (let assertion (failure assertion),
   (print (+

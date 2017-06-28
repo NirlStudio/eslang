@@ -167,7 +167,7 @@ function checkSuglyRuntime ($void) {
   checkStaticOperators($void, '[void / operators] ', [
     '`', 'export', 'let', 'var',
     '?', 'if', 'while', 'for', 'break', 'continue',
-    '+', '++', '--', '!', '~',
+    '+', '++', '--', '!', 'not', '~',
     '@', '=?', '=', '=>', 'redo', 'return', 'exit',
     'load', 'import', 'include'
   ])

@@ -1,7 +1,6 @@
-(define "Type" (= ()
+(let the-type lambda)
+(let the-value (=).
+(include "type_")
 
-).
-
-(define "Usage" (= ()
-
+(define "lambda usage" (= ()
 ).

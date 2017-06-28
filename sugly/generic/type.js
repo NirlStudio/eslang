@@ -76,7 +76,7 @@ module.exports = function ($void) {
 
   // Encoding: shared for all global types.
   link(Type, 'to-code', function () {
-    return this instanceof Type$ ? sharedSymbolOf(this.name) : null
+    return this === Type || this instanceof Type$ ? sharedSymbolOf(this.name) : null
   })
 
   // Description: shared for all global types.

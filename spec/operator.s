@@ -1,7 +1,6 @@
-(define "Type" (= ()
+(let the-type operator)
+(let the-value (=?).
+(include "type_")
 
-).
-
-(define "Usage" (= ()
-
+(define "operater usage" (= ()
 ).

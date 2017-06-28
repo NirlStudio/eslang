@@ -10,7 +10,7 @@ module.exports = function logical ($void) {
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
 
-  staticOperator('!', function (space, clause) {
+  var not = staticOperator('!', function (space, clause) {
     if (clause.$.length > 1) {
       var value = evaluate(clause.$[1], space)
       return value === false || value === 0 || value === null || typeof value === 'undefined'
@@ -18,7 +18,9 @@ module.exports = function logical ($void) {
     return true
   })
 
-  // global logical AND operators
+  staticOperator('not', not)
+
+  // global logical AND operator
   link(Null, '&&', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return null
@@ -39,7 +41,7 @@ module.exports = function logical ($void) {
     return true
   }, $Tuple.operator))
 
-  // global logical AND operators
+  // global logical OR operator
   link(Null, '||', operator(function (space, clause, operant) {
     if (!(space instanceof Space$)) {
       return null

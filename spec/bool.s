@@ -1,143 +1,176 @@
-(define "function form" (= ()
-  (should "return false for false, zero and null" (= ()
-    (assert false (bool ),
-    (assert false (bool false),
-    (assert false (bool 0),
-    (assert false (bool null),
+(let the-type bool)
+(let the-value false)
+(include "type_")
+
+(define "common behaviour" (= ()
+  (define "Identity" (=> ()
+    (should "true is true" (= ()
+      (assert (true is true),
+      (assert false (true is-not true),
+
+      (assert (true is-not false),
+      (assert false (true is false),
+    ),
+    (should "false is false" (=> ()
+      (assert (false is false),
+      (assert false (false is-not false),
+
+      (assert (false is-not true),
+      (assert false (false is true),
   ),
-  (should "return true for any other values" (= ()
-    (assert true (bool true),
-    (assert true (bool 1),
-    (assert true (bool -1),
-    (assert true (bool ""),
-    (assert true (bool "0"),
-    (assert true (bool "false"),
-    (assert true (bool (@),
-    (assert true (bool (object),
+
+  (define "Equivalence" (=> ()
+    (should "true is equivalent with true" (=> ()
+      (assert (true equals true),
+      (assert false (true not-equals true),
+
+      (assert (true not-equals false),
+      (assert false (true equals false),
+    ),
+    (should "false is equivalent with false" (=> ()
+      (assert (false equals false),
+      (assert false (false not-equals false),
+
+      (assert (false not-equals true),
+      (assert false (false equals true),
   ),
-).
 
-(define "Bool type" (= ()
-  (should "be the type object of boolean values" (= ()
-    (assert ((Bool is-a Type),
-    (assert ((Bool is-not-a Class),
+  (define "Equivalence (operators)" (=> ()
+    (should "type is equivalent with itself" (=> ()
+      (should "true is equivalent with true" (=> ()
+        (assert (true == true),
+        (assert false (true != true),
+
+        (assert (true != false),
+        (assert false (true == false),
+      ),
+      (should "false is equivalent with false" (=> ()
+        (assert (false == false),
+        (assert false (false != false),
+
+        (assert (false != true),
+        (assert false (false == true),
   ),
-).
 
-(define "(Bool value-of x) " (= ()
-  (should "standardize a value to its bool value." (= ()
-    (assert (Bool value-of true),
-    (assert false (Bool value-of false),
-
-    (assert (Bool value-of 1),
-    (assert false (Bool value-of 0),
-
-    (assert false (Bool value-of null),
-    (assert (Bool value-of ""),
-    (assert (Bool value-of "false"),
-    (assert (Bool value-of (@)),
-    (assert (Bool value-of (@>)),
-).
-
-(define "(Bool and x y z ...)" (= ()
-  (should "give a result by logical AND." (= ()
-    (assert (Bool and),
-    (assert (Bool and true),
-    (assert false (Bool and true false),
-    (assert (Bool and true 1),
-    (assert false (Bool and true 0),
-    (assert (Bool and true (@)),
-    (assert false (Bool and true null),
-).
-
-(define "(Bool or x y z ...)" (= ()
-  (should "give a result by logical OR." (= ()
-    (assert false (Bool or),
-    (assert (Bool or true),
-    (assert (Bool or true false),
-    (assert false (Bool or false false),
-    (assert (Bool or false 1),
-    (assert false (Bool or false 0),
-    (assert (Bool or false (@)),
-    (assert false (Bool or false null),
-).
-
-(define "(Bool not x)" (= ()
-  (should "give a result by logical NOT." (= ()
-    (assert (Bool not),
-    (assert false (Bool not true),
-    (assert (Bool not false),
-    (assert (Bool not 0),
-    (assert false (Bool not 1),
-    (assert false (Bool not (@)),
-    (assert (Bool not null),
-).
-
-(define "(a is b)" (= ()
-  (should "only return true if a and b are the same bool value." (= ()
-    (assert (true is true),
-    (assert (false is false),
-    (assert false (true is false),
-    (assert false (false is true),
-    (assert false (true is null),
-    (assert false (false is null),
-    (assert false (true is 0),
-    (assert false (false is 0),
-    (assert false (true is 1),
-    (assert false (false is 1),
-
-    (assert (Bool is Bool),
-    (assert false (Bool is true),
+  (define "Ordering" (=> ()
+    (should "true is only comparable with itself." (=> ()
+      (assert 0 (true compare true),
+      (assert null (true compare false),
+      (assert null (true compare type),
+      (assert null (true compare null),
+      (assert null (true compare 0),
+      (assert null (true compare ""),
+      (assert null (true compare (@:),
+    ),
+    (should "false is only comparable with itself." (=> ()
+      (assert 0 (false compare false),
+      (assert null (false compare true),
+      (assert null (false compare type),
+      (assert null (false compare null),
+      (assert null (false compare 0),
+      (assert null (false compare ""),
+      (assert null (false compare (@:),
+    ),
   ),
-).
 
-(define "(a equals b)" (= ()
-  (should "only return true if a and b are the same bool value." (= ()
-    (assert (true equals true),
-    (assert (false equals false),
-    (assert false (true equals false),
-    (assert false (false equals true),
-    (assert false (true equals null),
-    (assert false (false equals null),
-    (assert false (true equals 0),
-    (assert false (false equals 0),
-    (assert false (true equals 1),
-    (assert false (false equals 1),
+  (define "Emptiness" (=> ()
+    (should "false is defined as the empty value." (=> ()
+      (assert false (bool empty),
+      (assert false (true is-empty),
+      (assert (true  not-empty),
+      (assert (false is-empty),
+      (assert false (false  not-empty),
+  ),
+
+  (define "Encoding" (=> ()
+    (should "true is encoded to itself." (=> ()
+      (assert true (true to-code),
+    ),
+    (should "false is encoded to itself." (=> ()
+      (assert false (false to-code),
+  ),
+
+  (define "Representation" (=> ()
+    (should "true is represented as 'true'." (=> ()
+      (assert "true" (true to-string),
+    ),
+    (should "false is represented as 'false'." (=> ()
+      (assert "false" (false to-string),
   ),
 ).
 
-(define "(bool-value to-code )" (= ()
-  (should "return 'true' for true 'false' for 'false'." (= ()
-    (assert "true" (true to-code ),
-    (assert "false" (false to-code),
+(define "Value Conversion" (= ()
+  (should "true is converted to true." (= ()
+    (assert true (bool of true),
+  ),
+  (should "false is converted to false." (= ()
+    (assert false (bool of false),
+  ),
+  (should "null is converted to false." (= ()
+    (assert false (bool of null),
+    (assert false (bool of),
+  ),
+  (should "0 is converted to false." (= ()
+    (assert false (bool of 0),
+  ),
+  (should "Other values is converted to true." (= ()
+    (assert true (bool of 1),
+    (assert true (bool of -1),
+    (assert true (bool of NaN),
+    (assert true (bool of Infinity),
+    (assert true (bool of ""),
+    (assert true (bool of "X"),
+    (assert true (bool of (date of 0),
+    (assert true (bool of (range of 0),
+    (assert true (bool of (symbol of "X"),
+    (assert true (bool of (tuple of (@ 1 2),
+    (assert true (bool of (@),
+    (assert true (bool of (@ 1 2),
+    (assert true (bool of (@:),
+    (assert true (bool of (@ x:1),
   ),
 ).
 
-(define "(bool-value to-string )" (= ()
-  (should "return 'true' for true 'false' for 'false'." (= ()
-    (assert "true" (true to-string),
-    (assert "false" (false to-string),
+(define "Logical Operations" (= ()
+  (define "AND: &&" (= ()
+    (should "true and true is true" (= ()
+      (assert (true && true),
+    ),
+    (should "true and false is false" (= ()
+      (assert false (true && false),
+    ),
+    (should "false and true is false" (= ()
+      (assert false (false && true),
+    ),
+    (should "false and false is false" (= ()
+      (assert false (false && false),
+    ),
   ),
-).
-
-(define "(bool-value and value) or (bool-value && value)" (= ()
-  (should "return result by logical AND." (= ()
-    (assert (true and true),
-    (assert false (true and false),
-    (assert false (false and true),
-    (assert false (false and false),
-    (assert (true and),
-    (assert (true and 1),
-    (assert false (true and 0),
-    (assert false (true and null),
-
-    (assert (true && true),
-    (assert false (true && false),
-    (assert false (false && true),
-    (assert false (false && false),
-    (assert (true &&),
-    (assert (true && 1),
-    (assert false (true && 0),
-    (assert false (true && null),
+  (define "OR: ||" (= ()
+    (should "true or true is true" (= ()
+      (assert (true || true),
+    ),
+    (should "true or false is true" (= ()
+      (assert (true || false),
+    ),
+    (should "false or true is true" (= ()
+      (assert (false || true),
+    ),
+    (should "false or false is false" (= ()
+      (assert false (false || false),
+    ),
   ),
+  (define "NOT: not / !" (= ()
+    (should "the empty not op is defined as true" (= ()
+      (assert (not),
+      (assert (!),
+    ),
+    (should "the not value of true is false" (= ()
+      (assert false (not true),
+      (assert false (! true),
+    ),
+    (should "the not value of false is true" (= ()
+      (assert (not false),
+      (assert (! false),
+    ),
 ).
