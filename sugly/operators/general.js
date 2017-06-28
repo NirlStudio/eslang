@@ -10,7 +10,7 @@ module.exports = function general ($void) {
   var operator = $void.operator
   var thisCall = $void.thisCall
   var evaluate = $void.evaluate
-  var numberValueOf = $void.$.number.of
+  var numberValueOf = $.number.of
   var staticOperator = $void.staticOperator
 
   staticOperator('+', function (space, clause) {
@@ -79,17 +79,25 @@ module.exports = function general ($void) {
       return 0 // The value of this operator is defined as 0.
     }
     if (typeof operant !== 'string') {
-      operant = ''
+      return null
+    }
+    if (operant.length < 1) {
+      return operant
     }
     var clist = clause.$
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
-        operant = operant.replace(value, '')
+        if (operant.endsWith(value)) {
+          operant = operant.substring(0, operant.length - value.length)
+        }
       } else if (typeof value === 'number') {
         operant = operant.substring(0, operant.length - value)
       } else {
-        operant = operant.replace(thisCall(value, 'to-string'), '')
+        value = thisCall(value, 'to-string')
+        if (operant.endsWith(value)) {
+          operant = operant.substring(0, operant.length - value.length)
+        }
       }
     }
     var sym = clist[0]

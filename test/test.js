@@ -111,6 +111,8 @@ function checkNumber () {
 function checkString () {
   console.log('\n  - String')
   assert('String.prototype.trim')
+  assert('String.prototype.trimLeft')
+  assert('String.prototype.trimRight')
   assert('String.prototype.endsWith')
   assert('String.prototype.startsWith')
 }

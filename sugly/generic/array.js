@@ -122,7 +122,10 @@ module.exports = function ($void) {
     if (typeof begin !== 'number') {
       begin = 0
     }
-    return typeof end === 'number' ? this.slice(begin, end) : this.slice(begin)
+    if (typeof end !== 'number' || end >= this.length || end === 0) {
+      end = this.length
+    }
+    return this.slice(begin, end)
   })
 
   // append more items to the end of this array

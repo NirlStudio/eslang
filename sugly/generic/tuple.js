@@ -142,7 +142,16 @@ module.exports = function ($void) {
   // make a new copy with all items or some in a range.
   link(proto, 'copy', function (begin, end) {
     if (this instanceof Tuple$) {
+      if (typeof begin !== 'number') {
+        begin = 0
+      }
+      if (typeof end !== 'number' || end >= this.$.length || end === 0) {
+        end = this.$.length
+      }
       var s = this.$.slice(begin, end)
+      if (s.length === this.$.length) {
+        return this // a full copy returns the same tuple since it's readonly.
+      }
       return s && s.length > 0 ? new Tuple$(s, this.plain) : empty
     }
     return null

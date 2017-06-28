@@ -163,7 +163,7 @@ module.exports = function ($void) {
       }
       // as source code
       // TODO - revise to keep TZ & locale ? or use timestamp?
-      return '(date of ' + JSON.stringify(this) + ')'
+      return '(date of ' + this.getTime() + ')'
     }
     return null
   })

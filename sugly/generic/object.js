@@ -363,8 +363,11 @@ module.exports = function ($void) {
         fields.push('  ' + name + ': ' + thisCall(value, 'to-string'))
       }
     }, this)
+    if (fields.length < 2) {
+      fields[0] = '(@:'
+    }
     fields.push(')')
-    return fields.join('\n')
+    return fields.length > 2 ? fields.join('\n') : fields.join(' ')
   })
 
   // Indexer:

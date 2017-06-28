@@ -245,9 +245,10 @@ module.exports = function ($void) {
 
   // override a native type's proto indexer and inject the instance indexer
   // to native prototype.
+  var noFields = Object.create(null)
   $void.nativeIndexer = function nativeIndexer (type, nativeType, typeId, fieldsOrIndexer) {
     var indexer = typeof fieldsOrIndexer === 'function' ? fieldsOrIndexer
-      : createIntanceIndexer(type, nativeType, typeId, fieldsOrIndexer || {})
+      : createIntanceIndexer(type, nativeType, typeId, fieldsOrIndexer || noFields)
 
     var proto = type.proto
     var protoIndexer = createProtoIndexer(type)
