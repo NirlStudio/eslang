@@ -127,10 +127,10 @@ module.exports = function ($void) {
     }
     if (negativeNames) {
       if (!negate) {
-        var call = Function.prototype.call.bind(entity)
+        var apply = Function.prototype.apply.bind(entity)
         negate = function () {
-          var result = call(this, arguments)
-          typeof result === 'boolean' ? !result : result
+          var result = apply(this, arguments)
+          return typeof result === 'boolean' ? !result : result
         }
       }
       if (typeof negativeNames === 'string') {

@@ -39,8 +39,7 @@ module.exports = function execute ($void) {
     } else if (!args.arguments) {
       args.arguments = [] // ensure the existence of arguments.
     }
-    for (var i = 0; i < args.length; i++) {
-      var key = args[i]
+    for (var key in args) {
       if (key === 'arguments') {
         scope.context.arguments = args.arguments
       } else if (mainApp && key === 'env') {

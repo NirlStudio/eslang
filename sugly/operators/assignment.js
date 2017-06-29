@@ -1,10 +1,9 @@
 'use strict'
 
 module.exports = function assignment ($void) {
-  var $ = $void.$
-  var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
+  var Object$ = $void.Object
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
 
@@ -29,14 +28,16 @@ module.exports = function assignment ($void) {
   })
 
   // 'let' update the variable in most recent context.
-  // in function: (let var-name value), (let (var-name value) ...)
-  //              or (let (@ var-name ...) values)
+  // in function: (let var-name value)), or
+  //              (let (var-name ...) values), or
+  //              (let (field-name ...) object)
   // in operator: (let name-expr value-expr)
   staticOperator('let', createOperatorFor('let'))
 
   // 'var' explicitly declares a local variable in current function's context.
-  // in function: (var var-name value), (var (var-name value) ...)
-  //              or (var (@ var-name ...) values)
+  // in function: (var var-name value), or
+  //              (var (@ var-name ...) values), or
+  //              (var (field-name ...) object)
   // in operator: (var name-expr value-expr)
   staticOperator('var', createOperatorFor('var'))
 
@@ -61,40 +62,34 @@ module.exports = function assignment ($void) {
         return (space[method](sym.key, length < 3 ? null
           : tryToUpdateName(sym.key, evaluate(clist[2], space))))
       }
-      var i
-      // var (@ symbol ...) value-list)
-      if (sym instanceof Tuple$ && sym.$.length > 0 && sym.$[0] === $Symbol.object) {
-        var syms = sym.$
-        var values = length > 2 ? evaluate(clist[2], space) : null
-        if (Array.isArray(values)) { // assign the value one by one.
-          for (i = 1; i < syms.length; i++) {
-            if (syms[i] instanceof Symbol$) {
-              space[method](syms[i].key, i < values.length ? values[i] : null)
-            }
-          }
-        } else { // assign all symbols the same value.
-          for (i = 1; i < syms.length; i++) {
-            if (syms[i] instanceof Symbol$) {
-              space[method](syms[i].key, values)
-            }
-          }
-        }
-        return values
+      if (!(sym instanceof Tuple$) || sym.$.length < 1) {
+        return null // unrecognized pattern
       }
-      // (var (symbol value) ...)
+      // var (symbol ...) value-list)
+      var i
       var last = null
-      for (i = 1; i < length; i++) {
-        var pair = clist[i]
-        if (pair instanceof Tuple$ && pair.$.length > 0) {
-          pair = pair.$
-          sym = pair[0]
-          if (sym instanceof Symbol$) {
-            last = space[method](sym.key, pair.length > 1
-              ? tryToUpdateName(sym.key, evaluate(pair[1], space)) : null)
-            continue
+      var syms = sym.$
+      var values = length > 2 ? evaluate(clist[2], space) : null
+      if (Array.isArray(values)) { // assign the value one by one.
+        for (i = 0; i < syms.length; i++) {
+          if (syms[i] instanceof Symbol$) {
+            last = space[method](syms[i].key, i < values.length ? values[i] : null)
           }
         }
-        last = null
+      } else if (values instanceof Object$) { // read fields into an array.
+        for (i = 0; i < syms.length; i++) {
+          if (syms[i] instanceof Symbol$) {
+            var field = syms[i].key
+            var value = values[field]
+            last = space[method](field, typeof value === 'undefined' ? null : value)
+          }
+        }
+      } else { // assign all symbols the same value.
+        for (i = 0; i < syms.length; i++) {
+          if (syms[i] instanceof Symbol$) {
+            last = space[method](syms[i].key, values)
+          }
+        }
       }
       return last
     }

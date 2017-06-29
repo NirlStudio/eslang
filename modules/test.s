@@ -1,13 +1,8 @@
 # import rendering
-(let C (import "colors" "js").
-(let
-  (sign-passed (C passed),
-  (sign-failed (C failed),
-  (gray (C "gray"),
-  (green (C "green"),
-  (red (C "red"),
-  (underline (C "underline"),
-).
+(let colors (import "colors" "js").
+(let (gray green red underline) colors).
+(let (sign-passed sign-failed)
+  (import (passed failed) from colors).
 
 # to store all test cases.
 (let cases (@).

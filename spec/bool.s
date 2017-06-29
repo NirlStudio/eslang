@@ -2,7 +2,7 @@
 (let the-value false)
 (include "type_")
 
-(define "common behaviour" (= ()
+(define "Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "true is true" (= ()
       (assert (true is true),

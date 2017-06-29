@@ -173,11 +173,11 @@ module.exports = function ($void) {
         ? null : this.charCodeAt(offset)
   })
 
-  // Identity & Equivalence: override to be consistent with comparison
-  link(proto, ['is', 'equals', '=='], function (another) {
+  // Equivalence: override to be consistent with comparison
+  link(proto, ['equals', '=='], function (another) {
     return typeof this === 'string' && typeof another === 'string' &&
       this === another
-  }, ['is-not', 'not-equals', '!='], function (another) {
+  }, ['not-equals', '!='], function (another) {
     return typeof this !== 'string' || typeof another !== 'string' ||
       this !== another
   })

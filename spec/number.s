@@ -2,7 +2,7 @@
 (let the-value 0)
 (include "type_")
 
-(define "common behaviour" (= ()
+(define "Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "a number is its value" (= ()
       (assert (0 is 0),
@@ -826,5 +826,66 @@
     (assert true (NaN <= NaN), # NaN is comparable with itself
     (assert null (NaN <= Infinity),
     (assert null (NaN <= -Infinity),
+  ),
+).
+
+(define "Number Conversion" (= ()
+  (should "abs returns the absolute value of this number." (= ()
+    (assert 0 (0 abs),
+    (assert 1 (-1 abs),
+    (assert 1 (1 abs),
+    (assert 1.5 (-1.5 abs),
+    (assert 1.5 (1.5 abs),
+    (assert NaN (NaN abs),
+    (assert Infinity (Infinity abs),
+    (assert Infinity (-Infinity abs),
+  ),
+  (should "ceil returns the integer value great or equal this number." (= ()
+    (assert 0 (0 ceil),
+    (assert -1 (-1 ceil),
+    (assert 1 (1 ceil),
+    (assert -1 (-1.5 ceil),
+    (assert 2 (1.5 ceil),
+    (assert NaN (NaN ceil),
+    (assert Infinity (Infinity ceil),
+    (assert -Infinity (-Infinity ceil),
+  ),
+  (should "floor returns the integer value less or equal this number." (= ()
+    (assert 0 (0 floor),
+    (assert -1 (-1 floor),
+    (assert 1 (1 floor),
+    (assert -2 (-1.5 floor),
+    (assert 1 (1.5 floor),
+    (assert NaN (NaN floor),
+    (assert Infinity (Infinity floor),
+    (assert -Infinity (-Infinity floor),
+  ),
+  (should "round returns the closest integer value of this number by 0.5." (= ()
+    (assert 0 (0 round),
+    (assert -1 (-1 round),
+    (assert 1 (1 round),
+    (assert -1 (-1.49 round),
+    (assert -1 (-1.5 round),
+    (assert -2 (-1.51 round),
+    (assert 1 (1.49 round),
+    (assert 2 (1.5 round),
+    (assert 2 (1.51 round),
+    (assert NaN (NaN round),
+    (assert Infinity (Infinity round),
+    (assert -Infinity (-Infinity round),
+  ),
+  (should "trunc returns the integer part of this number." (= ()
+    (assert 0 (0 trunc),
+    (assert -1 (-1 trunc),
+    (assert 1 (1 trunc),
+    (assert -1 (-1.49 trunc),
+    (assert -1 (-1.5 trunc),
+    (assert -1 (-1.51 trunc),
+    (assert 1 (1.49 trunc),
+    (assert 1 (1.5 trunc),
+    (assert 1 (1.51 trunc),
+    (assert NaN (NaN trunc),
+    (assert Infinity (Infinity trunc),
+    (assert -Infinity (-Infinity trunc),
   ),
 ).

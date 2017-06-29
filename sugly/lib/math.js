@@ -12,14 +12,14 @@ module.exports = function ($void, JS) {
   // TODO: naming & removing?
   copyType(math, JS.Math, {
     /* basic */
-    'E': 'E',
-    'LN10': 'LN10',
-    'LN2': 'LN2',
-    'LOG10E': 'LOG10E',
-    'LOG2E': 'LOG2E',
-    'PI': 'PI',
-    'SQRT1_2': 'SQRT1_2',
-    'SQRT2': 'SQRT2',
+    'E': 'e',
+    'LN2': 'ln-2',
+    'LN10': 'ln-10',
+    'LOG2E': 'log2-e',
+    'LOG10E': 'log10-e',
+    'PI': 'pi',
+    'SQRT1_2': 'sqrt-1/2',
+    'SQRT2': 'sqrt-2',
 
     'sin': 'sin',
     'cos': 'cos',
@@ -29,18 +29,14 @@ module.exports = function ($void, JS) {
     'atan': 'atan',
     'atan2': 'atan2',
 
+    'log': 'ln',
     'exp': 'exp',
-    'log': 'log',
     'pow': 'pow',
+    'sqrt': 'sqrt',
 
     'max': 'max',
     'min': 'min',
 
-    'random': 'random',
-
-    /* extended */
-    'cbrt': 'cbrt',
-    'log2': 'log2',
-    'log10': 'log10'
+    'random': 'random'
   })
 }

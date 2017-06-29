@@ -4,21 +4,58 @@ module.exports = function import_ ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
+  var Symbol$ = $void.Symbol
+  var Object$ = $void.Object
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
+  var symbolFrom = $void.sharedSymbolOf('from')
 
   // import: a module from source.
+  //   (import src), or
+  //   (import field from src), or
+  //   (import (fields ...) from src)
   staticOperator('import', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return null
     }
-    // look into current space to have the base uri.
-    return importModule(space.local['-module'].uri,
-      evaluate(clist[1], space),
-      clist.length > 2 ? evaluate(clist[2], space) : null
-    )
+    if (clist.length < 4 || clist[2] !== symbolFrom) {
+      // look into current space to have the base uri.
+      return importModule(space.local['-module'].uri,
+        evaluate(clist[1], space),
+        clist.length > 2 ? evaluate(clist[2], space) : null
+      )
+    }
+    // (import field-or-fields from src)
+    var src = evaluate(clist[3], space)
+    var imported = src instanceof Object$ ? src // importing from an object
+      : importModule(space.local['-module'].uri, src,
+          clist.length > 4 ? evaluate(clist[4], space) : null)
+    if (!imported) {
+      return null // importing failed.
+    }
+    // find out fields
+    var i
+    var fields = clist[1]
+    if (fields instanceof Symbol$) {
+      fields = [fields.key]
+    } else if (fields instanceof Tuple$) {
+      var flist = fields.$
+      fields = []
+      for (i = 0; i < flist.length; i++) {
+        if (flist[i] instanceof Symbol$) {
+          fields.push(flist[i].key)
+        }
+      }
+    }
+    // import fields into an array.
+    var values = []
+    for (i = 0; i < fields.length; i++) {
+      var value = imported[fields[i]]
+      values.push(typeof value === 'undefined' ? null : value)
+    }
+    return values
   })
 
   // expose to be called by native code.
@@ -54,7 +91,7 @@ module.exports = function import_ ($void) {
     }
     // look up it in cache.
     if (modules[uri]) {
-      return modules[uri].export
+      return modules[uri].exporting
     }
     // try to load file
     var text = loader.read(uri)
@@ -106,7 +143,7 @@ module.exports = function import_ ($void) {
     }
     // look up it in cache.
     if (modules[uri]) {
-      return modules[uri].export
+      return modules[uri].exporting
     }
     try {
       var importing = require(uri) // the JS module must export a loader function.

@@ -2,7 +2,7 @@
 (let the-value "")
 (include "type_")
 
-(define "common behaviour" (= ()
+(define "Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "a string is itself." (= ()
       (assert ("" is ""),
