@@ -59,11 +59,12 @@ function iterator ($void) {
       return null
     }
     var list = this.$
-    var index = 0
+    var current = null
+    var next = 0
     return function (inSitu) {
-      return (index >= list.length) ? null
-        : typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
-          ? [list[index]] : [list[index++]]
+      return current !== null && typeof inSitu !== 'undefined' &&
+        inSitu !== false && inSitu !== null && inSitu !== 0 ? list[current]
+        : (next >= list.length) ? null : [list[(current = next++)]]
     }
   }
 }

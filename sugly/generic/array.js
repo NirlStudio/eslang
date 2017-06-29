@@ -51,11 +51,15 @@ function iterator ($void) {
       return null
     }
     var list = this
-    var index = 0
+    var current = null
+    var next = 0
     return function (inSitu) {
-      return (index >= list.length) ? null
-        : typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
-          ? [list[index]] : [list[index++]]
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current // cached current value
+      }
+      return next >= list.length ? null // no more
+        : (current = [list[next++]])
     }
   }
 }

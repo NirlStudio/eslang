@@ -30,27 +30,21 @@ function iterator ($void) {
       return null
     }
     var iter = this.entries()
-    var current = iter.next()
-    if (current.value) {
-      current = [current.value[0]]
-    } else {
-      current = null
-    }
+    var current = null
+    var next = iter.next()
+    next = next.value ? [next.value[0]] : null
     return function (inSitu) {
-      inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
-        inSitu !== null && inSitu !== 0
-      if (inSitu || current === null) {
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
         return current
-      } else {
-        var cur = current
-        current = iter.next()
-        if (current.value) {
-          current = [current.value[0]]
-        } else {
-          current = null
-        }
-        return cur
       }
+      if (next === null) {
+        return null // no more.
+      }
+      current = next // move to next
+      next = iter.next()
+      next = next.value ? [next.value[0]] : null
+      return current
     }
   }
 }

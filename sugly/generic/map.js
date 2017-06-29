@@ -35,27 +35,21 @@ function iterator ($void) {
       return null
     }
     var iter = this.entries()
-    var current = iter.next()
-    if (current.value) {
-      current = current.value
-    } else {
-      current = null
-    }
+    var current = null
+    var next = iter.next()
+    next = next.value ? next.value : null
     return function (inSitu) {
-      inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
-        inSitu !== null && inSitu !== 0
-      if (inSitu || current === null) {
-        return current
-      } else {
-        var cur = current
-        current = iter.next()
-        if (current.value) {
-          current = current.value
-        } else {
-          current = null
-        }
-        return cur
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current // cached current value
       }
+      if (next === null) {
+        return // no more.
+      }
+      current = next // move to next
+      next = iter.next()
+      next = next.value ? next.value : null
+      return current
     }
   }
 }
@@ -66,27 +60,20 @@ function iteratorKeys ($void) {
       return null
     }
     var iter = this.keys()
-    var current = iter.next()
-    if (current.done) {
-      current = null
-    } else {
-      current = [current.value]
-    }
+    var current = null
+    var next = iter.next()
+    next = next.done ? null : [next.value]
     return function (inSitu) {
-      inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
-        inSitu !== null && inSitu !== 0
-      if (inSitu || current === null) {
-        return current
-      } else {
-        var cur = current
-        current = iter.next()
-        if (current.done) {
-          current = null
-        } else {
-          current = [current.value]
-        }
-        return cur
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current // cached current value
       }
+      if (next === null) {
+        return null // no more.
+      }
+      current = next // move to next
+      next = next.done ? null : [next.value]
+      return current
     }
   }
 }
@@ -97,27 +84,21 @@ function iteratorValues ($void) {
       return null
     }
     var iter = this.values()
-    var current = iter.next()
-    if (current.done) {
-      current = null
-    } else {
-      current = [current.value]
-    }
+    var current = null
+    var next = iter.next()
+    next = next.done ? null : [next.value]
     return function (inSitu) {
-      inSitu = typeof inSitu !== 'undefined' && inSitu !== false &&
-        inSitu !== null && inSitu !== 0
-      if (inSitu || current === null) {
-        return current
-      } else {
-        var cur = current
-        current = iter.next()
-        if (current.done) {
-          current = null
-        } else {
-          current = [current.value]
-        }
-        return cur
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current // cached current value
       }
+      if (next === null) {
+        return null // no more.
+      }
+      current = next // move to next
+      next = iter.next()
+      next = next.done ? null : [next.value]
+      return current
     }
   }
 }
@@ -307,7 +288,7 @@ module.exports = function ($void) {
       ])
     }
     var list = [$Symbol.object, $Symbol.pairing, $Symbol.of('map')] // (@:map ...
-    var i
+    var i, item
     if (ctx.isReferred(map)) { // nested reference.
       // downgrade to an data array of key/value pairs: (@ (@key value) ...)
       list = [$Symbol.object]

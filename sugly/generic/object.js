@@ -46,14 +46,18 @@ function iterator ($void) {
     }
     var fields = Object.getOwnPropertyNames(this)
     var obj = this
-    var index = 0
+    var current = null
+    var next = 0
     return function (inSitu) {
-      if (index >= fields.length) {
-        return null
+      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current // cached current value
       }
-      var field = typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0
-        ? fields[index] : fields[index++]
-      return [field, obj[field]]
+      if (next >= fields.length) {
+        return null // no more
+      }
+      var field = fields[next++]
+      return (current = [field, obj[field]])
     }
   }
 }

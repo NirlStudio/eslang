@@ -7,16 +7,20 @@ function iterator ($void) {
       return null
     }
     var range = this
-    var value = this.begin
+    var current = null
+    var next = this.begin
     return function (inSitu) {
-      if (range.step > 0 ? value >= range.end : value <= range.end) {
+      if (current !== null &&
+          typeof inSitu !== 'undefined' && inSitu !== false &&
+          inSitu !== null && inSitu !== 0) {
+        return current
+      }
+      if (range.step > 0 ? next >= range.end : next <= range.end) {
         return null
       }
-      if (typeof inSitu !== 'undefined' && inSitu !== false && inSitu !== null && inSitu !== 0) {
-        return value
-      }
-      var v = value; value += range.step
-      return v
+      current = next
+      next += range.step
+      return current
     }
   }
 }
