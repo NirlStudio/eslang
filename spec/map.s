@@ -1,7 +1,0 @@
-(define "Type" (= ()
-
-).
-
-(define "Usage" (= ()
-
-).
