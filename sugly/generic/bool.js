@@ -4,45 +4,41 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.bool
   var link = $void.link
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var nativeIndexer = $void.nativeIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // the empty value of bool is the false.
-  link(Type, 'empty', false)
+  initializeType(Type, false)
 
   // booleanize
   $void.boolValueOf = link(Type, 'of', function (value) {
     return typeof value !== 'undefined' && value !== null && value !== 0 && value !== false
   })
 
-  // override type's indexer
-  typeIndexer(Type)
-
   var proto = Type.proto
-
   // logical operations are defined as general operators.
-
-  typeVerifier(Type)
 
   // Emptiness - false is the empty value
   link(proto, 'is-empty', function () {
-    return typeof this === 'boolean' ? !this : null
-  }, 'not-empty', function bool$notEmpty () {
-    return typeof this === 'boolean' ? this : null
+    return this === false
+  }, 'not-empty', function () {
+    return this !== false
   })
 
-  // Encoding: standardize to a boolean value.
+  // Encoding
   link(proto, 'to-code', function () {
     return typeof this === 'boolean' ? this : null
   })
 
   // Representation
   link(proto, 'to-string', function () {
-    return typeof this === 'boolean'
-      ? this ? 'true' : 'false'
-      : null
+    return typeof this === 'boolean' ? this.toString()
+      : this === proto ? '(bool proto)' : null
   })
 
-  nativeIndexer(Type, Boolean, 'boolean')
+  // add indexer
+  protoIndexer(Type)
+
+  // inject type
+  Boolean.prototype.type = Type // eslint-disable-line no-extend-native
 }

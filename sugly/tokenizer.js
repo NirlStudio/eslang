@@ -93,11 +93,9 @@ module.exports = function ($void) {
           raiseToken('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
         case "'": // TODO: static string?
-          stringPadding === -1
           beginWaiting("'", singleQuoteWaiter)
           break
         case '"': // TODO: format string?
-          stringPadding === -1
           beginWaiting('"', doubleQuoteWaiter)
           break
         case '#':

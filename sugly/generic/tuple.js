@@ -77,22 +77,21 @@ module.exports = function ($void) {
   var Range$ = $void.Range
   var Symbol$ = $void.Symbol
   var link = $void.link
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var createProtoIndexer = $void.createProtoIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // the empty value
-  var empty = link(Type, 'empty', new Tuple$([]))
+  var empty = initializeType(Type, new Tuple$([]))
   // a empty value for plain tuple.
-  link(Type, 'plain', new Tuple$([], true))
+  var plain = link(Type, 'plain', new Tuple$([], true))
 
   // a shared value to indicate a unkown structure.
   link(Type, 'unknown', new Tuple$([$Symbol.etc]))
 
   // empty operations
-  link(Type, 'lambda', new Tuple$([$Symbol.lambda, empty]))
-  link(Type, 'function', new Tuple$([$Symbol.function, empty]))
-  link(Type, 'operator', new Tuple$([$Symbol.operator, empty]))
+  link(Type, 'lambda', new Tuple$([$Symbol.lambda, empty, plain]))
+  link(Type, 'function', new Tuple$([$Symbol.function, empty, plain]))
+  link(Type, 'operator', new Tuple$([$Symbol.operator, empty, plain]))
 
   // empty objects
   link(Type, 'array', new Tuple$([$Symbol.object]))
@@ -115,47 +114,52 @@ module.exports = function ($void) {
 
   // create a common tuple (statement) of the argument values.
   link(Type, 'of', function () {
-    var list = append.apply([], arguments)
-    return new Tuple$(list)
+    return new Tuple$(append.apply([], arguments))
   })
 
   // create a plain tuple (code block or list of statements) of the argument values
   link(Type, 'of-plain', function () {
-    var list = append.apply([], arguments)
-    return new Tuple$(list, true)
+    return new Tuple$(append.apply([], arguments), true)
   })
 
   // create a tuple by elements from the iterable arguments or the argument
   // values itself if it's not iterable.
   link(Type, 'from', createTupleFrom($void, accepts, empty))
 
-  typeIndexer(Type)
-
   var proto = Type.proto
   // generate an iterator function to traverse all items.
   link(proto, 'iterate', iterator($void))
 
-  // return the length of this tuple.
-  link(proto, 'length', function () {
-    return this instanceof Tuple$ ? this.$.length : null
-  })
-
   // make a new copy with all items or some in a range.
   link(proto, 'copy', function (begin, end) {
-    if (this instanceof Tuple$) {
-      if (typeof begin !== 'number') {
+    if (!(this instanceof Tuple$)) {
+      return null
+    }
+    if (typeof begin !== 'number') {
+      begin = 0
+    } else if (begin < 0) {
+      begin += this.$.length
+      if (begin < 0) {
         begin = 0
       }
-      if (typeof end !== 'number' || end >= this.$.length || end === 0) {
-        end = this.$.length
-      }
-      var s = this.$.slice(begin, end)
-      if (s.length === this.$.length) {
-        return this // a full copy returns the same tuple since it's readonly.
-      }
-      return s && s.length > 0 ? new Tuple$(s, this.plain) : empty
     }
-    return null
+    if (typeof end !== 'number') {
+      end = this.$.length
+    } else if (end < 0) {
+      end += this.$.length
+      if (end < 0) {
+        end = 0
+      }
+    } else if (end > this.$.length) {
+      end = this.$.length
+    }
+    var s = this.$.slice(begin, end)
+    if (s.length === this.$.length) {
+      return this // a full copy returns the same tuple since it's readonly.
+    }
+    return s && s.length > 0
+      ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
+      : this.plain ? plain : empty
   })
 
   // retrieve the first element.
@@ -176,7 +180,7 @@ module.exports = function ($void) {
     }
     var list = this.$.slice(0) // copy a new list
     append.apply(list, arguments) // append & fix
-    return new Tuple$(list, this.plain)
+    return list.length > this.$.length ? new Tuple$(list, this.plain) : this
   })
 
   // merge this tuple and items from the argument tuples.
@@ -191,16 +195,13 @@ module.exports = function ($void) {
         Array.prototype.push.apply(list, t.$)
       }
     }
-    return new Tuple$(list, this.plain)
+    return list.length > this.$.length ? new Tuple$(list, this.plain) : this
   })
 
   // convert to an array, the items will be left as they're.
   link(proto, 'to-array', function () {
     return this instanceof Tuple$ ? this.$.slice(0) : null
   })
-
-  // Type Verification
-  typeVerifier(Type)
 
   // Emptiness: an empty tuple has no items.
   link(proto, 'is-empty', function () {
@@ -213,6 +214,7 @@ module.exports = function ($void) {
   link(proto, 'to-code', function () {
     return this instanceof Tuple$ ? this : null
   })
+
   // expand to a string list as an enclosed expression or a series of expressions.
   var toList = link(proto, 'to-list', function (indent, list) {
     if (!(this instanceof Tuple$)) {
@@ -255,30 +257,46 @@ module.exports = function ($void) {
   // Representation: as an enclosed expression or a plain series of expression.
   link(proto, 'to-string', function (indent) {
     return this instanceof Tuple$
-      ? toList.call(this, indent).join(' ') : null
+      ? toList.call(this, indent).join(' ')
+      : this === proto ? '(tuple proto)' : null
   })
 
   // Indexer
-  var protoIndexer = createProtoIndexer(Type)
-  link(proto, ':', function (index, length) {
+  protoIndexer(Type, function (index, length) {
     if (!(this instanceof Tuple$)) {
-      return this === proto ? protoIndexer(index, length) : null
+      return null
     }
     // getting properties
     if (typeof index === 'string') {
-      return index === ':' ? null
-        : index === 'type' ? Type // fake field
-          : index === 'plain' ? this.plain // expose length
-            : typeof proto[index] === 'undefined' ? null : proto[index]
+      return index === 'length' ? this.$.length
+        : index === 'plain' ? this.plain : proto[index]
     }
     // read items
-    if (typeof index === 'number') {
-      index = Math.trunc(index)
-      var list = this.$
-      return typeof length === 'number' && length > 0
-        ? new Tuple$(list.slice(index, index + length)) // slice to create a new tuple.
-        : index >= 0 && index < list.length ? list[index] : null // get an item.
+    if (typeof index !== 'number') {
+      return null
     }
-    return null
+    // use the same behaviour of string.
+    index = Math.trunc(index)
+    var list = this.$
+    if (index < 0) {
+      index += list.length
+      if (index < 0) {
+        index = 0
+      }
+    } else if (index >= list.length) {
+      return this.plain ? plain : empty
+    }
+    if (typeof length !== 'number') {
+      length = 1
+    } else if (length <= 0) {
+      return this.plain ? plain : empty
+    }
+    if (index + length > list.length) {
+      length = list.length - index
+    }
+    var l = list.slice(index, index + length)
+    return l.length === list.length ? this
+      : l.length < 1 ? this.plain ? plain : empty
+        : new Tuple$(l, this.plain)
   })
 }

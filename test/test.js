@@ -71,7 +71,8 @@ function assert (feature, expectedType) {
       break
     }
   }
-  typeof last === expectedType ? passed(feature) : failed(feature)
+  var typeName = typeof last
+  typeName === expectedType ? passed(feature) : failed(feature)
 }
 
 function checkSystem () {
@@ -177,7 +178,7 @@ function checkSuglyRuntime ($void) {
   checkObjects($void.$, '[Sugly / types] ', [
     'bool', 'string', 'number', 'date', 'range', 'symbol', 'tuple',
     'operator', 'lambda', 'function',
-    'object', 'module', 'class', 'device', 'array', 'set', 'map'
+    'object', 'module', 'class', 'device', 'array'
   ])
 
   checkObjects($void.$, '[Sugly / objects] ', [
@@ -186,7 +187,7 @@ function checkSuglyRuntime ($void) {
 
   checkFunctions($void.$, '[Sugly / functions] ', [
     // generic
-    'iterate', 'traverse', 'collect', 'call', 'apply',
+    'type-of', 'indexer-of', 'iterate', 'traverse', 'collect',
     // lib
     'encode', 'print', 'warn',
     // startup
@@ -196,6 +197,12 @@ function checkSuglyRuntime ($void) {
   ])
 
   checkInjections()
+
+  checkTypeOf($void)
+
+  checkIndexerOf($void)
+
+  checkTypes($void)
 }
 
 function checkStaticOperators ($void, group, names) {
@@ -236,11 +243,155 @@ function checkObjects ($, group, names) {
 
 function checkInjections () {
   console.log('\n  - Type Injections')
-  assert('Boolean.prototype.:')
-  assert('String.prototype.:')
-  assert('Number.prototype.:')
-  assert('Date.prototype.:')
-  assert('Object.prototype.:')
-  assert('Array.prototype.:')
-  assert('Function.prototype.:')
+  assert('Boolean.prototype.type', 'object')
+  assert('String.prototype.type', 'object')
+  assert('Number.prototype.type', 'object')
+  assert('Date.prototype.type', 'object')
+  assert('Object.prototype.type', 'object')
+  assert('Array.prototype.type', 'object')
+  assert('Function.prototype.type', 'object')
+}
+
+function check (result, name) {
+  result ? passed(name) : failed(name)
+}
+
+function checkTypeOf ($void) {
+  console.log('\n  - Static type-of')
+  var typeOf = $void.typeOf
+  check(typeOf() === null, 'undefined')
+  check(typeOf(null) === null, 'null')
+
+  var $ = $void.$
+  check(typeOf(true) === $.bool, 'bool')
+  check(typeOf('') === $.string, 'string')
+  check(typeOf(1) === $.number, 'number')
+  check(typeOf(new Date()) === $.date, 'date')
+  check(typeOf(function () {}) === $.function, 'function')
+  check(typeOf([]) === $.array, 'array')
+  check(typeOf({}) === $.object, 'object')
+}
+
+function checkIndexerOf ($void) {
+  console.log('\n  - Static indexer-of')
+  var $ = $void.$
+  var indexerOf = $void.indexerOf
+  check(indexerOf() === $void.null[':'], 'undefined')
+  check(indexerOf(null) === $void.null[':'], 'null')
+
+  check(indexerOf($.bool) === $.bool[':'], 'bool')
+  check($.bool[':']('type') === $.type, 'bool:type')
+  check($.bool[':'](':') === $.bool[':'], 'bool::')
+  check($.bool[':']('of') === $.bool.of, 'bool:of')
+  check(indexerOf(true) === $.bool.proto[':'], 'bool:true')
+  check(indexerOf(false) === $.bool.proto[':'], 'bool:false')
+  check($.bool.proto[':']('type') === $.bool, 'bool::type')
+  check($.bool.proto[':'](':') === $.bool.proto[':'], 'bool:::')
+
+  check(indexerOf($.string) === $.string[':'], 'string')
+  check(indexerOf('') === $.string.proto[':'], 'string:""')
+
+  check(indexerOf($.number) === $.number[':'], 'number')
+  check(indexerOf(0) === $.number.proto[':'], 'number:0')
+
+  check(indexerOf($.date) === $.date[':'], 'date')
+  check(indexerOf(new Date()) === $.date.proto[':'], '(date of)')
+
+  check(indexerOf($.range) === $.range[':'], 'range')
+  check(indexerOf(new $void.Range()) === $.range.proto[':'], '(range of)')
+
+  check(indexerOf($.symbol) === $.symbol[':'], 'symbol')
+  check(indexerOf(new $void.Symbol('x')) === $.symbol.proto[':'], '(symbol of)')
+
+  check(indexerOf($.operator) === $.operator[':'], 'operator')
+  check(indexerOf($.lambda) === $.lambda[':'], 'lambda')
+  check(indexerOf($.function) === $.function[':'], 'function')
+  check(indexerOf(function () {}) === $.function.proto[':'], 'number:0')
+
+  check(indexerOf($.array) === $.array[':'], 'array')
+  check(indexerOf([]) === $.array.proto[':'], 'array:[]')
+
+  check(indexerOf($.object) === $.object[':'], 'object')
+  check(indexerOf({}) === $.object.proto[':'], 'object:{}')
+}
+
+function checkTypes ($void) {
+  console.log('\n  - Primary Types')
+  var $ = $void.$
+  var seval = function (expr, value) {
+    var result = $void.$.eval(expr)
+    var success = typeof value === 'function' ? value(result) : result === value
+    if (!success) {
+      failed(' - ' + expr + ' is evaluated to a value of' + (typeof result))
+    }
+    return success
+  }
+  check(seval(
+    '', null
+  ), 'null')
+
+  check(seval(
+    'type', $.type
+  ), 'type')
+
+  check(seval(
+    'bool', $.bool
+  ), 'bool')
+  check(seval(
+    'true', true
+  ), 'bool:true')
+  check(seval(
+    'false', false
+  ), 'bool:false')
+  check(seval(
+    '(bool of)', false
+  ), '(bool of)')
+  check(seval(
+    '(bool of 1)', true
+  ), '(bool of 1)')
+
+  check(seval(
+    'string', $.string
+  ), 'string')
+  check(seval(
+    'number', $.number
+  ), 'number')
+  check(seval(
+    'date', $.date
+  ), 'date')
+  check(seval(
+    'range', $.range
+  ), 'range')
+  check(seval(
+    'symbol', $.symbol
+  ), 'symbol')
+  check(seval(
+    'tuple', $.tuple
+  ), 'tuple')
+  check(seval(
+    'operator', $.operator
+  ), 'operator')
+  check(seval(
+    'lambda', $.lambda
+  ), 'lambda')
+  check(seval(
+    'function', $.function
+  ), 'function')
+  check(seval(
+    '(array of 1 2)', function (a) {
+      return a.length === 2 && a[0] === 1 && a[1] === 2
+    }
+  ), '(array of 1 2)')
+  check(seval(
+    '', null
+  ), 'object')
+  check(seval(
+    '', null
+  ), 'module')
+  check(seval(
+    '', null
+  ), 'class')
+  check(seval(
+    '', null
+  ), 'device')
 }

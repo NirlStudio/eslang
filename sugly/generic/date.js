@@ -5,13 +5,12 @@ module.exports = function ($void) {
   var Type = $.date
   var $Number = $.number
   var link = $void.link
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var nativeIndexer = $void.nativeIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
   var numberCompare = $Number.proto.compare
 
   // empty value
-  link(Type, 'empty', new Date(0))
+  initializeType(Type, new Date(0))
 
   // parse a date/time string representation to a date object.
   link(Type, 'parse', function (str) {
@@ -59,8 +58,6 @@ module.exports = function ($void) {
     return (new Date()).getTime()
   })
 
-  typeIndexer(Type)
-
   var proto = Type.proto
 
   // test if this is a valid date.
@@ -73,7 +70,7 @@ module.exports = function ($void) {
   // retrieve the date fields: year, month, day, week-day
   link(proto, 'date', function (utc) {
     return this instanceof Date && !isNaN(this.getTime())
-      ? typeof utc !== 'undefined' && utc !== false && utc !== null && utc !== 0
+      ? utc === true
         ? [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()]
         : [this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()]
       : null
@@ -81,15 +78,15 @@ module.exports = function ($void) {
   // retrieve the time fields: hours, minutes, seconds, milliseconds
   link(proto, 'time', function (utc) {
     return this instanceof Date && !isNaN(this.getTime())
-      ? typeof utc !== 'undefined' && utc !== false && utc !== null && utc !== 0
+      ? utc === true
         ? [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]
         : [this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()]
       : null
   })
-  // retrieve the date fields: year, month, day, week-day
+  // retrieve all fields: year, month, day, week-day, hours, minutes, seconds, milliseconds
   link(proto, 'date-time', function (utc) {
     return this instanceof Date && !isNaN(this.getTime())
-      ? typeof utc !== 'undefined' && utc !== false && utc !== null && utc !== 0
+      ? utc === true
         ? [[this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()],
           [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]]
         : [[this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()],
@@ -154,9 +151,6 @@ module.exports = function ($void) {
     return typeof order === 'number' ? order <= 0 : null
   })
 
-  // Type Verification
-  typeVerifier(Type)
-
   // emptiness is defined to the 0 value of timestamp.
   link(proto, 'is-empty', function () {
     if (this instanceof Date) {
@@ -164,7 +158,13 @@ module.exports = function ($void) {
       return ts === 0 || isNaN(ts)
     }
     return null
-  }, 'not-empty')
+  }, 'not-empty', function () {
+    if (this instanceof Date) {
+      var ts = this.getTime()
+      return ts !== 0 && !isNaN(ts)
+    }
+    return null
+  })
 
   // Encoding
   link(proto, 'to-code', function () {
@@ -174,30 +174,30 @@ module.exports = function ($void) {
   // Representation for instance & description for proto itself.
   link(proto, 'to-string', function (format, localed) {
     if (!(this instanceof Date)) {
-      return null
+      return this === proto ? '(date proto)' : null
     }
     if (typeof format === 'boolean') {
       localed = format
       format = ''
     } else if (typeof format !== 'string') {
-      // encoding for source code.
-      // TODO - revise to keep TZ & locale ? or use timestamp?
+      // maybe encoding for source code.
       return '(date of ' + this.getTime() + ')'
     }
-    localed = typeof localed !== 'undefined' && localed !== false &&
-      localed !== null && localed !== 0
     switch (format) {
       case 'utc':
         return this.toUTCString()
       case 'date':
-        return localed ? this.toLocaleDateString() : this.toDateString()
+        return localed === true ? this.toLocaleDateString() : this.toDateString()
       case 'time':
-        return localed ? this.toLocaleTimeString() : this.toTimeString()
+        return localed === true ? this.toLocaleTimeString() : this.toTimeString()
       default:
-        return localed ? this.toLocaleString() : this.toString()
+        return localed === true ? this.toLocaleString() : this.toString()
     }
   })
 
   // Indexer for proto and instances
-  nativeIndexer(Type, Date, Date)
+  protoIndexer(Type)
+
+  // inject type
+  Date.prototype.type = Type // eslint-disable-line no-extend-native
 }

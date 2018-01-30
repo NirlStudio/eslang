@@ -5,16 +5,15 @@ module.exports = function ($void) {
   var Type = $.symbol
   var link = $void.link
   var Symbol$ = $void.Symbol
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var managedIndexer = $void.managedIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // common symbol repository
   var sharedSymbols = $void.sharedSymbols
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty symbol.
-  link(Type, 'empty', sharedSymbolOf(''))
+  initializeType(Type, sharedSymbolOf(''))
 
   // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
   link($, '...', null)
@@ -41,9 +40,6 @@ module.exports = function ($void) {
     return sharedSymbols[key] || new Symbol$(key)
   })
 
-  // Indexer for the type.
-  typeIndexer(Type)
-
   var proto = Type.proto
 
   // Identity and Equivalence is determined by the key
@@ -57,18 +53,15 @@ module.exports = function ($void) {
   link(proto, 'compare', function (another) {
     return this === another ? 0
       : this instanceof Symbol$ && another instanceof Symbol$
-        ? this.key.localeCompare(another.key)
+        ? this.key === another.key ? 0 : null
         : null
   })
 
-  // Type Verification
-  typeVerifier(Type)
-
   // Emptiness: The empty symbol's key is an empty string.
   link(proto, 'is-empty', function () {
-    return this.key === ''
+    return this instanceof Symbol$ ? this.key === '' : null
   }, 'not-empty', function () {
-    return this.key !== ''
+    return this instanceof Symbol$ ? this.key !== '' : null
   })
 
   // Encoding
@@ -78,11 +71,12 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function () {
-    return this instanceof Symbol$ ? this.key : null
+    return this instanceof Symbol$ ? this.key
+      : this === proto ? '(symbol proto)' : null
   })
 
-  // add default implementation for missing methods.
-  managedIndexer(Type, Symbol$, {
-    key: 1 // public fields.
-  })
+  // add indexer
+  protoIndexer(Type, Object.assign(Object.create(null), {
+    key: 'key'
+  }))
 }

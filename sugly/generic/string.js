@@ -5,39 +5,34 @@ module.exports = function ($void) {
   var Type = $.string
   var link = $void.link
   var thisCall = $void.thisCall
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var nativeIndexer = $void.nativeIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // the empty value
-  link(Type, 'empty', '')
+  initializeType(Type, '')
 
   // generate a string from inputs.
   link(Type, 'of', function (value) {
-    // return the empty value without argument.
+    // return the empty value without an argument.
     if (typeof value === 'undefined') {
       return ''
-    }
-    // returns the original string if there's only one string argument.
-    if (typeof value === 'string' && arguments.length < 2) {
-      return value
     }
     // concat the trimed values of strings and to-string results of non-strings.
     var result = []
     for (var i = 0; i < arguments.length; i++) {
       var str = arguments[i]
       if (typeof str !== 'string') {
-        str = $void.thisCall(str, 'to-string')
+        str = thisCall(str, 'to-string')
         if (typeof str !== 'string') {
-          str = '()'
+          str = ''
         }
       }
-      str = str.trim()
       if (str) {
         result.push(str)
       }
     }
-    return result.join(' ')
+    return result.length < 1 ? ''
+      : result.length === 1 ? result[0] : result.join('')
   })
 
   // generate a string from a series of unicode values
@@ -46,23 +41,38 @@ module.exports = function ($void) {
     return typeof str === 'undefined' ? '' : str
   })
 
-  typeIndexer(Type)
-
   var proto = Type.proto
   // Searching
   // TODO: match & search with regex?
   // retrieve the first char or the index of the first occurence of value.
   link(proto, 'first', function (value, from) {
-    return typeof this !== 'string' ? null
-      : typeof value !== 'string' ? this.length > 0 ? this.charAt(0) : null
-        : this.indexOf(value, typeof from !== 'number' ? 0 : from)
+    if (typeof this !== 'string') {
+      return null
+    }
+    switch (arguments.length) {
+      case 0:
+        return this.length > 0 ? this.charAt(0) : null
+      case 1:
+        return typeof value !== 'string' ? -1 : this.indexOf(value)
+      default:
+        return typeof value !== 'string' ? -1
+          : this.indexOf(value, typeof from !== 'number' ? 0 : from)
+    }
   })
   // retrieve the last char or the index of the last occurence of value.
   link(proto, 'last', function (value, from) {
-    return typeof this !== 'string' ? null
-      : typeof value !== 'string' ? this.length > 0
-          ? this.charAt(this.length - 1) : null
-        : this.lastIndexOf(value, typeof from !== 'number' ? this.length : from)
+    if (typeof this !== 'string') {
+      return null
+    }
+    switch (arguments.length) {
+      case 0:
+        return this.length > 0 ? this.charAt(this.length - 1) : null
+      case 1:
+        return typeof value !== 'string' ? -1 : this.lastIndexOf(value)
+      default:
+        return typeof value !== 'string' ? -1
+          : this.lastIndexOf(value, typeof from !== 'number' ? this.length : from)
+    }
   })
   link(proto, 'starts-with', function (value) {
     return typeof this === 'string' && typeof value === 'string'
@@ -76,16 +86,26 @@ module.exports = function ($void) {
   // Converting
   // generate sub-string from this string.
   link(proto, 'copy', function (begin, end) {
-    if (typeof this === 'string') {
-      if (typeof begin !== 'number') {
+    if (typeof this !== 'string') {
+      return null
+    }
+    if (typeof begin !== 'number') {
+      begin = 0
+    } else if (begin < 0) {
+      begin += this.length
+      if (begin < 0) {
         begin = 0
       }
-      if (typeof end !== 'number' || end > this.length) {
-        end = this.length
-      }
-      return this.slice(begin, end)
     }
-    return null
+    if (typeof end !== 'number') {
+      end = this.length
+    } else if (end < 0) {
+      end += this.length
+      if (end < 0) {
+        end = 0
+      }
+    }
+    return this.substr(begin, end - begin)
   })
   link(proto, 'trim', function () {
     return typeof this === 'string' ? this.trim() : null
@@ -98,7 +118,7 @@ module.exports = function ($void) {
   })
   link(proto, 'replace', function (value, newValue) {
     return typeof this !== 'string' ? null
-      : typeof value !== 'string' || value.length < 1 ? this
+      : typeof value !== 'string' || !value ? this
         : this.replace(
           new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
           typeof newValue === 'string' ? newValue : ''
@@ -106,13 +126,11 @@ module.exports = function ($void) {
   })
   link(proto, 'to-upper', function (localed) {
     return typeof this !== 'string' ? null
-      : typeof localed === 'undefined' || localed === false || localed === null || localed === 0
-        ? this.toUpperCase() : this.toLocaleUpperCase()
+      : localed === true ? this.toUpperCase() : this.toLocaleUpperCase()
   })
   link(proto, 'to-lower', function (localed) {
     return typeof this !== 'string' ? null
-      : typeof localed === 'undefined' || localed === false || localed === null || localed === 0
-        ? this.toLowerCase() : this.toLocaleLowerCase()
+      : localed === true ? this.toLowerCase() : this.toLocaleLowerCase()
   })
 
   // combination and splitting of strings
@@ -120,21 +138,25 @@ module.exports = function ($void) {
     if (typeof this !== 'string') {
       return null
     }
-    var result = [this]
+    var result = this ? [this] : []
     for (var i = 0; i < arguments.length; i++) {
       var str = arguments[i]
-      if (typeof str === 'string') {
-        result.push(str)
-      } else {
+      if (typeof str !== 'string') {
         str = $void.thisCall(str, 'to-string')
-        result.push(typeof str === 'string' ? str : '()')
+        if (typeof str !== 'string') {
+          str = ''
+        }
+      }
+      if (str) {
+        result.push(str)
       }
     }
-    return result.join('')
+    return result.length < 1 ? ''
+      : result.length === 1 ? result[0] : result.join('')
   })
   // the reversed operation of '-':
   // if the argument value is a string, to removes a substring if it's the suffix.
-  // if the argument value is a number, to removes a suffix with the lenth of this number.
+  // if the argument value is a number, to removes a suffix with the length of this number.
   // other argument values will be converted to a string and to be removed as suffix.
   link(proto, '-', function () {
     if (typeof this !== 'string') {
@@ -144,7 +166,7 @@ module.exports = function ($void) {
       return this
     }
     var result = this
-    for (var i = 0; i < arguments.length; i++) {
+    for (var i = arguments.length - 1; i >= 0; i--) {
       var value = arguments[i]
       if (typeof value === 'string') {
         if (result.endsWith(value)) {
@@ -154,7 +176,10 @@ module.exports = function ($void) {
         result = result.substring(0, result.length - value)
       } else {
         value = thisCall(value, 'to-string')
-        if (result.endsWith(value)) {
+        if (typeof value !== 'string') {
+          value = ''
+        }
+        if (value && result.endsWith(value)) {
           result = result.substring(0, result.length - value.length)
         }
       }
@@ -168,30 +193,22 @@ module.exports = function ($void) {
 
   // get a character's unicode value by its offset in this string.
   link(proto, 'char-at', function (offset) {
-    return typeof this !== 'string' ? null
-      : typeof offset !== 'number' || offset < 0 || offset >= this.length
-        ? null : this.charCodeAt(offset)
+    if (typeof this !== 'string' || typeof offset !== 'number') {
+      return null
+    }
+    if (offset < 0) {
+      offset += this.length
+    }
+    return offset < 0 || offset >= this.length ? null : this.charCodeAt(offset)
   })
 
-  // Equivalence: override to be consistent with comparison
-  link(proto, ['equals', '=='], function (another) {
-    return typeof this === 'string' && typeof another === 'string' &&
-      this === another
-  }, ['not-equals', '!='], function (another) {
-    return typeof this !== 'string' || typeof another !== 'string' ||
-      this !== another
-  })
+  // Equivalence inherits from null.
 
   // Ordering: override general comparison logic.
   link(proto, 'compare', function (another, localed) {
-    if (typeof this !== 'string' || typeof another !== 'string') {
-      return null
-    }
-    if (typeof localed === 'undefined' || localed === false ||
-        localed === null || localed === 0) {
-      return this === another ? 0 : this > another ? 1 : -1
-    }
-    return this.localeCompare(another)
+    return typeof this !== 'string' || typeof another !== 'string' ? null
+      : localed === true ? this.localeCompare(another)
+        : this === another ? 0 : this > another ? 1 : -1
   })
 
   // comparing operators
@@ -212,45 +229,33 @@ module.exports = function ($void) {
       ? this <= another : null
   })
 
-  typeVerifier(Type)
-
-  // the emptiness if string is determined by its length.
+  // the emptiness of string is determined by its length.
   link(proto, 'is-empty', function () {
     return typeof this === 'string' ? this === '' : null
   }, 'not-empty', function () {
     return typeof this === 'string' ? this !== '' : null
   })
 
-  // Encoding: standardize to a boolean value.
+  // Encoding
   link(proto, 'to-code', function () {
     return typeof this === 'string' ? this : null
   })
 
   // Representation
   link(proto, 'to-string', function () {
-    return typeof this === 'string' ? JSON.stringify(this) : null
+    return typeof this === 'string' ? JSON.stringify(this)
+      : this === proto ? '(string proto)' : null
   })
 
   // Indexer
-  nativeIndexer(Type, String, 'string', function (index, value) {
-    if (typeof this !== 'string') {
-      return null
-    }
-    // getting properties
-    if (typeof index === 'string') {
-      return index === ':' ? null
-        : index === 'type' ? Type // fake field
-          : index === 'length' ? this.length // expose length
-            : typeof proto[index] === 'undefined' ? null : proto[index]
-    }
-    // read char(s)
-    if (typeof index === 'number') {
-      return typeof value === 'number'
-        ? index >= 0 ? this.substr(index, value) // chars in a range.
-          : null
-        : index >= 0 && index < this.length ? this.substr(index, 1) // read a single character.
-          : null
-    }
-    return null
+  protoIndexer(Type, function (index, value) {
+    return typeof this !== 'string' ? null
+      : typeof index === 'string'
+        ? index === 'length' ? this.length : proto[index]
+        : typeof index !== 'number' ? null
+          : this.substr(index, typeof value === 'number' ? value : 1) // chars in a range.
   })
+
+  // inject type
+  String.prototype.type = Type // eslint-disable-line no-extend-native
 }

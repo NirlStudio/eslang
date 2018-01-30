@@ -85,6 +85,7 @@ module.exports = function ($void) {
   var link = $void.link
   var typeOf = $void.typeOf
   var Type$ = $void.Type
+  var Symbol$ = $void.Symbol
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var thisCall = $void.thisCall
@@ -92,19 +93,43 @@ module.exports = function ($void) {
   var CodingContext$ = $void.CodingContext
   var typeIndexer = $void.typeIndexer
   var ownsProperty = $void.ownsProperty
-  var nativeIndexer = $void.nativeIndexer
+  var typeEncoder = $void.typeEncoder
+  var protoIndexer = $void.protoIndexer
   var isPrototypeOf = $void.isPrototypeOf
   var encodingTypeOf = $void.encodingTypeOf
 
   // create an empty object.
-  link(Type, 'empty', function () {
+  link(Type, 'empty', function object$empty () {
     return new Object$()
   })
 
   // create a new object with the name/value pairs from iterable arguments.
   link(Type, 'of', createObjectOf($void))
 
-  // Indexer for the object type itself.
+  // set the value of a field.
+  link(Type, 'set', function (obj, name, value) {
+    return obj instanceof Object$ && typeof name === 'string'
+      ? (obj[name] = (typeof value !== 'undefined' ? value : null)) : null
+  })
+  // remove a field.
+  link(Type, 'unset', function (obj, name) {
+    if (obj instanceof Object$ && typeof name === 'string' && typeof obj[name] !== 'undefined') {
+      var value = obj[name]
+      delete obj[name]
+      return value
+    }
+  })
+  // get the value of a field.
+  link(Type, 'get', function (obj, name, value) {
+    return obj instanceof Object$ && typeof name === 'string' ? obj[name] : null
+  })
+
+  // TODO - move all instance methods to static, keep object is empty
+
+  // to-code & to-string
+  typeEncoder(Type)
+
+  // override type indexer
   typeIndexer(Type)
 
   var proto = Type.proto
@@ -197,7 +222,7 @@ module.exports = function ($void) {
         ? this[name] : null
   })
   // set the value of a field
-  var setField = link(proto, 'set-field', function (name, value) {
+  link(proto, 'set-field', function (name, value) {
     return this instanceof Object$ && typeof name === 'string' &&
         name && name !== ':' && name !== 'type' && name !== 'to-code' && this['is-readonly'] !== true
       ? (this[name] = (typeof value === 'undefined' ? null : value))
@@ -213,7 +238,7 @@ module.exports = function ($void) {
       ? typeof this[name] !== 'undefined' : false
   })
   // retrieve the value of a property
-  var getProperty = link(proto, 'get-property', function (name) {
+  link(proto, 'get-property', function (name) {
     return (this instanceof Object$ || typeOf(this) instanceof ObjectType$) &&
         typeof name === 'string' && name !== ':' &&
       typeof this[name] !== 'undefined' ? this[name] : null
@@ -349,7 +374,7 @@ module.exports = function ($void) {
   // Description
   link(proto, 'to-string', function () {
     if (!(this instanceof Object$)) {
-      return this && typeof this === 'object' ? '(@:genric)' : null
+      return this === proto ? '(object proto)' : null
     }
     // type
     var fields = ['(@']
@@ -376,28 +401,26 @@ module.exports = function ($void) {
 
   // Indexer:
   // an object can provide a customized indexer.
-  link(proto, 'indexer', null)
-  nativeIndexer(Type, Object, Object$, function (name, value) {
-    if (!(this instanceof Object$) || name === ':') {
+  protoIndexer(Type, function (name, value) {
+    if (!(this instanceof Object$) && typeOf(this) !== Type) {
       return null
     }
-    // global static properties.
-    if (name === 'type') {
-      return this.type
-    } else if (name === 'to-code') {
-      return this.type.proto['to-code'] // to keep the to-code mechanisim consistent.
-    }
-    if (this['is-readonly'] === true) {
-      value === undefined
-    }
     // try to forward to user's indexer
-    if (typeof this.indexer === 'function') {
-      return this.indexer(name, value)
+    if (ownsProperty(this, ':') && typeof this[':'] === 'function') {
+      return this[':'].apply(this, arguments)
     }
     // default read/write behaviour
-    return !name || typeof name !== 'string' ? null
-      : typeof value === 'undefined'
-        ? getProperty.call(this, name, value)
-        : setField.call(this, name, value)
+    if (typeof name !== 'string') {
+      if (name instanceof Symbol$) {
+        name = name.key // use the key of a symbol
+      }
+      return null // invalid property key.
+    }
+    return typeof value === 'undefined'
+      ? this[name] // getting
+      : (this[name] = value) // setting
   })
+
+  // inject type
+  Object.prototype.type = Type // eslint-disable-line no-extend-native
 }

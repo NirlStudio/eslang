@@ -4,27 +4,52 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.lambda
+  var $Operator = $.operator
   var $Tuple = $.tuple
-  var $Symbol = $.symbol
+  var $Array = $.Array
   var link = $void.link
-  var Tuple$ = $void.Tuple
+  var typeVerifier = $void.typeVerifier
   var prepareOperation = $void.prepareOperation
 
   // the empty function
   link(Type, 'empty', $void.lambda(function () {
     return null
-  }, new Tuple$( // (= () )
-    [$Symbol.lambda, $Tuple.empty, new Tuple$([], true)]
-  )))
+  }, $Tuple.lambda))
 
   // prepare common type implementation.
   prepareOperation(Type, $Tuple.lambda)
 
+  // common type verifier
+  typeVerifier(Type)
+
+  var proto = Type.proto
+
+  // explicitly call a function on a subject with arguments.
+  link(proto, 'call', function (subject) {
+    if (typeof this !== 'function' || this.type === $Operator) {
+      return null
+    }
+    return typeof subject === 'undefined' ? this.apply(null)
+      : this.apply(subject, Array.prototype.slice.call(arguments, 1))
+  })
+
+  // apply a function and expand arguments from an array.
+  link(proto, 'apply', function (subject, args) {
+    if (typeof this !== 'function' || this.type === $Operator) {
+      return null
+    }
+    if (typeof subject === 'undefined') {
+      return this.apply(null)
+    }
+    return Array.isArray(args) ? this.apply(subject, args)
+      : this.apply(subject, $Array.from(args))
+  })
+
   // Desccription
-  link(Type.proto, 'to-string', function () {
-    return typeof this !== 'function' ? null
-      : (this.name || '?lambda') + $Tuple.of($Symbol.lambda,
-        this.code instanceof Tuple$ ? this.code.$[1] : $Tuple.unknown,
-        $Symbol.etc)['to-string']()
+  link(proto, 'to-string', function () {
+    return typeof this !== 'function'
+      ? this === proto ? '(lambda proto)' : null
+      : '#( ' + (this.name || '?lambda') + ' )# ' +
+        (this.code || $Tuple.lambda)['to-string']()
   })
 }

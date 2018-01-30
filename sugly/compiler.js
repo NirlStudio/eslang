@@ -110,7 +110,7 @@ module.exports = function ($void) {
       }
     }
 
-    function endTopWith (ending, /* ... */) {
+    function endTopWith (ending, source) {
       var srcTop = sourceStack.pop()
       // append ending token(s)' source info.
       Array.prototype.push.apply(srcTop[0], arguments)
@@ -201,7 +201,9 @@ module.exports = function ($void) {
         src.push(expr[1])
       }
     })
-    compiling(text)
+    if (compiling(text) > 1) {
+      compiling('\n') // end pending waiter.
+    }
     compiling() // notify the end of stream.
     return warnings || new Tuple$(list, true, src)
   })

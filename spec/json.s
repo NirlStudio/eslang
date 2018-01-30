@@ -5,6 +5,6 @@
 ).
 (define "(json parse ...)" (= ()
   (should "return an object or value from a json string." (= ()
-    (assert ((json parse "[1,2,3]") is-a Array),
+    (assert ((json parse "[1,2,3]") is-a array),
   ),
 ).

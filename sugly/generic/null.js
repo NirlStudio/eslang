@@ -69,8 +69,7 @@ module.exports = function ($void) {
 
   // Indexer
   link(Null, ':', function (name) {
-    return typeof name !== 'string' || name === ':' ? null
-      : name === 'type' ? null // fake field
-        : (typeof Null[name] !== 'undefined' ? Null[name] : null)
+    return typeof name !== 'string' ? null
+      : (typeof Null[name] !== 'undefined' ? Null[name] : null)
   })
 }

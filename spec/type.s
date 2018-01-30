@@ -3,14 +3,14 @@
     (assert ((type proto) is-a null),
     (assert false ((type proto) is-not-a null),
   ),
-  (should "the type's proto is encoded to null. (Not allowed to be encoded directly)" (= ()
-    (assert null ((type proto) to-code),
+  (should "the type's proto is encoded to null." (= ()
+    (assert ((type proto) to-code) is null),
   ),
   (should "the type's proto is described as (type proto)." (= ()
     (assert "(type proto)" ((type proto) to-string),
   ),
-  (should "the type of type's proto is null." (= ()
-    (assert null ((type proto) type),
+  (should "the type of type's proto is type." (= ()
+    (assert type ((type proto) type),
   ),
 ).
 
@@ -62,8 +62,8 @@
 
 (define "Emptiness" (= ()
   (should "type is not an empty value." (= ()
-    (assert false (type is-empty),
-    (assert (type not-empty),
+    (assert (type is-empty),
+    (assert false (type not-empty),
 ).
 
 (define "Encoding" (= ()
@@ -77,9 +77,9 @@
 ).
 
 (define "Indexer" (= ()
-  (should "the indexer is not readable directly." (= ()
-    (assert null (type ":"),
+  (should "the indexer is a lambda." (= ()
+    (assert (:(type ":") is-a lambda),
   ),
-  (should "type's type is its proto." (= ()
-    (assert (type proto) (type "type"),
+  (should "type's type is type." (= ()
+    (assert type (type "type"),
 ).

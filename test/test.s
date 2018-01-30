@@ -6,7 +6,7 @@
   # generic
   "null" "type" "bool" "string" "number" "date" "range" "symbol" "tuple"
   "operator" "lambda" "function" "object"
-  "module" "array" "set" "map" "class" "device"
+  "module" "array" "class" "device"
   "iterate" "global"
 
   # runtime

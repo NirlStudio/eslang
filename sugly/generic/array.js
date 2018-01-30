@@ -19,7 +19,6 @@ function createArrayOf () {
 
 function createArrayFrom ($void) {
   var thisCall = $void.thisCall
-
   return function () {
     var list = []
     for (var i = 0; i < arguments.length; i++) {
@@ -78,12 +77,11 @@ module.exports = function ($void) {
   var copyProto = $void.copyProto
   var ObjectType$ = $void.ObjectType
   var CodingContext$ = $void.CodingContext
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var nativeIndexer = $void.nativeIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // create an empty array.
-  link(Type, 'empty', function () {
+  initializeType(Type, function () {
     return []
   })
 
@@ -92,30 +90,11 @@ module.exports = function ($void) {
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
-  link(Type, 'from', createArrayFrom($void))
-
-  // Type Indexer
-  typeIndexer(Type)
+  var arrayFrom = link(Type, 'from', createArrayFrom($void))
 
   var proto = Type.proto
   // generate an iterator function to traverse all array items.
   link(proto, 'iterate', iterator($void))
-
-  // the current length of this array.
-  link(proto, 'length', function () {
-    return Array.isArray(this) ? this.length : null
-  })
-
-  // override common object's copy-from to copy data only.
-  link(proto, ['copy-from', '='], function (source) {
-    if (Array.isArray(this)) {
-      if (Array.isArray(source) && source.length > 0) {
-        this.push.apply(this, source)
-      }
-      return this
-    }
-    return null
-  })
 
   // to create a shallow copy of this instance with all items,
   // or selected items in a range.
@@ -125,25 +104,33 @@ module.exports = function ($void) {
     }
     if (typeof begin !== 'number') {
       begin = 0
+    } else if (begin < 0) {
+      begin += this.length
+      if (begin < 0) {
+        begin = 0
+      }
     }
-    if (typeof end !== 'number' || end >= this.length || end === 0) {
+    if (typeof end !== 'number') {
+      end = this.length
+    } else if (end < 0) {
+      end += this.length
+      if (end < 0) {
+        end = 0
+      }
+    } else if (end > this.length) {
       end = this.length
     }
     return this.slice(begin, end)
   })
 
   // append more items to the end of this array
-  var appendFrom = link(proto, '+=', function () {
+  var appendFrom = link(proto, ['append', '+='], function () {
     if (!(Array.isArray(this))) {
       return null
     }
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
-      if (Array.isArray(src)) {
-        Array.prototype.push.apply(this, src)
-      } else {
-        this.push(src)
-      }
+      Array.prototype.push.apply(this, Array.isArray(src) ? src : arrayFrom(src))
     }
     return this
   })
@@ -163,16 +150,21 @@ module.exports = function ($void) {
     if (!Array.isArray(this) || typeof offset !== 'number') {
       return null
     }
-    var value = this[offset]
-    return typeof value === 'undefined' ? null : value
+    offset = Math.trunc(offset)
+    return this[offset < 0 ? offset + this.length : offset]
   })
   link(proto, 'set', function (offset, value) {
     if (!Array.isArray(this) || typeof offset !== 'number') {
       return null
     }
-    var current = this[offset]
-    this[offset] = typeof value === 'undefined' ? null : value
-    return typeof current === 'undefined' ? null : current
+    offset = Math.trunc(offset)
+    if (offset < 0) {
+      offset += this.length
+      if (offset < 0) {
+        return null
+      }
+    }
+    return (this[offset] = typeof value === 'undefined' ? null : value)
   })
   link(proto, 'clear', function () {
     if (Array.isArray(this)) {
@@ -185,13 +177,26 @@ module.exports = function ($void) {
   // sawp two value by offsets.
   link(proto, 'swap', function (x, y) {
     if (!Array.isArray(this)) {
+      return null
+    }
+    if (this.length < 2) {
       return false
     }
-    if (typeof x !== 'number' || x < 0) {
+    if (typeof x !== 'number') {
       x = 0
+    } else {
+      x = Math.trunc(x)
+      if (x < 0) {
+        x += this.length
+      }
     }
-    if (typeof y !== 'number' || y >= this.length) {
+    if (typeof y !== 'number') {
       y = this.length - 1
+    } else {
+      y = Math.trunc(y)
+      if (y < 0) {
+        y += this.length
+      }
     }
     if (x === y) {
       return false
@@ -203,11 +208,11 @@ module.exports = function ($void) {
   })
 
   link(proto, 'first', function (value) {
-    if (!Array.isArray(this) || this.length < 1) {
+    if (!Array.isArray(this)) {
       return null
     }
     if (typeof value === 'undefined') {
-      return this[0]
+      return this.length < 1 ? null : this[0]
     }
     for (var i = 0; i < this.length; i++) {
       var v = this[i]
@@ -218,11 +223,11 @@ module.exports = function ($void) {
     return null
   })
   link(proto, 'last', function (value) {
-    if (!Array.isArray(this) || this.length < 1) {
+    if (!Array.isArray(this)) {
       return null
     }
     if (typeof value === 'undefined') {
-      return this[this.length - 1]
+      return this.length < 1 ? null : this[this.length - 1]
     }
     for (var i = this.length - 1; i >= 0; i--) {
       var v = this[i]
@@ -254,14 +259,17 @@ module.exports = function ($void) {
 
   // sort
   link(proto, 'sort', function (comparer, copy) {
-    if (!Array.isArray(this) || this.length < 1) {
-      return this
+    if (!Array.isArray(this)) {
+      return null
     }
     if (typeof comparer === 'boolean') {
       copy = comparer
       comparer = null
     } else if (typeof comparer !== 'function') {
       comparer = null
+    }
+    if (this.length < 2) {
+      return copy === true ? this.slice(0) : this
     }
     var comparing = comparer ? function (a, b) {
       var order = comparer(a, b)
@@ -270,30 +278,8 @@ module.exports = function ($void) {
       var order = thisCall(a, 'compare', b)
       return order !== -1 && order !== 1 ? 0 : order
     }
-    return !Array.isArray(this) ? null
-      : boolOf(copy) ? this.slice(0).sort(comparing) : this.sort(comparing)
+    return copy === true ? this.slice(0).sort(comparing) : this.sort(comparing)
   })
-
-  // comparing operators for instance values
-  link(proto, '>', function (length) {
-    return Array.isArray(this) && typeof length === 'number'
-      ? this.length > length : null
-  })
-  link(proto, '>=', function (length) {
-    return Array.isArray(this) && typeof length === 'number'
-      ? this.length >= length : null
-  })
-  link(proto, '<', function (length) {
-    return Array.isArray(this) && typeof length === 'number'
-      ? this.length < length : null
-  })
-  link(proto, '<=', function (length) {
-    return Array.isArray(this) && typeof length === 'number'
-      ? this.length <= length : null
-  })
-
-  // Type Verification
-  typeVerifier(Type)
 
   // determine emptiness by array's length
   link(proto, 'is-empty', function () {
@@ -303,7 +289,7 @@ module.exports = function ($void) {
   })
 
   // default object persistency & describing logic
-  var toCode = link(proto, 'to-code', function (ctx) {
+  link(proto, 'to-code', function (ctx) {
     if (!Array.isArray(this)) {
       return null // illegal call.
     }
@@ -367,24 +353,19 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  nativeIndexer(Type, Array, null, function (name, value) {
-    if (!Array.isArray(this) || name === ':') {
+  protoIndexer(Type, function (name, value) {
+    if (!Array.isArray(this)) {
       return null
     }
-    // global static properties.
-    if (name === 'type') {
-      return Type
-    } else if (name === 'to-code') {
-      return toCode // to keep the to-code mechanisim consistent.
-    }
     return typeof name === 'string' // read properties
-      ? name && (typeof proto[name] !== 'undefined') ? proto[name] : null
+      ? name === 'length' ? this.length // expose native property 'length'
+        : typeof proto[name] === 'undefined' ? null : proto[name]
       : typeof name !== 'number' ? null
-        : typeof value === 'undefined'
+        : typeof value === 'undefined' // getting item
           ? typeof this[name] === 'undefined' ? null : this[name]
-          : (function (list, i, v) {
-            var t = list[i]; list[i] = v
-            return typeof t === 'undefined' ? null : t
-          })(this, name, value)
+          : (this[name] = value) // setting item
   })
+
+  // inject type
+  Array.prototype.type = Type // eslint-disable-line no-extend-native
 }

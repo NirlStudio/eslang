@@ -10,6 +10,7 @@ module.exports = function ($void) {
   var thisCall = $void.thisCall
   var ClassType$ = $void.ClassType
   var createType = $void.createType
+  var typeEncoder = $void.typeEncoder
   var typeIndexer = $void.typeIndexer
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticClassFields = $void.staticClassFields
@@ -54,6 +55,9 @@ module.exports = function ($void) {
       }
       return obj
     })
+
+    // TODO
+    typeEncoder(class_)
 
     // override type indexer for the new class.
     typeIndexer(class_)

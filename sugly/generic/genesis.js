@@ -6,7 +6,7 @@ module.exports = function () {
   */
   // The Void is out of the scope of the Being and cannot be analyzed in the
   // scope of Being. Therefore, it cannot be described as either existent or
-  // nonexistent. Boolean logic is only part of the Being.
+  // nonexistent. Boolean logic is part of the Being.
   var $void = {}
 
   /*
@@ -25,7 +25,7 @@ module.exports = function () {
     // The primal type is derived from the supreme prototype.
     publish(this, 'proto', Prototype)
     // The primal type is the container type of the supreme prototype.
-    define(Prototype, 'type', this)
+    publish(Prototype, 'type', this)
   }
   Type$.prototype = Prototype
 
@@ -53,18 +53,16 @@ module.exports = function () {
   $void.Type.prototype = Type
 
   /* It's ready to create primitive types, */
-  function create (name, superType, asMeta) {
+  function create (name, superType) {
     if (!superType) {
       superType = Type
     }
     var type = Object.create(superType)
-    if (!asMeta) { // a meta type is used to create more types and has not a proto.
-      // a new type should have a new nature.
-      publish(type, 'proto', Object.create(superType.proto))
-      // a proto always intrinsically knows its container type.
-      define(type.proto, 'type', type)
-      // give a name to the new type.
-    }
+    // a new type should have a new nature.
+    publish(type, 'proto', Object.create(superType.proto))
+    // a proto always intrinsically knows its container type.
+    publish(type.proto, 'type', type)
+    // give a name to the new type.
     naming(type, name)
   }
 
@@ -123,8 +121,8 @@ module.exports = function () {
   // The name 'list' is left to be used for more common scenarios.
   create('tuple')
   var Tuple$ = $void.Tuple = function Tuple$ (list, plain, source) {
-    define(this, '$', list) // hidden native data
-    define(this, 'plain', plain === true) // as code block.
+    publish(this, '$', list) // hidden native data
+    publish(this, 'plain', plain === true) // as code block.
     if (source) { // reserved for source map and other debug information.
       define(this, 'source', source)
     }
@@ -191,32 +189,24 @@ module.exports = function () {
 
   // A module is a special object which is a descriptor of a module. It's not the
   // module itself.
-  create('module', $.object)
+  create('module')
   var Module$ = $void.Module = function Module$ (uri) {
     publish(this, 'uri', uri)
-    define(this, 'is-readonly', true)
   }
   Module$.prototype = $.module.proto
 
   // define a placeholder module for global context.
   define($, '-module', new Module$('$'))
 
-  /* Basic Data Structures */
-  /* A fundamental data structure is mutable as a collection. */
-
-  // A collection of values indexed by zero-based continuous integers.
-  create('array', $.object)
-  // A collection of distinctive values indexed by themselves.
-  create('set', $.object)
-  // A collection of values indexed by a set of distinctive values.
-  create('map', $.object)
+  // A collection of values indexed by zero-based integers.
+  create('array')
 
   /* Extensible Data Type */
   /* A extensible data type can facilitate complexity by type inheritance. */
 
   // Class is a meta type to create types that can be extended by inheritance.
   // All instances of all classes can be downgraded to a common object.
-  create('class', $.object, true)
+  create('class', $.object)
   // A fake constructor for instanceof type checking.
   var ClassType$ = $void.ClassType = function ClassType$ () {}
   ClassType$.prototype = $.class
@@ -228,7 +218,7 @@ module.exports = function () {
   // as an communication interface between the program and an external hardware
   // or an event source.
   // By the nature of a device, it cannot be encoded or transfered directly.
-  create('device', $.object, true)
+  create('device', $.object)
   // A fake constructor for instanceof type checking.
   var DeviceType$ = $void.DeviceType = function DeviceType$ () {}
   DeviceType$.prototype = $.device
@@ -237,11 +227,16 @@ module.exports = function () {
     The Evoluation.
   */
   // export the ability of creation to enable an autonomous process.
-  $void.createType = function createType (superType) {
+  $void.createType = function createType (superType, module_, name) {
     var type = Object.create(superType)
     publish(type, 'proto', Object.create(superType.proto))
-    define(type.proto, 'type', type)
-    // the new type is left unnamed.
+    publish(type.proto, 'type', type)
+    if (module_) {
+      define(type, 'module', module_)
+    }
+    if (name) {
+      define(type, 'name', name)
+    }
     return type
   }
 
@@ -258,7 +253,7 @@ function publish (owner, key, value) {
   })
 }
 
-// Define a value as a property of an entity.
+// Define a value as a non-enumerable property of an entity.
 function define (entity, prop, value) {
   Object.defineProperty(entity, prop, {
     enumerable: false,

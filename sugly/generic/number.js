@@ -122,9 +122,8 @@ module.exports = function ($void) {
   var $Range = $.range
   var link = $void.link
   var copyType = $void.copyType
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
-  var nativeIndexer = $void.nativeIndexer
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
 
   // the value range and constant values.
   copyType(Type, Number, {
@@ -144,7 +143,7 @@ module.exports = function ($void) {
   var minBits = link(Type, 'min-bits', -Math.pow(2, 31))
 
   // The empty value
-  link(Type, 'empty', 0)
+  initializeType(Type, 0)
 
   // parse a string to its number value.
   var parse = link(Type, 'parse', function (str) {
@@ -165,8 +164,6 @@ module.exports = function ($void) {
     var int = intOf(input, defaultValue)
     return int >> 0
   })
-
-  typeIndexer(Type)
 
   var proto = Type.proto
   // test for special values
@@ -198,6 +195,9 @@ module.exports = function ($void) {
   link(proto, ['/', 'divide'], numberDivide(valueOf))
 
   // bitwise operations
+  link(proto, '~', function () {
+    return typeof this === 'number' ? ~this : null
+  })
   link(proto, '&', function (value) {
     return typeof this === 'number' ? this & value : null
   })
@@ -222,10 +222,9 @@ module.exports = function ($void) {
   // support ordering logic - comparable
   // For uncomparable entities, comparison result is consistent with the Equivalence.
   // Uncomparable state is indicated by a null and is taken as inequivalent.
-  // TODO: isNaN() vs. x !== x ?
   var compare = link(proto, 'compare', function (another) {
-    return this === another ? 0
-      : typeof this !== 'number' || typeof another !== 'number' ? null
+    return typeof this !== 'number' || typeof another !== 'number' ? null
+      : this === another ? 0 // two same valid values.
         : !isNaN(this) && !isNaN(another)
           ? this > another ? 1 : -1
           : isNaN(this) && isNaN(another)
@@ -255,7 +254,7 @@ module.exports = function ($void) {
   link(proto, ['equals', '=='], function (another) {
     return this === another || compare.call(this, another) === 0
   }, ['not-equals', '!='], function (another) {
-    return compare.call(this, another) !== 0
+    return this !== another && compare.call(this, another) !== 0
   })
 
   // support common math operations
@@ -275,8 +274,6 @@ module.exports = function ($void) {
     return typeof this === 'number' ? Math.trunc(this) : null
   })
 
-  typeVerifier(Type)
-
   // O and NaN are defined as empty.
   link(proto, 'is-empty', function () {
     return typeof this === 'number' ? this === 0 || isNaN(this) : null
@@ -291,22 +288,20 @@ module.exports = function ($void) {
 
   // Representation & Description
   link(proto, 'to-string', function (format) {
-    return typeof this === 'number' ? this.toString() : null
+    return typeof this === 'number' ? this.toString()
+      : this === proto ? '(number proto)' : null
   })
 
   // Indexer
-  nativeIndexer(Type, Number, 'number', function (index, value) {
-    if (typeof this !== 'number') {
-      return null
-    }
+  protoIndexer(Type, function (index, value) {
     // getting properties
-    if (typeof index === 'string') {
-      return index === ':' ? null
-        : index === 'type' ? Type // fake field
-          : typeof proto[index] === 'undefined' ? null : proto[index]
-    }
-    // create a range by this as Begin, index as End and value as Step.
-    return typeof index !== 'number' ? null
-      : $Range.of(this, index, typeof value === 'number' ? value : null)
+    return typeof this !== 'number' ? null
+      : typeof index === 'string' ? proto[index]
+        // create a range by this as Begin, index as End and value as Step.
+        : typeof index !== 'number' ? null
+          : $Range.of(this, index, typeof value === 'number' ? value : null)
   })
+
+  // inject type
+  Number.prototype.type = Type // eslint-disable-line no-extend-native
 }

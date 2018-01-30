@@ -5,18 +5,18 @@
 (let the-type-name (the-type name).
 
 (define (the-type-name + " type's proto") (=> ()
-  (should "the type's proto is a (type proto)." (=> ()
-    (assert ((the-type  proto) is-a (type proto),
-    (assert false ((the-type  proto) is-not-a (type proto),
+  (should "the type's proto is a type." (=> ()
+    (assert ((the-type proto) is-a the-type),
+    (assert false ((the-type proto) is-not-a the-type),
   ),
-  (should "the type's proto is encoded to null. (Not allowed to be encoded directly)" (=> ()
-    (assert null ((the-type  proto) to-code),
+  (should "the type's proto is encoded to null" (=> ()
+    (assert (((the-type proto) to-code) is null),
   ),
   (should "the type's proto is described as (type-name proto)." (=> ()
     (assert ("(" + (the-type  name) " proto)") ((the-type  proto) to-string),
   ),
   (should "the type of type's proto is (type proto)." (=> ()
-    (assert (type proto) ((the-type  proto) type),
+    (assert the-type ((the-type proto) type),
   ),
   (should "the indexer of type's proto is not readable directly." (=> ()
     (assert null ((the-type  proto) ":"),

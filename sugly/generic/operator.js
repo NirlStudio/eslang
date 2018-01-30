@@ -5,26 +5,27 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.operator
   var $Tuple = $.tuple
-  var $Symbol = $.symbol
   var link = $void.link
-  var Tuple$ = $void.Tuple
+  var typeVerifier = $void.typeVerifier
   var prepareOperation = $void.prepareOperation
 
-  // the empty function
-  link(Type, 'empty', $void.function(function () {
+  // the empty operator
+  link(Type, 'empty', $void.operator(function () {
     return null
-  }, new Tuple$( // (= () )
-    [$Symbol.operator, $Tuple.empty, new Tuple$([], true)]
-  )))
+  }, $Tuple.operator))
 
   // prepare common type implementation.
   prepareOperation(Type, $Tuple.operator)
 
+  // common type verifier
+  typeVerifier(Type)
+
+  var proto = Type.proto
   // Desccription
-  link(Type.proto, 'to-string', function () {
-    return typeof this !== 'function' ? null
-      : (this.name || '?lambda') + $Tuple.of($Symbol.operator,
-        this.code instanceof Tuple$ ? this.code.$[1] : $Tuple.unknown,
-        $Symbol.etc)['to-string']()
+  link(proto, 'to-string', function () {
+    return typeof this !== 'function'
+      ? this === proto ? '(operator proto)' : null
+      : '#( ' + (this.name || '?operator') + ' )# ' +
+        (this.code || $Tuple.operator)['to-string']()
   })
 }

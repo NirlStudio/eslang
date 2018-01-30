@@ -6,13 +6,13 @@ module.exports = function module ($void) {
   var $Tuple = $.tuple
   var link = $void.link
   var Module$ = $void.Module
-  var typeIndexer = $void.typeIndexer
-  var typeVerifier = $void.typeVerifier
+  var initializeType = $void.initializeType
+  var protoIndexer = $void.protoIndexer
   var CodingContext$ = $void.CodingContext
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // create an empty module.
-  link(Type, 'empty', function () {
+  initializeType(Type, function () {
     return new Module$(null)
   })
 
@@ -20,12 +20,6 @@ module.exports = function module ($void) {
   link(Type, 'of', function (uri) {
     return typeof $.load === 'function' ? $.load(uri) : null
   })
-
-  // type Indexer
-  typeIndexer(Type)
-
-  // Type Verification
-  typeVerifier(Type)
 
   var proto = Type.proto
   // determine emptiness by module uri.
@@ -61,5 +55,10 @@ module.exports = function module ($void) {
     return this instanceof Module$
       ? '(module of "' + (this['uri'] || '<unkown>') + '")'
       : null
+  })
+
+  // add indexer
+  protoIndexer(Type, function (name) {
+    return this instanceof Module$ && typeof name === 'string' ? this[name] : null
   })
 }

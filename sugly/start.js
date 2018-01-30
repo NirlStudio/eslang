@@ -25,8 +25,6 @@ function initializeSpace ($void) {
   require('./generic/module')($void)
 
   require('./generic/array')($void)
-  require('./generic/set')($void)
-  require('./generic/map')($void)
 
   require('./generic/class')($void)
   require('./generic/device')($void)
