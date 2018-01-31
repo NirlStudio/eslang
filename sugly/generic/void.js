@@ -5,7 +5,6 @@ module.exports = function ($void) {
   var Null = $void.null
   var Type$ = $void.Type
   var Object$ = $void.Object
-  var Module$ = $void.Module
   var Symbol$ = $void.Symbol
   var Tuple$ = $void.Tuple
   var $Tuple = $.tuple
@@ -94,23 +93,8 @@ module.exports = function ($void) {
   // to test if an entity can be named and exported.
   function isFormal (entity) {
     return typeof entity === 'function' || // a function,
-      (entity instanceof Type$) || // a type,
-      (entity instanceof Module$) // or a module
+      (entity instanceof Type$) // a type
   }
-
-  // TODO: all the namiing limitation will be removed later.
-  var staticObjectFields = Object.create(null)
-  $void.staticObjectFields = Object.assign(staticObjectFields, {
-    ':': 1,
-    'type': 1,
-    'to-code': 1
-  })
-
-  $void.staticClassFields = Object.assign(Object.create(staticObjectFields), {
-    'super': 1,
-    'of': 1,
-    'empty': 1
-  })
 
 // to export an entity to a module.
   $void.export = function $export (space, name, entity) {

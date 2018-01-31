@@ -21,13 +21,9 @@ function initializeSpace ($void) {
   require('./generic/lambda')($void)
   require('./generic/function')($void)
 
-  require('./generic/object')($void)
-  require('./generic/module')($void)
-
   require('./generic/array')($void)
-
+  require('./generic/object')($void)
   require('./generic/class')($void)
-  require('./generic/device')($void)
 
   require('./generic/global')($void)
 

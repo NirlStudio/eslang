@@ -151,14 +151,14 @@ function checkSuglyRuntime ($void) {
   checkFunctions($void, '[Void / constructors] ', [
     // genesis
     'Type', 'Range', 'Symbol', 'Tuple',
-    'Object', 'Module', 'ClassType', 'DeviceType',
+    'Object', 'ClassType',
     // runtime
     'Signal', 'Space'
   ])
 
   checkFunctions($void, '[Void / functions] ', [
     // genesis
-    'operator', 'lambda', 'function', 'createType',
+    'operator', 'lambda', 'function', 'createClass',
     // runtime
     'createLambdaSpace', 'createFunctionSpace',
     'createOperatorSpace', 'createModuleSpace',
@@ -176,9 +176,11 @@ function checkSuglyRuntime ($void) {
   ])
 
   checkObjects($void.$, '[Sugly / types] ', [
-    'bool', 'string', 'number', 'date', 'range', 'symbol', 'tuple',
+    'type',
+    'bool', 'string', 'number', 'date', 'range',
+    'symbol', 'tuple',
     'operator', 'lambda', 'function',
-    'object', 'module', 'class', 'device', 'array'
+    'array', 'object', 'class'
   ])
 
   checkObjects($void.$, '[Sugly / objects] ', [
@@ -387,11 +389,5 @@ function checkTypes ($void) {
   ), 'object')
   check(seval(
     '', null
-  ), 'module')
-  check(seval(
-    '', null
   ), 'class')
-  check(seval(
-    '', null
-  ), 'device')
 }

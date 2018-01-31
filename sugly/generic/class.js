@@ -3,118 +3,139 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.class
+  var $Type = $.type
   var $Tuple = $.tuple
+  var $Object = $.object
+  var $Operator = $.operator
   var link = $void.link
   var Object$ = $void.Object
   var typeOf = $void.typeOf
   var thisCall = $void.thisCall
   var ClassType$ = $void.ClassType
-  var createType = $void.createType
+  var createClass = $void.createClass
   var typeEncoder = $void.typeEncoder
   var typeIndexer = $void.typeIndexer
+  var protoIndexer = $void.protoIndexer
   var sharedSymbolOf = $void.sharedSymbolOf
-  var staticClassFields = $void.staticClassFields
-  var staticObjectFields = $void.staticObjectFields
 
   // define a new class.
-  link(Type, 'of', function (parent, type, proto) {
-    // ignore parent if it's not a class.
-    var class_ = createType(parent instanceof ClassType$ ? parent : Type)
-    var proto_ = class_.proto
-
-    // update type properties
-    if (type instanceof Object$) {
-      Object.getOwnPropertyNames(type).forEach(function (field) {
-        if (!staticClassFields[field]) {
-          class_[field] = type[field]
+  link(Type, 'of', function () {
+    // prepare class members
+    var typeMembers = new Object$()
+    var instMembers = new Object$()
+    for (var i = 0; i < arguments.length; i++) {
+      var parent = arguments[i]
+      if (parent instanceof ClassType$) {
+        Object.assign(typeMembers, parent)
+        Object.assign(instMembers, parent.proto)
+      } else if (parent instanceof Object$ || typeOf(parent) === $Object) {
+        Object.assign(typeMembers, parent)
+        if (parent.proto instanceof Object$ || typeOf(parent.proto) === $Object) {
+          Object.assign(instMembers, parent.proto)
         }
-      })
+      }
     }
+    delete typeMembers.proto
+    delete instMembers.type
 
-    // update instance properties
-    if (proto instanceof Object$) {
-      Object.getOwnPropertyNames(proto).forEach(function (field) {
-        if (!staticObjectFields[field]) {
-          class_.proto[field] = proto[field]
-        }
-      })
-    }
+    // create empty class
+    var class_ = Object.assign(createClass(), typeMembers)
+    var proto_ = Object.assign(class_.proto, instMembers)
+    typeMembers.proto = instMembers
 
-    // override empty function to create an empty instance
+    // add function to create an empty instance
     link(class_, 'empty', function () {
       return Object.create(proto_)
     })
 
-    // override of function to create instance
-    link(class_, 'of', function (source) {
+    // add function to create an instance with properties
+    var constructor = proto_.constructor
+    link(class_, 'of', typeof constructor === 'function' && constructor.type !== $Operator ? function (props) {
       var obj = Object.create(proto_)
-      if (typeof proto_.of === 'function') {
-        proto_.of.apply(obj, arguments)
-      } else if (typeof obj['='] === 'function' && source instanceof Object$) {
-        obj['='](source)
+      if (arguments.length < 2) {
+        constructor.call(obj, props instanceof Object$ || typeOf(props) === $Object ? props : null)
+      } else {
+        var allProps = new Object$()
+        for (var i = 0; i < arguments.length; i++) {
+          props = arguments[i]
+          if (props instanceof Object$ || typeOf(props) === $Object) {
+            Object.assign(allProps, props)
+          }
+        }
+        constructor.call(obj, allProps)
+      }
+      return obj
+    } : function (props) {
+      if (arguments.length < 2) {
+        return props instanceof Object$ || typeOf(props) === $Object
+          ? Object.assign(Object.create(proto_), props)
+          : Object.create(proto_)
+      }
+      var obj = Object.create(proto_)
+      for (var i = 0; i < arguments.length; i++) {
+        props = arguments[i]
+        if (props instanceof Object$ || typeOf(props) === $Object) {
+          Object.assign(obj, props)
+        }
       }
       return obj
     })
 
-    // TODO
-    typeEncoder(class_)
+    // TODO: copy type members or just proto?
+    // Encoding
+    var class$ = function () {}
+    class$.prototype = proto_
+    typeof class_['to-code'] !== 'function' && link(class_, 'to-code', function (ctx) {
+      return $Tuple.of(sharedSymbolOf('class'), sharedSymbolOf('of'), typeMembers['to-code'](ctx))
+    })
 
-    // override type indexer for the new class.
+    // Description
+    typeof class_['to-string'] !== 'function' && link(class_, 'to-string', function () {
+      // TODO: #( name )# (class of typeMembers)
+      return '#( ' + (this.name || '?class') + ' )# ' +
+        thisCall(this, 'to-code')['to-string']() // TODO
+    })
+
+    // override type indexer
     typeIndexer(class_)
+
+    // Class type verifier : TODO
+    link(proto_, 'is-a', function (t) {
+      return t === class_ || t === $Object
+    })
+    link(proto_, 'is-not-a', function (t) {
+      return thisCall(this, 'is-a') !== true
+    })
+
+    // override proto indexer
+    var indexer = typeof proto_[':'] === 'function' &&
+      proto_[':'].type !== $Operator ? proto_[':'] : null
+    indexer ? protoIndexer(class_, indexer) : protoIndexer(class_)
+
     return class_
   })
 
-  // check if this class' instance complys to a template object.
-  link(Type, 'as', function (template) {
-    if (!(this instanceof ClassType$) || !(template instanceof Object$)) {
-      return false
-    }
-    var fields = Object.getOwnPropertyNames(template)
-    for (var i = 0; i < fields.length; i++) {
-      var field = fields[i]
-      var value = this.proto[field]
-      if (typeof value === 'undefined' || value === null) {
-        return false
-      }
-      var tvalue = template[field]
-      if (tvalue !== null) {
-        var type = typeOf(value)
-        if (!thisCall(type, 'is-of', tvalue) &&
-          !thisCall(type, 'is-of', typeOf(tvalue))) {
-          return false
-        }
-      }
-    }
-    return true
+  // Type Verification: shared for all classes.
+  link(Type, 'is-a', function (type) {
+    return type === $Type || (this !== Type && type === Type)
+  })
+  link(Type, 'is-not-a', function (type) {
+    return thisCall(this, 'is-a', type) !== true
   })
 
-  // Encoding: a class can be encoded if it has been exported to module.
-  link(Type, 'to-code', function (ctx) {
-    if (this === Type) {
-      return sharedSymbolOf('class') // the $.class itself.
-    }
-    if (!(this instanceof ClassType$)) {
-      return null
-    }
-    if (this.module) {
-      if (this.module.uri === '$') {
-        return sharedSymbolOf(this.name) // exported as a global class.
-      }
-      var mod = thisCall(this.module, 'to-code', ctx)
-      if (mod) { // as a public member of a module
-        return $Tuple.of(mod, sharedSymbolOf(this.name))
-      }
-    }
-    // an annoymous class is not portable. Its instance will be downgraded to a
-    // nearest exported type or a common object.
-    return null
+  // Emptiness: shared by all classes.
+  // The meta class is taken as empty.
+  // Any other class is not empty.
+  link(Type, 'is-empty', function () {
+    return this === Type
+  })
+  link(Type, 'not-empty', function () {
+    return thisCall(this, 'is-empty') !== true
   })
 
-  // Description: shared for all global types.
-  link(Type, 'to-string', function () {
-    return this && typeof this.name === 'string' ? this.name : null
-  })
+  // Encoding & Description of class
+  typeEncoder(Type)
 
-  // Type Indexer for global class itself.
+  // Type Indexer for class.
   typeIndexer(Type)
 }

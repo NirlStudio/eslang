@@ -15,7 +15,7 @@ module.exports = function include ($void) {
     }
     // look into current space to have the base uri.
     return includeCode(space,
-      space.local['-module'].uri,
+      space.local['-source'],
       evaluate(clist[1], space)
     )
   })
@@ -25,8 +25,8 @@ module.exports = function include ($void) {
       console.warn('include > invalid source:', source)
       return null
     }
-    if (baseUri !== 'string') {
-      baseUri = null
+    if (moduleUri !== 'string') {
+      moduleUri = null
     }
     if (!source.endsWith('.s')) {
       source += '.s'

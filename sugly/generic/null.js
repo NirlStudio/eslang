@@ -11,7 +11,7 @@ module.exports = function ($void) {
 
   link(Null, [
     // Identity: to recognize two different entities.
-    'is',
+    'is', '===',
     // Equivalence: to test if two entities are equivalent in effect.
     // Equivalence logic should be implemented symmetrically.
     // So it's different with the behaviour of NaN in JS, since an identity must be
@@ -23,7 +23,7 @@ module.exports = function ($void) {
       typeof another === 'undefined' ? null : another)
   }, [
     // the negative method of Identity test.
-    'is-not',
+    'is-not', '!==',
     // the negative method of Equivalence test.
     'not-equals', '!='
   ], function (another) {

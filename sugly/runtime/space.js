@@ -3,7 +3,6 @@
 module.exports = function space ($void) {
   var $ = $void.$
   var $Object = $.object
-  var Module$ = $void.Module
   var $export = $void.export
   var ownsProperty = $void.ownsProperty
 
@@ -47,14 +46,8 @@ module.exports = function space ($void) {
 
   $void.createModuleSpace = function (uri) {
     var local = Object.create($)
-    Object.defineProperty(local, '-module', {
-      enumerable: false,
-      configurable: false,
-      writable: false,
-      value: new Module$(uri)
-    })
+    local['-source'] = uri
     var export_ = Object.create($Object.proto)
-    export_['-module'] = local['-module']
     return new Space$(local, null, null, export_)
   }
 

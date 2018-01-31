@@ -33,7 +33,6 @@ module.exports = function () {
   function naming (type, name) {
     publish($, name, type)
     publish(type, 'name', name)
-    define(type, 'module', null)
     return type
   }
 
@@ -174,6 +173,9 @@ module.exports = function () {
   /* Generally, all compound entities are mutable. */
   /* All compound entities are also fixed points of evaluation funtion. */
 
+  // A collection of values indexed by zero-based integers.
+  create('array')
+
   // The object is the fundamental type of all compound entities.
   create('object')
   var Object$ = $void.Object = function Object$ (src) {
@@ -187,57 +189,26 @@ module.exports = function () {
   var ObjectType$ = $void.ObjectType = function ObjectType$ () {}
   ObjectType$.prototype = $.object
 
-  // A module is a special object which is a descriptor of a module. It's not the
-  // module itself.
-  create('module')
-  var Module$ = $void.Module = function Module$ (uri) {
-    publish(this, 'uri', uri)
-  }
-  Module$.prototype = $.module.proto
-
-  // define a placeholder module for global context.
-  define($, '-module', new Module$('$'))
-
-  // A collection of values indexed by zero-based integers.
-  create('array')
-
   /* Extensible Data Type */
   /* A extensible data type can facilitate complexity by type inheritance. */
 
   // Class is a meta type to create types that can be extended by inheritance.
   // All instances of all classes can be downgraded to a common object.
-  create('class', $.object)
+  var $Class = naming(Object.create(Type), 'class')
+
   // A fake constructor for instanceof type checking.
   var ClassType$ = $void.ClassType = function ClassType$ () {}
   ClassType$.prototype = $.class
-
-  /* Boundary Sentinel Type */
-  /* This type of instances work as I/O channels to external autonomous entities. */
-
-  // Device is a meta type to create a instantiable type for an entity that works
-  // as an communication interface between the program and an external hardware
-  // or an event source.
-  // By the nature of a device, it cannot be encoded or transfered directly.
-  create('device', $.object)
-  // A fake constructor for instanceof type checking.
-  var DeviceType$ = $void.DeviceType = function DeviceType$ () {}
-  DeviceType$.prototype = $.device
 
   /*
     The Evoluation.
   */
   // export the ability of creation to enable an autonomous process.
-  $void.createType = function createType (superType, module_, name) {
-    var type = Object.create(superType)
-    publish(type, 'proto', Object.create(superType.proto))
-    publish(type.proto, 'type', type)
-    if (module_) {
-      define(type, 'module', module_)
-    }
-    if (name) {
-      define(type, 'name', name)
-    }
-    return type
+  $void.createClass = function createClass () {
+    var class_ = Object.create($Class)
+    publish(class_, 'proto', Object.create($.object.proto))
+    publish(class_.proto, 'type', class_)
+    return class_
   }
 
   return $void
