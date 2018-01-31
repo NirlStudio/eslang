@@ -92,19 +92,15 @@ module.exports = function ($void) {
 
   // to test if an entity can be named and exported.
   function isFormal (entity) {
-    return typeof entity === 'function' || // a function,
-      (entity instanceof Type$) // a type
+    return typeof entity === 'function' || entity instanceof Type$
   }
 
 // to export an entity to a module.
   $void.export = function $export (space, name, entity) {
     publish(space, name, entity)
-    if (isFormal(entity) &&
-      !Object.prototype.hasOwnProperty.call(entity, 'module')) {
+    if (isFormal(entity) && typeof entity.name === 'undefined') {
       // the public name overrides the inner name.
       publish(entity, 'name', name)
-      // An exported entity is aware of its module.
-      define(entity, 'module', space['-module'] || null)
     }
     return entity
   }

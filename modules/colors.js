@@ -15,7 +15,7 @@ module.exports = function importing (exporting) {
   } catch (err) { // create a mock interface if it's missing
     mockColors(exporting)
     exporting['is-missing'] = true
-    exporting['-module']['error'] = err
+    exporting['import-error'] = err
   }
   // give special indicator characters.
   if (os === 'win32') {

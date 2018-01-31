@@ -14,9 +14,7 @@ module.exports = function include ($void) {
       return null
     }
     // look into current space to have the base uri.
-    return includeCode(space,
-      space.local['-source'],
-      evaluate(clist[1], space)
+    return includeCode(space, space.local['-module'], evaluate(clist[1], space)
     )
   })
 

@@ -22,7 +22,7 @@ module.exports = function import_ ($void) {
     }
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      return importModule(space.local['-source'],
+      return importModule(space.local['-module'],
       evaluate(clist[1], space),
         clist.length > 2 ? evaluate(clist[2], space) : null
       )
@@ -30,7 +30,7 @@ module.exports = function import_ ($void) {
     // (import field-or-fields from src)
     var src = evaluate(clist[3], space)
     var imported = src instanceof Object$ ? src // importing from an object
-      : importModule(space.local['-source'], src,
+      : importModule(space.local['-module'], src,
           clist.length > 4 ? evaluate(clist[4], space) : null)
     if (!imported) {
       return null // importing failed.

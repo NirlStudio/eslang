@@ -81,16 +81,15 @@ module.exports = function ($void) {
       return obj
     })
 
-    // TODO: copy type members or just proto?
     // Encoding
     var class$ = function () {}
     class$.prototype = proto_
-    typeof class_['to-code'] !== 'function' && link(class_, 'to-code', function (ctx) {
+    link(class_, 'to-code', function (ctx) {
       return $Tuple.of(sharedSymbolOf('class'), sharedSymbolOf('of'), typeMembers['to-code'](ctx))
     })
 
     // Description
-    typeof class_['to-string'] !== 'function' && link(class_, 'to-string', function () {
+    link(class_, 'to-string', function () {
       // TODO: #( name )# (class of typeMembers)
       return '#( ' + (this.name || '?class') + ' )# ' +
         thisCall(this, 'to-code')['to-string']() // TODO
