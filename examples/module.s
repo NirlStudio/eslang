@@ -4,5 +4,5 @@
   (print "(mod l 10 20) is" (mod l 10 20),
   (print "(mod f 10 20) is" (mod f 10 20),
   else
-  (print "fialed to load the module"),
+  (print "failed to load the module"),
 ).

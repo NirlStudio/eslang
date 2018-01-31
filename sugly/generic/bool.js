@@ -32,7 +32,7 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function () {
-    return typeof this === 'boolean' ? this.toString()
+    return typeof this === 'boolean' ? this ? 'true' : 'false'
       : this === proto ? '(bool proto)' : null
   })
 

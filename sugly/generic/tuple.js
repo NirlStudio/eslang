@@ -77,6 +77,7 @@ module.exports = function ($void) {
   var Range$ = $void.Range
   var Symbol$ = $void.Symbol
   var link = $void.link
+  var thisCall = $void.thisCall
   var initializeType = $void.initializeType
   var protoIndexer = $void.protoIndexer
 
@@ -216,48 +217,62 @@ module.exports = function ($void) {
   })
 
   // expand to a string list as an enclosed expression or a series of expressions.
-  var toList = link(proto, 'to-list', function (indent, list) {
+  link(proto, 'to-list', function (list, indent, padding) {
     if (!(this instanceof Tuple$)) {
       return null
     }
     if (!Array.isArray(list)) {
       list = []
     }
-    var hasIndent = typeof indent === 'string'
+    if (typeof indent !== 'string') {
+      indent = '  '
+    }
+    if (typeof padding !== 'string') {
+      padding = ''
+    }
+
+    var i, item
+    var lineBreak = '\n' + padding
     if (this.plain) {
-      this.$.forEach(function (item) {
-        hasIndent ? list.push('\n', indent) : list.push('\n')
+      for (i = 0; i < this.$.length; i++) {
+        list.push(lineBreak)
+        item = this.$[i]
         if (item instanceof Tuple$) {
-          item['to-list'](hasIndent ? indent + '  ' : indent, list)
+          item['to-list'](list, indent, padding)
         } else {
-          list.push($void.thisCall(item, 'to-string'))
+          list.push(thisCall(item, 'to-string'))
         }
-      })
-    } else {
-      list.push('(')
-      this.$.forEach(function (item) {
-        if (item instanceof Tuple$) {
-          if (item.plain) {
-            if (item.$.length > 0) {
-              item['to-list'](hasIndent ? indent + '  ' : indent, list)
-              list.push('\n', indent)
-            }
-          } else {
-            item['to-list'](hasIndent ? indent : indent, list)
+      }
+      return list
+    }
+
+    list.push('(')
+    var first = true
+    for (i = 0; i < this.$.length; i++) {
+      item = this.$[i]
+      if (item instanceof Tuple$) {
+        if (item.plain) {
+          if (item.$.length > 0) {
+            item['to-list'](list, indent, padding + indent)
+            list.push(lineBreak)
           }
         } else {
-          list.push($void.thisCall(item, 'to-string'))
+          first ? (first = false) : list.push(' ')
+          item['to-list'](list, indent, padding)
         }
-      })
-      list.push(')')
+      } else {
+        first ? (first = false) : list.push(' ')
+        list.push($void.thisCall(item, 'to-string'))
+      }
     }
+    list.push(')')
     return list
   })
 
   // Representation: as an enclosed expression or a plain series of expression.
-  link(proto, 'to-string', function (indent) {
+  link(proto, 'to-string', function (indent, padding) {
     return this instanceof Tuple$
-      ? toList.call(this, indent).join(' ')
+      ? this['to-list']([], indent, padding).join('')
       : this === proto ? '(tuple proto)' : null
   })
 

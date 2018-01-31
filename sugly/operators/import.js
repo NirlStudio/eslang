@@ -86,7 +86,7 @@ module.exports = function import_ ($void) {
     // try to locate the source in dirs.
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
-      console.warn('import > fialed to resolve source for', uri)
+      console.warn('import > failed to resolve source for', uri)
       return null
     }
     // look up it in cache.
@@ -138,7 +138,7 @@ module.exports = function import_ ($void) {
     ]
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
-      console.warn('import > fialed to resolve source for', source, 'in', dirs)
+      console.warn('import > failed to resolve source for', source, 'in', dirs)
       return null
     }
     // look up it in cache.
@@ -162,7 +162,7 @@ module.exports = function import_ ($void) {
       modules[uri] = scope
       return scope.exporting
     } catch (err) {
-      console.warn('import > fialed to import JS module of', source,
+      console.warn('import > failed to import JS module of', source,
         'for', err, 'from', uri)
       return null
     }

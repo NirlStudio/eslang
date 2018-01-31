@@ -180,7 +180,7 @@ module.exports = function ($void) {
       localed = format
       format = ''
     } else if (typeof format !== 'string') {
-      // maybe encoding for source code.
+      // encoding as source code for unnown format.
       return '(date of ' + this.getTime() + ')'
     }
     switch (format) {

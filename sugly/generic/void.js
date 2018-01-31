@@ -122,9 +122,9 @@ module.exports = function ($void) {
       if (isFormal(entity) && !entity.name) {
         publish(entity, 'name', names[0])
       }
-      names.forEach(function (name) {
-        publish(owner, name, entity)
-      })
+      for (var i = 0; i < names.length; i++) {
+        publish(owner, names[i], entity)
+      }
     }
     if (negativeNames) {
       if (!negate) {
@@ -139,9 +139,9 @@ module.exports = function ($void) {
         publish(owner, negativeNames, negate)
       } else {
         publish(negate, 'name', negativeNames[0])
-        negativeNames.forEach(function (name) {
-          publish(owner, name, negate)
-        })
+        for (var j = 0; j < negativeNames.length; j++) {
+          publish(owner, negativeNames[j], negate)
+        }
       }
     }
     return entity
@@ -403,7 +403,9 @@ function define (entity, prop, value) {
 
 // export native entities to its managed owners.
 function copy (target, src, mapping, wrapper) {
-  Object.getOwnPropertyNames(mapping).forEach(function (name) {
+  var names = Object.getOwnPropertyNames(mapping)
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i]
     var value = src[name]
     if (typeof value === 'undefined') {
       console.warn(src, 'missing required property:', name)
@@ -414,6 +416,6 @@ function copy (target, src, mapping, wrapper) {
       value = wrapper(name, value)
     }
     publish(target, name, value)
-  })
+  }
   return target
 }

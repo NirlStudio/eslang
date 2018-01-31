@@ -14,8 +14,7 @@ module.exports = function include ($void) {
       return null
     }
     // look into current space to have the base uri.
-    return includeCode(space, space.local['-module'], evaluate(clist[1], space)
-    )
+    return includeCode(space, space.local['-module'], evaluate(clist[1], space))
   })
 
   function includeCode (space, moduleUri, source) {
@@ -23,7 +22,7 @@ module.exports = function include ($void) {
       console.warn('include > invalid source:', source)
       return null
     }
-    if (moduleUri !== 'string') {
+    if (typeof moduleUri !== 'string') {
       moduleUri = null
     }
     if (!source.endsWith('.s')) {
@@ -35,7 +34,7 @@ module.exports = function include ($void) {
     // try to locate the source.
     var uri = loader.resolve(source, baseUri ? [baseUri] : [])
     if (typeof uri !== 'string') {
-      console.warn('include > fialed to resolve for', uri)
+      console.warn('include > failed to resolve for', uri)
       return null
     }
     // try to load file

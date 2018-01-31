@@ -44,7 +44,7 @@ module.exports = function load ($void) {
     // try to locate the source
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
-      console.warn('load > fialed to resolve for', uri)
+      console.warn('load > failed to resolve for', uri)
       return null
     }
     // try to load file
