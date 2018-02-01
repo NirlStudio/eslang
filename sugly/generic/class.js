@@ -85,6 +85,7 @@ module.exports = function ($void) {
     var class$ = function () {}
     class$.prototype = proto_
     link(class_, 'to-code', function (ctx) {
+      // support the ctx.
       return $Tuple.of(sharedSymbolOf('class'), sharedSymbolOf('of'), typeMembers['to-code'](ctx))
     })
 

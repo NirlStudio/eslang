@@ -20,8 +20,7 @@ module.exports = function control ($void) {
       return null // short circuit - the result will be null anyway.
     }
     var cond = evaluate(clist[1], space)
-    if (cond === true ||
-      cond !== false && cond !== null && cond !== 0) {
+    if (typeof cond !== 'undefined' && cond !== null && cond !== 0 && cond !== false) {
       return evaluate(clist[2], space)
     }
     return length > 3 ? evaluate(clist[3], space) : null
@@ -37,8 +36,7 @@ module.exports = function control ($void) {
 
     var result, i, expr
     var cond = evaluate(clist[1], space)
-    if (cond === true || // would more people prefer true?
-        cond !== false && cond !== null && cond !== 0) { //
+    if (typeof cond !== 'undefined' && cond !== null && cond !== 0 && cond !== false) { //
       expr = clist[2]
       if (expr === symbolElse) {
         return null // no true branch.
@@ -103,8 +101,7 @@ module.exports = function control ($void) {
           if (test) { return null }
         } else { // break/continue can be used in condition expression.
           var cond = test()
-          if (cond !== true && // it most likely is true when loop
-              cond === false || cond === null || cond === 0) {
+          if (cond === false || typeof cond === 'undefined' || cond === null || cond === 0) {
             break
           }
         }
@@ -218,8 +215,7 @@ module.exports = function control ($void) {
           if (test) { return result }
         } else { // break/continue can be used in condition expression.
           var cond = test()
-          if (cond !== true && // it most likely is true when loop
-              cond === false || cond === null || cond === 0) {
+          if (cond === false || typeof cond === 'undefined' || cond === null || cond === 0) {
             break
           }
         }

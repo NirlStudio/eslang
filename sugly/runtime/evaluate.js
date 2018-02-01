@@ -20,7 +20,7 @@ module.exports = function evaluate ($void) {
     }
     if (clause.plain) { // a plain expression list (code block)
       var last = null
-      for (var i = 0; i < clist.length; i++) {
+      for (var i = 0; i < length; i++) {
         last = evaluate(clist[i], space)
       }
       return last

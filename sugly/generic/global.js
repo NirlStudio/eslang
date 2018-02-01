@@ -20,5 +20,4 @@ module.exports = function ($void) {
   // Experimental: Pure Symbols
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
-  $export($, 'super', sharedSymbolOf('super'))
 }

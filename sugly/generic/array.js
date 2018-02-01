@@ -358,11 +358,10 @@ module.exports = function ($void) {
       return null
     }
     return typeof name === 'string' // read properties
-      ? name === 'length' ? this.length // expose native property 'length'
-        : typeof proto[name] === 'undefined' ? null : proto[name]
+      ? name === 'length' ? this.length : proto[name]
       : typeof name !== 'number' ? null
         : typeof value === 'undefined' // getting item
-          ? typeof this[name] === 'undefined' ? null : this[name]
+          ? this[name]
           : (this[name] = value) // setting item
   })
 

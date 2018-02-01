@@ -47,7 +47,8 @@ module.exports = function object ($void) {
     if (typeof data.activator === 'function' && data.activator.type !== $Operator) {
       var obj = data.activator()
       if (typeof obj !== 'undefined' && obj !== null) {
-        return obj // the activator should return a typed entity if it does return anything.
+        // the activator should return a typed entity if it does return anything.
+        return obj
       }
     }
     // restore data to its proper type.
@@ -66,7 +67,7 @@ module.exports = function object ($void) {
         return Object.create($Object.proto)
       }
       var type = evaluate(clist[2], space) // (@:type-or-factory )
-      return objectCreate(space, clist, type, 3)
+      return objectCreate(space, clist, type || $Object, 3)
     }
     if (length > 2 && clist[2] === $Symbol.pairing) { // (@ ? :)
       return objectCreate(space, clist, $Object, 1)

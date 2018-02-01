@@ -99,7 +99,7 @@ module.exports = function assignment ($void) {
 function tryToUpdateName (name, value) {
   if (typeof value === 'function' && !value.name) {
     Object.defineProperty(value, 'name', {
-      enumerable: false,
+      enumerable: true,
       configurable: false,
       writable: false,
       value: name

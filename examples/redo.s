@@ -1,7 +1,7 @@
 
 (let sum (= (x base)
   ((x == 1) ?
-    (return (1 + base),
+    (1 + base),
     (redo (x - 1) (x + base).
 
 (print "sum 1" (sum 1).
