@@ -237,8 +237,8 @@
     (assert "(date of 0)" (string of (date of 0),
     (assert "(0 0 1)" (string of (range of 0 0 1),
     (assert "x" (string of (symbol of "x"),
-    (assert "(@ )" (string of (@),
-    (assert "(@: )" (string of (@:),
+    (assert "(@ 1)" (string of (@ 1),
+    (assert "(@ :)" (string of (@:),
   ),
   (should "multiple values are joint together by spaces." (= ()
     (assert "aa" (string of "a" "a"),

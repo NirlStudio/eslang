@@ -158,7 +158,7 @@ function checkSuglyRuntime ($void) {
 
   checkFunctions($void, '[Void / functions] ', [
     // genesis
-    'operator', 'lambda', 'function', 'createClass',
+    'operator', 'lambda', 'function',
     // runtime
     'createLambdaSpace', 'createFunctionSpace',
     'createOperatorSpace', 'createModuleSpace',

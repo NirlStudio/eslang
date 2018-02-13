@@ -4,8 +4,8 @@ module.exports = function object ($void) {
   var $ = $void.$
   var $Object = $.object
   var $Symbol = $.symbol
-  var $Operator = $.operator
   var Symbol$ = $void.Symbol
+  var ClassType$ = $void.ClassType
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
 
@@ -21,7 +21,7 @@ module.exports = function object ($void) {
 
   // (@ symbol: value ...)
   function objectCreate (space, clist, type, offset) {
-    var data = Object.create($Object.proto)
+    var obj = type.empty()
     var length = clist.length
     offset += 1 // moving to the first ':'
     while (offset < length) {
@@ -40,20 +40,15 @@ module.exports = function object ($void) {
         }
       }
       offset += 1
-      data[name] = offset < length ? evaluate(clist[offset], space) : null
+      obj[name] = offset < length ? evaluate(clist[offset], space) : null
       offset += 2 // jump to next ':'
     }
-    // activate the data object
-    if (typeof data.activator === 'function' && data.activator.type !== $Operator) {
-      var obj = data.activator()
-      if (typeof obj !== 'undefined' && obj !== null) {
-        // the activator should return a typed entity if it does return anything.
-        return obj
-      }
+    // activate a typed object
+    var activator = type.proto.activator
+    if (typeof activator === 'function') {
+      activator.call(obj, obj)
     }
-    // restore data to its proper type.
-    return type === $Object || typeof type.of !== 'function' ||
-      type.of.type === $Operator ? data : type.of(data)
+    return obj
   }
 
   staticOperator('@', function (space, clause) {
@@ -67,7 +62,7 @@ module.exports = function object ($void) {
         return Object.create($Object.proto)
       }
       var type = evaluate(clist[2], space) // (@:type-or-factory )
-      return objectCreate(space, clist, type || $Object, 3)
+      return objectCreate(space, clist, type instanceof ClassType$ ? type : $Object, 3)
     }
     if (length > 2 && clist[2] === $Symbol.pairing) { // (@ ? :)
       return objectCreate(space, clist, $Object, 1)

@@ -24,15 +24,6 @@ module.exports = function ($void) {
 
   var proto = Type.proto
 
-  // explicitly call a function on a subject with arguments.
-  link(proto, 'call', function (subject) {
-    if (typeof this !== 'function' || this.type === $Operator) {
-      return null
-    }
-    return typeof subject === 'undefined' ? this.apply(null)
-      : this.apply(subject, Array.prototype.slice.call(arguments, 1))
-  })
-
   // apply a function and expand arguments from an array.
   link(proto, 'apply', function (subject, args) {
     if (typeof this !== 'function' || this.type === $Operator) {

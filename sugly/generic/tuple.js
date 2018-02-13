@@ -230,6 +230,14 @@ module.exports = function ($void) {
     if (typeof padding !== 'string') {
       padding = ''
     }
+    if (this.plain && this.$.length === 1) { // unwrap a container block
+      if (this.$[0] instanceof Tuple$) {
+        this.$[0]['to-list'](list, indent, padding)
+      } else {
+        list.push(thisCall(this.$[0], 'to-string'))
+      }
+      return list
+    }
 
     var i, item
     var lineBreak = '\n' + padding

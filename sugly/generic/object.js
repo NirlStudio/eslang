@@ -30,30 +30,25 @@ function iterator ($void) {
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.object
-  var $Tuple = $.tuple
   var $Symbol = $.symbol
+  var Tuple$ = $void.Tuple
   var link = $void.link
   var typeOf = $void.typeOf
   var Symbol$ = $void.Symbol
-  var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var thisCall = $void.thisCall
-  var ObjectType$ = $void.ObjectType
-  var CodingContext$ = $void.CodingContext
+  var EncodingContext$ = $void.EncodingContext
   var typeIndexer = $void.typeIndexer
   var ownsProperty = $void.ownsProperty
   var typeEncoder = $void.typeEncoder
   var protoIndexer = $void.protoIndexer
-  var encodingTypeOf = $void.encodingTypeOf
 
   // create an empty object.
-  link(Type, 'empty', function () {
-    return new Object$()
-  })
+  var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
 
   // create a new object and copy fields from source objects.
   link(Type, 'of', function () {
-    var obj = new Object$()
+    var obj = createObject()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       if (source instanceof Object$ || typeOf(source) === Type) {
@@ -72,9 +67,8 @@ module.exports = function ($void) {
           Object.assign(target, source)
         }
       }
-      return target
     }
-    return null
+    return target
   })
 
   // get the value of a field.
@@ -113,7 +107,7 @@ module.exports = function ($void) {
       ? ownsProperty(obj, name)
       : null
   })
-  // check the existence of a field
+  // retrieve field names.
   link(Type, 'fields-of', function (obj) {
     return obj instanceof Object$ || typeOf(obj) === Type
       ? Object.getOwnPropertyNames(obj)
@@ -130,119 +124,52 @@ module.exports = function ($void) {
   // generate an iterator function to traverse all fields as [name, value].
   link(proto, 'iterate', iterator($void))
 
-  // Identity: override the operator and negative logic to use the primary one.
-  link(proto, '===', function (another) {
-    return thisCall(this, 'is', another) === true
-  })
-  link(proto, ['is-not', '!=='], function (another) {
-    return thisCall(this, 'is', another) !== true
-  })
-  // Equivalence: override the operator and negative logic to use the primary one.
-  link(proto, '==', function (another) {
-    return thisCall(this, 'equals', another) === true
-  })
-  // orverride the negative testing to use the positive one.
-  link(proto, ['not-equals', '!='], function (another) {
-    return thisCall(this, 'equals', another) !== true
-  })
-
   // Type Verification
   link(proto, 'is-a', function (t) {
-    return t === Type || t === typeOf(this)
+    return t === Type
   }, 'is-not-a', function (t) {
-    return thisCall(this, 'is-a', t) !== true
+    return t !== Type
   })
 
   // default object emptiness logic
   link(proto, 'is-empty', function () {
     return this instanceof Object$ || typeOf(this) === Type
-      ? Object.getOwnPropertyNames(this).length < 1 : null
+      ? !(Object.getOwnPropertyNames(this).length > 0) : null
   }, 'not-empty', function () {
-    return thisCall(this, 'is-empty') !== true
+    return this instanceof Object$ || typeOf(this) === Type
+      ? Object.getOwnPropertyNames(this).length > 0 : null
   })
 
   // Encoding
-  // add an overridable method to report persistent fields.
-  // null: to be encoded to as null.
-  //   []: an empty arrry indicates to be encoded to an empty object.
-  link(proto, 'resolve', null)
   // encoding logic for all object instances.
   link(proto, 'to-code', function (ctx) {
-    if (!(this instanceof Object$)) {
-      return null // illegal call.
+    if (this === proto) {
+      return null
     }
-    // customized objects can hide some or all fields.
-    var fields = typeof this.resolve === 'function'
-      ? this.resolve() : Object.getOwnPropertyNames(this)
-    if (!Array.isArray(fields)) {
-      return null // this is an volatile entity.
-    }
-    var type = encodingTypeOf(this.type)
-    // an empty object.
-    if (fields.length < 1) {
-      return type === Type ? $Tuple.object
-        : $Tuple.of($Symbol.object, $Symbol.pairing, type['to-code']())
-    }
-    // this is a compound object.
-    if (ctx instanceof CodingContext$) {
-      var sym = ctx.touch(this, type)
+    console.log('to-code', this)
+    if (ctx instanceof EncodingContext$) {
+      var sym = ctx.begin(this)
       if (sym) {
         return sym
       }
-      return encodeObject(ctx, this, type, fields)
-    } else { // as root
-      ctx = new CodingContext$()
-      ctx.touch(this, type)
-      var code = encodeObject(ctx, this, type, fields)
-      return ctx.final(code)
+    } else {
+      ctx = new EncodingContext$(this)
     }
+    var props = Object.getOwnPropertyNames(this)
+    var code = [$Symbol.object]
+    for (var i = 0; i < props.length; i++) {
+      code.push($Symbol.of(props[i]), thisCall(this[props[i]], 'to-code', ctx))
+    }
+    if (code.length < 2) {
+      code.push($Symbol.pairing)
+    }
+    return ctx.end(this, typeOf(this), new Tuple$(code))
   })
-
-  function encodeObject (ctx, obj, type, fields) {
-    var list = [$Symbol.object] // (@ ...
-    var typed = false
-    if (type !== Type) { // a special object
-      typed = true
-      list.push($Symbol.pairing, type['to-code']()) // (@:type ...)
-    }
-    for (var i = 0; i < fields.length; i++) {
-      var name = fields[i]
-      var value = obj[name]
-      var code = thisCall(value, 'to-code', ctx)
-      list.push($Symbol.of(name), $Symbol.pairing, code)
-    }
-    if (typed && ctx.isReferred(obj)) { // nested reference.
-      list.splice(1, 2) // downgrade to a common data object.
-    }
-    return ctx.complete(obj, new Tuple$(list))
-  }
 
   // Description
   link(proto, 'to-string', function () {
-    if (!(this instanceof Object$)) {
-      return this === proto ? '(object proto)' : null
-    }
-    // type
-    var fields = ['(@']
-    if (this.type !== Type) {
-      fields.push(':' + this.type['to-string']())
-    }
-    // fields
-    Object.getOwnPropertyNames(this).forEach(function (name) {
-      var value = this[name]
-      var valueType = typeOf(value)
-      if (valueType === Type || valueType instanceof ObjectType$) {
-        // prevent recursive call.
-        fields.push('  ' + name + ': (@:' + valueType['to-string']() + ' ... )')
-      } else {
-        fields.push('  ' + name + ': ' + thisCall(value, 'to-string'))
-      }
-    }, this)
-    if (fields.length < 2) {
-      fields[0] = '(@:'
-    }
-    fields.push(')')
-    return fields.length > 2 ? fields.join('\n') : fields.join(' ')
+    return this === proto ? '(object proto)'
+      : thisCall(thisCall(this, 'to-code'), 'to-string')
   })
 
   // Indexer:

@@ -4,6 +4,7 @@ var JS = global || window
 
 function initializeSpace ($void) {
   require('./generic/void')($void)
+  require('./generic/encoding')($void)
 
   require('./generic/null')($void)
   require('./generic/type')($void)

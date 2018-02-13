@@ -5,137 +5,304 @@ module.exports = function ($void) {
   var Type = $.class
   var $Type = $.type
   var $Tuple = $.tuple
+  var $Symbol = $.symbol
   var $Object = $.object
-  var $Operator = $.operator
   var link = $void.link
+  var Tuple$ = $void.Tuple
+  var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var typeOf = $void.typeOf
-  var thisCall = $void.thisCall
   var ClassType$ = $void.ClassType
+  var InstanceType$ = $void.InstanceType$
   var createClass = $void.createClass
-  var typeEncoder = $void.typeEncoder
+  var ownsProperty = $void.ownsProperty
   var typeIndexer = $void.typeIndexer
-  var protoIndexer = $void.protoIndexer
   var sharedSymbolOf = $void.sharedSymbolOf
+  var initializeType = $void.initializeType
+  var EncodingContext$ = $void.EncodingContext
 
-  // define a new class.
+  // initialize the meta class.
+  initializeType(Type, createClass)
+
+  // define a class by classes and/or class descriptors.
   link(Type, 'of', function () {
-    // prepare class members
-    var typeMembers = new Object$()
-    var instMembers = new Object$()
-    for (var i = 0; i < arguments.length; i++) {
-      var parent = arguments[i]
-      if (parent instanceof ClassType$) {
-        Object.assign(typeMembers, parent)
-        Object.assign(instMembers, parent.proto)
-      } else if (parent instanceof Object$ || typeOf(parent) === $Object) {
-        Object.assign(typeMembers, parent)
-        if (parent.proto instanceof Object$ || typeOf(parent.proto) === $Object) {
-          Object.assign(instMembers, parent.proto)
-        }
+    return as.apply(createClass(), arguments)
+  })
+
+  // copy fields from source objects to the target class instance or an object.
+  link(Type, 'attach', function (target) {
+    if (target instanceof Object$) {
+      for (var i = 1; i < arguments.length; i++) {
+        $Object.assign(target, arguments[i])
+        activate.call(target, arguments[i])
       }
     }
-    delete typeMembers.proto
-    delete instMembers.type
+    return target
+  })
 
-    // create empty class
-    var class_ = Object.assign(createClass(), typeMembers)
-    var proto_ = Object.assign(class_.proto, instMembers)
-    typeMembers.proto = instMembers
+  // get the value of a field.
+  link(Type, 'get', function (obj, name, value) {
+    return obj instanceof ClassType$ && typeof name === 'string'
+      ? typeof value === 'undefined' ? obj[name]
+        : typeof obj[name] === 'undefined' ? value : obj[name]
+      : null
+  })
+  // set the value of a field.
+  link(Type, 'set', function (obj, name, value) {
+    return obj instanceof ClassType$ && typeof name === 'string'
+      ? (obj[name] = (typeof value !== 'undefined' ? value : null))
+      : null
+  })
+  // remove a field.
+  link(Type, 'unset', function (obj, name) {
+    if (obj instanceof ClassType$ && typeof name === 'string' && ownsProperty(obj, name)) {
+      var value = obj[name]
+      delete obj[name]
+      return value
+    }
+  })
 
-    // add function to create an empty instance
-    link(class_, 'empty', function () {
-      return Object.create(proto_)
-    })
+  // check the existence of a property
+  link(Type, 'has', function (obj, name) {
+    return obj instanceof ClassType$ && typeof name === 'string'
+      ? typeof obj[name] !== 'undefined' : null
+  })
+  // check the existence of a field
+  link(Type, 'owns', function (obj, name) {
+    return obj instanceof ClassType$ && typeof name === 'string'
+      ? ownsProperty(obj, name) : null
+  })
+  // retrieve field names.
+  link(Type, 'fields-of', function (obj) {
+    return obj instanceof ClassType$ ? Object.getOwnPropertyNames(obj) : null
+  })
 
-    // add function to create an instance with properties
-    var constructor = proto_.constructor
-    link(class_, 'of', typeof constructor === 'function' && constructor.type !== $Operator ? function (props) {
-      var obj = Object.create(proto_)
-      if (arguments.length < 2) {
-        constructor.call(obj, props instanceof Object$ || typeOf(props) === $Object ? props : null)
-      } else {
-        var allProps = new Object$()
-        for (var i = 0; i < arguments.length; i++) {
-          props = arguments[i]
-          if (props instanceof Object$ || typeOf(props) === $Object) {
-            Object.assign(allProps, props)
+  // the prototype of classes
+  var proto = Type.proto
+
+  // generate an empty instance.
+  link(proto, 'empty', function () {
+    return this instanceof ClassType$ ? Object.create(this.proto) : null
+  })
+
+  // make this class to act as other classes and/or class descriptors.
+  var as = link(proto, 'as', function () {
+    if (this instanceof ClassType$) {
+      var type_ = Object.create(null)
+      for (var i = 0; i < arguments.length; i++) {
+        var parent = arguments[i]
+        if (parent instanceof ClassType$) {
+          Object.assign(type_, parent)
+          Object.assign(this.proto, parent.proto)
+        } else if (parent instanceof Object$ || typeOf(parent) === $Object) {
+          Object.assign(type_, parent)
+          if (parent.proto instanceof Object$ || typeOf(parent.proto) === $Object) {
+            Object.assign(this.proto, parent.proto)
           }
         }
-        constructor.call(obj, allProps)
       }
-      return obj
-    } : function (props) {
-      if (arguments.length < 2) {
-        return props instanceof Object$ || typeOf(props) === $Object
-          ? Object.assign(Object.create(proto_), props)
-          : Object.create(proto_)
-      }
-      var obj = Object.create(proto_)
+      delete type_.proto
+      return Object.assign(this, type_)
+    }
+    return this
+  })
+
+  // static construction: create an instance by arguments.
+  link(proto, 'of', function () {
+    return this instanceof ClassType$
+      ? construct.apply(Object.create(this.proto), arguments) : null
+  })
+
+  // static activation: restore an instance by one or more property set.
+  link(proto, 'with', function () {
+    if (this instanceof ClassType$) {
+      var inst = Object.create(this.proto)
       for (var i = 0; i < arguments.length; i++) {
-        props = arguments[i]
-        if (props instanceof Object$ || typeOf(props) === $Object) {
-          Object.assign(obj, props)
-        }
+        $Object.assign(inst, arguments[i])
+        activate.call(inst, arguments[i])
       }
-      return obj
-    })
-
-    // Encoding
-    var class$ = function () {}
-    class$.prototype = proto_
-    link(class_, 'to-code', function (ctx) {
-      // support the ctx.
-      return $Tuple.of(sharedSymbolOf('class'), sharedSymbolOf('of'), typeMembers['to-code'](ctx))
-    })
-
-    // Description
-    link(class_, 'to-string', function () {
-      // TODO: #( name )# (class of typeMembers)
-      return '#( ' + (this.name || '?class') + ' )# ' +
-        thisCall(this, 'to-code')['to-string']() // TODO
-    })
-
-    // override type indexer
-    typeIndexer(class_)
-
-    // Class type verifier : TODO
-    link(proto_, 'is-a', function (t) {
-      return t === class_ || t === $Object
-    })
-    link(proto_, 'is-not-a', function (t) {
-      return thisCall(this, 'is-a') !== true
-    })
-
-    // override proto indexer
-    var indexer = typeof proto_[':'] === 'function' &&
-      proto_[':'].type !== $Operator ? proto_[':'] : null
-    indexer ? protoIndexer(class_, indexer) : protoIndexer(class_)
-
-    return class_
+      return inst
+    }
   })
 
-  // Type Verification: shared for all classes.
-  link(Type, 'is-a', function (type) {
-    return type === $Type || (this !== Type && type === Type)
+  // Type Verification: a class is a class and a type.
+  link(proto, 'is-a', function (type) {
+    return type === Type || type === $Type
   })
-  link(Type, 'is-not-a', function (type) {
-    return thisCall(this, 'is-a', type) !== true
+  link(proto, 'is-not-a', function (type) {
+    return type !== Type && type !== $Type
   })
 
   // Emptiness: shared by all classes.
-  // The meta class is taken as empty.
-  // Any other class is not empty.
-  link(Type, 'is-empty', function () {
-    return this === Type
+  link(proto, 'is-empty', function () {
+    return this instanceof ClassType$
+      ? Object.getOwnPropertyNames(this.proto).length < 1 : null
   })
-  link(Type, 'not-empty', function () {
-    return thisCall(this, 'is-empty') !== true
+  link(proto, 'not-empty', function () {
+    return this instanceof ClassType$
+      ? Object.getOwnPropertyNames(this.proto).length > 0 : null
   })
 
-  // Encoding & Description of class
-  typeEncoder(Type)
+  // convert a class (type) to a common object (data).
+  link(proto, 'to-object', function () {
+    if (this instanceof ClassType$) {
+      var obj = Object.assign($Object.empty(), this)
+      obj.proto = Object.assign($Object.empty(), obj.proto)
+      return obj
+    }
+  })
 
-  // Type Indexer for class.
-  typeIndexer(Type)
+  // Encoding
+  link(proto, 'to-code', function () {
+    return typeof this.name === 'string' ? sharedSymbolOf(this.name) : $Symbol.empty
+  })
+
+  // Description
+  link(proto, 'to-string', function () {
+    return typeof this.name === 'string' ? this.name : '?class'
+  })
+
+  typeIndexer(proto)
+
+  // the prototype of class instances
+  var instance = proto.proto
+
+  // root instance constructor
+  var construct = link(instance, 'constructor', function () {
+    if (this instanceof InstanceType$) {
+      if (typeof this.constructor === 'function' && this.constructor !== construct) {
+        // apply constructor
+        this.constructor.apply(this, arguments)
+      } else { // behave like (object assign this ...)
+        var args = [this]
+        Array.prototype.push.apply(args, arguments)
+        $Object.assign.apply($Object, args)
+      }
+    }
+    return this
+  })
+
+  // root instance activator: accept a plain object and apply the activator logic too.
+  var activate = link(instance, 'activator', function (source) {
+    if (typeof this.activator === 'function' && this.activator !== activate) {
+      this.activator(source)
+    }
+    return this
+  })
+
+  // Enable the customization of Identity.
+  var is = link(instance, 'is', function (another) {
+    return this.is !== is ? this.is(another) === true : Object.is(this, another)
+  })
+  link(instance, '===', function (another) {
+    return is.call(this, another)
+  })
+  link(instance, ['is-not', '!=='], function (another) {
+    return !is.call(this, another)
+  })
+
+  // Enable the customization of Ordering.
+  var compare = link(instance, 'compare', function (another) {
+    if (this.compare === compare) {
+      return Object.is(this, another) ? 0 : null
+    }
+    switch (this.compare(another)) {
+      case 0:
+        return 0
+      case 1:
+        return 1
+      case -1:
+        return -1
+      default:
+        return null
+    }
+  })
+
+  // Enable the customization of Equivalence.
+  var equals = link(instance, 'equals', function (another) {
+    return this.equals === equals
+      ? Object.is(this, another) : this.equals(another) === true
+  })
+  link(instance, '==', function (another) {
+    return equals.call(this, another)
+  })
+  link(instance, ['not-equals', '!='], function (another) {
+    return !equals.call(this, another)
+  })
+
+  // Emptiness: allow customization.
+  var isEmpty = link(instance, 'is-empty', function () {
+    var overriding = this['is-empty']
+    return overriding === isEmpty
+      ? Object.getOwnPropertyNames(this).length < 1
+      : overriding.call(this) === true
+  })
+  link(instance, 'not-empty', function () {
+    return !isEmpty.call(this)
+  })
+
+  // Type Verification
+  var isA = link(instance, 'is-a', function (t) {
+    var overriding = this['is-a']
+    return overriding === isA ? this.type === t : overriding.call(this, t) === true
+  })
+  link(instance, 'is-not-a', function (t) {
+    return !isA.call(this, t)
+  })
+
+  // Enable the customization of Encoding.
+  var toCode = link(instance, 'to-code', function (ctx) {
+    var overriding = this['to-code']
+    if (overriding === toCode) {
+      return $Object.proto['to-code'].call(this, ctx)
+    }
+    if (ctx instanceof EncodingContext$) {
+      var sym = ctx.begin(this)
+      if (sym) {
+        return sym
+      }
+    } else {
+      ctx = new EncodingContext$(this)
+    }
+    var code = overriding.call(this)
+    return ctx.end(this, typeOf(this),
+      code instanceof Tuple$ ? code : $Tuple.object)
+  })
+
+  // Enable the customization of Description.
+  var toString = link(instance, 'to-string', function () {
+    var overriding = this['to-string']
+    return overriding === toString
+      ? toCode.call(this)['to-string']()
+      : overriding.apply(this, arguments)
+  })
+
+  var indexer = link(instance, ':', function (name, value) {
+    if (this === instance) { // common class instance
+      if (name instanceof Symbol$) {
+        name = name.key
+      }
+      return typeof name !== 'string' ? null
+        : typeof value === 'undefined'
+          ? instance[name] // getting
+          : typeof proto[name] !== 'undefined' ? proto[name] // no overriding
+            : (proto[name] = value) // extending is allowed
+    }
+    // class instance proto & class instances
+    var overriding = this[':']
+    if (overriding === indexer || typeof overriding !== 'function') {
+      overriding = null
+    }
+    if (typeof value === 'undefined') { // getting
+      if (typeof name !== 'string') {
+        return overriding ? overriding.call(this, name) : null
+      }
+      value = instance[name] // common class instance proto.
+      return typeof value !== 'undefined' ? value
+        : overriding ? overriding.call(this, name) : this[name]
+    }
+    // setting or customized indexer
+    return overriding ? overriding.apply(this, arguments)
+      : typeof name === 'string' ? (this[name] = value) : null
+  })
 }

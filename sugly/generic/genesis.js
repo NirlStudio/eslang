@@ -48,7 +48,7 @@ module.exports = function () {
   // P.S, so is our fate too?
 
   /* A placeholder constructor to test a type. */
-  $void.Type = function Type () {}
+  $void.Type = function () {}
   $void.Type.prototype = Type
 
   /* It's ready to create primitive types, */
@@ -92,7 +92,7 @@ module.exports = function () {
   // A range value represents a descrete sequence of numbers in the interval of
   // [begin, end) and a step value.
   create('range')
-  var Range$ = $void.Range = function Range$ (begin, end, step) {
+  var Range$ = $void.Range = function (begin, end, step) {
     publish(this, 'begin', begin)
     publish(this, 'end', end)
     publish(this, 'step', step)
@@ -109,7 +109,7 @@ module.exports = function () {
   // A symbol will be resolved to the associated value under current context or
   // null by the evaluation function.
   create('symbol')
-  var Symbol$ = $void.Symbol = function Symbol$ (key) {
+  var Symbol$ = $void.Symbol = function (key) {
     publish(this, 'key', key)
   }
   Symbol$.prototype = $.symbol.proto
@@ -119,7 +119,7 @@ module.exports = function () {
   // an output value by the evaluation function.
   // The name 'list' is left to be used for more common scenarios.
   create('tuple')
-  var Tuple$ = $void.Tuple = function Tuple$ (list, plain, source) {
+  var Tuple$ = $void.Tuple = function (list, plain, source) {
     publish(this, '$', list) // hidden native data
     publish(this, 'plain', plain === true) // as code block.
     if (source) { // reserved for source map and other debug information.
@@ -136,7 +136,7 @@ module.exports = function () {
   // more syntax structures can be defined.
   // An operator is an immutable entity and can be fully encoded.
   create('operator')
-  $void.operator = function operator$ (impl, code) {
+  $void.operator = function (impl, code) {
     define(impl, 'type', $.operator)
     define(impl, 'code', code)
     return impl
@@ -150,7 +150,7 @@ module.exports = function () {
   // as input, so the runtime helps to evaluate all them before invocation.
   // A lambda is an immutable entity and can be fully encoded.
   create('lambda')
-  $void.lambda = function lambda$ (impl, code) {
+  $void.lambda = function (impl, code) {
     define(impl, 'type', $.lambda)
     define(impl, 'code', code)
     return impl
@@ -163,7 +163,7 @@ module.exports = function () {
   // For the existence of the context, a function cannot be fully encoded. But
   // it may be automatically downgraded to a lambda when the encoding is required.
   create('function', $.lambda)
-  $void.function = function function$ (impl, code) {
+  $void.function = function (impl, code) {
     define(impl, 'type', $.function)
     define(impl, 'code', code)
     return impl
@@ -178,38 +178,37 @@ module.exports = function () {
 
   // The object is the fundamental type of all compound entities.
   create('object')
-  var Object$ = $void.Object = function Object$ (src) {
+  var Object$ = $void.Object = function (src) {
     if (src) {
       Object.assign(this, src)
     }
   }
   Object$.prototype = $.object.proto
 
-  // A fake constructor for instanceof type checking.
-  var ObjectType$ = $void.ObjectType = function ObjectType$ () {}
-  ObjectType$.prototype = $.object
-
-  /* Extensible Data Type */
-  /* A extensible data type can facilitate complexity by type inheritance. */
-
-  // Class is a meta type to create types that can be extended by inheritance.
-  // All instances of all classes can be downgraded to a common object.
-  var $Class = naming(Object.create(Type), 'class')
-
-  // A fake constructor for instanceof type checking.
-  var ClassType$ = $void.ClassType = function ClassType$ () {}
-  ClassType$.prototype = $.class
-
   /*
     The Evoluation.
   */
+  // Class is a meta type to create more types.
+  var $Class = naming(Object.create(Type), 'class')
+
+  // the prototype of classes is also type.
+  var $ClassProto = publish($Class, 'proto', Object.create(Type))
+  publish($ClassProto, 'type', $Class)
+
+  // the prototype of class instances is object.proto.
+  var $Instance = publish($ClassProto, 'proto', Object.create($.object.proto))
+  publish($Instance, 'type', $ClassProto)
+
+  // A fake constructor for instanceof checking for a class.
+  var ClassType$ = $void.ClassType = function () {}
+  ClassType$.prototype = $ClassProto
+
+  // A fake constructor for instanceof checking for an instance of a class.
+  var InstanceType$ = $void.InstanceType = function () {}
+  InstanceType$.prototype = $Instance
+
   // export the ability of creation to enable an autonomous process.
-  $void.createClass = function createClass () {
-    var class_ = Object.create($Class)
-    publish(class_, 'proto', Object.create($.object.proto))
-    publish(class_.proto, 'type', class_)
-    return class_
-  }
+  $void.createClass = create.bind(null, null, $ClassProto)
 
   return $void
 }
@@ -222,6 +221,7 @@ function publish (owner, key, value) {
     writable: false,
     value: value
   })
+  return value
 }
 
 // Define a value as a non-enumerable property of an entity.
@@ -232,4 +232,5 @@ function define (entity, prop, value) {
     writable: false,
     value: value
   })
+  return value
 }

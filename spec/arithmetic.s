@@ -1,5 +1,5 @@
 (define "and: +" (= ()
-  (should "return the sum of arugment values" (= ()
+  (should "return the sum of argument values" (= ()
     (assert 0 (0 +),
     (assert 1 (1 +),
     (assert 3 (1 + 2),
@@ -13,7 +13,7 @@
 (let mVar1 20)
 (define "and & save: +=" (=> ()
   (should "return the sum of argument values and assign it to the first\
-            arugment if it's a symbol" (=> ()
+            argument if it's a symbol" (=> ()
     (let num 1)
     (assert 11 (num += 10),
     (assert 11 num),
@@ -37,7 +37,7 @@
 (let mVar2 20)
 (define "subtract & save: -=" (=> ()
   (should "return the difference of the first argument and all other arguments,\
-            and assign it to the first arugment if it's a symbol" (=> ()
+            and assign it to the first argument if it's a symbol" (=> ()
     (let num 1)
     (assert -9 (num -= 10),
     (assert -9 num),
@@ -61,7 +61,7 @@
 (let mVar3 20)
 (define "multiply & save: *=" (=> ()
   (should "return the product of arguments, and assign it to the first \
-            arugment if it's a symbol" (=> ()
+            argument if it's a symbol" (=> ()
     (let num 2)
     (assert 20 (num *= 10),
     (assert 20 (num),
@@ -86,7 +86,7 @@
 (let mVar4 20)
 (define "divide & save: /=" (=> ()
   (should "return the quotient of dividing the first argument by other arguments, \
-            and assign it to the first arugment if it's a symbol" (=> ()
+            and assign it to the first argument if it's a symbol" (=> ()
     (let num 20)
     (assert 2 (num /= 10),
     (assert 2 (num),
@@ -98,7 +98,7 @@
 (let mVar5 20)
 (define "self increment: ++" (=> ()
   (should "return the quotient of dividing the first argument by other arguments, \
-            and assign it to the first arugment if it's a symbol" (=> ()
+            and assign it to the first argument if it's a symbol" (=> ()
     (assert 1 (++),
     (assert 1 (++ ""),
     (assert 1 (++ (@),
@@ -120,7 +120,7 @@
 (let mVar6 20)
 (define "self decrement: --" (=> ()
   (should "return the quotient of dividing the first argument by other arguments, \
-            and assign it to the first arugment if it's a symbol" (=> ()
+            and assign it to the first argument if it's a symbol" (=> ()
     (assert -1 (--),
     (assert -1 (-- ""),
     (assert -1 (-- (@),

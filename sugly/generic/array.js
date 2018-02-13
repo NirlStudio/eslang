@@ -66,17 +66,13 @@ function iterator ($void) {
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.array
-  var $Tuple = $.tuple
   var $Symbol = $.symbol
-  var $Object = $.object
   var boolOf = $.bool.of
   var link = $void.link
-  var typeOf = $void.typeOf
   var Tuple$ = $void.Tuple
   var thisCall = $void.thisCall
   var copyProto = $void.copyProto
-  var ObjectType$ = $void.ObjectType
-  var CodingContext$ = $void.CodingContext
+  var EncodingContext$ = $void.EncodingContext
   var initializeType = $void.initializeType
   var protoIndexer = $void.protoIndexer
 
@@ -293,53 +289,27 @@ module.exports = function ($void) {
     if (!Array.isArray(this)) {
       return null // illegal call.
     }
-    // an empty object.
-    if (this.length < 1) {
-      return $Tuple.array
-    }
-    // not empty
-    if (ctx instanceof CodingContext$) {
-      var sym = ctx.touch(this, Type)
+    if (ctx instanceof EncodingContext$) {
+      var sym = ctx.begin(this)
       if (sym) {
         return sym
       }
-      return encode(ctx, this)
-    } else { // as root
-      ctx = new CodingContext$()
-      ctx.touch(this, Type)
-      var code = encode(ctx, this)
-      return ctx.final(code)
+    } else {
+      ctx = new EncodingContext$(this)
     }
+    var code = [$Symbol.object]
+    for (var i = 0; i < this.length; i++) {
+      code.push(thisCall(this[i], 'to-code', ctx))
+    }
+    return ctx.end(this, Type, new Tuple$(code))
   })
-
-  function encode (ctx, array) {
-    var list = [$Symbol.object] // (@ ...
-    for (var i = 0; i < array.length; i++) {
-      var value = array[i]
-      list.push(thisCall(value, 'to-code', ctx))
-    }
-    return ctx.complete(array, new Tuple$(list))
-  }
 
   // Description
   link(proto, 'to-string', function (separator) {
-    if (!Array.isArray(this)) {
-      return null
-    }
-    var items = ['(@']
-    for (var i = 0; i < this.length; i++) {
-      var value = this[i]
-      var valueType = typeOf(value)
-      if (valueType === $Object || valueType instanceof ObjectType$) {
-        // prevent recursive call.
-        items.push('(@:' + valueType['to-string']() + ' ... )')
-      } else {
-        items.push(thisCall(value, 'to-string'))
-      }
-    }
-    items.push(')')
-    return items.join(separator || ' ')
+    return this === proto ? '(array proto)'
+      : thisCall(thisCall(this, 'to-code'), 'to-string')
   })
+
   link(proto, 'join', function (separator) {
     if (!Array.isArray(this)) {
       return null

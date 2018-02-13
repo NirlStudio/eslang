@@ -41,6 +41,13 @@ module.exports = function ($void) {
       typeof another === 'undefined' ? null : another) ? 0 : null
   })
 
+  // Emptiness: null, type.proto and all protos are empty.
+  link(Null, 'is-empty', function () {
+    return true
+  }, 'not-empty', function () {
+    return false
+  })
+
   // Type Verification: to test if an entity is an instance of a type.
   link(Null, 'is-a', function (type) {
     // null is null and null is a null.
@@ -48,13 +55,6 @@ module.exports = function ($void) {
     return typeof type === 'undefined' || type === null
   }, 'is-not-a', function (type) {
     return typeof type !== 'undefined' && type !== null
-  })
-
-  // Emptiness: null, type.proto and all protos are empty.
-  link(Null, 'is-empty', function () {
-    return true
-  }, 'not-empty', function () {
-    return false
   })
 
   // Encoding

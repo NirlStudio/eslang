@@ -7,12 +7,8 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var Symbol$ = $void.Symbol
   var Tuple$ = $void.Tuple
-  var $Tuple = $.tuple
-  var $Array = $.array
   var $Lambda = $.lambda
   var $Object = $.object
-  var $Symbol = $.symbol
-  var ObjectType$ = $void.ObjectType
 
   // a static version of isPrototypeOf.
   var isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
@@ -67,20 +63,6 @@ module.exports = function ($void) {
     return entity.type instanceof Type$ ? entity.type : null
   }
   define(typeOf, 'name', 'type-of')
-
-  function encodingTypeOf (type) {
-    if (!(type instanceof ObjectType$) || type === $Object) {
-      return $Object
-    }
-    var typeCode = type['to-code']()
-    while (!typeCode && type) {
-      // type downgrading
-      type = Object.getPrototypeOf(type)
-      typeCode = type['to-code']()
-    }
-    return typeCode && type ? type : $Object
-  }
-  $void.encodingTypeOf = encodingTypeOf
 
   function thisCall (subject, methodName) {
     var method = indexerOf(subject).call(subject, methodName)
@@ -190,6 +172,9 @@ module.exports = function ($void) {
   // override a type's indexer.
   function typeIndexer (type) {
     return link(type, ':', function (name, value) {
+      if (name instanceof Symbol$) {
+        name = name.key
+      }
       return typeof name !== 'string' ? null
         : typeof value === 'undefined' ? type[name]
           : typeof type[name] !== 'undefined' ? type[name] // no overriding
@@ -306,78 +291,6 @@ module.exports = function ($void) {
               : index === 'body' ? (this.code || emptyCode).$[2]
                 : proto[index]
     })
-  }
-
-  $void.CodingContext = CodingContext$
-  function CodingContext$ () {
-    this.map = new Map()
-    this.code = []
-    this.counter = -1
-    this.symbol = null
-  }
-  CodingContext$.prototype = {
-    touch: function (obj, type) {
-      if (!this.map.has(obj)) {
-        this.map.set(obj, [null, null])
-        return null // new object
-      }
-      // occur more than once
-      var record = this.map.get(obj)
-      if (record[0]) {
-        return record[0] // has been allocated a key.
-      }
-      // allocate a new key
-      this.counter += 1
-      var ref = record[0] = new Tuple$([this.symbol, this.counter]) // (_ i)
-      // check if it's the first variable.
-      if (this.code.length < 1) {
-        this.symbol = $Symbol.of('_') // use an array as a cache.
-        this.codeBlock = [ // function body: (var _ (@))
-          $Symbol.var, this.symbol, $Tuple.array
-        ]
-        this.code = [ // instant function call: (=():() ...)
-          $Symbol.lambda, $Tuple.empty, $Symbol.pairing, $Tuple.empty,
-          new Tuple$(this.codeBlock, true)
-        ]
-      }
-      // push local variable
-      if (record[1]) {
-        var code = record[1]
-        if (code instanceof Tuple$) { // for safety.
-          // change declaration to a reference.
-          var tmp = new Tuple$(code.$)
-          code.$ = ref.$
-          code = tmp
-        }
-        this.codeBlock.push( // (_ i (...))
-          $Tuple.of(this.symbol, this.counter, code))
-      } else {
-        this.codeBlock.push($Tuple.of(this.symbol, this.counter, // (_ i ...
-          type === $Object ? $Tuple.object // (@:)
-            : type === $Array ? $Tuple.array // (@)
-              : $Tuple.of($Symbol.object, $Symbol.pairing, type['to-code']()) // (@:type)
-        ))
-      }
-      return ref
-    },
-    isReferred: function (obj) {
-      var record = this.map.get(obj)
-      return record && record[0]
-    },
-    complete: function (obj, code) {
-      var record = this.map.get(obj)
-      var ref = record[0]
-      if (ref) { // reused already, e.g. a nest reference.
-        // updating: ((_ i) = (...))
-        this.codeBlock.push($Tuple.of(ref, sharedSymbolOf('='), code))
-      } else { // save it for possible future reference.
-        record[1] = code
-      }
-      return code
-    },
-    final: function (code) {
-      return this.code.length > 0 ? new Tuple$(this.code) : code
-    }
   }
 }
 
