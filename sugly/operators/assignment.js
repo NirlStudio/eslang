@@ -24,7 +24,8 @@ module.exports = function assignment ($void) {
     // in normal context, the symbol part can only be a symbol
     sym = clist[1]
     return sym instanceof Symbol$
-      ? space.export(sym.key, evaluate(clist[2], space)) : null
+      ? space.export(sym.key, space.var(sym.key, evaluate(clist[2], space)))
+      : null
   })
 
   // 'let' update the variable in most recent context.
@@ -67,13 +68,12 @@ module.exports = function assignment ($void) {
       }
       // var (symbol ...) value-list)
       var i
-      var last = null
       var syms = sym.$
       var values = length > 2 ? evaluate(clist[2], space) : null
       if (Array.isArray(values)) { // assign the value one by one.
         for (i = 0; i < syms.length; i++) {
           if (syms[i] instanceof Symbol$) {
-            last = space[method](syms[i].key, i < values.length ? values[i] : null)
+            space[method](syms[i].key, i < values.length ? values[i] : null)
           }
         }
       } else if (values instanceof Object$) { // read fields into an array.
@@ -81,17 +81,17 @@ module.exports = function assignment ($void) {
           if (syms[i] instanceof Symbol$) {
             var field = syms[i].key
             var value = values[field]
-            last = space[method](field, typeof value === 'undefined' ? null : value)
+            space[method](field, typeof value === 'undefined' ? null : value)
           }
         }
       } else { // assign all symbols the same value.
         for (i = 0; i < syms.length; i++) {
           if (syms[i] instanceof Symbol$) {
-            last = space[method](syms[i].key, values)
+            space[method](syms[i].key, values)
           }
         }
       }
-      return last
+      return values
     }
   }
 }

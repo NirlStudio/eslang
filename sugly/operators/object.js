@@ -2,6 +2,7 @@
 
 module.exports = function object ($void) {
   var $ = $void.$
+  var $Class = $.class
   var $Object = $.object
   var $Symbol = $.symbol
   var Symbol$ = $void.Symbol
@@ -62,7 +63,11 @@ module.exports = function object ($void) {
         return Object.create($Object.proto)
       }
       var type = evaluate(clist[2], space) // (@:type-or-factory )
-      return objectCreate(space, clist, type instanceof ClassType$ ? type : $Object, 3)
+      return type === $Class
+        ? $Class.of(objectCreate(space, clist, $Object, 3))
+        : type instanceof ClassType$
+          ? objectCreate(space, clist, type, 3)
+          : objectCreate(space, clist, $Object, 3)
     }
     if (length > 2 && clist[2] === $Symbol.pairing) { // (@ ? :)
       return objectCreate(space, clist, $Object, 1)
