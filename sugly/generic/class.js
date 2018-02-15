@@ -88,21 +88,18 @@ module.exports = function ($void) {
   // make this class to act as other classes and/or class descriptors.
   var as = link(proto, 'as', function () {
     if (this instanceof ClassType$) {
-      var type_ = Object.create(null)
       for (var i = 0; i < arguments.length; i++) {
         var parent = arguments[i]
         if (parent instanceof ClassType$) {
-          Object.assign(type_, parent)
+          Object.assign(this, parent)
           Object.assign(this.proto, parent.proto)
         } else if (parent instanceof Object$ || typeOf(parent) === $Object) {
-          Object.assign(type_, parent)
+          Object.assign(this, parent)
           if (parent.proto instanceof Object$ || typeOf(parent.proto) === $Object) {
             Object.assign(this.proto, parent.proto)
           }
         }
       }
-      delete type_.proto
-      return Object.assign(this, type_)
     }
     return this
   })

@@ -6,11 +6,15 @@ module.exports = function ($void, JS) {
   var thisCall = $void.thisCall
 
   $export($, 'print', function () {
-    console.log.apply(console, toStrings.apply(null, arguments))
+    var text = toStrings.apply(null, arguments)
+    console.log(text)
+    return text
   })
 
   $export($, 'warn', function () {
-    console.warn.apply(console, toStrings.apply(null, arguments))
+    var text = toStrings.apply(null, arguments)
+    console.warn(text)
+    return text
   })
 
   function toStrings () {
@@ -23,6 +27,6 @@ module.exports = function ($void, JS) {
         strings.push(thisCall(value, 'to-string'))
       }
     }
-    return strings
+    return strings.join(' ')
   }
 }

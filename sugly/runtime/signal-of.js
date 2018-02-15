@@ -15,7 +15,8 @@ module.exports = function ($void) {
         throw new Signal$(type, evaluate(clist[1], space), 1)
       }
       var result = []
-      for (var i = 1; i < length; i++) {
+      var i
+      for (i = 1; i < length; i++) {
         result.push(evaluate(clist[i], space))
       }
       throw new Signal$(type, result, i - 1)

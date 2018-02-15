@@ -6,13 +6,10 @@ module.exports = function ($void, JS) {
   var $export = $void.export
   var copyType = $void.copyType
 
-  var uri = $export($, 'uri', new Object$({
-    'is-readonly': true
-  }))
-  copyType(uri, JS, {
+  $export($, 'uri', copyType(new Object$(), JS, {
     'encodeURI': 'encode',
     'decodeURI': 'decode',
     'encodeURIComponent': 'escape',
     'decodeURIComponent': 'unescape'
-  })
+  }))
 }

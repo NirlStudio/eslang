@@ -28,7 +28,7 @@ module.exports = function ($void) {
   $void.sharedSymbolOf = sharedSymbolOf
 
   // retrieve the system indexer of an entity.
-  var indexerOf = $void.indexerOf = $['indexer-of'] = function (entity) {
+  var indexerOf = $void.indexerOf = function (entity) {
     if (typeof entity === 'undefined' || entity === null) {
       return Null[':']
     }
@@ -46,10 +46,9 @@ module.exports = function ($void) {
         ? entity.type.proto[':'] // use the type's indexer
         : Null[':'] // take other unknown entities as null.
   }
-  define(indexerOf, 'name', 'indexer-of')
 
   // retrieve the real type of an entity.
-  var typeOf = $void.typeOf = $['type-of'] = function (entity) {
+  $void.typeOf = function (entity) {
     if (typeof entity === 'undefined' || entity === null) {
       return null // the type of null is itself.
     }
@@ -62,7 +61,6 @@ module.exports = function ($void) {
     // bool, string, number, function and other unknonwn native entities.
     return entity.type instanceof Type$ ? entity.type : null
   }
-  define(typeOf, 'name', 'type-of')
 
   function thisCall (subject, methodName) {
     var method = indexerOf(subject).call(subject, methodName)
@@ -300,16 +298,6 @@ function publish (owner, key, value) {
     enumerable: true,
     configurable: false,
     writable: true,
-    value: value
-  })
-}
-
-// Define a value as a property of an entity.
-function define (entity, prop, value) {
-  Object.defineProperty(entity, prop, {
-    enumerable: false,
-    configurable: false,
-    writable: false,
     value: value
   })
 }

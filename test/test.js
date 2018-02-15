@@ -184,14 +184,12 @@ function checkSuglyRuntime ($void) {
   ])
 
   checkObjects($void.$, '[Sugly / objects] ', [
-    '-runtime', 'uri', 'math', 'json' // TODO: 'timer'
+    '-runtime', 'uri', 'math', 'json', 'emitter', 'timer'
   ])
 
   checkFunctions($void.$, '[Sugly / functions] ', [
-    // generic
-    'type-of', 'indexer-of', 'iterate', 'traverse', 'collect',
     // lib
-    'encode', 'print', 'warn',
+    'env', 'encode', 'print', 'warn',
     // startup
     'tokenizer', 'tokenize', 'compiler', 'compile',
     // runtime

@@ -3,13 +3,8 @@ sugly-lang
 A simple &amp; ugly programming language
 
 ```sugly
-"Hello, world!" # value ouput
+"Hello, world!"
 
-```
-or
-```sugly
-(print "Hello, world!")
-() #reset module output
 ```
 
 Run from npm

@@ -6,12 +6,8 @@ module.exports = function ($void, JS) {
   var $export = $void.export
   var copyType = $void.copyType
 
-  var json = $export($, 'json', new Object$({
-    'is-readonly': true
-  }))
-  // TODO - type adaptation
-  copyType(json, JS.JSON, {
-    'stringify': 'string-of',
+  $export($, 'json', copyType(new Object$(), JS.JSON, {
+    'stringify': 'of',
     'parse': 'parse'
-  })
+  }))
 }

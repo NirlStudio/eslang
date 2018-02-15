@@ -29,11 +29,12 @@ function initializeSpace ($void) {
   require('./generic/global')($void)
 
   require('./lib/encode')($void, JS)
+  require('./lib/print')($void, JS)
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
   require('./lib/json')($void, JS)
+  require('./lib/emitter')($void, JS)
   require('./lib/timer')($void, JS)
-  require('./lib/print')($void, JS)
 }
 
 function initializeRuntime ($void) {

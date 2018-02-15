@@ -23,9 +23,9 @@ module.exports = function () {
   function Type$ () { /* 2. Separation & Aggregation */
     // This function should be executed once, and only once.
     // The primal type is derived from the supreme prototype.
-    publish(this, 'proto', Prototype)
+    define(this, 'proto', Prototype)
     // The primal type is the container type of the supreme prototype.
-    publish(Prototype, 'type', this)
+    define(Prototype, 'type', this)
   }
   Type$.prototype = Prototype
 
@@ -58,11 +58,14 @@ module.exports = function () {
     }
     var type = Object.create(superType)
     // a new type should have a new nature.
-    publish(type, 'proto', Object.create(superType.proto))
+    define(type, 'proto', Object.create(superType.proto))
     // a proto always intrinsically knows its container type.
-    publish(type.proto, 'type', type)
+    define(type.proto, 'type', type)
     // give a name to the new type.
-    naming(type, name)
+    if (name) {
+      naming(type, name)
+    }
+    return type
   }
 
   /* And there was evening, and there was morning — the first day. */
@@ -193,11 +196,11 @@ module.exports = function () {
 
   // the prototype of classes is also type.
   var $ClassProto = publish($Class, 'proto', Object.create(Type))
-  publish($ClassProto, 'type', $Class)
+  define($ClassProto, 'type', $Class)
 
   // the prototype of class instances is object.proto.
   var $Instance = publish($ClassProto, 'proto', Object.create($.object.proto))
-  publish($Instance, 'type', $ClassProto)
+  define($Instance, 'type', $ClassProto)
 
   // A fake constructor for instanceof checking for a class.
   var ClassType$ = $void.ClassType = function () {}

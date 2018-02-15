@@ -33,6 +33,8 @@ module.exports = function ($void) {
   typeIndexer(proto)
 
   /* The Primal Type */
+  link(Type, 'of', $void.typeOf)
+
   // Identity inherits type.proto.
   // Equivalence inherits type.proto.
   // Ordering inherits type.proto.
