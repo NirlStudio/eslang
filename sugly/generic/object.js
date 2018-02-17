@@ -146,7 +146,6 @@ module.exports = function ($void) {
     if (this === proto) {
       return null
     }
-    console.log('to-code', this)
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
       if (sym) {
@@ -158,7 +157,7 @@ module.exports = function ($void) {
     var props = Object.getOwnPropertyNames(this)
     var code = [$Symbol.object]
     for (var i = 0; i < props.length; i++) {
-      code.push($Symbol.of(props[i]), thisCall(this[props[i]], 'to-code', ctx))
+      code.push($Symbol.of(props[i]), $Symbol.pairing, thisCall(this[props[i]], 'to-code', ctx))
     }
     if (code.length < 2) {
       code.push($Symbol.pairing)

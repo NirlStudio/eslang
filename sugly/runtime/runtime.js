@@ -10,7 +10,7 @@ module.exports = function runtime ($void) {
     'version': new Object$({
       'major': 0,
       'minor': 3,
-      'patch': 0
+      'patch': 1
     }),
     'environment': new Object$({
       'debugging': false

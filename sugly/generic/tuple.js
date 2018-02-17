@@ -269,7 +269,7 @@ module.exports = function ($void) {
           item['to-list'](list, indent, padding)
         }
       } else {
-        first ? (first = false) : list.push(' ')
+        first || item === $Symbol.pairing ? (first = false) : list.push(' ')
         list.push($void.thisCall(item, 'to-string'))
       }
     }

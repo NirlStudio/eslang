@@ -13,7 +13,7 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var typeOf = $void.typeOf
   var ClassType$ = $void.ClassType
-  var InstanceType$ = $void.InstanceType$
+  var InstanceType$ = $void.InstanceType
   var createClass = $void.createClass
   var ownsProperty = $void.ownsProperty
   var typeIndexer = $void.typeIndexer
@@ -85,22 +85,53 @@ module.exports = function ($void) {
     return this instanceof ClassType$ ? Object.create(this.proto) : null
   })
 
+  // generate an instance without arguments.
+  link(proto, 'default', function () {
+    return this instanceof ClassType$
+      ? construct.call(Object.create(this.proto)) : null
+  })
+
   // make this class to act as other classes and/or class descriptors.
   var as = link(proto, 'as', function () {
-    if (this instanceof ClassType$) {
-      for (var i = 0; i < arguments.length; i++) {
-        var parent = arguments[i]
-        if (parent instanceof ClassType$) {
-          Object.assign(this, parent)
-          Object.assign(this.proto, parent.proto)
-        } else if (parent instanceof Object$ || typeOf(parent) === $Object) {
-          Object.assign(this, parent)
-          if (parent.proto instanceof Object$ || typeOf(parent.proto) === $Object) {
-            Object.assign(this.proto, parent.proto)
-          }
+    if (!(this instanceof ClassType$)) {
+      return this
+    }
+    var type_ = {}
+    var proto_ = {}
+    for (var i = 0; i < arguments.length; i++) {
+      var src = arguments[i]
+      var t, p
+      if (src instanceof ClassType$) {
+        t = src
+        p = src.proto
+      } else if (src instanceof Object$ || typeOf(src) === $Object) {
+        p = src
+        if (src.static instanceof Object$ || typeOf(src.static) === $Object) {
+          t = src.static
+        } else {
+          t = {}
+        }
+      } else {
+        t = {}; p = {}
+      }
+      var j, key
+      var fields = Object.getOwnPropertyNames(t)
+      for (j = 0; j < fields.length; j++) {
+        key = fields[j]
+        if (typeof this[key] === 'undefined') {
+          type_[key] = t[key]
+        }
+      }
+      fields = Object.getOwnPropertyNames(p)
+      for (j = 0; j < fields.length; j++) {
+        key = fields[j]
+        if (key !== 'type') {
+          proto_[key] = p[key]
         }
       }
     }
+    Object.assign(this, type_)
+    Object.assign(this.proto, proto_)
     return this
   })
 

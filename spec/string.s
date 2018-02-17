@@ -238,7 +238,7 @@
     (assert "(0 0 1)" (string of (range of 0 0 1),
     (assert "x" (string of (symbol of "x"),
     (assert "(@ 1)" (string of (@ 1),
-    (assert "(@ :)" (string of (@:),
+    (assert "(@:)" (string of (@:),
   ),
   (should "multiple values are joint together by spaces." (= ()
     (assert "aa" (string of "a" "a"),
