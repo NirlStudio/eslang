@@ -4,12 +4,11 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.string
   var link = $void.link
+  var Symbol$ = $void.Symbol
   var thisCall = $void.thisCall
-  var initializeType = $void.initializeType
-  var protoIndexer = $void.protoIndexer
 
   // the empty value
-  initializeType(Type, '')
+  link(Type, 'empty', '')
 
   // generate a string from inputs.
   link(Type, 'of', function (value) {
@@ -31,67 +30,51 @@ module.exports = function ($void) {
         result.push(str)
       }
     }
-    return result.length < 1 ? ''
-      : result.length === 1 ? result[0] : result.join('')
+    return result.join('')
   })
 
   // generate a string from a series of unicode values
   link(Type, 'of-chars', function () {
-    var str = String.fromCharCode.apply(String, arguments)
-    return typeof str === 'undefined' ? '' : str
+    return String.fromCharCode.apply(String, arguments)
   })
 
   var proto = Type.proto
+  // return the length of this string.
+  link(proto, 'length', function () {
+    return this.length
+  })
+
   // Searching
-  // TODO: match & search with regex?
-  // retrieve the first char or the index of the first occurence of value.
-  link(proto, 'first', function (value, from) {
-    if (typeof this !== 'string') {
-      return null
-    }
-    switch (arguments.length) {
-      case 0:
-        return this.length > 0 ? this.charAt(0) : null
-      case 1:
-        return typeof value !== 'string' ? -1 : this.indexOf(value)
-      default:
-        return typeof value !== 'string' ? -1
-          : this.indexOf(value, typeof from !== 'number' ? 0 : from)
-    }
+  // retrieve the first char.
+  link(proto, 'first', function (count) {
+    return typeof count === 'undefined'
+      ? this.length > 0 ? this.charAt(0) : null
+      : this.substr(0, count >> 0)
+  })
+  // try to find the index of the first occurence of value.
+  link(proto, 'first-of', function (value, from) {
+    from >>= 0
+    return this.indexOf(value, from < 0 ? from + this.length : from)
+  })
+  // retrieve the last char.
+  link(proto, 'last', function (count) {
+    return typeof count === 'undefined'
+      ? this.length > 0 ? this.charAt(this.length - 1) : null
+      : this.substr(this.length - (count >>= 0), count)
   })
   // retrieve the last char or the index of the last occurence of value.
-  link(proto, 'last', function (value, from) {
-    if (typeof this !== 'string') {
-      return null
-    }
-    switch (arguments.length) {
-      case 0:
-        return this.length > 0 ? this.charAt(this.length - 1) : null
-      case 1:
-        return typeof value !== 'string' ? -1 : this.lastIndexOf(value)
-      default:
-        return typeof value !== 'string' ? -1
-          : this.lastIndexOf(value, typeof from !== 'number' ? this.length : from)
-    }
+  link(proto, 'last-of', function (value, from) {
+    return this.lastIndexOf(value, typeof from !== 'number' ? this.length : from)
   })
-  link(proto, 'starts-with', function (value) {
-    return typeof this === 'string' && typeof value === 'string'
-      ? this.startsWith(value) : null
-  })
-  link(proto, 'ends-with', function (value) {
-    return typeof this === 'string' && typeof value === 'string'
-      ? this.endsWith(value) : null
-  })
+
+  link(proto, 'starts-with', String.prototype.startsWith)
+  link(proto, 'ends-with', String.prototype.endsWith)
 
   // Converting
   // generate sub-string from this string.
   link(proto, 'copy', function (begin, end) {
-    if (typeof this !== 'string') {
-      return null
-    }
-    if (typeof begin !== 'number') {
-      begin = 0
-    } else if (begin < 0) {
+    begin >>= 0
+    if (begin < 0) {
       begin += this.length
       if (begin < 0) {
         begin = 0
@@ -107,37 +90,27 @@ module.exports = function ($void) {
     }
     return this.substr(begin, end - begin)
   })
-  link(proto, 'trim', function () {
-    return typeof this === 'string' ? this.trim() : null
-  })
-  link(proto, 'trim-left', function () {
-    return typeof this === 'string' ? this.trimLeft() : null
-  })
-  link(proto, 'trim-right', function () {
-    return typeof this === 'string' ? this.trimRight() : null
-  })
+
+  link(proto, 'trim', String.prototype.trim)
+  link(proto, 'trim-left', String.prototype.trimLeft)
+  link(proto, 'trim-right', String.prototype.trimRight)
+
   link(proto, 'replace', function (value, newValue) {
-    return typeof this !== 'string' ? null
-      : typeof value !== 'string' || !value ? this
-        : this.replace(
-          new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-          typeof newValue === 'string' ? newValue : ''
-        )
+    return typeof value !== 'string' || !value ? this
+      : this.replace(
+        new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+        typeof newValue === 'string' ? newValue : ''
+      )
   })
   link(proto, 'to-upper', function (localed) {
-    return typeof this !== 'string' ? null
-      : localed === true ? this.toUpperCase() : this.toLocaleUpperCase()
+    return localed === true ? this.toUpperCase() : this.toLocaleUpperCase()
   })
   link(proto, 'to-lower', function (localed) {
-    return typeof this !== 'string' ? null
-      : localed === true ? this.toLowerCase() : this.toLocaleLowerCase()
+    return localed === true ? this.toLowerCase() : this.toLocaleLowerCase()
   })
 
   // combination and splitting of strings
   link(proto, ['concat', '+'], function () {
-    if (typeof this !== 'string') {
-      return null
-    }
     var result = this ? [this] : []
     for (var i = 0; i < arguments.length; i++) {
       var str = arguments[i]
@@ -151,17 +124,13 @@ module.exports = function ($void) {
         result.push(str)
       }
     }
-    return result.length < 1 ? ''
-      : result.length === 1 ? result[0] : result.join('')
+    return result.join('')
   })
   // the reversed operation of '-':
   // if the argument value is a string, to removes a substring if it's the suffix.
   // if the argument value is a number, to removes a suffix with the length of this number.
   // other argument values will be converted to a string and to be removed as suffix.
   link(proto, '-', function () {
-    if (typeof this !== 'string') {
-      return null
-    }
     if (this.length < 1 || arguments.length < 1) {
       return this
     }
@@ -187,71 +156,55 @@ module.exports = function ($void) {
     return result
   })
   link(proto, 'split', function (value) {
-    return typeof this !== 'string' ? null
-      : typeof value !== 'string' || value.length < 1 ? [this] : this.split(value)
+    return typeof value !== 'string' || value.length < 1 ? [this] : this.split(value)
   })
 
   // get a character's unicode value by its offset in this string.
   link(proto, 'char-at', function (offset) {
-    if (typeof this !== 'string' || typeof offset !== 'number') {
-      return null
-    }
-    if (offset < 0) {
-      offset += this.length
-    }
-    return offset < 0 || offset >= this.length ? null : this.charCodeAt(offset)
+    offset >>= 0
+    var code = this.charCodeAt(offset < 0 ? offset + this.length : offset)
+    return isNaN(code) ? null : code
   })
 
   // Equivalence inherits from null.
 
   // Ordering: override general comparison logic.
   link(proto, 'compare', function (another, localed) {
-    return typeof this !== 'string' || typeof another !== 'string' ? null
+    return typeof another !== 'string' ? null
       : localed === true ? this.localeCompare(another)
         : this === another ? 0 : this > another ? 1 : -1
   })
 
   // comparing operators
   link(proto, '>', function (another) {
-    return typeof this === 'string' && typeof another === 'string'
-      ? this > another : null
+    return typeof another === 'string' ? this > another : null
   })
   link(proto, '>=', function (another) {
-    return typeof this === 'string' && typeof another === 'string'
-      ? this >= another : null
+    return typeof another === 'string' ? this >= another : null
   })
   link(proto, '<', function (another) {
-    return typeof this === 'string' && typeof another === 'string'
-      ? this < another : null
+    return typeof another === 'string' ? this < another : null
   })
   link(proto, '<=', function (another) {
-    return typeof this === 'string' && typeof another === 'string'
-      ? this <= another : null
+    return typeof another === 'string' ? this <= another : null
   })
 
   // the emptiness of string is determined by its length.
   link(proto, 'is-empty', function () {
-    return typeof this === 'string' ? this === '' : null
+    return this === ''
   }, 'not-empty', function () {
-    return typeof this === 'string' ? this !== '' : null
-  })
-
-  // Encoding
-  link(proto, 'to-code', function () {
-    return typeof this === 'string' ? this : null
+    return this !== ''
   })
 
   // Representation
   link(proto, 'to-string', function () {
-    return typeof this === 'string' ? JSON.stringify(this)
-      : this === proto ? '(string proto)' : null
+    return JSON.stringify(this)
   })
 
   // Indexer
-  protoIndexer(Type, function (index, value) {
-    return typeof this !== 'string' ? null
-      : typeof index === 'string'
-        ? index === 'length' ? this.length : proto[index]
+  link(proto, ':', function (index, value) {
+    return typeof index === 'string' ? proto[index]
+      : index instanceof Symbol$ ? [proto.key]
         : typeof index !== 'number' ? null
           : this.substr(index, typeof value === 'number' ? value : 1) // chars in a range.
   })

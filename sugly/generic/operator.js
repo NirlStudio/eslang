@@ -6,7 +6,6 @@ module.exports = function ($void) {
   var Type = $.operator
   var $Tuple = $.tuple
   var link = $void.link
-  var typeVerifier = $void.typeVerifier
   var prepareOperation = $void.prepareOperation
 
   // the empty operator
@@ -17,15 +16,10 @@ module.exports = function ($void) {
   // prepare common type implementation.
   prepareOperation(Type, $Tuple.operator)
 
-  // common type verifier
-  typeVerifier(Type)
-
   var proto = Type.proto
   // Desccription
   link(proto, 'to-string', function () {
-    return typeof this !== 'function'
-      ? this === proto ? '(operator proto)' : null
-      : '#( ' + (this.name || '?operator') + ' )# ' +
+    return '#( ' + (this.name || '?operator') + '\n' +
         (this.code || $Tuple.operator)['to-string']()
   })
 }

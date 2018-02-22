@@ -4,11 +4,9 @@ module.exports = function ($void) {
   var $ = $void.$
   var Null = $void.null
   var Type$ = $void.Type
-  var Object$ = $void.Object
   var Symbol$ = $void.Symbol
   var Tuple$ = $void.Tuple
   var $Lambda = $.lambda
-  var $Object = $.object
 
   // a static version of isPrototypeOf.
   var isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
@@ -22,44 +20,19 @@ module.exports = function ($void) {
 
   // to retrieve or create a shared symbol.
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
-  function sharedSymbolOf (key) {
+  $void.sharedSymbolOf = function (key) {
     return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
   }
-  $void.sharedSymbolOf = sharedSymbolOf
 
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
-    if (typeof entity === 'undefined' || entity === null) {
-      return Null[':']
-    }
-    if (typeof entity === 'object') {
-      return entity instanceof Object$
-        ? $Object.proto[':'] // always return the generic indexer for all managed objects.
-        : entity instanceof Type$ ? entity[':'] // managed types, type.proto and values.
-          : entity.type instanceof Type$ ? entity.type.proto[':'] // injected types
-            : $Object.proto[':'] // take other native objects as common objects.
-    }
-    // boolean, string, number, function and other unknow native entities
-    return typeof entity === 'function'
-      ? entity.type.proto[':'] // use the owned or injected type.
-      : entity.type instanceof Type$ // with a valid injected type
-        ? entity.type.proto[':'] // use the type's indexer
-        : Null[':'] // take other unknown entities as null.
+    return typeof entity === 'undefined' || entity === null
+      ? Null[':'] : (entity.type && entity.type.proto[':']) || Null[':']
   }
 
   // retrieve the real type of an entity.
   $void.typeOf = function (entity) {
-    if (typeof entity === 'undefined' || entity === null) {
-      return null // the type of null is itself.
-    }
-    if (typeof entity === 'object') {
-      var type = ownsProperty(entity, 'type') // if the object owns a type field,
-        ? Object.getPrototypeOf(entity).type // use its prototype's type,
-        : entity.type // otherwise try to use the type property directly.
-      return type instanceof Type$ ? type : $Object
-    }
-    // bool, string, number, function and other unknonwn native entities.
-    return entity.type instanceof Type$ ? entity.type : null
+    return typeof entity === 'undefined' || entity === null ? null : entity.type
   }
 
   function thisCall (subject, methodName) {
@@ -129,165 +102,47 @@ module.exports = function ($void) {
   $void.link = link
 
   // to export native type (static) methods.
-  $void.copyType = function $copyType (type, src, mapping) {
-    return copy(type, src, mapping,
-      function $copyType$Wrapper (name, func) {
-        var wrapper = function () {
-          return func.apply(src, arguments)
-        }
-        publish(wrapper, 'name', type.name + '$' + name)
-        return wrapper
-      }
-    )
-  }
-
-  // to export native prototype (instance) methods.
-  $void.copyProto = function $copyProto (type, src, verifier, mapping) {
-    return copy(type.proto, src.prototype, mapping,
-      function $copyProto$Wrapper (name, method) {
-        var wrapper = function () {
-          return verifier(this) ? method.apply(this, arguments) : null
-        }
-        publish(wrapper, 'name', type.name + '$$' + name)
-        return wrapper
-      }
-    )
-  }
-
-  // override type verification methods.
-  function typeEncoder (type) {
-    var name = type.name
-    var symbol = sharedSymbolOf(name)
-    link(type, 'to-code', function () {
-      return symbol
-    })
-    link(type, 'to-string', function () {
-      return name
-    })
-  }
-  $void.typeEncoder = typeEncoder
-
-  // override a type's indexer.
-  function typeIndexer (type) {
-    return link(type, ':', function (name, value) {
-      if (name instanceof Symbol$) {
-        name = name.key
-      }
-      return typeof name !== 'string' ? null
-        : typeof value === 'undefined' ? type[name]
-          : typeof type[name] !== 'undefined' ? type[name] // no overriding
-            : (type[name] = value) // extending is allowed
-    })
-  }
-  $void.typeIndexer = typeIndexer
-
-  // override type verification methods.
-  function typeVerifier (type) {
-    var proto = type.proto
-    link(proto, 'is-a', function (t) {
-      return t === type
-    }, 'is-not-a', function (t) {
-      return t !== type
-    })
-  }
-  $void.typeVerifier = typeVerifier
-
-  function protoIndexer (type, fieldsOrIndexer) {
-    var proto = type.proto
-    return link(proto, ':', typeof fieldsOrIndexer === 'object' ? function (name, value) {
-      if (name instanceof Symbol$) {
-        name = name.key
-      }
-      return typeof name !== 'string' ? null
-        : this !== proto
-          ? fieldsOrIndexer[name] ? this[fieldsOrIndexer[name]] // readonly fields
-            : proto[name] // inherited property.
-          : typeof value === 'undefined'
-            ? proto[name] // getting
-            : typeof proto[name] !== 'undefined' ? proto[name] // no overriding
-              : (proto[name] = value) // extending is allowed
-    } : typeof fieldsOrIndexer === 'function' ? function (name, value) {
-      if (name instanceof Symbol$) {
-        name = name.key
-      }
-      return this !== proto
-        ? fieldsOrIndexer.apply(this, arguments) // forward arguments to instance indexer
-        : typeof name !== 'string' ? null
-          : typeof value === 'undefined'
-            ? proto[name] // getting
-            : typeof proto[name] !== 'undefined' ? proto[name] // no overriding
-              : (proto[name] = value) // extending is allowed
-    } : function (name, value) {
-      if (name instanceof Symbol$) {
-        name = name.key
-      }
-      return typeof name !== 'string' ? null
-        : this !== proto
-          ? typeof proto[name] === 'undefined' ? null : proto[name] // readonly
-          : typeof value === 'undefined'
-            ? proto[name] // getting
-            : typeof proto[name] !== 'undefined' ? proto[name] // no overriding
-              : (proto[name] = value) // extending is allowed
-    })
-  }
-  $void.protoIndexer = protoIndexer
-
-  $void.initializeType = function initializeType (type, emptyValue) {
-    // an empty value or empty value generator function.
-    link(type, 'empty', emptyValue)
-    // to-code & to-string
-    typeEncoder(type)
-    // type indexer
-    typeIndexer(type)
-    // is-a & is-not-a
-    typeVerifier(type)
-    return emptyValue
+  $void.copyType = function (target, src, mapping) {
+    var names = Object.getOwnPropertyNames(mapping)
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i]
+      publish(target, mapping[name], src[name])
+    }
+    return target
   }
 
   $void.prepareOperation = function prepareOperation (type, emptyCode) {
-    // to-code & to-string
-    typeEncoder(type)
-
-    // override indexer for the operation type.
-    typeIndexer(type)
-
     var proto = type.proto
+    // return function's name
+    link(proto, 'name', function () {
+      return this.name
+    })
+
     // test if the operation is a generic one.
     link(proto, 'is-generic', function () {
-      return typeof this !== 'function' ? null
-        : !this.code || !(this.code instanceof Tuple$)
+      return !(this.code instanceof Tuple$)
     }, 'not-generic', function () {
-      return typeof this !== 'function' ? null
-        : this.code instanceof Tuple$
+      return this.code instanceof Tuple$
     })
 
     // Emptiness: a managed operation without a body.
     link(proto, 'is-empty', function () {
-      return typeof this !== 'function' ? null
-        : this.code instanceof Tuple$ && (
-          this.code.$.length < 3 || this.code.$[2].$.length < 1
-        )
+      return this.code instanceof Tuple$ &&
+          (this.code.$.length < 3 || this.code.$[2].$.length < 1)
     }, 'not-empty', function () {
-      return typeof this !== 'function' ? null
-        : !(this.code instanceof Tuple$) || (
-          this.code.$.length > 2 && this.code.$[2].$.length > 0
-        )
+      return !(this.code instanceof Tuple$) ||
+          (this.code.$.length > 2 && this.code.$[2].$.length > 0)
     })
 
+    // Encoding
     link(proto, 'to-code', function (ctx) {
-      return typeof this === 'function'
-        ? this.code instanceof Tuple$ ? this.code : emptyCode
-        : null
+      return this.code instanceof Tuple$ ? this.code : emptyCode
     })
 
-    // Indexer: no injection of indexer into Function.prototype
-    protoIndexer(type, function (index, value) {
-      return typeof this !== 'function' || typeof index !== 'string' ? null
-        : index === 'type' ? type // fake field
-          : index === 'name' ? this.name || ''
-            : index === 'parameters' ? (this.code || emptyCode).$[1]
-              : index === 'body' ? (this.code || emptyCode).$[2]
-                : proto[index]
+    // Indexer
+    link(proto, ':', function (index) {
+      return typeof index === 'string' ? proto[index]
+        : index instanceof Symbol$ ? proto[index.key] : null
     })
   }
 }
@@ -300,23 +155,4 @@ function publish (owner, key, value) {
     writable: true,
     value: value
   })
-}
-
-// export native entities to its managed owners.
-function copy (target, src, mapping, wrapper) {
-  var names = Object.getOwnPropertyNames(mapping)
-  for (var i = 0; i < names.length; i++) {
-    var name = names[i]
-    var value = src[name]
-    if (typeof value === 'undefined') {
-      console.warn(src, 'missing required property:', name)
-      return
-    }
-    name = mapping[name]
-    if (typeof value === 'function') {
-      value = wrapper(name, value)
-    }
-    publish(target, name, value)
-  }
-  return target
 }

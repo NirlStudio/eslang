@@ -223,8 +223,8 @@
     ),
   ),
   (define "date & time" (= ()
-    (should "(a-date date-time) returns hours, minutes, seconds and milliseconds at the date." (= ()
-      (let (d t) ((date of 2017 6 29 1 2 3 4) date-time),
+    (should "(a-date all-fields) returns hours, minutes, seconds and milliseconds at the date." (= ()
+      (let (d t) ((date of 2017 6 29 1 2 3 4) all-fields),
       (assert 2017 (d 0),
       (assert 6 (d 1),
       (assert 29 (d 2),
@@ -234,8 +234,8 @@
       (assert 3 (t 2),
       (assert 4 (t 3),
     ),
-    (should "(a-date date-time as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
-      (let (d t) ((date of-utc 2017 6 29 1 2 3 4) date-time true),
+    (should "(a-date all-fields as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
+      (let (d t) ((date of-utc 2017 6 29 1 2 3 4) all-fields true),
       (assert 2017 (d 0),
       (assert 6 (d 1),
       (assert 29 (d 2),

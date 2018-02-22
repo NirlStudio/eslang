@@ -13,16 +13,12 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var typeOf = $void.typeOf
   var ClassType$ = $void.ClassType
-  var InstanceType$ = $void.InstanceType
   var createClass = $void.createClass
-  var ownsProperty = $void.ownsProperty
-  var typeIndexer = $void.typeIndexer
   var sharedSymbolOf = $void.sharedSymbolOf
-  var initializeType = $void.initializeType
   var EncodingContext$ = $void.EncodingContext
 
   // initialize the meta class.
-  initializeType(Type, createClass)
+  link(Type, 'empty', createClass)
 
   // define a class by classes and/or class descriptors.
   link(Type, 'of', function () {
@@ -33,48 +29,14 @@ module.exports = function ($void) {
   link(Type, 'attach', function (target) {
     if (target instanceof Object$) {
       for (var i = 1; i < arguments.length; i++) {
-        $Object.assign(target, arguments[i])
-        activate.call(target, arguments[i])
+        var src = arguments[i]
+        if (src instanceof Object$ || typeOf(src) === $Object) {
+          Object.assign(target, src)
+          activate.call(target, src)
+        }
       }
     }
     return target
-  })
-
-  // get the value of a field.
-  link(Type, 'get', function (obj, name, value) {
-    return obj instanceof ClassType$ && typeof name === 'string'
-      ? typeof value === 'undefined' ? obj[name]
-        : typeof obj[name] === 'undefined' ? value : obj[name]
-      : null
-  })
-  // set the value of a field.
-  link(Type, 'set', function (obj, name, value) {
-    return obj instanceof ClassType$ && typeof name === 'string'
-      ? (obj[name] = (typeof value !== 'undefined' ? value : null))
-      : null
-  })
-  // remove a field.
-  link(Type, 'unset', function (obj, name) {
-    if (obj instanceof ClassType$ && typeof name === 'string' && ownsProperty(obj, name)) {
-      var value = obj[name]
-      delete obj[name]
-      return value
-    }
-  })
-
-  // check the existence of a property
-  link(Type, 'has', function (obj, name) {
-    return obj instanceof ClassType$ && typeof name === 'string'
-      ? typeof obj[name] !== 'undefined' : null
-  })
-  // check the existence of a field
-  link(Type, 'owns', function (obj, name) {
-    return obj instanceof ClassType$ && typeof name === 'string'
-      ? ownsProperty(obj, name) : null
-  })
-  // retrieve field names.
-  link(Type, 'fields-of', function (obj) {
-    return obj instanceof ClassType$ ? Object.getOwnPropertyNames(obj) : null
   })
 
   // the prototype of classes
@@ -82,22 +44,18 @@ module.exports = function ($void) {
 
   // generate an empty instance.
   link(proto, 'empty', function () {
-    return this instanceof ClassType$ ? Object.create(this.proto) : null
+    return Object.create(this.proto)
   })
 
   // generate an instance without arguments.
   link(proto, 'default', function () {
-    return this instanceof ClassType$
-      ? construct.call(Object.create(this.proto)) : null
+    return construct.call(Object.create(this.proto))
   })
 
   // make this class to act as other classes and/or class descriptors.
   var as = link(proto, 'as', function () {
-    if (!(this instanceof ClassType$)) {
-      return this
-    }
-    var type_ = {}
-    var proto_ = {}
+    var type_ = Object.create(null)
+    var proto_ = Object.create(null)
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
       var t, p
@@ -118,14 +76,14 @@ module.exports = function ($void) {
       var fields = Object.getOwnPropertyNames(t)
       for (j = 0; j < fields.length; j++) {
         key = fields[j]
-        if (typeof this[key] === 'undefined') {
+        if (typeof proto[key] === 'undefined') {
           type_[key] = t[key]
         }
       }
       fields = Object.getOwnPropertyNames(p)
       for (j = 0; j < fields.length; j++) {
         key = fields[j]
-        if (key !== 'type') {
+        if (key !== 'type' && key !== 'static') {
           proto_[key] = p[key]
         }
       }
@@ -137,20 +95,20 @@ module.exports = function ($void) {
 
   // static construction: create an instance by arguments.
   link(proto, 'of', function () {
-    return this instanceof ClassType$
-      ? construct.apply(Object.create(this.proto), arguments) : null
+    return construct.apply(Object.create(this.proto), arguments)
   })
 
   // static activation: restore an instance by one or more property set.
   link(proto, 'with', function () {
-    if (this instanceof ClassType$) {
-      var inst = Object.create(this.proto)
-      for (var i = 0; i < arguments.length; i++) {
-        $Object.assign(inst, arguments[i])
-        activate.call(inst, arguments[i])
+    var inst = Object.create(this.proto)
+    for (var i = 0; i < arguments.length; i++) {
+      var src = arguments[i]
+      if (src instanceof Object$ || typeOf(src) === $Object) {
+        Object.assign(inst, src)
+        activate.call(inst, src)
       }
-      return inst
     }
+    return activate.call(inst, inst)
   })
 
   // Type Verification: a class is a class and a type.
@@ -163,26 +121,16 @@ module.exports = function ($void) {
 
   // Emptiness: shared by all classes.
   link(proto, 'is-empty', function () {
-    return this instanceof ClassType$
-      ? Object.getOwnPropertyNames(this.proto).length < 1 : null
+    return Object.getOwnPropertyNames(this.proto).length < 1
   })
   link(proto, 'not-empty', function () {
-    return this instanceof ClassType$
-      ? Object.getOwnPropertyNames(this.proto).length > 0 : null
-  })
-
-  // convert a class (type) to a common object (data).
-  link(proto, 'to-object', function () {
-    if (this instanceof ClassType$) {
-      var obj = Object.assign($Object.empty(), this)
-      obj.proto = Object.assign($Object.empty(), obj.proto)
-      return obj
-    }
+    return Object.getOwnPropertyNames(this.proto).length > 0
   })
 
   // Encoding
   link(proto, 'to-code', function () {
-    return typeof this.name === 'string' ? sharedSymbolOf(this.name) : $Symbol.empty
+    return typeof this.name === 'string'
+      ? sharedSymbolOf(this.name) : $Symbol.empty
   })
 
   // Description
@@ -190,29 +138,24 @@ module.exports = function ($void) {
     return typeof this.name === 'string' ? this.name : '?class'
   })
 
-  typeIndexer(proto)
-
   // the prototype of class instances
   var instance = proto.proto
 
   // root instance constructor
   var construct = link(instance, 'constructor', function () {
-    if (this instanceof InstanceType$) {
-      if (typeof this.constructor === 'function' && this.constructor !== construct) {
-        // apply constructor
-        this.constructor.apply(this, arguments)
-      } else { // behave like (object assign this ...)
-        var args = [this]
-        Array.prototype.push.apply(args, arguments)
-        $Object.assign.apply($Object, args)
-      }
+    if (this.constructor !== construct) {
+      this.constructor.apply(this, arguments)
+    } else { // behave like (object assign this ...)
+      var args = [this]
+      args.push.apply(args, arguments)
+      $Object.assign.apply($Object, args)
     }
     return this
   })
 
   // root instance activator: accept a plain object and apply the activator logic too.
   var activate = link(instance, 'activator', function (source) {
-    if (typeof this.activator === 'function' && this.activator !== activate) {
+    if (this.activator !== activate) {
       this.activator(source)
     }
     return this
@@ -220,7 +163,8 @@ module.exports = function ($void) {
 
   // Enable the customization of Identity.
   var is = link(instance, 'is', function (another) {
-    return this.is !== is ? this.is(another) === true : Object.is(this, another)
+    return this.is === is ? this === another
+      : this === another || this.is(another) === true
   })
   link(instance, '===', function (another) {
     return is.call(this, another)
@@ -231,8 +175,11 @@ module.exports = function ($void) {
 
   // Enable the customization of Ordering.
   var compare = link(instance, 'compare', function (another) {
+    if (this === another) {
+      return 0
+    }
     if (this.compare === compare) {
-      return Object.is(this, another) ? 0 : null
+      return null // no overridden
     }
     switch (this.compare(another)) {
       case 0:
@@ -248,8 +195,8 @@ module.exports = function ($void) {
 
   // Enable the customization of Equivalence.
   var equals = link(instance, 'equals', function (another) {
-    return this.equals === equals
-      ? Object.is(this, another) : this.equals(another) === true
+    return this.equals === equals ? this === another
+      : this === another || this.equals(another) === true
   })
   link(instance, '==', function (another) {
     return equals.call(this, another)
@@ -272,7 +219,8 @@ module.exports = function ($void) {
   // Type Verification
   var isA = link(instance, 'is-a', function (t) {
     var overriding = this['is-a']
-    return overriding === isA ? this.type === t : overriding.call(this, t) === true
+    return overriding === isA ? this.type === t
+      : this.type === t || overriding.call(this, t) === true
   })
   link(instance, 'is-not-a', function (t) {
     return !isA.call(this, t)
@@ -305,32 +253,30 @@ module.exports = function ($void) {
       : overriding.apply(this, arguments)
   })
 
-  var indexer = link(instance, ':', function (name, value) {
-    if (this === instance) { // common class instance
-      if (name instanceof Symbol$) {
-        name = name.key
+  var indexer = link(instance, ':', function (index, value) {
+    // always return standard methods
+    if (typeof value === 'undefined') {
+      if (typeof index === 'string') {
+        value = instance[index]
+      } else if (index instanceof Symbol$) {
+        value = instance[index.key]
       }
-      return typeof name !== 'string' ? null
-        : typeof value === 'undefined'
-          ? instance[name] // getting
-          : typeof proto[name] !== 'undefined' ? proto[name] // no overriding
-            : (proto[name] = value) // extending is allowed
+      if (typeof value !== 'undefined') {
+        return value
+      }
     }
-    // class instance proto & class instances
+    // try to call overridden indexer
     var overriding = this[':']
-    if (overriding === indexer || typeof overriding !== 'function') {
-      overriding = null
+    if (overriding !== indexer) {
+      return overriding.apply(this, arguments)
     }
-    if (typeof value === 'undefined') { // getting
-      if (typeof name !== 'string') {
-        return overriding ? overriding.call(this, name) : null
-      }
-      value = instance[name] // common class instance proto.
-      return typeof value !== 'undefined' ? value
-        : overriding ? overriding.call(this, name) : this[name]
+    // default getter
+    if (typeof value === 'undefined') {
+      return typeof index === 'string' ? this[index]
+        : index instanceof Symbol$ ? this[index.key] : null
     }
-    // setting or customized indexer
-    return overriding ? overriding.apply(this, arguments)
-      : typeof name === 'string' ? (this[name] = value) : null
+    // default setter
+    return typeof index === 'string' ? (this[index] = value)
+      : index instanceof Symbol$ ? (this[index.key] = value) : null
   })
 }

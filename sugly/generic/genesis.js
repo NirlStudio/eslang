@@ -31,8 +31,8 @@ module.exports = function () {
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
   function naming (type, name) {
-    publish($, name, type)
-    publish(type, 'name', name)
+    define($, name, type)
+    define(type, 'name', name)
     return type
   }
 
@@ -123,8 +123,8 @@ module.exports = function () {
   // The name 'list' is left to be used for more common scenarios.
   create('tuple')
   var Tuple$ = $void.Tuple = function (list, plain, source) {
-    publish(this, '$', list) // hidden native data
-    publish(this, 'plain', plain === true) // as code block.
+    define(this, '$', list) // hidden native data
+    define(this, 'plain', plain === true) // as code block.
     if (source) { // reserved for source map and other debug information.
       define(this, 'source', source)
     }
@@ -195,20 +195,16 @@ module.exports = function () {
   var $Class = naming(Object.create(Type), 'class')
 
   // the prototype of classes is also type.
-  var $ClassProto = publish($Class, 'proto', Object.create(Type))
+  var $ClassProto = define($Class, 'proto', Object.create(Type))
   define($ClassProto, 'type', $Class)
 
   // the prototype of class instances is object.proto.
-  var $Instance = publish($ClassProto, 'proto', Object.create($.object.proto))
+  var $Instance = define($ClassProto, 'proto', Object.create($.object.proto))
   define($Instance, 'type', $ClassProto)
 
   // A fake constructor for instanceof checking for a class.
   var ClassType$ = $void.ClassType = function () {}
   ClassType$.prototype = $ClassProto
-
-  // A fake constructor for instanceof checking for an instance of a class.
-  var InstanceType$ = $void.InstanceType = function () {}
-  InstanceType$.prototype = $Instance
 
   // export the ability of creation to enable an autonomous process.
   $void.createClass = create.bind(null, null, $ClassProto)

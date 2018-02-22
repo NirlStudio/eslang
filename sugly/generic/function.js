@@ -28,9 +28,7 @@ module.exports = function ($void) {
 
   // Desccription
   link(proto, 'to-string', function () {
-    return typeof this !== 'function'
-      ? this === proto ? '(function proto)' : null
-      : '#( ' + (this.name || '?function') + ' )# ' +
+    return '#( ' + (this.name || '?function') + '\n' +
         (this.code || $Tuple.function)['to-string']()
   })
 

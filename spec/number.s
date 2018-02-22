@@ -236,11 +236,12 @@
     (assert NaN (number parse "X"),
     (assert NaN (number parse),
     (assert NaN (number parse null),
-    (assert NaN (number parse 0),
-    (assert NaN (number parse 1.5),
-    (assert NaN (number parse -1.5),
     (assert NaN (number parse false),
     (assert NaN (number parse true),
+
+    (assert 0 (number parse 0),
+    (assert 1.5 (number parse 1.5),
+    (assert -1.5 (number parse -1.5),
   ),
   (should "parse a decimal string to its integer value" (= ()
     (assert 0 (number parse-int "0"),

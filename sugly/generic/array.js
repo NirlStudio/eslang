@@ -1,198 +1,128 @@
 'use strict'
 
-function createArrayOf () {
-  return function (x, y, z) {
-    switch (arguments.length) {
-      case 0:
-        return []
-      case 1:
-        return [x]
-      case 2:
-        return [x, y]
-      case 3:
-        return [x, y, z]
-      default:
-        return Array.prototype.slice.call(arguments)
-    }
-  }
-}
-
-function createArrayFrom ($void) {
-  var thisCall = $void.thisCall
-  return function () {
-    var list = []
-    for (var i = 0; i < arguments.length; i++) {
-      var source = arguments[i]
-      if (Array.isArray(source)) {
-        Array.prototype.push.apply(list, source)
-        continue
-      }
-      var next = typeof source === 'function'
-        ? source : thisCall(source, 'iterate')
-      if (typeof next !== 'function') {
-        list.push(source)
-        continue
-      }
-      var item = next()
-      while (typeof item !== 'undefined' && item !== null) {
-        list.push(!Array.isArray(item) ? item
-          : item.length > 0 ? item[0] : null)
-        item = next()
-      }
-    }
-    return list
-  }
-}
-
-function iterator ($void) {
-  return function () {
-    if (!Array.isArray(this)) {
-      return null
-    }
-    var list = this
-    var current = null
-    var next = 0
-    return function (inSitu) {
-      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
-          inSitu !== null && inSitu !== 0) {
-        return current // cached current value
-      }
-      return next >= list.length ? null // no more
-        : (current = [list[next++]])
-    }
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.array
   var $Symbol = $.symbol
-  var boolOf = $.bool.of
-  var link = $void.link
   var Tuple$ = $void.Tuple
+  var Symbol$ = $void.Symbol
+  var link = $void.link
   var thisCall = $void.thisCall
-  var copyProto = $void.copyProto
   var EncodingContext$ = $void.EncodingContext
-  var initializeType = $void.initializeType
-  var protoIndexer = $void.protoIndexer
 
   // create an empty array.
-  initializeType(Type, function () {
+  link(Type, 'empty', function () {
     return []
   })
 
   // create an array of the arguments
-  link(Type, 'of', createArrayOf())
+  link(Type, 'of', function (x, y, z) {
+    switch (arguments.length) {
+      case 0: return []
+      case 1: return [x]
+      case 2: return [x, y]
+      case 3: return [x, y, z]
+      default: return Array.prototype.slice.call(arguments)
+    }
+  })
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
-  var arrayFrom = link(Type, 'from', createArrayFrom($void))
+  var arrayFrom = link(Type, 'from', function () {
+    var list = []
+    for (var i = 0; i < arguments.length; i++) {
+      var source = arguments[i]
+      if (Array.isArray(source)) {
+        list.push.apply(list, source)
+      } else {
+        var next = thisCall(source, 'iterate')
+        if (typeof next !== 'function') {
+          list.push(source)
+        } else {
+          var item = next()
+          while (typeof item !== 'undefined' && item !== null) {
+            list.push(Array.isArray(item) ? item.length > 0 ? item[0] : null : item)
+            item = next()
+          }
+        }
+      }
+    }
+    return list
+  })
 
   var proto = Type.proto
+  // return the length of this array.
+  link(proto, 'length', function () {
+    return this.length
+  })
+
   // generate an iterator function to traverse all array items.
-  link(proto, 'iterate', iterator($void))
+  link(proto, 'iterate', function () {
+    var list = this
+    var current = null
+    var next = 0
+    return function (inSitu) {
+      return current !== null && inSitu === true ? current
+        : next >= list.length ? null : (current = [list[next++]])
+    }
+  })
 
   // to create a shallow copy of this instance with all items,
   // or selected items in a range.
   link(proto, 'copy', function (begin, end) {
-    if (!Array.isArray(this)) {
-      return null
-    }
-    if (typeof begin !== 'number') {
-      begin = 0
-    } else if (begin < 0) {
+    begin = begin >> 0
+    if (begin < 0) {
       begin += this.length
-      if (begin < 0) {
-        begin = 0
-      }
     }
-    if (typeof end !== 'number') {
-      end = this.length
-    } else if (end < 0) {
+    end = typeof end === 'undefined' ? this.length : end >> 0
+    if (end < 0) {
       end += this.length
-      if (end < 0) {
-        end = 0
-      }
-    } else if (end > this.length) {
-      end = this.length
     }
     return this.slice(begin, end)
   })
 
   // append more items to the end of this array
   var appendFrom = link(proto, ['append', '+='], function () {
-    if (!(Array.isArray(this))) {
-      return null
-    }
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
-      Array.prototype.push.apply(this, Array.isArray(src) ? src : arrayFrom(src))
+      this.push.apply(this, Array.isArray(src) ? src : arrayFrom(src))
     }
     return this
   })
 
   // create a new array with items in this array and argument values.
   link(proto, 'concat', function () {
-    return Array.isArray(this) ? this.concat.apply(this, arguments) : null
+    return this.concat.apply(this, arguments)
   })
 
   // create a new array with items in this array and argument arrays.
   link(proto, ['merge', '+'], function () {
-    return Array.isArray(this) ? appendFrom.apply(this.slice(0), arguments) : null
+    return appendFrom.apply(this.slice(0), arguments)
   })
 
-  // array item accessors
+  // getter by index
   link(proto, 'get', function (offset) {
-    if (!Array.isArray(this) || typeof offset !== 'number') {
-      return null
-    }
-    offset = Math.trunc(offset)
+    offset = offset >> 0
     return this[offset < 0 ? offset + this.length : offset]
   })
+  // setter by index
   link(proto, 'set', function (offset, value) {
-    if (!Array.isArray(this) || typeof offset !== 'number') {
-      return null
-    }
-    offset = Math.trunc(offset)
-    if (offset < 0) {
-      offset += this.length
-      if (offset < 0) {
-        return null
-      }
-    }
+    offset = offset >> 0
     return (this[offset] = typeof value === 'undefined' ? null : value)
   })
   link(proto, 'clear', function () {
-    if (Array.isArray(this)) {
-      this.splice(0)
-      return this
-    } else {
-      return null
-    }
+    this.splice(0)
+    return this
   })
   // sawp two value by offsets.
   link(proto, 'swap', function (x, y) {
-    if (!Array.isArray(this)) {
-      return null
+    x = x >> 0
+    if (x < 0) {
+      x += this.length
     }
-    if (this.length < 2) {
-      return false
-    }
-    if (typeof x !== 'number') {
-      x = 0
-    } else {
-      x = Math.trunc(x)
-      if (x < 0) {
-        x += this.length
-      }
-    }
-    if (typeof y !== 'number') {
-      y = this.length - 1
-    } else {
-      y = Math.trunc(y)
-      if (y < 0) {
-        y += this.length
-      }
+    y = y >> 0
+    if (y < 0) {
+      y += this.length
     }
     if (x === y) {
       return false
@@ -203,12 +133,13 @@ module.exports = function ($void) {
     return true
   })
 
-  link(proto, 'first', function (value) {
-    if (!Array.isArray(this)) {
-      return null
-    }
+  link(proto, 'first', function (count) {
+    count >>= 0
+    return count > 1 ? this.slice(0, count) : this[0]
+  })
+  link(proto, 'first-of', function (value) {
     if (typeof value === 'undefined') {
-      return this.length < 1 ? null : this[0]
+      value = null
     }
     for (var i = 0; i < this.length; i++) {
       var v = this[i]
@@ -218,12 +149,14 @@ module.exports = function ($void) {
     }
     return null
   })
-  link(proto, 'last', function (value) {
-    if (!Array.isArray(this)) {
-      return null
-    }
+  link(proto, 'last', function (count) {
+    count >>= 0
+    return count > 1 ? this.slice(this.length - count, this.length)
+      : this[this.length - 1]
+  })
+  link(proto, 'last-of', function (value) {
     if (typeof value === 'undefined') {
-      return this.length < 1 ? null : this[this.length - 1]
+      value = null
     }
     for (var i = this.length - 1; i >= 0; i--) {
       var v = this[i]
@@ -234,38 +167,25 @@ module.exports = function ($void) {
     return null
   })
 
-  var verify = Array.isArray.bind(Array)
-  // standard array operations to produce a new array
-  copyProto(Type, Array, verify, {
-    'splice': 'splice'
-  })
+  // edit current array
+  proto.splice = Array.prototype.splice
 
-  // use an array as a stack.
-  copyProto(Type, Array, verify, {
-    /* IE5.5 */
-    'pop': 'pop',
-    'push': 'push'
-  })
+  // stack operations.
+  proto.pop = Array.prototype.pop
+  proto.push = Array.prototype.push
 
   // reverse
   link(proto, 'reverse', function (copy) {
-    return !Array.isArray(this) ? null
-      : boolOf(copy) ? this.slice(0).reverse() : this.reverse()
+    return copy === true ? this.slice(0).reverse() : this.reverse()
   })
 
   // sort
   link(proto, 'sort', function (comparer, copy) {
-    if (!Array.isArray(this)) {
-      return null
-    }
     if (typeof comparer === 'boolean') {
       copy = comparer
       comparer = null
     } else if (typeof comparer !== 'function') {
       comparer = null
-    }
-    if (this.length < 2) {
-      return copy === true ? this.slice(0) : this
     }
     var comparing = comparer ? function (a, b) {
       var order = comparer(a, b)
@@ -279,16 +199,13 @@ module.exports = function ($void) {
 
   // determine emptiness by array's length
   link(proto, 'is-empty', function () {
-    return Array.isArray(this) ? this.length < 1 : null
+    return this.length < 1
   }, 'not-empty', function () {
-    return Array.isArray(this) ? this.length > 0 : null
+    return !(this.length < 1)
   })
 
   // default object persistency & describing logic
   link(proto, 'to-code', function (ctx) {
-    if (!Array.isArray(this)) {
-      return null // illegal call.
-    }
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
       if (sym) {
@@ -306,33 +223,25 @@ module.exports = function ($void) {
 
   // Description
   link(proto, 'to-string', function (separator) {
-    return this === proto ? '(array proto)'
-      : thisCall(thisCall(this, 'to-code'), 'to-string')
+    return thisCall(thisCall(this, 'to-code'), 'to-string')
   })
 
   link(proto, 'join', function (separator) {
-    if (!Array.isArray(this)) {
-      return null
-    }
     var items = []
     for (var i = 0; i < this.length; i++) {
       var value = this[i]
       items.push(typeof value === 'string' ? value : thisCall(value, 'to-string'))
     }
-    return items.join(separator || ' ')
+    return items.join(typeof separator === 'string' ? separator : ' ')
   })
 
   // Indexer
-  protoIndexer(Type, function (name, value) {
-    if (!Array.isArray(this)) {
-      return null
-    }
-    return typeof name === 'string' // read properties
-      ? name === 'length' ? this.length : proto[name]
-      : typeof name !== 'number' ? null
-        : typeof value === 'undefined' // getting item
-          ? this[name]
-          : (this[name] = value) // setting item
+  link(proto, ':', function (index, value) {
+    return typeof index === 'string' ? proto[index]
+        : typeof index !== 'number'
+          ? index instanceof Symbol$ ? proto[index.key] : null
+          : typeof value === 'undefined' ? this[index] // getting item
+            : (this[index] = value) // setting item
   })
 
   // inject type

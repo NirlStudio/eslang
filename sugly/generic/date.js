@@ -3,14 +3,12 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.date
-  var $Number = $.number
   var link = $void.link
-  var initializeType = $void.initializeType
-  var protoIndexer = $void.protoIndexer
-  var numberCompare = $Number.proto.compare
+  var Symbol$ = $void.Symbol
+  var numberCompare = $.number.proto.compare
 
   // empty value
-  initializeType(Type, new Date(0))
+  link(Type, 'empty', new Date(0))
 
   // parse a date/time string representation to a date object.
   link(Type, 'parse', function (str) {
@@ -62,68 +60,62 @@ module.exports = function ($void) {
 
   // test if this is a valid date.
   link(proto, 'is-valid', function () {
-    return this instanceof Date ? !isNaN(this.getTime()) : null
+    return !isNaN(this.getTime())
   }, 'is-not-valid', function () {
-    return this instanceof Date ? isNaN(this.getTime()) : null
+    return isNaN(this.getTime())
   })
 
   // retrieve the date fields: year, month, day, week-day
   link(proto, 'date', function (utc) {
-    return this instanceof Date && !isNaN(this.getTime())
-      ? utc === true
+    return isNaN(this.getTime()) ? null
+      : utc === true
         ? [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()]
         : [this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()]
-      : null
   })
   // retrieve the time fields: hours, minutes, seconds, milliseconds
   link(proto, 'time', function (utc) {
-    return this instanceof Date && !isNaN(this.getTime())
-      ? utc === true
+    return isNaN(this.getTime()) ? null
+      : utc === true
         ? [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]
         : [this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()]
-      : null
   })
   // retrieve all fields: year, month, day, week-day, hours, minutes, seconds, milliseconds
-  link(proto, 'date-time', function (utc) {
-    return this instanceof Date && !isNaN(this.getTime())
-      ? utc === true
+  link(proto, 'all-fields', function (utc) {
+    return isNaN(this.getTime()) ? null
+      : utc === true
         ? [[this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()],
           [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]]
         : [[this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()],
           [this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()]]
-      : null
   })
 
   link(proto, 'timestamp', function (utc) {
-    return this instanceof Date ? this.getTime() : null
+    return this.getTime()
   })
 
   link(proto, 'tz-offset', function () {
-    return this instanceof Date ? this.getTimezoneOffset() : null
+    return this.getTimezoneOffset()
   })
 
   // support & override general operators
   link(proto, '+', function (milliseconds) {
-    return this instanceof Date
-      ? isNaN(this.getTime()) || typeof milliseconds !== 'number' || milliseconds === 0
-        ? this : new Date(this.getTime() + milliseconds)
-      : null
+    return typeof milliseconds === 'number'
+      ? new Date(this.getTime() + milliseconds)
+      : this
   })
   link(proto, '-', function (dateOrTime) {
-    return this instanceof Date
-      ? typeof dateOrTime === 'number'
-        ? isNaN(this.getTime()) || dateOrTime === 0
-          ? this : new Date(this.getTime() - dateOrTime)
-        : dateOrTime instanceof Date
-          ? this.getTime() - dateOrTime.getTime() : this
-      : null
+    return typeof dateOrTime === 'number'
+      ? new Date(this.getTime() - dateOrTime)
+      : dateOrTime instanceof Date
+        ? this.getTime() - dateOrTime.getTime()
+        : this
   })
 
   // Ordering: date comparison
   var compare = link(proto, 'compare', function (another) {
-    return (this instanceof Date) && (another instanceof Date)
+    return another instanceof Date
       ? numberCompare.call(this.getTime(), another.getTime())
-      : null // invalid type.
+      : null
   })
 
   // override Identity and Equivalence logic to test by timestamp value
@@ -153,35 +145,22 @@ module.exports = function ($void) {
 
   // emptiness is defined to the 0 value of timestamp.
   link(proto, 'is-empty', function () {
-    if (this instanceof Date) {
-      var ts = this.getTime()
-      return ts === 0 || isNaN(ts)
-    }
-    return null
+    var ts = this.getTime()
+    return ts === 0 || isNaN(ts)
   }, 'not-empty', function () {
-    if (this instanceof Date) {
-      var ts = this.getTime()
-      return ts !== 0 && !isNaN(ts)
-    }
-    return null
-  })
-
-  // Encoding
-  link(proto, 'to-code', function () {
-    return this instanceof Date ? this : null
+    var ts = this.getTime()
+    return ts !== 0 && !isNaN(ts)
   })
 
   // Representation for instance & description for proto itself.
   link(proto, 'to-string', function (format, localed) {
-    if (!(this instanceof Date)) {
-      return this === proto ? '(date proto)' : null
+    if (typeof format === 'undefined') {
+      // encoding as source code by default.
+      return '(date of ' + this.getTime() + ')'
     }
     if (typeof format === 'boolean') {
       localed = format
       format = ''
-    } else if (typeof format !== 'string') {
-      // encoding as source code for unnown format.
-      return '(date of ' + this.getTime() + ')'
     }
     switch (format) {
       case 'utc':
@@ -195,8 +174,11 @@ module.exports = function ($void) {
     }
   })
 
-  // Indexer for proto and instances
-  protoIndexer(Type)
+  // Indexer
+  link(proto, ':', function (index) {
+    return typeof index === 'string' ? proto[index]
+        : index instanceof Symbol$ ? proto[index.key] : null
+  })
 
   // inject type
   Date.prototype.type = Type // eslint-disable-line no-extend-native

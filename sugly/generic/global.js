@@ -8,14 +8,16 @@ module.exports = function ($void) {
   // an empty symbol to be resolve to null.
   $export($, '', null)
 
+  // special empty symbols
+  $export($, '*', null)
+  $export($, '...', null)
+
+  // constant values
   $export($, 'true', true)
   $export($, 'false', false)
 
   $export($, 'NaN', NaN)
   $export($, 'Infinity', Infinity)
-
-  // special empty symbols
-  $export($, '*', null) // as a common placeholder for null or empty statement.
 
   // Experimental: Pure Symbols
   $export($, 'in', sharedSymbolOf('in'))

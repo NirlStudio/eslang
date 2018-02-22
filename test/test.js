@@ -285,8 +285,6 @@ function checkIndexerOf ($void) {
   check($.bool[':']('of') === $.bool.of, 'bool:of')
   check(indexerOf(true) === $.bool.proto[':'], 'bool:true')
   check(indexerOf(false) === $.bool.proto[':'], 'bool:false')
-  check($.bool.proto[':']('type') === $.bool, 'bool::type')
-  check($.bool.proto[':'](':') === $.bool.proto[':'], 'bool:::')
 
   check(indexerOf($.string) === $.string[':'], 'string')
   check(indexerOf('') === $.string.proto[':'], 'string:""')

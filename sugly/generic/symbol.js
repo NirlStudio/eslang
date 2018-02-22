@@ -5,18 +5,15 @@ module.exports = function ($void) {
   var Type = $.symbol
   var link = $void.link
   var Symbol$ = $void.Symbol
-  var initializeType = $void.initializeType
-  var protoIndexer = $void.protoIndexer
 
   // common symbol repository
   var sharedSymbols = $void.sharedSymbols
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty symbol.
-  initializeType(Type, sharedSymbolOf(''))
+  link(Type, 'empty', sharedSymbolOf(''))
 
   // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
-  link($, '...', null)
   link(Type, 'etc', sharedSymbolOf('...'))
 
   // symbols for common operators
@@ -40,43 +37,38 @@ module.exports = function ($void) {
     return sharedSymbols[key] || new Symbol$(key)
   })
 
+  // create a shared symbol from a key.
+  link(Type, 'of-shared', sharedSymbolOf)
+
   var proto = Type.proto
 
   // Identity and Equivalence is determined by the key
   link(proto, ['is', 'equals', '=='], function (another) {
     return this === another || (
-      this instanceof Symbol$ && another instanceof Symbol$ &&
-      this.key.localeCompare(another.key))
-  }, ['is-not', 'not-equals', '!='])
+      another instanceof Symbol$ && this.key === another.key
+    )
+  }, ['is-not', 'not-equals', '!='], function (another) {
+    return this !== another && (
+      !(another instanceof Symbol$) || this.key !== another.key
+    )
+  })
 
   // Ordering: to determine by the string value of key.
   link(proto, 'compare', function (another) {
     return this === another ? 0
-      : this instanceof Symbol$ && another instanceof Symbol$
-        ? this.key === another.key ? 0 : null
-        : null
+      : another instanceof Symbol$ && this.key === another.key
+        ? 0 : null
   })
 
   // Emptiness: The empty symbol's key is an empty string.
   link(proto, 'is-empty', function () {
-    return this instanceof Symbol$ ? this.key === '' : null
+    return this.key === ''
   }, 'not-empty', function () {
-    return this instanceof Symbol$ ? this.key !== '' : null
-  })
-
-  // Encoding
-  link(proto, 'to-code', function () {
-    return this instanceof Symbol$ ? this : null
+    return this.key !== ''
   })
 
   // Representation
   link(proto, 'to-string', function () {
-    return this instanceof Symbol$ ? this.key
-      : this === proto ? '(symbol proto)' : null
+    return this.key
   })
-
-  // add indexer
-  protoIndexer(Type, Object.assign(Object.create(null), {
-    key: 'key'
-  }))
 }

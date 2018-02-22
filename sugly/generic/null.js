@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var Null = $void.null
   var link = $void.link
+  var Symbol$ = $void.Symbol
 
   // Fundamental Entity Relationships: Identity, Equivalence and Ordering
   // Identity, Equivalence and Ordering logics must be symmetrical.
@@ -19,16 +20,14 @@ module.exports = function ($void) {
     // defined by any property that's unrelevant with its effect to its environment.
     'equals', '=='
   ], function (another) {
-    return Object.is(typeof this === 'undefined' ? null : this,
-      typeof another === 'undefined' ? null : another)
+    return Object.is(this, typeof another === 'undefined' ? null : another)
   }, [
     // the negative method of Identity test.
     'is-not', '!==',
     // the negative method of Equivalence test.
     'not-equals', '!='
   ], function (another) {
-    return !Object.is(typeof this === 'undefined' ? null : this,
-      typeof another === 'undefined' ? null : another)
+    return !Object.is(this, typeof another === 'undefined' ? null : another)
   })
 
   // Ordering: general comparison
@@ -37,8 +36,8 @@ module.exports = function ($void) {
   //    -1 - from this to another is ascending.
   //  null - not-sortable
   link(Null, 'compare', function (another) {
-    return Object.is(typeof this === 'undefined' ? null : this,
-      typeof another === 'undefined' ? null : another) ? 0 : null
+    return Object.is(this, typeof another === 'undefined' ? null : another)
+      ? 0 : null
   })
 
   // Emptiness: null, type.proto and all protos are empty.
@@ -59,7 +58,7 @@ module.exports = function ($void) {
 
   // Encoding
   link(Null, 'to-code', function () {
-    return null
+    return this
   })
 
   // Representation (static values) or Description (non-static values)
@@ -68,8 +67,8 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(Null, ':', function (name) {
-    return typeof name !== 'string' ? null
-      : (typeof Null[name] !== 'undefined' ? Null[name] : null)
+  link(Null, ':', function (index) {
+    return typeof index === 'string' ? Null[index]
+      : index instanceof Symbol$ ? Null[index.key] : null
   })
 }

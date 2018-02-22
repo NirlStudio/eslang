@@ -1,19 +1,3 @@
-(define "(type proto)" (= ()
-  (should "the type's proto is a null." (= ()
-    (assert ((type proto) is-a null),
-    (assert false ((type proto) is-not-a null),
-  ),
-  (should "the type's proto is encoded to null." (= ()
-    (assert ((type proto) to-code) is null),
-  ),
-  (should "the type's proto is described as (type proto)." (= ()
-    (assert "(type proto)" ((type proto) to-string),
-  ),
-  (should "the type of type's proto is type." (= ()
-    (assert type ((type proto) type),
-  ),
-).
-
 (define "Identity" (= ()
   (should "type is only itself" (= ()
     (assert (type is type),
@@ -53,11 +37,8 @@
 
 (define "Type Verification" (= ()
   (should "type is an instance of its proto." (= ()
-    (assert (type is-a (type proto),
-    (assert false (type is-not-a (type proto),
-
-    (assert false (type is-a type),
-    (assert (type is-not-a type),
+    (assert (type is-a type),
+    (assert false (type is-not-a type)
 ).
 
 (define "Emptiness" (= ()

@@ -16,8 +16,7 @@ function createValueOf ($void, parse) {
     } else {
       value = NaN
     }
-    return isNaN(value) && typeof defaultValue === 'number'
-      ? defaultValue : value
+    return isNaN(value) && typeof defaultValue === 'number' ? defaultValue : value
   }
 }
 
@@ -62,9 +61,6 @@ function createIntParser ($void) {
 
 function numberAnd (valueOf) {
   return function () {
-    if (typeof this !== 'number') {
-      return null
-    }
     var result = this
     for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
@@ -76,9 +72,6 @@ function numberAnd (valueOf) {
 
 function numberSubtract (valueOf) {
   return function () {
-    if (typeof this !== 'number') {
-      return null
-    }
     var result = this
     for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
@@ -90,9 +83,6 @@ function numberSubtract (valueOf) {
 
 function numberTimes (valueOf) {
   return function () {
-    if (typeof this !== 'number') {
-      return null
-    }
     var result = this
     for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
@@ -104,9 +94,6 @@ function numberTimes (valueOf) {
 
 function numberDivide (valueOf) {
   return function () {
-    if (typeof this !== 'number') {
-      return null
-    }
     var result = this
     for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
@@ -121,9 +108,8 @@ module.exports = function ($void) {
   var Type = $.number
   var $Range = $.range
   var link = $void.link
+  var Symbol$ = $void.Symbol
   var copyType = $void.copyType
-  var initializeType = $void.initializeType
-  var protoIndexer = $void.protoIndexer
 
   // the value range and constant values.
   copyType(Type, Number, {
@@ -143,11 +129,11 @@ module.exports = function ($void) {
   var minBits = link(Type, 'min-bits', -Math.pow(2, 31))
 
   // The empty value
-  initializeType(Type, 0)
+  link(Type, 'empty', 0)
 
   // parse a string to its number value.
-  var parse = link(Type, 'parse', function (str) {
-    return str && typeof str === 'string' ? parseFloat(str) : NaN
+  var parse = link(Type, 'parse', function (value) {
+    return parseFloat(value)
   })
 
   // parse a string as an integer value.
@@ -161,16 +147,15 @@ module.exports = function ($void) {
 
   // get an signed integer value which is stable with bitwise operation.
   link(Type, 'of-bits', function (input, defaultValue) {
-    var int = intOf(input, defaultValue)
-    return int >> 0
+    return intOf(input, defaultValue) >> 0
   })
 
   var proto = Type.proto
   // test for special values
   link(proto, 'is-valid', function () {
-    return typeof this === 'number' ? !isNaN(this) : null
+    return !isNaN(this)
   }, 'is-not-valid', function () {
-    return typeof this === 'number' ? isNaN(this) : null
+    return isNaN(this)
   })
   link(proto, 'is-int', function () {
     return Number.isSafeInteger(this)
@@ -178,52 +163,52 @@ module.exports = function ($void) {
     return !Number.isSafeInteger(this)
   })
   link(proto, 'is-bits', function () {
-    return typeof this === 'number' ? this >= minBits && this <= maxBits : null
+    return this >= minBits && this <= maxBits
   }, 'is-not-bits', function () {
-    return typeof this === 'number' ? this < minBits || this > maxBits : null
+    return this < minBits || this > maxBits
   })
   link(proto, 'is-finite', function () {
-    return typeof this === 'number' ? isFinite(this) : null
+    return isFinite(this)
   }, 'is-infinite', function () {
-    return typeof this === 'number' ? !isFinite(this) : null
+    return !isFinite(this)
   })
 
   // support basic arithmetic operations
   link(proto, ['+', 'and'], numberAnd(valueOf))
-  link(proto, ['-', 'subtract'], numberSubtract(valueOf))
+  link(proto, ['-', 'minus'], numberSubtract(valueOf))
   link(proto, ['*', 'times'], numberTimes(valueOf))
-  link(proto, ['/', 'divide'], numberDivide(valueOf))
+  link(proto, ['/', 'divided-by'], numberDivide(valueOf))
 
   // bitwise operations
   link(proto, '~', function () {
-    return typeof this === 'number' ? ~this : null
+    return ~this
   })
   link(proto, '&', function (value) {
-    return typeof this === 'number' ? this & value : null
+    return this & value
   })
   link(proto, '|', function (value) {
-    return typeof this === 'number' ? this | value : null
+    return this | value
   })
   link(proto, '^', function (value) {
-    return typeof this === 'number' ? this ^ value : null
+    return this ^ value
   })
   link(proto, '<<', function (offset) {
-    return typeof this === 'number' ? this << offset : null
+    return this << offset
   })
   // use zero-based shift by default since signed shift may cause an implicit conversion.
   link(proto, '>>', function (offset) {
-    return typeof this === 'number' ? this >>> offset : null
+    return this >>> offset
   })
   // signed right-shift.
   link(proto, '>>>', function (offset) {
-    return typeof this === 'number' ? this >> offset : null
+    return this >> offset
   })
 
   // support ordering logic - comparable
   // For uncomparable entities, comparison result is consistent with the Equivalence.
   // Uncomparable state is indicated by a null and is taken as inequivalent.
   var compare = link(proto, 'compare', function (another) {
-    return typeof this !== 'number' || typeof another !== 'number' ? null
+    return typeof another !== 'number' ? null
       : this === another ? 0 // two same valid values.
         : !isNaN(this) && !isNaN(another)
           ? this > another ? 1 : -1
@@ -252,54 +237,50 @@ module.exports = function ($void) {
 
   // override equivalence logic since 0 != -0 != +0 by identity-base test.
   link(proto, ['equals', '=='], function (another) {
-    return this === another || compare.call(this, another) === 0
+    return this === another || (isNaN(this) && isNaN(another))
   }, ['not-equals', '!='], function (another) {
-    return this !== another && compare.call(this, another) !== 0
+    return this !== another && (!isNaN(this) || !isNaN(another))
   })
 
   // support common math operations
   link(proto, 'abs', function () {
-    return typeof this === 'number' ? Math.abs(this) : null
+    return Math.abs(this)
   })
   link(proto, 'ceil', function () {
-    return typeof this === 'number' ? Math.ceil(this) : null
+    return Math.ceil(this)
   })
   link(proto, 'floor', function () {
-    return typeof this === 'number' ? Math.floor(this) : null
+    return Math.floor(this)
   })
   link(proto, 'round', function () {
-    return typeof this === 'number' ? Math.round(this) : null
+    return Math.round(this)
   })
   link(proto, 'trunc', function () {
-    return typeof this === 'number' ? Math.trunc(this) : null
+    return Math.trunc(this)
   })
 
   // O and NaN are defined as empty.
   link(proto, 'is-empty', function () {
-    return typeof this === 'number' ? this === 0 || isNaN(this) : null
+    return this === 0 || isNaN(this)
   }, 'not-empty', function () {
-    return typeof this === 'number' ? this !== 0 && !isNaN(this) : null
-  })
-
-  // Encoding
-  link(proto, 'to-code', function () {
-    return typeof this === 'number' ? this : null
+    return this !== 0 && !isNaN(this)
   })
 
   // Representation & Description
   link(proto, 'to-string', function (format) {
-    return typeof this === 'number' ? this.toString()
-      : this === proto ? '(number proto)' : null
+    switch (format) {
+      case 'h': case 'hex': return '0x' + this.toString(16)
+      case 'o': case 'oct': return '0' + this.toString(8)
+      case 'b': case 'bin': return '0b' + this.toString(2)
+      default: return this.toString()
+    }
   })
 
   // Indexer
-  protoIndexer(Type, function (index, value) {
-    // getting properties
-    return typeof this !== 'number' ? null
-      : typeof index === 'string' ? proto[index]
-        // create a range by this as Begin, index as End and value as Step.
-        : typeof index !== 'number' ? null
-          : $Range.of(this, index, typeof value === 'number' ? value : null)
+  link(proto, ':', function (index, value) {
+    return typeof index === 'string' ? proto[index]
+      : index instanceof Symbol$ ? proto[index.key]
+        : typeof index === 'number' ? $Range.of(this, index, value) : null
   })
 
   // inject type

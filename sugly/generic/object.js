@@ -1,32 +1,5 @@
 'use strict'
 
-function iterator ($void) {
-  var typeOf = $void.typeOf
-  var Object$ = $void.Object
-  var $Object = $void.$.object
-
-  return function () {
-    if (!(this instanceof Object$) && typeOf(this) !== $Object) {
-      return null
-    }
-    var fields = Object.getOwnPropertyNames(this)
-    var obj = this
-    var current = null
-    var next = 0
-    return function (inSitu) {
-      if (current !== null && typeof inSitu !== 'undefined' && inSitu !== false &&
-          inSitu !== null && inSitu !== 0) {
-        return current // cached current value
-      }
-      if (next >= fields.length) {
-        return null // no more
-      }
-      var field = fields[next++]
-      return (current = [field, obj[field]])
-    }
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.object
@@ -38,10 +11,7 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var thisCall = $void.thisCall
   var EncodingContext$ = $void.EncodingContext
-  var typeIndexer = $void.typeIndexer
   var ownsProperty = $void.ownsProperty
-  var typeEncoder = $void.typeEncoder
-  var protoIndexer = $void.protoIndexer
 
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
@@ -51,7 +21,7 @@ module.exports = function ($void) {
     var obj = createObject()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
-      if (source instanceof Object$ || typeOf(source) === Type) {
+      if (source instanceof Object$) {
         Object.assign(obj, source)
       }
     }
@@ -60,10 +30,10 @@ module.exports = function ($void) {
 
   // copy fields from source objects to the target object
   link(Type, 'assign', function (target) {
-    if (target instanceof Object$ || typeOf(target) === Type) {
+    if (target instanceof Object$) {
       for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i]
-        if (source instanceof Object$ || typeOf(source) === Type) {
+        if (source instanceof Object$) {
           Object.assign(target, source)
         }
       }
@@ -73,56 +43,55 @@ module.exports = function ($void) {
 
   // get the value of a field.
   link(Type, 'get', function (obj, name, value) {
-    return (obj instanceof Object$ || typeOf(obj) === Type) && typeof name === 'string'
-      ? typeof value === 'undefined' ? obj[name]
-        : typeof obj[name] === 'undefined' ? value : obj[name]
-      : null
+    return obj instanceof Object$ && typeof name === 'string'
+      ? typeof obj[name] === 'undefined' ? value : obj[name]
+      : value
   })
   // set the value of a field.
   link(Type, 'set', function (obj, name, value) {
-    return (obj instanceof Object$ || typeOf(obj) === Type) && typeof name === 'string'
+    return obj instanceof Object$ && typeof name === 'string'
       ? (obj[name] = (typeof value !== 'undefined' ? value : null))
       : null
   })
   // remove a field.
   link(Type, 'unset', function (obj, name) {
-    if ((obj instanceof Object$ || typeOf(obj) === Type) &&
-        typeof name === 'string' && ownsProperty(obj, name)
-    ) {
+    if (obj instanceof Object$ && typeof name === 'string') {
       var value = obj[name]
-      delete obj[name]
-      return value
+      return delete obj[name] ? value : null
     }
   })
 
   // check the existence of a property
   link(Type, 'has', function (obj, name) {
-    return (obj instanceof Object$ || typeOf(obj) === Type) && typeof name === 'string'
+    return obj instanceof Object$ && typeof name === 'string'
       ? typeof obj[name] !== 'undefined'
-      : null
+      : false
   })
   // check the existence of a field
   link(Type, 'owns', function (obj, name) {
-    return (obj instanceof Object$ || typeOf(obj) === Type) && typeof name === 'string'
+    return obj instanceof Object$ && typeof name === 'string'
       ? ownsProperty(obj, name)
-      : null
+      : false
   })
   // retrieve field names.
   link(Type, 'fields-of', function (obj) {
-    return obj instanceof Object$ || typeOf(obj) === Type
-      ? Object.getOwnPropertyNames(obj)
-      : null
+    return obj instanceof Object$ ? Object.getOwnPropertyNames(obj) : []
   })
-
-  // to-code & to-string
-  typeEncoder(Type)
-
-  // override type indexer
-  typeIndexer(Type)
 
   var proto = Type.proto
   // generate an iterator function to traverse all fields as [name, value].
-  link(proto, 'iterate', iterator($void))
+  link(proto, 'iterate', function () {
+    var fields = Object.getOwnPropertyNames(this)
+    var obj = this
+    var current = null
+    var next = 0
+    var field
+    return function (inSitu) {
+      return current !== null && inSitu === true ? current // cached current value
+        : next >= fields.length ? null // no more
+          : (current = [(field = fields[next++]), obj[field]])
+    }
+  })
 
   // Type Verification
   link(proto, 'is-a', function (t) {
@@ -133,19 +102,14 @@ module.exports = function ($void) {
 
   // default object emptiness logic
   link(proto, 'is-empty', function () {
-    return this instanceof Object$ || typeOf(this) === Type
-      ? !(Object.getOwnPropertyNames(this).length > 0) : null
+    return !(Object.getOwnPropertyNames(this).length > 0)
   }, 'not-empty', function () {
-    return this instanceof Object$ || typeOf(this) === Type
-      ? Object.getOwnPropertyNames(this).length > 0 : null
+    return Object.getOwnPropertyNames(this).length > 0
   })
 
   // Encoding
   // encoding logic for all object instances.
   link(proto, 'to-code', function (ctx) {
-    if (this === proto) {
-      return null
-    }
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
       if (sym) {
@@ -167,30 +131,20 @@ module.exports = function ($void) {
 
   // Description
   link(proto, 'to-string', function () {
-    return this === proto ? '(object proto)'
-      : thisCall(thisCall(this, 'to-code'), 'to-string')
+    return thisCall(thisCall(this, 'to-code'), 'to-string')
   })
 
   // Indexer:
   // an object can provide a customized indexer.
-  protoIndexer(Type, function (name, value) {
-    if (!(this instanceof Object$) && typeOf(this) !== Type) {
-      return null
-    }
-    // try to forward to user's indexer
-    if (ownsProperty(this, ':') && typeof this[':'] === 'function') {
-      return this[':'].apply(this, arguments)
-    }
-    // default read/write behaviour
-    if (typeof name !== 'string') {
-      if (name instanceof Symbol$) {
-        name = name.key // use the key of a symbol
+  link(proto, ':', function (index, value) {
+    if (typeof index !== 'string') {
+      if (index instanceof Symbol$) {
+        index = index.key // use the key of a symbol
+      } else {
+        return null // unsupported property key.
       }
-      return null // invalid property key.
     }
-    return typeof value === 'undefined'
-      ? this[name] // getting
-      : (this[name] = value) // setting
+    return typeof value === 'undefined' ? this[index] : (this[index] = value)
   })
 
   // inject type
