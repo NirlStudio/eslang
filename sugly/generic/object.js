@@ -95,14 +95,16 @@ module.exports = function ($void) {
   // Type Verification
   link(proto, 'is-a', function (t) {
     return t === Type
-  }, 'is-not-a', function (t) {
+  })
+  link(proto, 'is-not-a', function (t) {
     return t !== Type
   })
 
   // default object emptiness logic
   link(proto, 'is-empty', function () {
     return !(Object.getOwnPropertyNames(this).length > 0)
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return Object.getOwnPropertyNames(this).length > 0
   })
 

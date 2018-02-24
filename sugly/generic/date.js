@@ -61,7 +61,8 @@ module.exports = function ($void) {
   // test if this is a valid date.
   link(proto, 'is-valid', function () {
     return !isNaN(this.getTime())
-  }, 'is-not-valid', function () {
+  })
+  link(proto, 'is-not-valid', function () {
     return isNaN(this.getTime())
   })
 
@@ -121,7 +122,8 @@ module.exports = function ($void) {
   // override Identity and Equivalence logic to test by timestamp value
   link(proto, ['is', 'equals', '=='], function (another) {
     return this === another || compare.call(this, another) === 0
-  }, ['is-not', 'not-equals', '!='], function (another) {
+  })
+  link(proto, ['is-not', 'not-equals', '!='], function (another) {
     return this !== another && compare.call(this, another) !== 0
   })
 
@@ -147,7 +149,8 @@ module.exports = function ($void) {
   link(proto, 'is-empty', function () {
     var ts = this.getTime()
     return ts === 0 || isNaN(ts)
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     var ts = this.getTime()
     return ts !== 0 && !isNaN(ts)
   })

@@ -6,6 +6,7 @@ module.exports = function assignment ($void) {
   var Object$ = $void.Object
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
+  var tryToUpdateName = $void.tryToUpdateName
 
   // 'export' exports a value when called in module context.
   // (export symbol value)
@@ -55,13 +56,13 @@ module.exports = function assignment ($void) {
         var key = typeof sym === 'string' ? sym
           : sym instanceof Symbol$ ? sym.key : null
         return key ? space[method](key,
-          length < 3 ? null : tryToUpdateName(key, evaluate(clist[2], space)))
+          length < 3 ? null : tryToUpdateName(evaluate(clist[2], space), key))
           : null
       }
       // (var symbol value)
       if (sym instanceof Symbol$) {
         return (space[method](sym.key, length < 3 ? null
-          : tryToUpdateName(sym.key, evaluate(clist[2], space))))
+          : tryToUpdateName(evaluate(clist[2], space), sym.key)))
       }
       if (!(sym instanceof Tuple$) || sym.$.length < 1) {
         return null // unrecognized pattern
@@ -94,16 +95,4 @@ module.exports = function assignment ($void) {
       return values
     }
   }
-}
-
-function tryToUpdateName (name, value) {
-  if (typeof value === 'function' && !value.name) {
-    Object.defineProperty(value, 'name', {
-      enumerable: true,
-      configurable: false,
-      writable: false,
-      value: name
-    })
-  }
-  return value
 }

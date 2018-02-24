@@ -22,7 +22,8 @@ module.exports = function ($void) {
   // type verification: a function is also a lambda
   link(proto, 'is-a', function (t) {
     return t === Type || t === $Lambda
-  }, 'is-not-a', function (t) {
+  })
+  link(proto, 'is-not-a', function (t) {
     return t !== Type && t !== $Lambda
   })
 

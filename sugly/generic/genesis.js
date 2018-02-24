@@ -23,16 +23,16 @@ module.exports = function () {
   function Type$ () { /* 2. Separation & Aggregation */
     // This function should be executed once, and only once.
     // The primal type is derived from the supreme prototype.
-    define(this, 'proto', Prototype)
+    this.proto = Prototype
     // The primal type is the container type of the supreme prototype.
-    define(Prototype, 'type', this)
+    Prototype.type = this
   }
   Type$.prototype = Prototype
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
   function naming (type, name) {
-    define($, name, type)
-    define(type, 'name', name)
+    $[name] = type
+    type.name = name
     return type
   }
 
@@ -58,13 +58,11 @@ module.exports = function () {
     }
     var type = Object.create(superType)
     // a new type should have a new nature.
-    define(type, 'proto', Object.create(superType.proto))
+    type.proto = Object.create(superType.proto)
     // a proto always intrinsically knows its container type.
-    define(type.proto, 'type', type)
+    type.proto.type = type
     // give a name to the new type.
-    if (name) {
-      naming(type, name)
-    }
+    naming(type, name)
     return type
   }
 
@@ -96,9 +94,9 @@ module.exports = function () {
   // [begin, end) and a step value.
   create('range')
   var Range$ = $void.Range = function (begin, end, step) {
-    publish(this, 'begin', begin)
-    publish(this, 'end', end)
-    publish(this, 'step', step)
+    this.begin = begin
+    this.end = end
+    this.step = step
   }
   Range$.prototype = $.range.proto
 
@@ -113,7 +111,7 @@ module.exports = function () {
   // null by the evaluation function.
   create('symbol')
   var Symbol$ = $void.Symbol = function (key) {
-    publish(this, 'key', key)
+    this.key = key
   }
   Symbol$.prototype = $.symbol.proto
 
@@ -123,10 +121,10 @@ module.exports = function () {
   // The name 'list' is left to be used for more common scenarios.
   create('tuple')
   var Tuple$ = $void.Tuple = function (list, plain, source) {
-    define(this, '$', list) // hidden native data
-    define(this, 'plain', plain === true) // as code block.
+    this.$ = list // hidden native data
+    this.plain = plain === true // as code block.
     if (source) { // reserved for source map and other debug information.
-      define(this, 'source', source)
+      this.source = source
     }
   }
   Tuple$.prototype = $.tuple.proto
@@ -140,8 +138,8 @@ module.exports = function () {
   // An operator is an immutable entity and can be fully encoded.
   create('operator')
   $void.operator = function (impl, code) {
-    define(impl, 'type', $.operator)
-    define(impl, 'code', code)
+    impl.type = $.operator
+    impl.code = code
     return impl
   }
 
@@ -154,8 +152,8 @@ module.exports = function () {
   // A lambda is an immutable entity and can be fully encoded.
   create('lambda')
   $void.lambda = function (impl, code) {
-    define(impl, 'type', $.lambda)
-    define(impl, 'code', code)
+    impl.type = $.lambda
+    impl.code = code
     return impl
   }
 
@@ -167,8 +165,8 @@ module.exports = function () {
   // it may be automatically downgraded to a lambda when the encoding is required.
   create('function', $.lambda)
   $void.function = function (impl, code) {
-    define(impl, 'type', $.function)
-    define(impl, 'code', code)
+    impl.type = $.function
+    impl.code = code
     return impl
   }
 
@@ -194,42 +192,26 @@ module.exports = function () {
   // Class is a meta type to create more types.
   var $Class = naming(Object.create(Type), 'class')
 
-  // the prototype of classes is also type.
-  var $ClassProto = define($Class, 'proto', Object.create(Type))
-  define($ClassProto, 'type', $Class)
-
-  // the prototype of class instances is object.proto.
-  var $Instance = define($ClassProto, 'proto', Object.create($.object.proto))
-  define($Instance, 'type', $ClassProto)
+  // the prototype of classes is also a type.
+  var $ClassProto = $Class.proto = Object.create(Type)
+  $ClassProto.type = $Class
 
   // A fake constructor for instanceof checking for a class.
   var ClassType$ = $void.ClassType = function () {}
   ClassType$.prototype = $ClassProto
 
+  // the prototype of class instances is object.proto.
+  var $Instance = $ClassProto.proto = Object.create($.object.proto)
+
   // export the ability of creation to enable an autonomous process.
-  $void.createClass = create.bind(null, null, $ClassProto)
+  $void.createClass = function () {
+    var class_ = Object.create($ClassProto)
+    // a new type should have a new nature.
+    class_.proto = Object.create($Instance)
+    // a proto always intrinsically knows its container type.
+    class_.proto.type = class_
+    return class_
+  }
 
   return $void
-}
-
-// Publish a value to its owner by a key.
-function publish (owner, key, value) {
-  Object.defineProperty(owner, key, {
-    enumerable: true,
-    configurable: false,
-    writable: false,
-    value: value
-  })
-  return value
-}
-
-// Define a value as a non-enumerable property of an entity.
-function define (entity, prop, value) {
-  Object.defineProperty(entity, prop, {
-    enumerable: false,
-    configurable: false,
-    writable: false,
-    value: value
-  })
-  return value
 }

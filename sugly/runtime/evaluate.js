@@ -53,7 +53,7 @@ module.exports = function evaluate ($void) {
       subject = evaluate(subject, space)
     } // else, the subject is a common value.
 
-    // swith subject to predicate if it's apppliable.
+    // switch subject to predicate if it's apppliable.
     var predicate
     if (typeof subject === 'function' && implicitMode) {
       if (subject.type === $Operator) {
@@ -114,7 +114,7 @@ module.exports = function evaluate ($void) {
         throw signal
       } else {
         console.warn('evaluating > unknow signal:', signal,
-          'when evaluating', clause, 'with', args)
+          'when evaluating', clause)
         return null
       }
     }

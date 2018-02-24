@@ -18,7 +18,8 @@ module.exports = function ($void) {
   // Emptiness
   link(proto, 'is-empty', function () {
     return this === false
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return this !== false
   })
 

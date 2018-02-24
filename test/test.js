@@ -123,7 +123,6 @@ function checkObject () {
   assert('Object.is')
   assert('Object.assign')
   assert('Object.create')
-  assert('Object.defineProperty')
   assert('Object.getOwnPropertyNames')
 }
 
@@ -188,6 +187,8 @@ function checkSuglyRuntime ($void) {
   ])
 
   checkFunctions($void.$, '[Sugly / functions] ', [
+    // iterate
+    'iterate', 'iterator', 'select', 'selector', 'collect', 'collector', 'reduce', 'reducer',
     // lib
     'env', 'encode', 'print', 'warn',
     // startup

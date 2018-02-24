@@ -52,7 +52,14 @@ module.exports = function ($void) {
       this.begin === another.begin &&
       this.end === another.end &&
       this.step === another.step)
-  }, ['is-not', 'not-equals', '!='])
+  })
+  link(proto, ['is-not', 'not-equals', '!='], function (another) {
+    return this !== another && (
+      !(another instanceof Range$) ||
+      this.begin !== another.begin ||
+      this.end !== another.end ||
+      this.step !== another.step)
+  })
 
   // override comparison logic to keep consistent with Identity & Equivalence.
   link(proto, 'compare', function (another) {
@@ -70,7 +77,8 @@ module.exports = function ($void) {
   // range is empty if it cannot iterate at least once.
   link(proto, 'is-empty', function () {
     return this.step > 0 ? this.begin >= this.end : this.begin <= this.end
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return this.step > 0 ? this.begin < this.end : this.begin > this.end
   })
 

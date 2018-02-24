@@ -21,7 +21,8 @@ module.exports = function ($void) {
     'equals', '=='
   ], function (another) {
     return Object.is(this, typeof another === 'undefined' ? null : another)
-  }, [
+  })
+  link(Null, [
     // the negative method of Identity test.
     'is-not', '!==',
     // the negative method of Equivalence test.
@@ -43,7 +44,8 @@ module.exports = function ($void) {
   // Emptiness: null, type.proto and all protos are empty.
   link(Null, 'is-empty', function () {
     return true
-  }, 'not-empty', function () {
+  })
+  link(Null, 'not-empty', function () {
     return false
   })
 
@@ -52,7 +54,8 @@ module.exports = function ($void) {
     // null is null and null is a null.
     // type.proto is not null but is a null.
     return typeof type === 'undefined' || type === null
-  }, 'is-not-a', function (type) {
+  })
+  link(Null, 'is-not-a', function (type) {
     return typeof type !== 'undefined' && type !== null
   })
 

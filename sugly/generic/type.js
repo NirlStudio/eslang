@@ -5,7 +5,6 @@ module.exports = function ($void) {
   var Type = $.type
   var $Symbol = $.symbol
   var $Object = $.object
-  var Type$ = $void.Type
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var indexerOf = $void.indexerOf
@@ -21,7 +20,8 @@ module.exports = function ($void) {
   // Type Verification: Any non-empty value is an instance of its type.
   link(proto, 'is-a', function (type) {
     return this.type === type
-  }, 'is-not-a', function (type) {
+  })
+  link(proto, 'is-not-a', function (type) {
     return this.type !== type
   })
 
@@ -33,10 +33,10 @@ module.exports = function ($void) {
 
   // Indexer: default readonly accessor for all types.
   // all value types' protos must provide a customized indexer.
-  link(proto, ':', function (index) {
+  link(proto, ':', function proto$indexer (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? this[index.key] : ''
-    return name && name !== 'proto' ? this[name] : null
+    return name === 'proto' ? this.objectify() : this[name]
   })
 
   /* Retrieve the real type of an entity. */
@@ -50,18 +50,23 @@ module.exports = function ($void) {
   /* Convert this type to a type descriptor object. */
   link(Type, 'objectify', function () {
     var typeDef = $Object.empty()
-    if (this instanceof Type$) {
-      Object.assign(typeDef, this.proto)
-      typeDef.static = Object.assign($Object.empty(), this)
+    var name
+    for (name in this.proto) {
+      if (name !== 'type') {
+        typeDef[name] = this.proto[name]
+      }
+    }
+    var typeStatic = typeDef.static = $Object.empty()
+    for (name in this) {
+      if (name !== 'proto') {
+        typeStatic[name] = this[name]
+      }
     }
     return typeDef
   })
 
   /* Extend this type with one or more type descriptor objects. */
   link(Type, 'typify', function () {
-    if (!(this instanceof Type$)) {
-      return this
-    }
     for (var i = 0; i < arguments.length; i++) {
       var typeDef = arguments[i]
       var props = typeDef instanceof Object$
@@ -89,7 +94,8 @@ module.exports = function ($void) {
   // Type Verification: Any type is a type.
   link(Type, 'is-a', function (type) {
     return Type === type
-  }, 'is-not-a', function (type) {
+  })
+  link(Type, 'is-not-a', function (type) {
     return Type !== type
   })
 
@@ -98,7 +104,8 @@ module.exports = function ($void) {
   //  Any other type is not empty.
   link(Type, 'is-empty', function () {
     return this === Type
-  }, 'not-empty', function () {
+  })
+  link(Type, 'not-empty', function () {
     return this !== Type
   })
 

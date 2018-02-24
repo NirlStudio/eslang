@@ -212,7 +212,8 @@ module.exports = function ($void) {
   // determine emptiness by array's length
   link(proto, 'is-empty', function () {
     return this.length < 1
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return !(this.length < 1)
   })
 

@@ -90,6 +90,11 @@ module.exports = function ($void) {
     return this.plain
   })
 
+  // the source map of this tuple.
+  link(proto, 'source-map', function () {
+    return this.source
+  })
+
   var array = $Array.proto
   // generate an iterator function to traverse all items.
   link(proto, 'iterate', function () {
@@ -163,7 +168,8 @@ module.exports = function ($void) {
   // Emptiness: an empty tuple has no items.
   link(proto, 'is-empty', function () {
     return this.$.length < 1
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return !(this.$.length < 1)
   })
 

@@ -2,11 +2,11 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var Null = $void.null
-  var Type$ = $void.Type
-  var Symbol$ = $void.Symbol
-  var Tuple$ = $void.Tuple
   var $Lambda = $.lambda
+  var Null = $void.null
+  var Tuple$ = $void.Tuple
+  var Symbol$ = $void.Symbol
+  var ClassType$ = $void.ClassType
 
   // a static version of isPrototypeOf.
   var isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
@@ -26,8 +26,8 @@ module.exports = function ($void) {
 
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
-    return typeof entity === 'undefined' || entity === null
-      ? Null[':'] : (entity.type && entity.type.proto[':']) || Null[':']
+    return (entity === null || typeof entity === 'undefined') ? Null[':']
+      : (entity.type && entity.type.proto[':']) || Null[':']
   }
 
   function thisCall (subject, methodName) {
@@ -38,58 +38,39 @@ module.exports = function ($void) {
   }
   $void.thisCall = thisCall
 
-  // to test if an entity can be named and exported.
-  function isFormal (entity) {
-    return typeof entity === 'function' || entity instanceof Type$
-  }
-
-// to export an entity to a module.
-  $void.export = function $export (space, name, entity) {
-    publish(space, name, entity)
-    if (isFormal(entity) && typeof entity.name === 'undefined') {
-      // the public name overrides the inner name.
-      publish(entity, 'name', name)
+  // try to update the name of a function or a class.
+  var tryToUpdateName = $void.tryToUpdateName = function (entity, name) {
+    if (typeof entity === 'function') {
+      if (!entity.$name) {
+        entity.$name = name
+      }
+    } else if (entity instanceof ClassType$) {
+      if (!entity.name) {
+        entity.name = name
+      }
     }
     return entity
   }
 
+  // to export an entity to a space.
+  $void.export = function (space, name, entity) {
+    space[name] = entity
+    return tryToUpdateName(entity, name)
+  }
+
   // to link an entity to its owner.
-  function link (owner, names, entity, negativeNames, negate) {
-    if (typeof entity === 'function' && !entity.type) {
+  function link (owner, names, entity) {
+    if (typeof entity === 'function' && !ownsProperty(entity, 'type')) {
       entity.type = $Lambda
-    }
-    if (typeof negate === 'function' && !negate.type) {
-      negate.type = $Lambda
+      if (!entity.$name) {
+        entity.$name = typeof names === 'string' ? names : names[0]
+      }
     }
     if (typeof names === 'string') {
-      publish(owner, names, entity)
-      if (isFormal(entity) && !entity.name) {
-        publish(entity, 'name', names)
-      }
+      owner[names] = entity
     } else {
-      if (isFormal(entity) && !entity.name) {
-        publish(entity, 'name', names[0])
-      }
       for (var i = 0; i < names.length; i++) {
-        publish(owner, names[i], entity)
-      }
-    }
-    if (negativeNames) {
-      if (!negate) {
-        var apply = Function.prototype.apply.bind(entity)
-        negate = function () {
-          var result = apply(this, arguments)
-          return typeof result === 'boolean' ? !result : result
-        }
-      }
-      if (typeof negativeNames === 'string') {
-        publish(negate, 'name', negativeNames)
-        publish(owner, negativeNames, negate)
-      } else {
-        publish(negate, 'name', negativeNames[0])
-        for (var j = 0; j < negativeNames.length; j++) {
-          publish(owner, negativeNames[j], negate)
-        }
+        owner[names[i]] = entity
       }
     }
     return entity
@@ -101,7 +82,10 @@ module.exports = function ($void) {
     var names = Object.getOwnPropertyNames(mapping)
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
-      publish(target, mapping[name], src[name])
+      var func = target[mapping[name]] = src[name]
+      if (typeof func === 'function' && !func.$name) {
+        func.$name = mapping[name]
+      }
     }
     return target
   }
@@ -110,13 +94,14 @@ module.exports = function ($void) {
     var proto = type.proto
     // return function's name
     link(proto, 'name', function () {
-      return this.name
+      return this.$name
     })
 
     // test if the operation is a generic one.
     link(proto, 'is-generic', function () {
       return !(this.code instanceof Tuple$)
-    }, 'not-generic', function () {
+    })
+    link(proto, 'not-generic', function () {
       return this.code instanceof Tuple$
     })
 
@@ -124,7 +109,8 @@ module.exports = function ($void) {
     link(proto, 'is-empty', function () {
       return this.code instanceof Tuple$ &&
           (this.code.$.length < 3 || this.code.$[2].$.length < 1)
-    }, 'not-empty', function () {
+    })
+    link(proto, 'not-empty', function () {
       return !(this.code instanceof Tuple$) ||
           (this.code.$.length > 2 && this.code.$[2].$.length > 0)
     })
@@ -140,14 +126,4 @@ module.exports = function ($void) {
         : index instanceof Symbol$ ? proto[index.key] : null
     })
   }
-}
-
-// Publish a value to its owner by a key.
-function publish (owner, key, value) {
-  Object.defineProperty(owner, key, {
-    enumerable: true,
-    configurable: false,
-    writable: true,
-    value: value
-  })
 }

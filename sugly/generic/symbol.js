@@ -47,7 +47,8 @@ module.exports = function ($void) {
     return this === another || (
       another instanceof Symbol$ && this.key === another.key
     )
-  }, ['is-not', 'not-equals', '!='], function (another) {
+  })
+  link(proto, ['is-not', 'not-equals', '!='], function (another) {
     return this !== another && (
       !(another instanceof Symbol$) || this.key !== another.key
     )
@@ -63,12 +64,19 @@ module.exports = function ($void) {
   // Emptiness: The empty symbol's key is an empty string.
   link(proto, 'is-empty', function () {
     return this.key === ''
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return this.key !== ''
   })
 
   // Representation
   link(proto, 'to-string', function () {
     return this.key
+  })
+
+  // Indexer
+  link(proto, ':', function (index) {
+    return typeof index === 'string' ? this[index]
+      : index instanceof Symbol$ ? this[index.key] : null
   })
 }

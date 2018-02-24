@@ -120,9 +120,6 @@
 ).
 
 (define "Indexer" (= ()
-  (should "the indexer is not readable directly." (= ()
-    (assert null (null ":"),
-  ),
   (should "null's type is null." (= ()
     (assert null (null "type"),
 ).

@@ -207,7 +207,8 @@ module.exports = function ($void) {
   // the emptiness of string is determined by its length.
   link(proto, 'is-empty', function () {
     return this === ''
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return this !== ''
   })
 

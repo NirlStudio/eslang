@@ -32,7 +32,7 @@
   (++ assert-step)
   (let "expected" (expected),
   (var "value" (expr),
-  (if (value != expected)
+  (if (:value != expected)
     (return (@
       failed: true
       step: assert-step

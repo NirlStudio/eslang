@@ -154,22 +154,26 @@ module.exports = function ($void) {
   // test for special values
   link(proto, 'is-valid', function () {
     return !isNaN(this)
-  }, 'is-not-valid', function () {
+  })
+  link(proto, 'is-not-valid', function () {
     return isNaN(this)
   })
   link(proto, 'is-int', function () {
     return Number.isSafeInteger(this)
-  }, 'is-not-int', function () {
+  })
+  link(proto, 'is-not-int', function () {
     return !Number.isSafeInteger(this)
   })
   link(proto, 'is-bits', function () {
     return this >= minBits && this <= maxBits
-  }, 'is-not-bits', function () {
+  })
+  link(proto, 'is-not-bits', function () {
     return this < minBits || this > maxBits
   })
   link(proto, 'is-finite', function () {
     return isFinite(this)
-  }, 'is-infinite', function () {
+  })
+  link(proto, 'is-infinite', function () {
     return !isFinite(this)
   })
 
@@ -238,7 +242,8 @@ module.exports = function ($void) {
   // override equivalence logic since 0 != -0 != +0 by identity-base test.
   link(proto, ['equals', '=='], function (another) {
     return this === another || (isNaN(this) && isNaN(another))
-  }, ['not-equals', '!='], function (another) {
+  })
+  link(proto, ['not-equals', '!='], function (another) {
     return this !== another && (!isNaN(this) || !isNaN(another))
   })
 
@@ -262,7 +267,8 @@ module.exports = function ($void) {
   // O and NaN are defined as empty.
   link(proto, 'is-empty', function () {
     return this === 0 || isNaN(this)
-  }, 'not-empty', function () {
+  })
+  link(proto, 'not-empty', function () {
     return this !== 0 && !isNaN(this)
   })
 
