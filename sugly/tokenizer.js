@@ -26,6 +26,7 @@ module.exports = function ($void) {
     var waiter = null
     var spacing = false
     var indenting = 0
+    var clauseIndent = 0
     var lastChar = null
     var escaping = false
     var pendingIndent = -1
@@ -67,6 +68,7 @@ module.exports = function ($void) {
       waiter = null
       spacing = false
       indenting = 0
+      clauseIndent = 0
       lastChar = null
       escaping = false
       pendingIndent = -1
@@ -83,6 +85,9 @@ module.exports = function ($void) {
       }
       switch (c) {
         case '(':
+          raiseToken('punctuation', c, [clauseIndent, lineNo, lineOffset])
+          clauseIndent = -1 // clear begining indent
+          break
         case ')':
           raiseToken('punctuation', c, [indenting, lineNo, lineOffset])
           break
@@ -104,6 +109,7 @@ module.exports = function ($void) {
         case ' ':
           if (indenting >= 0) {
             indenting += 1
+            clauseIndent = indenting
           } else {
             raiseSpace(c)
           }
@@ -141,6 +147,7 @@ module.exports = function ($void) {
         lineNo += 1
         lineOffset = 0
         indenting = 0
+        clauseIndent = 0
       } else {
         lineOffset += 1
       }

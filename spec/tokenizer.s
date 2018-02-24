@@ -8,5 +8,5 @@
   (should "(tokenize ...) return an array of tokens." (= ()
     (let tokens (tokenize "x y   z"),
     (assert (tokens is-a array),
-    (assert ((tokens length) is 5),
+    (assert 5 (tokens length),
 ).
