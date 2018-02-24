@@ -15,7 +15,7 @@ module.exports = function load ($void) {
       return null
     }
     // look into current space to have the base uri.
-    return loadData(space.local['-module'],
+    return loadData(space, space.local['-module'],
       evaluate(clist[1], space),
       clist.length > 2 ? evaluate(clist[2], space) : null
     )
@@ -24,7 +24,7 @@ module.exports = function load ($void) {
   // expose to be called by native code
   $void.loadData = loadData
 
-  function loadData (moduleUri, source, type) {
+  function loadData (space, moduleUri, source, type) {
     if (typeof source !== 'string') {
       console.warn('load > invalid source:', source)
       return null
@@ -60,7 +60,7 @@ module.exports = function load ($void) {
       return null
     }
     try { // to load data
-      return execute(code, uri)[0]
+      return execute(space, code, uri)[0]
     } catch (signal) {
       console.warn('load > invalid call to', signal.id,
         'in', code, 'from', uri, 'on', moduleUri)

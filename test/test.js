@@ -159,8 +159,8 @@ function checkSuglyRuntime ($void) {
     // genesis
     'operator', 'lambda', 'function',
     // runtime
-    'createLambdaSpace', 'createFunctionSpace',
-    'createOperatorSpace', 'createModuleSpace',
+    'createModuleSpace', 'createAppSpace',
+    'createLambdaSpace', 'createFunctionSpace', 'createOperatorSpace',
     'evaluate', 'signalOf',
     'lambdaOf', 'functionOf', 'operatorOf',
     'execute'
@@ -279,6 +279,7 @@ function checkIndexerOf ($void) {
   var indexerOf = $void.indexerOf
   check(indexerOf() === $void.null[':'], 'undefined')
   check(indexerOf(null) === $void.null[':'], 'null')
+  check(indexerOf($.type) === $void.$.type[':'], 'type')
 
   check(indexerOf($.bool) === $.bool[':'], 'bool')
   check($.bool[':']('type') === $.type, 'bool:type')
@@ -303,9 +304,11 @@ function checkIndexerOf ($void) {
   check(indexerOf(new $void.Symbol('x')) === $.symbol.proto[':'], '(symbol of)')
 
   check(indexerOf($.operator) === $.operator[':'], 'operator')
+  check(indexerOf($void.operator(function () {})) === $.operator.proto[':'], '(=> ...)')
   check(indexerOf($.lambda) === $.lambda[':'], 'lambda')
+  check(indexerOf($void.lambda(function () {})) === $.lambda.proto[':'], '(=> ...)')
   check(indexerOf($.function) === $.function[':'], 'function')
-  check(indexerOf(function () {}) === $.function.proto[':'], 'number:0')
+  check(indexerOf(function () {}) === $.function.proto[':'], '(=> ...)')
 
   check(indexerOf($.array) === $.array[':'], 'array')
   check(indexerOf([]) === $.array.proto[':'], 'array:[]')
@@ -348,7 +351,6 @@ function checkTypes ($void) {
   check(seval(
     '(bool of 1)', true
   ), '(bool of 1)')
-
   check(seval(
     'string', $.string
   ), 'string')
@@ -382,9 +384,9 @@ function checkTypes ($void) {
     }
   ), '(array of 1 2)')
   check(seval(
-    '', null
+    'object', $.object
   ), 'object')
   check(seval(
-    '', null
+    'class', $.class
   ), 'class')
 }

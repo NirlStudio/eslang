@@ -29,7 +29,7 @@ module.exports = function run ($void) {
       return expr
     }
     try {
-      return args ? execute(code, null, args)[0] : execute(code)[0]
+      return args ? execute(null, code, null, args)[0] : execute(null, code)[0]
     } catch (signal) { // any unexpected signal
       if (code === expr) {
         console.warn('eval > invalid call to', signal.id, 'for', code)

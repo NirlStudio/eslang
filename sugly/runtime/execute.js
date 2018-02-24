@@ -6,8 +6,8 @@ module.exports = function execute ($void) {
   var createAppSpace = $void.createAppSpace
   var createModuleSpace = $void.createModuleSpace
 
-  $void.execute = function execute (code, uri, args, mainApp) {
-    var scope = mainApp ? createAppSpace(uri) : createModuleSpace(uri)
+  $void.execute = function execute (space, code, uri, args, mainApp) {
+    var scope = mainApp ? createAppSpace(uri) : createModuleSpace(uri, space)
     populateArguments(scope, args, mainApp)
     try {
       return [evaluate(code, scope), scope]

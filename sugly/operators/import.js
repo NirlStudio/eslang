@@ -22,7 +22,7 @@ module.exports = function import_ ($void) {
     }
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      return importModule(space.local['-module'],
+      return importModule(space, space.local['-module'],
       evaluate(clist[1], space),
         clist.length > 2 ? evaluate(clist[2], space) : null
       )
@@ -30,7 +30,7 @@ module.exports = function import_ ($void) {
     // (import field-or-fields from src)
     var src = evaluate(clist[3], space)
     var imported = src instanceof Object$ ? src // importing from an object
-      : importModule(space.local['-module'], src,
+      : importModule(space, space.local['-module'], src,
           clist.length > 4 ? evaluate(clist[4], space) : null)
     if (!imported) {
       return null // importing failed.
@@ -64,13 +64,13 @@ module.exports = function import_ ($void) {
   // the cached modules
   var modules = $void.modules = Object.create(null)
 
-  function importModule (moduleUri, source, type) {
+  function importModule (space, moduleUri, source, type) {
     if (typeof source !== 'string') {
       console.warn('import > invalid source:', source)
       return null
     }
     if (type === 'js') {
-      return importJSModule(source)
+      return importJSModule(space, source)
     }
     if (!source.endsWith('.s')) {
       source += '.s'
@@ -107,7 +107,7 @@ module.exports = function import_ ($void) {
     }
 
     try { // to load module
-      var scope = execute(code, uri)[1]
+      var scope = execute(null, code, uri)[1]
       if (scope) { // try to cache it.
         scope.time = new Date()
         modules[uri] = scope
@@ -122,7 +122,7 @@ module.exports = function import_ ($void) {
     }
   }
 
-  function importJSModule (source) {
+  function importJSModule (space, source) {
     var loader = $void.loader
     if (loader.isAbsolute(source)) {
       console.warn("import > It's forbidden to load a native module",
@@ -151,7 +151,7 @@ module.exports = function import_ ($void) {
         console.warn('import > invalid JS module', source, 'at', uri)
         return null
       }
-      var scope = $void.createModuleSpace(uri)
+      var scope = $void.createModuleSpace(uri, null)
       var status = importing(scope.exporting, scope.context)
       if (status !== true) { // the loader can report error details
         console.warn('import > failed to import JS module of', source,
