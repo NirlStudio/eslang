@@ -31,16 +31,19 @@ module.exports = function ($void) {
 
   // Representation and Description need be customized by each type.
 
-  // Indexer: default readonly accessor for all types and values.
+  // Indexer: default readonly accessor for all types.
+  // all value types' protos must provide a customized indexer.
   link(proto, ':', function (index) {
-    return typeof index === 'string' ? this[index]
-      : index instanceof Symbol$ ? this[index.key] : null
+    var name = typeof index === 'string' ? index
+      : index instanceof Symbol$ ? this[index.key] : ''
+    return name && name !== 'proto' ? this[name] : null
   })
 
   /* Retrieve the real type of an entity. */
   link(Type, 'of', function (entity) {
     return typeof entity === 'undefined' || entity === null ? null : entity.type
   })
+
   /* Retrieve the type indexer of an entity. */
   link(Type, 'indexer-of', indexerOf)
 

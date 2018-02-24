@@ -4,6 +4,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.range
   var Range$ = $void.Range
+  var Symbol$ = $void.Symbol
   var link = $void.link
 
   // the empty value
@@ -75,8 +76,12 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function () {
-    return this instanceof Range$
-      ? '(' + [this.begin, this.end, this.step].join(' ') + ')'
-      : this === proto ? '(range proto)' : null
+    return '(' + [this.begin, this.end, this.step].join(' ') + ')'
+  })
+
+  // Indexer
+  link(proto, ':', function (index, value) {
+    return typeof index === 'string' ? this[index]
+      : index instanceof Symbol$ ? this[index.key] : null
   })
 }

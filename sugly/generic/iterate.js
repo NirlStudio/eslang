@@ -45,12 +45,14 @@ module.exports = function iterate ($void) {
         ? convert.apply(subject, item) : convert.call(subject, item))
     }
   })
+
   // generate an iterator from a coverter
   $export($, 'iterator', function (convert, subject) {
     return function (source) {
       return iterate(source, convert, subject)
     }
   })
+
   // extract some elements from an iterable entity with a filter function.
   var select = $export($, 'select', function (source, filter, subject) {
     var next
@@ -87,12 +89,14 @@ module.exports = function iterate ($void) {
       return null
     }
   })
+
   // generate an iterator from a filter
   $export($, 'selector', function (filter, subject) {
     return function (source) {
       return select(source, filter, subject)
     }
   })
+
   // accumulate iteration output to a value from an iterator or iterable entity.
   var collect = $export($, 'collect', function (source, accumulate, subject) {
     var next
@@ -121,12 +125,14 @@ module.exports = function iterate ($void) {
     }
     return sum
   })
+
   // generate an iterator from a coverter
   $export($, 'collector', function (accumulate, subject) {
     return function (source) {
       return collect(source, accumulate, subject)
     }
   })
+
   // generate an iterator from a coverter
   var reduce = $export($, 'reduce', function (source) {
     var next = typeof source === 'function' ? source : thisCall(source, 'iterate')
@@ -138,11 +144,12 @@ module.exports = function iterate ($void) {
       if (typeof processor === 'function') {
         next = processor(next)
       } else {
-        return processor // a terminator
+        next = processor
       }
     }
     return next
   })
+
   // generate a reducer from a series of processors of iterator, selector and accumulator.
   $export($, 'reducer', function () {
     var args = [null]
