@@ -6,7 +6,7 @@ module.exports = function interpreter ($void) {
   var Signal$ = $void.Signal
   var $export = $void.export
   var evaluate = $void.evaluate
-  var createModuleSpace = $void.createModuleSpace
+  var createAppSpace = $void.createAppSpace
   var populateArguments = $void.populateArguments
 
   // interactively feed & evaluate
@@ -18,7 +18,7 @@ module.exports = function interpreter ($void) {
     // save the base uri into environment.
     $void.env('uri', baseUri)
     // create a module space.
-    var scope = createModuleSpace(baseUri)
+    var scope = createAppSpace(baseUri)
     populateArguments(scope, args, true)
     // create compiler.
     var compile = compiler(function (expr, status) {

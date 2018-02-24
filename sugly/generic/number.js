@@ -275,9 +275,9 @@ module.exports = function ($void) {
   // Representation & Description
   link(proto, 'to-string', function (format) {
     switch (format) {
-      case 'h': case 'hex': return '0x' + this.toString(16)
-      case 'o': case 'oct': return '0' + this.toString(8)
-      case 'b': case 'bin': return '0b' + this.toString(2)
+      case 'h': case 'hex': return '0x' + (this >> 0).toString(16)
+      case 'o': case 'oct': return '0' + (this >> 0).toString(8)
+      case 'b': case 'bin': return '0b' + (this >> 0).toString(2)
       default: return this.toString()
     }
   })
@@ -285,8 +285,8 @@ module.exports = function ($void) {
   // Indexer
   link(proto, ':', function (index, value) {
     return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? proto[index.key]
-        : typeof index === 'number' ? $Range.of(this, index, value) : null
+      : typeof index === 'number' ? $Range.of(this, index, value)
+        : index instanceof Symbol$ ? proto[index.key] : null
   })
 
   // inject type

@@ -151,7 +151,7 @@ module.exports = function import_ ($void) {
         console.warn('import > invalid JS module', source, 'at', uri)
         return null
       }
-      var scope = $void.createModuleSpace()
+      var scope = $void.createModuleSpace(uri)
       var status = importing(scope.exporting, scope.context)
       if (status !== true) { // the loader can report error details
         console.warn('import > failed to import JS module of', source,

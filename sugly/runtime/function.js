@@ -32,25 +32,28 @@ module.exports = function function_ ($void) {
   }
 
   function createLambda (params, tbody) {
-    var me = nop(function () {
+    var $lambda = function () {
       var scope = createLambdaSpace()
       // populate arguments
       for (var i = 0; i < params.length; i++) {
         var param = params[i]
         scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
       }
-      scope.context['do'] = me
-      scope.context['this'] = typeof this === 'undefined' ? null : this
-      scope.context['arguments'] = Array.prototype.slice.call(arguments)
+      scope.context.do = $lambda
+      scope.context.this = typeof this === 'undefined' ? null : this
+      scope.context.arguments = Array.prototype.slice.call(arguments)
       // execution
       while (true) { // redo
         try {
-          return evaluate(tbody, scope)
+          var result = evaluate(tbody, scope)
+          clearContext(scope)
+          return result
         } catch (signal) {
+          clearContext(scope)
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createLambdaSpace(),
-                me, this, params, signal.value, signal.count)
+                $lambda, this, params, signal.value, signal.count)
               continue
             } else if (signal.id !== 'exit') {
               // return, break & continue if they're not in loop.
@@ -62,8 +65,8 @@ module.exports = function function_ ($void) {
           return null
         }
       }
-    })
-    return me
+    }
+    return $lambda
   }
 
   $void.functionOf = function functionOf (space, clause, offset) {
@@ -91,25 +94,28 @@ module.exports = function function_ ($void) {
       local: local,
       locals: locals
     }
-    var me = nop(function () {
+    var $func = function () {
       var scope = createFunctionSpace(parent)
       // populate arguments
       for (var i = 0; i < params.length; i++) {
         var param = params[i]
         scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
       }
-      scope.context['do'] = me
-      scope.context['this'] = typeof this === 'undefined' ? null : this
-      scope.context['arguments'] = Array.prototype.slice.call(arguments)
+      scope.context.do = $func
+      scope.context.this = typeof this === 'undefined' ? null : this
+      scope.context.arguments = Array.prototype.slice.call(arguments)
       // execution
       while (true) { // redo
         try {
-          return evaluate(tbody, scope)
+          var result = evaluate(tbody, scope)
+          clearContext(scope)
+          return result
         } catch (signal) {
+          clearContext(scope)
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createFunctionSpace(parent),
-                me, this, params, signal.value, signal.count)
+                $func, this, params, signal.value, signal.count)
               continue
             } else if (signal.id !== 'exit') {
               // return, break & continue if they're not in loop.
@@ -121,8 +127,8 @@ module.exports = function function_ ($void) {
           return null
         }
       }
-    })
-    return me
+    }
+    return $func
   }
 
   // to prepare a new context for redo
@@ -194,6 +200,8 @@ module.exports = function function_ ($void) {
   }
 }
 
-function nop (x) {
-  return x
+function clearContext (scope) {
+  delete scope.context.do
+  delete scope.context.this
+  delete scope.context.arguments
 }

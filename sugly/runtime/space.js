@@ -46,9 +46,18 @@ module.exports = function space ($void) {
 
   $void.createModuleSpace = function (uri) {
     var local = Object.create($)
-    local['-module'] = uri
+    local['-module'] = uri || ''
     var export_ = Object.create($Object.proto)
     return new Space$(local, null, null, export_)
+  }
+
+  $void.createAppSpace = function (uri) {
+    var app = Object.create($)
+    var local = Object.create(app)
+    local['-module'] = uri
+    var space = new Space$(local, null, null, app)
+    space.app = app
+    return space
   }
 
   $void.createLambdaSpace = function () {

@@ -72,16 +72,16 @@ module.exports = function ($void) {
         t = {}; p = {}
       }
       var j, key
-      var fields = Object.getOwnPropertyNames(t)
-      for (j = 0; j < fields.length; j++) {
-        key = fields[j]
+      var names = Object.getOwnPropertyNames(t)
+      for (j = 0; j < names.length; j++) {
+        key = names[j]
         if (typeof proto[key] === 'undefined') {
           type_[key] = t[key]
         }
       }
-      fields = Object.getOwnPropertyNames(p)
-      for (j = 0; j < fields.length; j++) {
-        key = fields[j]
+      names = Object.getOwnPropertyNames(p)
+      for (j = 0; j < names.length; j++) {
+        key = names[j]
         if (key !== 'type' && key !== 'static') {
           proto_[key] = p[key]
         }
@@ -108,6 +108,28 @@ module.exports = function ($void) {
       }
     }
     return activate.call(inst, inst)
+  })
+
+  // Convert this class's definition to a type descriptor object.
+  link(Type, 'to-object', function () {
+    var typeDef = $Object.empty()
+    var names = Object.getOwnPropertyNames(this.proto)
+    var i, name
+    for (i = 0; i < names.length; i++) {
+      name = names[i]
+      if (name !== 'type') {
+        typeDef[name] = this.proto[name]
+      }
+    }
+    var typeStatic = typeDef.static = $Object.empty()
+    names = Object.getOwnPropertyNames(this)
+    for (i = 0; i < names.length; i++) {
+      name = names[i]
+      if (name !== 'proto') {
+        typeStatic[name] = this[name]
+      }
+    }
+    return typeDef
   })
 
   // Type Verification: a class is a class and a type.

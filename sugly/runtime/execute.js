@@ -3,10 +3,11 @@
 module.exports = function execute ($void) {
   var Signal$ = $void.Signal
   var evaluate = $void.evaluate
+  var createAppSpace = $void.createAppSpace
   var createModuleSpace = $void.createModuleSpace
 
   $void.execute = function execute (code, uri, args, mainApp) {
-    var scope = createModuleSpace(uri || null)
+    var scope = mainApp ? createAppSpace(uri) : createModuleSpace(uri)
     populateArguments(scope, args, mainApp)
     try {
       return [evaluate(code, scope), scope]

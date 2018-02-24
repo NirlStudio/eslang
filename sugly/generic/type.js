@@ -39,15 +39,15 @@ module.exports = function ($void) {
     return name === 'proto' ? this.objectify() : this[name]
   })
 
-  /* Retrieve the real type of an entity. */
+  // Retrieve the real type of an entity.
   link(Type, 'of', function (entity) {
     return typeof entity === 'undefined' || entity === null ? null : entity.type
   })
 
-  /* Retrieve the type indexer of an entity. */
+  // Retrieve the type indexer of an entity.
   link(Type, 'indexer-of', indexerOf)
 
-  /* Convert this type to a type descriptor object. */
+  // Type Reflection: Convert this type to a type descriptor object.
   link(Type, 'objectify', function () {
     var typeDef = $Object.empty()
     var name
@@ -65,7 +65,7 @@ module.exports = function ($void) {
     return typeDef
   })
 
-  /* Extend this type with one or more type descriptor objects. */
+  // Type Reflection: Extend this type with one or more type descriptor objects.
   link(Type, 'typify', function () {
     for (var i = 0; i < arguments.length; i++) {
       var typeDef = arguments[i]
