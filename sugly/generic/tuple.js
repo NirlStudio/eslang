@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.tuple
+  var $Array = $.array
   var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var Range$ = $void.Range
@@ -89,28 +90,21 @@ module.exports = function ($void) {
     return this.plain
   })
 
+  var array = $Array.proto
   // generate an iterator function to traverse all items.
   link(proto, 'iterate', function () {
-    var list = this.$
-    var current = null
-    var next = 0
-    return function (inSitu) {
-      return current !== null && inSitu === true ? current
-        : next >= list.length ? null : (current = [list[next++]])
-    }
+    return array.iterate.apply(this.$, arguments)
   })
 
   // make a new copy with all items or some in a range.
-  link(proto, 'copy', function (begin, end) {
-    begin = begin >> 0
-    if (begin < 0) {
-      begin += this.length
-    }
-    end = typeof end === 'undefined' ? this.length : end >> 0
-    if (end < 0) {
-      end += this.length
-    }
-    var s = this.$.slice(begin, end)
+  link(proto, 'copy', function (begin, count) {
+    var s = array.copy.apply(this.$, arguments)
+    return s && s.length > 0
+      ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
+      : this.plain ? plain : empty
+  })
+  link(proto, 'in', function (begin, end) {
+    var s = array.in.apply(this.$, arguments)
     return s && s.length > 0
       ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
       : this.plain ? plain : empty
@@ -118,48 +112,23 @@ module.exports = function ($void) {
 
   // retrieve the first element.
   link(proto, 'first', function (count) {
-    count >>= 0
-    return count > 1 ? this.$.slice(0, count) : this.$[0]
+    return array.first.apply(this.$, arguments)
   })
   link(proto, 'first-of', function (value) {
-    if (typeof value === 'undefined') {
-      value = null
-    }
-    var list = this.$
-    for (var i = 0; i < list.length; i++) {
-      var v = list[i]
-      if (v === value || Object.is(v, value) || thisCall(v, 'equals', value)) {
-        return i
-      }
-    }
-    return null
+    return array['first-of'].apply(this.$, arguments)
   })
 
   // retrieve the last element.
   link(proto, 'last', function (count) {
-    count >>= 0
-    var list = this.$
-    return count > 1 ? list.slice(list.length - count, list.length)
-      : list[list.length - 1]
+    return array.last.apply(this.$, arguments)
   })
   link(proto, 'last-of', function (value) {
-    if (typeof value === 'undefined') {
-      value = null
-    }
-    var list = this.$
-    for (var i = list.length - 1; i >= 0; i--) {
-      var v = list[i]
-      if (v === value || Object.is(v, value) || thisCall(v, 'equals', value)) {
-        return i
-      }
-    }
-    return null
+    return array['last-of'].apply(this.$, arguments)
   })
 
   // merge this tuple's items and argument values to create a new one.
   link(proto, 'concat', function () {
-    var list = this.$.slice(0) // copy a new list
-    append.apply(list, arguments) // append & fix
+    var list = append.apply(this.$.slice(0), arguments)
     return list.length > this.$.length ? new Tuple$(list, this.plain) : this
   })
 
@@ -262,11 +231,9 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index, length) {
+  link(proto, ':', function (index, end) {
     return typeof index === 'string' ? proto[index]
-        : typeof index !== 'number'
-          ? index instanceof Symbol$ ? proto[index.key] : null
-          : typeof length === 'undefined' ? this.$[index] // getting item
-            : this.copy(index, length)
+        : index instanceof Symbol$ ? proto[index.key]
+          : array.in.apply(this.$, arguments)
   })
 }

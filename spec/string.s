@@ -318,34 +318,58 @@
 ).
 
 (define "Converting Operations" (= ()
-  (define "copy" (= ()
-    (should "(str copy) returns the original string w/o arguments." (= ()
+  (define "copy / in" (= ()
+    (should "(str copy) and (str in) returns the original string w/o arguments." (= ()
       (assert "" ("" copy),
       (assert "ABC" ("ABC" copy),
+      (assert "" ("" in),
+      (assert "ABC" ("ABC" in),
     ),
-    (should "(str copy begin) returns the sub-string from the begin offset." (= ()
+    (should "(str copy begin) and (str in begin) returns the sub-string from the begin offset." (= ()
       (assert "" ("" copy 0),
       (assert "" ("" copy 1),
       (assert "ABC" ("ABC" copy 0),
       (assert "BC" ("ABC" copy 1),
       (assert "C" ("ABC" copy -1),
+      (assert "" ("" in 0),
+      (assert "" ("" in 1),
+      (assert "ABC" ("ABC" in 0),
+      (assert "BC" ("ABC" in 1),
+      (assert "C" ("ABC" in -1),
     ),
     (should "(str copy begin end) returns the sub-string from the begin offset to end offset." (= ()
       (assert "" ("" copy 0 1),
       (assert "" ("" copy 1 2),
       (assert "" ("ABC" copy 0 0),
-      (assert "" ("ABC" copy 1 1),
+      (assert "B" ("ABC" copy 1 1),
       (assert "A" ("ABC" copy 0 1),
       (assert "AB" ("ABC" copy 0 2),
       (assert "ABC" ("ABC" copy 0 10),
       (assert "" ("ABC" copy -1 0),
-      (assert "" ("ABC" copy -1 -1),
-      (assert "" ("ABC" copy -1 1),
-      (assert "" ("ABC" copy -1 2),
+      (assert "B" ("ABC" copy -1 -1),
+      (assert "C" ("ABC" copy -1 1),
+      (assert "C" ("ABC" copy -1 2),
       (assert "C" ("ABC" copy -1 3),
-      (assert "AB" ("ABC" copy 0 -1),
-      (assert "A" ("ABC" copy 0 -2),
-      (assert "" ("ABC" copy 0 -3),
+      (assert "C" ("ABC" copy 0 -1),
+      (assert "BC" ("ABC" copy 0 -2),
+      (assert "ABC" ("ABC" copy 0 -3),
+    ),
+    (should "(str in begin end) returns the sub-string from the begin offset to end offset." (= ()
+      (assert "" ("" in 0 1),
+      (assert "" ("" in 1 2),
+      (assert "" ("ABC" in 0 0),
+      (assert "" ("ABC" in 1 1),
+      (assert "A" ("ABC" in 0 1),
+      (assert "AB" ("ABC" in 0 2),
+      (assert "ABC" ("ABC" in 0 10),
+      (assert "" ("ABC" in -1 0),
+      (assert "" ("ABC" in -1 -1),
+      (assert "" ("ABC" in -1 1),
+      (assert "" ("ABC" in -1 2),
+      (assert "C" ("ABC" in -1 3),
+      (assert "AB" ("ABC" in 0 -1),
+      (assert "A" ("ABC" in 0 -2),
+      (assert "" ("ABC" in 0 -3),
     ),
   ),
   (define "trim" (= ()

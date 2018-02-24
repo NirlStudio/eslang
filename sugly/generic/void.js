@@ -30,16 +30,11 @@ module.exports = function ($void) {
       ? Null[':'] : (entity.type && entity.type.proto[':']) || Null[':']
   }
 
-  // retrieve the real type of an entity.
-  $void.typeOf = function (entity) {
-    return typeof entity === 'undefined' || entity === null ? null : entity.type
-  }
-
   function thisCall (subject, methodName) {
     var method = indexerOf(subject).call(subject, methodName)
-    return typeof method !== 'function' ? method : method.apply(subject,
-      arguments.length < 3 ? [] : Array.prototype.slice.call(arguments, 2)
-    )
+    return typeof method !== 'function' ? method
+      : arguments.length < 3 ? method.call(subject)
+        : method.apply(subject, Array.prototype.slice.call(arguments, 2))
   }
   $void.thisCall = thisCall
 

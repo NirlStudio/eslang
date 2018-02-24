@@ -6,7 +6,6 @@ module.exports = function ($void) {
   var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var link = $void.link
-  var typeOf = $void.typeOf
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var thisCall = $void.thisCall
@@ -126,7 +125,7 @@ module.exports = function ($void) {
     if (code.length < 2) {
       code.push($Symbol.pairing)
     }
-    return ctx.end(this, typeOf(this), new Tuple$(code))
+    return ctx.end(this, Type, new Tuple$(code))
   })
 
   // Description

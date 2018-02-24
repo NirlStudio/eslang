@@ -11,7 +11,6 @@ module.exports = function ($void) {
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
-  var typeOf = $void.typeOf
   var ClassType$ = $void.ClassType
   var createClass = $void.createClass
   var sharedSymbolOf = $void.sharedSymbolOf
@@ -30,7 +29,7 @@ module.exports = function ($void) {
     if (target instanceof Object$) {
       for (var i = 1; i < arguments.length; i++) {
         var src = arguments[i]
-        if (src instanceof Object$ || typeOf(src) === $Object) {
+        if (src instanceof Object$) {
           Object.assign(target, src)
           activate.call(target, src)
         }
@@ -62,9 +61,9 @@ module.exports = function ($void) {
       if (src instanceof ClassType$) {
         t = src
         p = src.proto
-      } else if (src instanceof Object$ || typeOf(src) === $Object) {
+      } else if (src instanceof Object$) {
         p = src
-        if (src.static instanceof Object$ || typeOf(src.static) === $Object) {
+        if (src.static instanceof Object$) {
           t = src.static
         } else {
           t = {}
@@ -103,7 +102,7 @@ module.exports = function ($void) {
     var inst = Object.create(this.proto)
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
-      if (src instanceof Object$ || typeOf(src) === $Object) {
+      if (src instanceof Object$) {
         Object.assign(inst, src)
         activate.call(inst, src)
       }
@@ -241,7 +240,7 @@ module.exports = function ($void) {
       ctx = new EncodingContext$(this)
     }
     var code = overriding.call(this)
-    return ctx.end(this, typeOf(this),
+    return ctx.end(this, this.type,
       code instanceof Tuple$ ? code : $Tuple.object)
   })
 

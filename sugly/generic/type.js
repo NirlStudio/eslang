@@ -8,6 +8,7 @@ module.exports = function ($void) {
   var Type$ = $void.Type
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
+  var indexerOf = $void.indexerOf
   var link = $void.link
 
   /* The Supreme Prototype */
@@ -37,7 +38,11 @@ module.exports = function ($void) {
   })
 
   /* Retrieve the real type of an entity. */
-  link(Type, 'of', $void.typeOf)
+  link(Type, 'of', function (entity) {
+    return typeof entity === 'undefined' || entity === null ? null : entity.type
+  })
+  /* Retrieve the type indexer of an entity. */
+  link(Type, 'indexer-of', indexerOf)
 
   /* Convert this type to a type descriptor object. */
   link(Type, 'objectify', function () {

@@ -72,7 +72,22 @@ module.exports = function ($void) {
 
   // Converting
   // generate sub-string from this string.
-  link(proto, 'copy', function (begin, end) {
+  link(proto, 'copy', function (begin, count) {
+    begin >>= 0
+    count = typeof count === 'undefined' ? this.length : count >> 0
+    if (count < 0) {
+      begin += count
+      count = -count
+    }
+    if (begin < 0) {
+      begin += this.length
+      if (begin < 0) {
+        begin = 0
+      }
+    }
+    return this.substr(begin, count)
+  })
+  link(proto, 'in', function (begin, end) {
     begin >>= 0
     if (begin < 0) {
       begin += this.length

@@ -258,7 +258,7 @@ function check (result, name) {
 
 function checkTypeOf ($void) {
   console.log('\n  - Static type-of')
-  var typeOf = $void.typeOf
+  var typeOf = $void.$.type.of
   check(typeOf() === null, 'undefined')
   check(typeOf(null) === null, 'null')
 

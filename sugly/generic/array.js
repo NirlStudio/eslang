@@ -69,7 +69,19 @@ module.exports = function ($void) {
 
   // to create a shallow copy of this instance with all items,
   // or selected items in a range.
-  link(proto, 'copy', function (begin, end) {
+  link(proto, 'copy', function (begin, count) {
+    begin = begin >> 0
+    count = typeof count === 'undefined' ? this.length : count >> 0
+    if (count < 0) {
+      begin += count
+      count = -count
+    }
+    if (begin < 0) {
+      begin += this.length
+    }
+    return this.slice(begin, begin + count)
+  })
+  var inRange = link(proto, 'in', function (begin, end) {
     begin = begin >> 0
     if (begin < 0) {
       begin += this.length
@@ -237,11 +249,12 @@ module.exports = function ($void) {
 
   // Indexer
   link(proto, ':', function (index, value) {
-    return typeof index === 'string' ? proto[index]
-        : typeof index !== 'number'
-          ? index instanceof Symbol$ ? proto[index.key] : null
-          : typeof value === 'undefined' ? this[index] // getting item
-            : (this[index] = value) // setting item
+    return typeof index === 'number'
+      ? typeof value === 'undefined' ? this[index] // getting item
+        : (this[index] = value) // setting item
+      : typeof index === 'string' ? proto[index]
+        : index instanceof Symbol$ ? proto[index.key]
+          : inRange.apply(this, arguments)
   })
 
   // inject type
