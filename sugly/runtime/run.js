@@ -14,21 +14,17 @@ module.exports = function run ($void) {
     }
     // try to resolve the base uri of the whole application
     if (typeof baseUri !== 'string') {
-      baseUri = null
+      baseUri = $.env('uri')
     }
     if (!source.endsWith('.s')) {
       source += '.s'
     }
     // try to resolve the uri for source
     var loader = $void.loader
-    var uri = loader.resolve(source,
-      baseUri ? [baseUri] : [])
+    var uri = loader.resolve(source, [baseUri])
     if (typeof uri !== 'string') {
       console.warn('run > failed to resolve source for', uri)
       return null
-    }
-    if (!baseUri) { // try to grab a path from the uri
-      baseUri = loader.dir(uri)
     }
     // try to load file
     var text = loader.read(uri)
@@ -42,8 +38,6 @@ module.exports = function run ($void) {
       console.warn('run > compiler warnings:', code)
       return null
     }
-    // save base uri into environment.
-    $void.env('uri', baseUri)
     try {
       return execute(null, code, uri, args, true)[0]
     } catch (signal) {

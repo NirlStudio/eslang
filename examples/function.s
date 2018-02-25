@@ -13,3 +13,7 @@
 (let sum2 (and1100 400).
 (print "(and300 300)" sum1 (sum1 == 600).
 (print "(and1100 400)" sum2 (sum2 == 1500).
+
+# instant evaluation
+(print "(=> :() (10 + z)) is" (=> :() (10 + z).
+(print "(=>(1 2) :(x y) (+ x y z) is" (=> (1 2) :(x y) (+ x y z).

@@ -16,6 +16,9 @@ module.exports = function ($void) {
   // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
   link(Type, 'etc', sharedSymbolOf('...'))
 
+  // a sepcial empty symbol to indicate "all" or "any" for parser and operator
+  link(Type, 'all', sharedSymbolOf('*'))
+
   // symbols for common operators
   link(Type, 'quote', sharedSymbolOf('`'))
 

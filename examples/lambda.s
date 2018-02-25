@@ -21,3 +21,7 @@
 (let and0 (x-and 1000).
 (let sum (and0 222).
 (print "(and0 222)" sum (sum == 222).
+
+# instant evaluation
+(print "(= :() (10 + z)) is" (= :() (10 + z).
+(print "(=(1 2) :(x y) (+ x y) is" (= (1 2) :(x y) (+ x y).

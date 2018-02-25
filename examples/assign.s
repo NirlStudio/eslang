@@ -22,20 +22,20 @@
 (let (x y z) 0).
 (print "(let (x y z) 0):" (x == 0) (y == 0) (z == 0).
 
-((= () (let x 1).
+(=: () (let x 1).
 (print "(= () (let x 1):" (x == 0).
 
-((= () (var y 2).
+(=: () (var y 2).
 (print "(= () (var y 2):" (y == 0).
 
-((=> () (let x 3) (print (x == 3).
-(print "(=> () (let x 1):" (x == 3).
+(=>: () (let x 3) (print (x == 3).
+(print "(=> () (let x 3):" (x == 3).
 
-((=> () (var y 4) (print (y == 4).
-(print "(=> () (var y 2):" (y == 0).
+(=>: () (var y 4) (print (y == 4).
+(print "(=> () (var y 4):" (y == 0).
 
 ((=? () (let "x" 5) (print (x == 5).
-(print "(=>? () (let \"x\" 1):" (x == 1).
+(print "(=>? () (let \"x\" 5):" (x == 5).
 
 ((=? () (var "y" 6) (print (y == 6).
-(print "(=>? () (var \"y\" 2):" (y == 0).
+(print "(=>? () (var \"y\" 6):" (y == 0).

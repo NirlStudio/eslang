@@ -23,7 +23,8 @@ module.exports = function include ($void) {
       return null
     }
     if (typeof moduleUri !== 'string') {
-      moduleUri = null
+      console.warn('include > missing module:', source)
+      return null
     }
     if (!source.endsWith('.s')) {
       source += '.s'

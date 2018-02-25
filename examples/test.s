@@ -1,7 +1,7 @@
 (if (:define is null)
   (let direct-testing true)
   (print "---- loading testing framework ----"),
-  (let (define should assert test) (import "test"),
+  (let * (import "test"),
   (print "define is a function?" (type of define),
   (print "should is a function?" (type of should),
   (print "assert is a operator?" (type of assert),

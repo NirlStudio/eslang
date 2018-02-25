@@ -24,14 +24,10 @@ module.exports = function load ($void) {
   // expose to be called by native code
   $void.loadData = loadData
 
-  function loadData (space, moduleUri, source, type) {
+  function loadData (space, moduleUri, source) {
     if (typeof source !== 'string') {
       console.warn('load > invalid source:', source)
       return null
-    }
-    if (type === 'js') { // json data?
-      // TODO: wrap native objects
-      // return importJSModule($, source)
     }
     if (!source.endsWith('.s')) {
       source += '.s'
@@ -39,10 +35,20 @@ module.exports = function load ($void) {
     // space uri > app uri.
     var loader = $void.loader
     var baseUri = loader.dir(moduleUri)
-    var dirs = baseUri ? [baseUri, // under the same directory
-      $.env('uri')] : [$.env('uri')] // the app directory
-    // try to locate the source
-    var uri = loader.resolve(source, dirs)
+    var dirs = baseUri ? [baseUri] : [] // under the same directory
+    if ($.env('uri') !== baseUri) {
+      dirs.push($.env('uri')) // the app directory
+    }
+    // try to locate the sourcevar uri
+    var uri
+    for (var i = 0; i < dirs.length; i++) {
+      uri = loader.resolve(source, [dirs[i]])
+      if (uri === moduleUri) {
+        uri = ['400', 'A module cannot import itself.', [source, [dirs[i]]]]
+      } else if (typeof uri === 'string') {
+        break
+      }
+    }
     if (typeof uri !== 'string') {
       console.warn('load > failed to resolve for', uri)
       return null

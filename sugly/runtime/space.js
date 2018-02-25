@@ -19,7 +19,8 @@ module.exports = function space ($void) {
   }
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
-      return this.context[key]
+      var value = this.context[key]
+      return typeof value === 'undefined' ? null : value
     },
     var: function (key, value) {
       return (this.local[key] = value)
@@ -44,12 +45,13 @@ module.exports = function space ($void) {
   })
 
   $void.createModuleSpace = function (uri, appSpace) {
-    var local = Object.create((appSpace && appSpace.app) || $)
+    var app = appSpace && appSpace.app
+    var local = Object.create(app || $)
     local['-module'] = uri || ''
     var export_ = Object.create($Object.proto)
     var space = new Space$(local, null, null, export_)
-    if (appSpace && appSpace.app) {
-      space.app = appSpace
+    if (app) {
+      space.app = app
     }
     return space
   }
@@ -64,15 +66,24 @@ module.exports = function space ($void) {
     return space
   }
 
-  $void.createLambdaSpace = function () {
-    return new Space$(Object.create($))
+  $void.createLambdaSpace = function (app) {
+    if (app) {
+      var space = new Space$(Object.create(app))
+      space.app = app
+      return space
+    } else {
+      return new Space$(Object.create($))
+    }
   }
 
   $void.createFunctionSpace = function (parent) {
-    return parent
-      ? new Space$(Object.create(parent.local),
-          parent.locals ? parent.locals.concat(parent.local) : [parent.local])
-      : new Space$(Object.create($))
+    var space = new Space$(Object.create(parent.local),
+        parent.locals ? parent.locals.concat(parent.local) : [parent.local]
+    )
+    if (parent.app) {
+      space.app = parent.app
+    }
+    return space
   }
 
   // customized the behaviour of the space of an operator
@@ -85,6 +96,10 @@ module.exports = function space ($void) {
     this.local = parent.local
     if (parent.locals) {
       this.locals = parent.locals
+    }
+    // reserve app
+    if (parent.app) {
+      this.app = parent.app
     }
   }
   OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {

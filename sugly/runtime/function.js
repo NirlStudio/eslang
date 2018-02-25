@@ -22,7 +22,7 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return lambda(createLambda(params, tbody), new Tuple$(code))
+      return lambda(createLambda(params, tbody, space.app), new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
       return lambda(function () { // use an empty function
@@ -31,9 +31,9 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createLambda (params, tbody) {
+  function createLambda (params, tbody, app) {
     var $lambda = function () {
-      var scope = createLambdaSpace()
+      var scope = createLambdaSpace(app)
       // populate arguments
       for (var i = 0; i < params.length; i++) {
         var param = params[i]
@@ -52,7 +52,7 @@ module.exports = function function_ ($void) {
           clearContext(scope)
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
-              scope = prepareToRedo(createLambdaSpace(),
+              scope = prepareToRedo(createLambdaSpace(app),
                 $lambda, this, params, signal.value, signal.count)
               continue
             } else if (signal.id !== 'exit') {
@@ -79,7 +79,7 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return function_(createFunction(params, tbody, space.local, space.locals),
+      return function_(createFunction(params, tbody, space.local, space.locas, space.app),
         new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
@@ -89,10 +89,11 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createFunction (params, tbody, local, locals) {
+  function createFunction (params, tbody, local, locals, app) {
     var parent = {
       local: local,
-      locals: locals
+      locals: locals,
+      app: app
     }
     var $func = function () {
       var scope = createFunctionSpace(parent)
