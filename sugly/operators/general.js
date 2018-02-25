@@ -57,7 +57,7 @@ module.exports = function general ($void) {
     if (typeof operant !== 'string') {
       operant = ''
     }
-    var clist = clause.$
+    var clist = clause && clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
@@ -84,7 +84,7 @@ module.exports = function general ($void) {
     if (operant.length < 1) {
       return operant
     }
-    var clist = clause.$
+    var clist = clause && clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {

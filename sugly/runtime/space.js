@@ -19,8 +19,7 @@ module.exports = function space ($void) {
   }
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
-      var value = this.context[key]
-      return typeof value === 'undefined' ? null : this.context[key]
+      return this.context[key]
     },
     var: function (key, value) {
       return (this.local[key] = value)
@@ -44,11 +43,15 @@ module.exports = function space ($void) {
     }
   })
 
-  $void.createModuleSpace = function (uri, space) {
-    var local = Object.create((space && space.app) || $)
+  $void.createModuleSpace = function (uri, appSpace) {
+    var local = Object.create((appSpace && appSpace.app) || $)
     local['-module'] = uri || ''
     var export_ = Object.create($Object.proto)
-    return new Space$(local, null, null, export_)
+    var space = new Space$(local, null, null, export_)
+    if (appSpace && appSpace.app) {
+      space.app = appSpace
+    }
+    return space
   }
 
   $void.createAppSpace = function (uri) {

@@ -78,48 +78,76 @@ module.exports = function import_ ($void) {
     // space uri > app uri > runtime uri
     var loader = $void.loader
     var baseUri = moduleUri ? loader.dir(moduleUri) : null
-    var dirs = baseUri ? [baseUri, // under the same directory
-      baseUri + '/modules'] : [] // local modules directory
-    dirs.push($.env('uri') + '/modules', // app shared modules
-      $void.runtime('uri') + '/modules' // runtime shared modules
-    )
+    var dirs = baseUri ? [
+      baseUri, // under the same directory
+      baseUri + '/modules' // local modules directory
+    ] : []
+    if ($.env('uri') !== baseUri) {
+      dirs.push($.env('uri') + '/modules') // app shared modules
+    }
+    if ($void.runtime('uri') !== baseUri) {
+      dirs.push($void.runtime('uri') + '/modules') // runtime shared modules
+    }
     // try to locate the source in dirs.
-    var uri = loader.resolve(source, dirs)
+    var uri
+    for (var i = 0; i < dirs.length; i++) {
+      uri = loader.resolve(source, [dirs[i]])
+      if (uri === moduleUri) {
+        uri = ['400', 'A module cannot import itself.', [source, [dirs[i]]]]
+      } else if (typeof uri === 'string') {
+        break
+      }
+    }
     if (typeof uri !== 'string') {
       console.warn('import > failed to resolve source for', uri)
       return null
     }
     // look up it in cache.
     if (modules[uri]) {
-      return modules[uri].exporting
+      if (modules[uri] === 100) {
+        console.warn('import > loop dependency detected at', uri, 'from', moduleUri)
+        return modules[uri].exporting
+      }
+      if ((Date.now() - modules[uri].importTime) < 3000) {
+        return modules[uri].exporting
+      } // else try to reload
+    } else {
+      // generate a fake module to prevent loop dependency, either on purpose or not.
+      modules[uri] = Object.assign(Object.create(null), {
+        importStatus: 100,
+        importTime: Date.now(),
+        exporting: Object.create(null)
+      })
     }
     // try to load file
     var text = loader.read(uri)
     if (typeof text !== 'string') {
       console.warn('import > failed to read source', source, 'for', text)
-      return null
+      return modules[uri].exporting
     }
     // compile text
     var code = compile(text)
     if (!(code instanceof Tuple$)) {
       console.warn('import > compiler warnings:', code)
-      return null
+      return modules[uri].exporting
     }
 
     try { // to load module
       var scope = execute(null, code, uri)[1]
       if (scope) { // try to cache it.
-        scope.time = new Date()
         modules[uri] = scope
-        return scope.exporting
+        modules[uri].importStatus = 200
+        modules[uri].importTime = Date.now()
+      } else {
+        modules[uri].importStatus = 500
+        console.warn('import > failed when executing', code)
       }
-      console.warn('import > failed when executing', code)
-      return null
     } catch (signal) {
+      modules[uri].importStatus = 400
       console.warn('import > invalid call to', signal.id,
-        'in', code, 'from', uri, 'on', moduleUri)
-      return null
+        'in', code, 'at', uri, 'from', moduleUri)
     }
+    return modules[uri].exporting
   }
 
   function importJSModule (space, source) {

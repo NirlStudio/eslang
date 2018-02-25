@@ -20,7 +20,8 @@ module.exports = function ($void) {
     // defined by any property that's unrelevant with its effect to its environment.
     'equals', '=='
   ], function (another) {
-    return Object.is(this, typeof another === 'undefined' ? null : another)
+    return Object.is(typeof this === 'undefined' ? null : this,
+      typeof another === 'undefined' ? null : another)
   })
   link(Null, [
     // the negative method of Identity test.
@@ -28,7 +29,8 @@ module.exports = function ($void) {
     // the negative method of Equivalence test.
     'not-equals', '!='
   ], function (another) {
-    return !Object.is(this, typeof another === 'undefined' ? null : another)
+    return !Object.is(typeof this === 'undefined' ? null : this,
+      typeof another === 'undefined' ? null : another)
   })
 
   // Ordering: general comparison

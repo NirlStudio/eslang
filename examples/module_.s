@@ -1,6 +1,8 @@
-(var z 100)
-(export x 1)
-(export x 2)
+(export x 100)
+(export x 200)
+(export y 200)
+(export y 300)
+(var z 300)
 
-(export l (= ( x y) (+ x y z).
-(export f (=> ( x y) (+ x y z).
+(export l0 (= x (+ x y z).
+(export f600 (=> x (+ x y z).

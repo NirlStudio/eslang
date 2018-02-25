@@ -43,15 +43,15 @@ module.exports = function logical ($void) {
 
   // global logical OR operator
   link(Null, '||', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return null
-    }
-    var clist = clause.$
-    if (typeof operant === 'undefined' || clist.length < 2) {
+    var clist = clause && clause.$
+    if (typeof operant === 'undefined' || !clist.length || clist.length < 2) {
       return false // the value of OR is defined as False
     }
     if (operant !== false && operant !== null && operant !== 0) {
       return true
+    }
+    if (!(space instanceof Space$)) {
+      return null
     }
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
@@ -67,38 +67,35 @@ module.exports = function logical ($void) {
   // - (x ? y) returns x itself or returns y if x is equivalent to false.
   // - (x ? y z) returns y if x is equivalent to true, returns z otherwise.
   link(Null, '?', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return null
+    var clist = clause && clause.$
+    if (!clist || !clist.length || clist.length < 2) {
+      return null // invalid call
     }
-    var clist = clause.$
-    if (typeof operant === 'undefined' || clist.length < 2) {
-      return null // the value of OR is defined as False
-    }
-    if (operant !== false && operant !== null && operant !== 0) {
+    if (typeof operant !== 'undefined' && operant !== false && operant !== null && operant !== 0) {
       switch (clist.length) { // true logic
         case 2:
           return true
         case 3:
           return operant
         default:
-          return evaluate(clist[2], space)
+          return space instanceof Space$ ? evaluate(clist[2], space) : null
       }
     }
     switch (clist.length) { // false logic
       case 2:
         return false
       case 3:
-        return evaluate(clist[2], space)
+        return space instanceof Space$ ? evaluate(clist[2], space) : null
       default:
-        return evaluate(clist[3], space)
+        return space instanceof Space$ ? evaluate(clist[3], space) : null
     }
   }, $Tuple.operator))
 
   // Null Fallback: only for null.
   // (x ?? y z ...) returns the first non-null value after it if x is null.
   link(Null, '??', operator(function (space, clause, operant) {
-    if (operant !== null) {
-      return typeof operant === 'undefined' ? null : operant // shortcut
+    if (typeof operant !== 'undefined' && operant !== null) {
+      return operant // shortcut
     }
     if (!(space instanceof Space$)) {
       return null // the value of OR is defined as False

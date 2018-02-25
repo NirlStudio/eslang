@@ -21,12 +21,12 @@ module.exports = function bitwise ($void) {
 
   // bitwise AND and assign it back to the same variable
   link($Number.proto, '&=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     var clist = clause.$
     if (typeof operant !== 'number' || clist.length < 3) {
       return 0
+    }
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
     }
     var value = evaluate(clist[2], space)
     operant &= typeof value === 'number' ? value : 0
@@ -40,14 +40,15 @@ module.exports = function bitwise ($void) {
 
   // bitwise OR and assign it back to the same variable
   link($Number.proto, '|=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     if (typeof operant !== 'number') {
       return 0
     }
-    var clist = clause.$
-    var value = clist.length > 2 ? evaluate(clist[2], space) : 0
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    var clist = clause && clause.$
+    var value = clist && clist.length && clist.length > 2
+      ? evaluate(clist[2], space) : 0
     operant |= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
@@ -59,14 +60,15 @@ module.exports = function bitwise ($void) {
 
   // bitwise XOR and assign it back to the same variable
   link($Number.proto, '^=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     if (typeof operant !== 'number') {
       return 0
     }
-    var clist = clause.$
-    var value = clist.length > 2 ? evaluate(clist[2], space) : 0
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    var clist = clause && clause.$
+    var value = clist && clist.length && clist.length > 2
+      ? evaluate(clist[2], space) : 0
     operant ^= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
@@ -78,14 +80,15 @@ module.exports = function bitwise ($void) {
 
   // bitwise left-shift and assign it back to the same variable
   link($Number.proto, '<<=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     if (typeof operant !== 'number') {
       return 0
     }
-    var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    var clist = clause && clause.$
+    var offset = clist && clist.length && clist.length > 2
+      ? evaluate(clist[2], space) : 0
     operant <<= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
@@ -97,14 +100,15 @@ module.exports = function bitwise ($void) {
 
   // bitwise right-shift and assign it back to the same variable
   link($Number.proto, '>>=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     if (typeof operant !== 'number') {
       return 0
     }
-    var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    var clist = clause && clause.$
+    var offset = clist && clist.length && clist.length > 2
+      ? evaluate(clist[2], space) : 0
     operant >>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
@@ -116,14 +120,15 @@ module.exports = function bitwise ($void) {
 
   // bitwise zero-fill right-shift and assign it back to the same variable
   link($Number.proto, '>>>=', operator(function (space, clause, operant) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
-    }
     if (typeof operant !== 'number') {
       return 0
     }
-    var clist = clause.$
-    var offset = clist.length > 2 ? evaluate(clist[2], space) : 0
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    var clist = clause && clause.$
+    var offset = clist && clist.length && clist.length > 2
+      ? evaluate(clist[2], space) : 0
     operant >>>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]

@@ -48,7 +48,7 @@ module.exports = function arithmetic ($void) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
+    if (typeof operant !== 'number' || !clause || !clause.$ || !clause.$.length) {
       operant = 0
     }
     var sym = clause.$[0]
@@ -63,7 +63,7 @@ module.exports = function arithmetic ($void) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
+    if (typeof operant !== 'number' || !clause || !clause.$ || !clause.$.length) {
       operant = 0
     }
     var sym = clause.$[0]
@@ -81,7 +81,7 @@ module.exports = function arithmetic ($void) {
     if (typeof operant !== 'number') {
       operant = 0
     }
-    var clist = clause.$
+    var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
@@ -103,7 +103,7 @@ module.exports = function arithmetic ($void) {
     if (typeof operant !== 'number') {
       operant = 0
     }
-    var clist = clause.$
+    var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
@@ -125,7 +125,7 @@ module.exports = function arithmetic ($void) {
     if (typeof operant !== 'number') {
       operant = 0
     }
-    var clist = clause.$
+    var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
@@ -147,7 +147,7 @@ module.exports = function arithmetic ($void) {
     if (typeof operant !== 'number') {
       operant = 0
     }
-    var clist = clause.$
+    var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
