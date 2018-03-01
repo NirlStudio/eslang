@@ -131,9 +131,23 @@ module.exports = function ($void) {
   // The empty value
   link(Type, 'empty', 0)
 
+  // An empty value indicating an invalid number.
+  link(Type, 'invalid', NaN)
+
   // parse a string to its number value.
+  var regexParse = /\s*\(number\s+(invalid|[-]?infinity)\s*\)\s*/
   var parse = link(Type, 'parse', function (value) {
-    return parseFloat(value)
+    var keys = typeof value === 'string' ? value.match(regexParse) : null
+    switch (keys && keys.length > 1 ? keys[1] : '') {
+      case 'invalid':
+        return NaN
+      case 'infinity':
+        return Number.POSITIVE_INFINITY
+      case '-infinity':
+        return Number.NEGATIVE_INFINITY
+      default:
+        return parseFloat(value)
+    }
   })
 
   // parse a string as an integer value.
@@ -155,7 +169,7 @@ module.exports = function ($void) {
   link(proto, 'is-valid', function () {
     return !isNaN(this)
   })
-  link(proto, 'is-not-valid', function () {
+  link(proto, 'is-invalid', function () {
     return isNaN(this)
   })
   link(proto, 'is-int', function () {
@@ -199,13 +213,13 @@ module.exports = function ($void) {
   link(proto, '<<', function (offset) {
     return this << offset
   })
-  // use zero-based shift by default since signed shift may cause an implicit conversion.
-  link(proto, '>>', function (offset) {
-    return this >>> offset
-  })
   // signed right-shift.
-  link(proto, '>>>', function (offset) {
+  link(proto, '>>', function (offset) {
     return this >> offset
+  })
+  // zero-based right shift.
+  link(proto, '>>>', function (offset) {
+    return this >>> offset
   })
 
   // support ordering logic - comparable
@@ -278,7 +292,10 @@ module.exports = function ($void) {
       case 'h': case 'hex': return '0x' + (this >> 0).toString(16)
       case 'o': case 'oct': return '0' + (this >> 0).toString(8)
       case 'b': case 'bin': return '0b' + (this >> 0).toString(2)
-      default: return this.toString()
+      default: return isNaN(this) ? '(number invalid)'
+        : this === Number.POSITIVE_INFINITY ? '(number infinity)'
+          : this === Number.NEGATIVE_INFINITY ? '(number -infinity)'
+          : this.toString()
     }
   })
 

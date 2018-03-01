@@ -48,8 +48,8 @@
             discarding bits shifted off." (= ()
     (assert 0 (0 >> 1),
     (assert 0 (0 >> 3),
-    (assert 2147483647 (-1 >> 1),
-    (assert 536870911 (-1 >> 3),
+    (assert -1 (-1 >> 1),
+    (assert -1 (-1 >> 3),
     (assert 1 (2 >> 1),
     (assert 1 (8 >> 3),
 ).
@@ -59,8 +59,8 @@
             discarding bits shifted off, and shifting in zeroes from the left." (= ()
     (assert 0 (0 >>> 1),
     (assert 0 (0 >>> 3),
-    (assert -1 (-1 >>> 1),
-    (assert -1 (-1 >>> 3),
+    (assert 2147483647 (-1 >>> 1),
+    (assert 536870911 (-1 >>> 3),
     (assert 1 (2 >>> 1),
     (assert 1 (8 >>> 3),
 ).

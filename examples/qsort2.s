@@ -5,7 +5,7 @@
   (let right (@),
   (for i in (1 (data length))
     (let v (data:i),
-    (((v >= mid) ? right left) push v)
+    (((v >= mid) ? right left) push v),
   ),
   ((do left) += mid (do right),
 ).

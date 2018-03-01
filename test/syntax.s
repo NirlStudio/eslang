@@ -1,207 +1,274 @@
 ###############################################################################
-# syntax-highlighting test.
-###############################################################################
+# comment.line.number-sign.sugly
 
-# keywords & opertors
-(` a)
-(`(a))
-(` (a))
-(` a)
-(` `)
-(` =>)
+# keyword.other.punctuation.sugly
+: @ ` $
+@ ` $ :
+` $ : @
+$ : @ `
+@(@ a@ @ @b @)@
+:(: a: : :b :):
+`(` a` ` `b `)`
+$($ a$ $ $b $)$
 
-(quote)
-(quote(a))
-(quote (a))
-(quote a)
-(quote `)
-(quote =>)
-(quote quote -quote quote-"quote")
+# keyword.operator.quote.sugly
+quote
+quote(quote -quote quote quote- quote)quote
 
-(let let "let")
-(var var "let")
+# keyword.operator.assignment.sugly
+let(let -let let let- let)let
+var(var -var var var- var)var
+export(export -export export export- export)export
 
-(return return "return")
-(exit exit "exit")
-(halt halt "halt")
+# keyword.control.flow.sugly
+if
+if(if -if if if- if)if
+for
+for(for -for for for- for)for
+while
+while(while -while while while- while)while
+break
+break(break -break break break- break)break
+continue
+continue(continue -continue continue continue- continue)continue
 
+# keyword.control.preposition.sugly
+else
+else(else -else else else- else)else
+in
+in(in -in in in- in)in
+
+# keyword.control.procedure.sugly
+redo
+redo(redo -redo redo redo- redo)redo
+return
+return(return -return return return- return)return
+exit
+exit(exit -exit exit exit- exit)exit
+
+# suport.function.self.sugly
+do
+do(do -do do do- do)do
+
+# variable.language.sugly
+this
+this(this -this this this- this)this
+arguments
+arguments(arguments -arguments arguments arguments- arguments)arguments
+operant
+operant(operant -operant operant operant- operant)operant
+operands
+operands(operands -operands operands operands- operands)operands
+
+# storage.type.generic.sugly
+(type type "bool")
 (bool bool "bool")
 (number number "number")
-(string string "string")
-(symbol symbol "symbol")
-(function function "function")
-(lambda lambda "lambda")
-(object object "object")
-(class class "class")
-(array array "array")
 (date date "date")
+(string string "string")
+(range range "range")
+(symbol symbol "symbol")
+(tuple tuple "tuple")
+(lambda lambda "lambda")
+(function function "function")
+(operator operator "operator")
+(array array "array")
+(class class "class")
+(object object "object")
 
-(if if  "if")
-(else else -else else- "else" else)
+# constant.language.sugly
+null
+null(null null null: null :null null@ null @null null)null
+true
+true(true true true: true :true true@ true @true true)true
+false
+false(false false false: false :false false@ false @false false)false
 
-(while while "while")
-(for for "for")
-(in in "in")
-(break break "break")
-(continue continue "continue"
+# meta.operator.operator-decl.sugly
+=?(=?(=? x )=? )
 
-(operator operator "operator" operator)
-(operator export operator "operator" operator)
-(operator export operator "operator" operator)
+# meta.operator.lambda-decl.sugly
+=(=(= x )= )
+=(=(=: x )=: )
+=>(=>(=> x )=> )
+=>(=>(=> x : x )=> y : y)
 
-(assert assert "assert")
-
-(`)
-( `
-( `())
-( ` ())
-(` ` "`")
-(@ @ "@")
-(= = "=")
-(=> => "=>")
-(= > = > "= >")
-(-> -> --> ->> "->")
-(| | || ||| "|")
-(? ? ?? ??? "?")
-(: : :: :1 1: :"" "": :x x:  ":")
-
+# keyword.operator.global.sugly
++
 (+)
-( +)
-( +())
-( + ())
-(+ + "+")
-(+= += ++= +== "+=")
-(- - "-")
-(-= -= --= -== "-=")
-(* * ** *)
-(*= *= **= *== "*=")
-(/ / "/")
-(/= /= //= /== "/=")
+(+(+ + +)
+?
+(?)
+(?(? ? ?)
+!
+(!)
+(!(! ! !))
+~
+(~)
+(~(~ ~ ~))
 
-(++ ++ +++ "++")
-(-- -- --- "--")
+# keyword.operator.double.sugly
+++
+(++)
+(++(++ ++ ++))
+--
+(--)
+(--(-- -- --))
 
-(== == === "==")
-(!= != !!= !== "!=")
+# keyword.operator.general.sugly
+(x ? t f)
+((1 + 1)? t f)
+(x ?? t f)
+((1 + 1)?? t f)
+(x && t f)
+((1 + 1)&& t f)
+(x || t f)
+((1 + 1)|| t f)
 
-(> > >> >>> ">")
-(>= >= >>= >== ">=")
+# meta.operator.arithmetic.sugly
++((1 + 2)+ 3)
+++((1 ++ 2)++ 3)
++=((1 += 2)+= 3)
 
-(< < << <<< "<")
-(<= <= <<= <== "<=")
+-((1 - 2)- 3)
+--((1 -- 2)-- 3)
+-=((1 -= 2)-= 3)
 
-(argc  argc  -argc argc- "argc" argc)
-(argv argv -argv argv- "argv" argv)
+*((1 * 2)* 3)
+*=((1 *= 2)*= 3)
 
-(this this -this this- "this" this)
-(do  do  -do do- "do" do)
+/((1 / 2)/ 3)
+/=((1 /= 2)/= 3)
 
-(%C %C  %C)
-(%V  %V  %V)
-(%X  %X  %X) # invalid
-(%0 %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %-1)
+# meta.operator.bitwise.sugly
+&(& (a & b)& c)
+&=(&= (a &= b)&= c)
 
-(& && &&& "&") # not defined yet.
-(&& && "&&")
-(|| || ||| "||")
-(! ! !! !!! "!")
+|(| (a | b)| c)
+|=(|= (a |= b)|= c)
 
-# constant values
-(null null null()null -null null- "false" null)
-(true  true true()true -true true- "true" true)
-(false false false()false -false false- "true" false)
-(+ "asdasdas d1231231 12 12")
-(+ 1 2 3.5 0.7)
+^(^ (a ^ b)^ c)
+^=(^= (a ^= b)^= c)
 
-# global functions
-(bool bool -bool bool- bool)(bool bool)
-(string string)(string string)
-(symbol symbol)(symbol symbol)
-(object object)(object object)
-(date date)(date date)
-(array array)(array array)
+<<(<< (a << b)<< c)
+<<=(<<= (a <<= b)<<= c)
 
-(range range)(range range)
-(iterate iterate)(iterate iterate)
+>>(>> (a >> b)>> c)
+>>=(>>= (a >>= b)>>= c)
 
-(is-empty is-empty)(is-empty is-empty)
-(not-empty not-empty)(not-empty not-empty)
+>>>(>>> (a >>> b)>>> c)
+>>>=(>>>= (a >>>= b)>>>= c)
 
-(compile compile)(compile compile)
+# meta.operator.comparison.sugly
+==(== (a == b)== c)
+!=(!= (a != b)!= c)
 
-(call call)(call call)
-(apply apply)(apply apply)
-(execute execute)(execute execute)
-(export export)(export export)
+>(> (a > b)> c)
+>=(>= (a >= b)>= c)
 
-(function function)(function function)
-(lambda lambda)(lambda lambda)
+<(< (a < b)< c)
+<=(<= (a <= b)<= c)
 
-(eval eval)(eval eval)
-(load load)(load load)
-(exec exec)(exec exec)
-(run run)(run run)
-(import import)(import import)
-(require require)(require require)
-(retire retire)(retire retire)
+# meta.function.entity.sugly (null)
+(((empty is) is) is x)
+(((is-not is-not) is-not) is-not x)
+(((equals equals) equals) equals x)
+(((not-equals not-equals) not-equals) not-equals x)
+(((compare compare) compare) compare x)
+(((is-empty is-empty) is-empty) is-empty x)
+(((not-empty not-empty) not-empty) not-empty x)
+(((is-a is-a) is-a) is-a x)
+(((is-not-a is-not-a) is-not-a) is-not-a x)
+(((to-code to-code) to-code) to-code x)
+(((to-string to-string) to-string) to-string x)
 
-# from sugly test
+# meta.function.type.sugly (type)
+(((of of) of) of x)
+(((indexer-of indexer-of) indexer-of) indexer-of x)
+(((objectify objectify) objectify) objectify x)
+(((typify typify) typify) typify x)
+
+# meta.constant.empty.sugly
+(bool empty)
+(string empty)
+(number empty)
+(date empty)
+(range empty)
+(symbol empty)
+(tuple empty)
+
+# meta.operator.empty.sugly
+(operator empty)
+
+# meta.function.empty.sugly
+(lambda empty)
+(function empty)
+(array empty)
+(object empty)
+(class empty)
+
+# meta.function.other.empty.sugly
+(((empty empty) empty) empty y)
+
+# meta.function.iteration.sugly
+(iterate)
+(iterator)
+(select)
+(selector)
+(collect)
+(collector)
+(reduce)
+(reducer)
+
+# meta.function.runtime.sugly
+(compile)
+(compiler)
+(tokenize)
+(tokenizer)
+(interpreter)
+(eval)
+(import)
+(load)
+(include)
+(run)
+
+# meta.function.lib.sugly
+(encode)
+(print)
+(warn)
+
+# support.variable.object.lib.sugly
+uri
+uri(uri uri uri)uri
+math
+math(math math math)math
+json
+json(json json json)json
+
+# support.class.lib.sugly
+emmiter
+emmiter(emmiter emmiter emmiter)emmiter
+timer
+timer(timer timer timer)timer
+
+# meta.function.test.sugly
 (define define)(define define)
 (should should) (should should)
+(test test) (test test)
 
-# global objects
-(obj $ var1 var2)
-(obj func $ var1 var2)
-"123$bcd $\t xyz"
+# meta.operator.test.sugly
+(assert assert) (assert assert)
 
-(Bool Bool -Bool Bool- "Bool" Bool)
-(String Symbol Object Function Date Array print encode uri math json runtime)
+# numbers
+00 01 07 08 09 0a
+0x1234567890abcdef 0xg
+0x1234567890ABCDEF 0xG
+0b0011 0b0022
+-0 0
+-1 1
+-1.03 1.03
+-1.03e+12
+-1.03E-12
 
-
-# print function group
-(print code)
-(print code-)
-(print -code)
-(print var)
-(print "value" var)
-(print non-sugly-method var)
-(warn code)
-(warn code-)
-(warn -code)
-(warn code var)
-(warn "value" var)
-(warn non-sugly-method var)
-
-(math pow asa)
-
-# more examples
-(let var (x == 1).
-(let func (=> x (+ x 1).
-(let func (=> (x y) (+ x 1).
-(let func (= x (+ x 1).
-(let func (= (x y) (+ x 1).
-($ func 1 1)
-
-(let func (function x (+ x 1).
-(let func (function (x y) (+ x 1).
-
-(let func (lambda x (+ x 1).
-(let func (lambda (x y) (+ x 1).
-
-(let func (= a > x (+ x 1).
-(let func (= b > (x y) (+ x 1).
-
-(let obj1 (@ p: 1 m: (= x (+ x 10).
-(obj1 m 1)
-
-(let obj2 (@ p: 1 m: (= (x y) (+ x y 10).
-(obj2 m 1)
-
-(@ p:1 v:2)
-
-# code snippets.
-(if condition  true else  false),
-(for condition stepping body),
-(for v in iterable body),
-(for i in ($range max) body),
-(while condition body ),
+# string
+"123$bcd\"''$\t xyz"

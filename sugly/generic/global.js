@@ -16,10 +16,7 @@ module.exports = function ($void) {
   $export($, 'true', true)
   $export($, 'false', false)
 
-  $export($, 'NaN', NaN)
-  $export($, 'Infinity', Infinity)
-
-  // Experimental: Pure Symbols
+  // Other Pure Symbols
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
 }
