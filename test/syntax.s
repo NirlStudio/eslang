@@ -210,6 +210,23 @@ false(false false false: false :false false@ false @false false)false
 # meta.function.other.empty.sugly
 (((empty empty) empty) empty y)
 
+# common
+
+# string
+# number
+# date
+# range
+
+# symbol
+# tuple
+
+# operator ?
+# lambda & function
+
+# array
+# object
+# class
+
 # meta.function.iteration.sugly
 (iterate)
 (iterator)
@@ -240,8 +257,10 @@ false(false false false: false :false false@ false @false false)false
 # support.variable.object.lib.sugly
 uri
 uri(uri uri uri)uri
+
 math
 math(math math math)math
+
 json
 json(json json json)json
 
