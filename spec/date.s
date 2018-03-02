@@ -139,13 +139,13 @@
     (assert NaN ((date of NaN) timestamp),
   ),
   (should "(date of year month ...) returns a date by fields." (= ()
-    (assert 1900 (((date of 1900 1 2 3 4 5 6) date) 0),
-    (assert 1 (((date of 1900 1 2 3 4 5 6) date) 1),
-    (assert 2 (((date of 1900 1 2 3 4 5 6) date) 2),
-    (assert 3 (((date of 1900 1 2 3 4 5 6) time) 0),
-    (assert 4 (((date of 1900 1 2 3 4 5 6) time) 1),
-    (assert 5 (((date of 1900 1 2 3 4 5 6) time) 2),
-    (assert 6 (((date of 1900 1 2 3 4 5 6) time) 3),
+    (assert 1900 (((date of 1900 1 2 3 4 5 6) the-date) 0),
+    (assert 1 (((date of 1900 1 2 3 4 5 6) the-date) 1),
+    (assert 2 (((date of 1900 1 2 3 4 5 6) the-date) 2),
+    (assert 3 (((date of 1900 1 2 3 4 5 6) the-time) 0),
+    (assert 4 (((date of 1900 1 2 3 4 5 6) the-time) 1),
+    (assert 5 (((date of 1900 1 2 3 4 5 6) the-time) 2),
+    (assert 6 (((date of 1900 1 2 3 4 5 6) the-time) 3),
   ),
   (should "(date of-utc year month ...) returns a date by fields with utc values." (= ()
     (assert (((date of-utc 1900 1) is-valid),
@@ -155,13 +155,13 @@
     (assert (((date of-utc 1900 1 2 3 4 5) is-valid),
     (assert (((date of-utc 1900 1 2 3 4 5 6) is-valid),
 
-    (assert 1900 (((date of-utc 1900 1 2 3 4 5 6) date true) 0),
-    (assert 1 (((date of-utc 1900 1 2 3 4 5 6) date true) 1),
-    (assert 2 (((date of-utc 1900 1 2 3 4 5 6) date true) 2),
-    (assert 3 (((date of-utc 1900 1 2 3 4 5 6) time true) 0),
-    (assert 4 (((date of-utc 1900 1 2 3 4 5 6) time true) 1),
-    (assert 5 (((date of-utc 1900 1 2 3 4 5 6) time true) 2),
-    (assert 6 (((date of-utc 1900 1 2 3 4 5 6) time true) 3),
+    (assert 1900 (((date of-utc 1900 1 2 3 4 5 6) the-date "utc") 0),
+    (assert 1 (((date of-utc 1900 1 2 3 4 5 6) the-date "utc") 1),
+    (assert 2 (((date of-utc 1900 1 2 3 4 5 6) the-date "utc") 2),
+    (assert 3 (((date of-utc 1900 1 2 3 4 5 6) the-time "utc") 0),
+    (assert 4 (((date of-utc 1900 1 2 3 4 5 6) the-time "utc") 1),
+    (assert 5 (((date of-utc 1900 1 2 3 4 5 6) the-time "utc") 2),
+    (assert 6 (((date of-utc 1900 1 2 3 4 5 6) the-time "utc") 3),
   ),
   (should "(date now) returns current time." (= ()
     (assert ((date now) is-valid),
@@ -195,31 +195,31 @@
 
 (define "Retrieve Date fields" (= ()
   (define "date fields" (= ()
-    (should "(a-date date) returns year, month, day in month and day in week." (= ()
-      (assert 2017 (((date of 2017 6 29 1 1 1) date) 0),
-      (assert 6 (((date of 2017 6 29 1 1 1) date) 1),
-      (assert 29 (((date of 2017 6 29 1 1 1) date) 2),
-      (assert 4 (((date of 2017 6 29 1 1 1) date) 3),
+    (should "(a-date the-date) returns year, month, day in month and day in week." (= ()
+      (assert 2017 (((date of 2017 6 29 1 1 1) the-date) 0),
+      (assert 6 (((date of 2017 6 29 1 1 1) the-date) 1),
+      (assert 29 (((date of 2017 6 29 1 1 1) the-date) 2),
+      (assert 4 (((date of 2017 6 29 1 1 1) the-date) 3),
     ),
     (should "(a-date date as-utc) returns year, month, day in month and day in week in UTC." (= ()
-      (assert 2017 (((date of-utc 2017 6 29 1 1 1) date true) 0),
-      (assert 6 (((date of-utc 2017 6 29 1 1 1) date true) 1),
-      (assert 29 (((date of-utc 2017 6 29 1 1 1) date true) 2),
-      (assert 4 (((date of-utc 2017 6 29 1 1 1) date true) 3),
+      (assert 2017 (((date of-utc 2017 6 29 1 1 1) the-date "utc") 0),
+      (assert 6 (((date of-utc 2017 6 29 1 1 1) the-date "utc") 1),
+      (assert 29 (((date of-utc 2017 6 29 1 1 1) the-date "utc") 2),
+      (assert 4 (((date of-utc 2017 6 29 1 1 1) the-date "utc") 3),
     ),
   ),
   (define "time fields" (= ()
-    (should "(a-date time) returns hours, minutes, seconds and milliseconds at the date." (= ()
-      (assert 1 (((date of 2017 6 29 1 2 3 4) time) 0),
-      (assert 2 (((date of 2017 6 29 1 2 3 4) time) 1),
-      (assert 3 (((date of 2017 6 29 1 2 3 4) time) 2),
-      (assert 4 (((date of 2017 6 29 1 2 3 4) time) 3),
+    (should "(a-date the-time) returns hours, minutes, seconds and milliseconds at the date." (= ()
+      (assert 1 (((date of 2017 6 29 1 2 3 4) the-time) 0),
+      (assert 2 (((date of 2017 6 29 1 2 3 4) the-time) 1),
+      (assert 3 (((date of 2017 6 29 1 2 3 4) the-time) 2),
+      (assert 4 (((date of 2017 6 29 1 2 3 4) the-time) 3),
     ),
     (should "(a-date time as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
-      (assert 1 (((date of-utc 2017 6 29 1 2 3 4) time true) 0),
-      (assert 2 (((date of-utc 2017 6 29 1 2 3 4) time true) 1),
-      (assert 3 (((date of-utc 2017 6 29 1 2 3 4) time true) 2),
-      (assert 4 (((date of-utc 2017 6 29 1 2 3 4) time true) 3),
+      (assert 1 (((date of-utc 2017 6 29 1 2 3 4) the-time "utc") 0),
+      (assert 2 (((date of-utc 2017 6 29 1 2 3 4) the-time "utc") 1),
+      (assert 3 (((date of-utc 2017 6 29 1 2 3 4) the-time "utc") 2),
+      (assert 4 (((date of-utc 2017 6 29 1 2 3 4) the-time "utc") 3),
     ),
   ),
   (define "date & time" (= ()
@@ -235,7 +235,7 @@
       (assert 4 (t 3),
     ),
     (should "(a-date all-fields as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
-      (let (d t) ((date of-utc 2017 6 29 1 2 3 4) all-fields true),
+      (let (d t) ((date of-utc 2017 6 29 1 2 3 4) all-fields "utc"),
       (assert 2017 (d 0),
       (assert 6 (d 1),
       (assert 29 (d 2),
@@ -258,12 +258,10 @@
       (assert NaN ((date of "AAA") timestamp),
     ),
   ),
-  (define "timezone offset" (= ()
-    (should "(a-date tz-offset) returns the timezone offset as a number" (= ()
-      (assert (((date of 0) tz-offset) is-a number),
-      (assert (((date of 1) tz-offset) is-a number),
-      (assert (((date of -1) tz-offset) is-a number),
-      (assert (((date of NaN) tz-offset) is-a number),
+  (define "timezone info" (= ()
+    (should "(date timezone) returns the timezone info as an object" (= ()
+      # (assert (((date timezone) name) is-a string),
+      (assert (((date timezone) offset) is-a number)
     ),
     (should "(a-date timestamp) returns NaN for an invalid date." (= ()
       (assert NaN ((date of NaN) timestamp),

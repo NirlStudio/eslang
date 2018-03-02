@@ -29,7 +29,7 @@ module.exports = function ($void) {
     if (target instanceof Object$) {
       for (var i = 1; i < arguments.length; i++) {
         var src = arguments[i]
-        if (src instanceof Object$) {
+        if (src instanceof Object$ || (src && src.type === $Object)) {
           Object.assign(target, src)
           activate.call(target, src)
         }
@@ -98,7 +98,7 @@ module.exports = function ($void) {
   })
 
   // static activation: restore an instance by one or more property set.
-  link(proto, 'with', function () {
+  link(proto, 'from', function () {
     var inst = Object.create(this.proto)
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
@@ -111,7 +111,7 @@ module.exports = function ($void) {
   })
 
   // Convert this class's definition to a type descriptor object.
-  link(Type, 'to-object', function () {
+  link(proto, 'to-object', function () {
     var typeDef = $Object.empty()
     var names = Object.getOwnPropertyNames(this.proto)
     var i, name

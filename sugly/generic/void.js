@@ -92,9 +92,19 @@ module.exports = function ($void) {
 
   $void.prepareOperation = function prepareOperation (type, emptyCode) {
     var proto = type.proto
-    // return function's name
+    // return operation's name
     link(proto, 'name', function () {
       return this.$name
+    })
+
+    // return operation's parameters
+    link(proto, 'parameters', function () {
+      return (this.code || emptyCode)[1]
+    })
+
+    // return operation's body
+    link(proto, 'body', function () {
+      return (this.code || emptyCode)[2]
     })
 
     // test if the operation is a generic one.
@@ -117,7 +127,7 @@ module.exports = function ($void) {
 
     // Encoding
     link(proto, 'to-code', function (ctx) {
-      return this.code instanceof Tuple$ ? this.code : emptyCode
+      return this.code || emptyCode
     })
 
     // Indexer

@@ -7,8 +7,8 @@ module.exports = function ($void, JS) {
   var copyType = $void.copyType
 
   $export($, 'math', copyType(new Object$(), JS.Math, {
-    'E': 'E',
-    'PI': 'Pi',
+    'E': 'e',
+    'PI': 'pi',
 
     'sin': 'sin',
     'cos': 'cos',

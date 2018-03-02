@@ -108,7 +108,7 @@ module.exports = function ($void) {
       ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
       : this.plain ? plain : empty
   })
-  link(proto, 'in', function (begin, end) {
+  link(proto, 'slice', function (begin, end) {
     var s = array.in.apply(this.$, arguments)
     return s && s.length > 0
       ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
@@ -240,6 +240,6 @@ module.exports = function ($void) {
   link(proto, ':', function (index, end) {
     return typeof index === 'string' ? proto[index]
         : index instanceof Symbol$ ? proto[index.key]
-          : array.in.apply(this.$, arguments)
+          : array.slice.apply(this.$, arguments)
   })
 }

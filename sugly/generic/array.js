@@ -55,6 +55,16 @@ module.exports = function ($void) {
   link(proto, 'length', function () {
     return this.length
   })
+  // return the amount of elements.
+  link(proto, 'count', function () {
+    var count = 0
+    for (var i = 0; i < this.length; i++) {
+      if (typeof this[i] !== 'undefined') {
+        count++
+      }
+    }
+    return count
+  })
 
   // generate an iterator function to traverse all array items.
   link(proto, 'iterate', function () {
@@ -81,7 +91,7 @@ module.exports = function ($void) {
     }
     return this.slice(begin, begin + count)
   })
-  var inRange = link(proto, 'in', function (begin, end) {
+  var slice = link(proto, 'slice', function (begin, end) {
     begin = begin >> 0
     if (begin < 0) {
       begin += this.length
@@ -122,10 +132,29 @@ module.exports = function ($void) {
     offset = offset >> 0
     return (this[offset] = typeof value === 'undefined' ? null : value)
   })
+  // reset one or more entries by index
+  link(proto, 'reset', function (offset, more) {
+    if (typeof more === 'undefined') {
+      return delete this[offset >> 0] ? 1 : 0
+    }
+    var counter = delete this[offset >> 0] ? 1 : 0
+    for (var i = 1; i < arguments.length; i++) {
+      if (delete this[arguments[i] >> 0]) {
+        counter++
+      }
+    }
+    return counter
+  })
+  // remove all entries.
   link(proto, 'clear', function () {
     this.splice(0)
     return this
   })
+  // check the existence of an entry
+  link(proto, 'has', function (offset) {
+    return typeof this[offset >> 0] !== 'undefined'
+  })
+
   // sawp two value by offsets.
   link(proto, 'swap', function (x, y) {
     x = x >> 0
@@ -180,11 +209,17 @@ module.exports = function ($void) {
   })
 
   // edit current array
-  proto.splice = Array.prototype.splice
+  link(proto, 'splice', function () {
+    Array.prototype.splice.apply(this, arguments)
+    return this
+  })
 
   // stack operations.
   proto.pop = Array.prototype.pop
-  proto.push = Array.prototype.push
+  link(proto, 'push', function () {
+    Array.prototype.push.apply(this, arguments)
+    return this
+  })
 
   // reverse
   link(proto, 'reverse', function (copy) {
@@ -255,7 +290,7 @@ module.exports = function ($void) {
         : (this[index] = value) // setting item
       : typeof index === 'string' ? proto[index]
         : index instanceof Symbol$ ? proto[index.key]
-          : inRange.apply(this, arguments)
+          : slice.apply(this, arguments)
   })
 
   // inject type

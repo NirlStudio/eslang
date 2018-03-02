@@ -262,9 +262,6 @@ module.exports = function ($void) {
   })
 
   // support common math operations
-  link(proto, 'abs', function () {
-    return Math.abs(this)
-  })
   link(proto, 'ceil', function () {
     return Math.ceil(this)
   })

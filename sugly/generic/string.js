@@ -87,7 +87,7 @@ module.exports = function ($void) {
     }
     return this.substr(begin, count)
   })
-  link(proto, 'in', function (begin, end) {
+  var slice = link(proto, 'slice', function (begin, end) {
     begin >>= 0
     if (begin < 0) {
       begin += this.length
@@ -218,11 +218,13 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index, value) {
+  link(proto, ':', function (index) {
     return typeof index === 'string' ? proto[index]
       : index instanceof Symbol$ ? [proto.key]
         : typeof index !== 'number' ? null
-          : this.substr(index, typeof value === 'number' ? value : 1) // chars in a range.
+          : arguments.length > 1
+            ? slice.apply(this, arguments) // chars in a range.
+            : this.substr((index >>= 0) >= 0 ? index : index + this.length, 1)
   })
 
   // inject type

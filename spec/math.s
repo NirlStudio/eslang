@@ -1,6 +1,10 @@
 (define "constants" (= ()
   (should "have constant E" (= ()
-    (assert ((math E) is-a number),
+    (assert ((math e) is-a number),
+  ),
+  (should "have constant E" (= ()
+    (assert ((math pi) is-a number),
+  ),
 ).
 
 (define "functions" (= ()

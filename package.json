@@ -15,7 +15,7 @@
     "assert": "node . test examples/test"
   },
   "bin": {
-    "sugly" : "./bin/sugly",
+    "sugly" : "./bin/sugly"
   },
   "dependencies": {
     "colors": "^1.1.2"

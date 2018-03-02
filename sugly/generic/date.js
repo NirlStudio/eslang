@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.date
+  var $Object = $.object
   var link = $void.link
   var Symbol$ = $void.Symbol
   var numberCompare = $.number.proto.compare
@@ -56,6 +57,15 @@ module.exports = function ($void) {
     return (new Date()).getTime()
   })
 
+  link(Type, 'timezone', function () {
+    var format = Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat() : null
+    var options = format && format.resolveOptions && format.resolveOptions()
+    return $Object.of({
+      name: (options && options.timeZone) || null,
+      offset: (new Date()).getTimezoneOffset()
+    })
+  })
+
   var proto = Type.proto
 
   // test if this is a valid date.
@@ -67,23 +77,23 @@ module.exports = function ($void) {
   })
 
   // retrieve the date fields: year, month, day, week-day
-  link(proto, 'date', function (utc) {
+  link(proto, 'the-date', function (utc) {
     return isNaN(this.getTime()) ? null
-      : utc === true
+      : utc && utc.toLowerCase && utc.toLowerCase() === 'utc'
         ? [this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()]
         : [this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()]
   })
   // retrieve the time fields: hours, minutes, seconds, milliseconds
-  link(proto, 'time', function (utc) {
+  link(proto, 'the-time', function (utc) {
     return isNaN(this.getTime()) ? null
-      : utc === true
+      : utc && utc.toLowerCase && utc.toLowerCase() === 'utc'
         ? [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]
         : [this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()]
   })
   // retrieve all fields: year, month, day, week-day, hours, minutes, seconds, milliseconds
   link(proto, 'all-fields', function (utc) {
     return isNaN(this.getTime()) ? null
-      : utc === true
+      : utc && utc.toLowerCase && utc.toLowerCase() === 'utc'
         ? [[this.getUTCFullYear(), this.getUTCMonth() + 1, this.getUTCDate(), this.getUTCDay()],
           [this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds(), this.getUTCMilliseconds()]]
         : [[this.getFullYear(), this.getMonth() + 1, this.getDate(), this.getDay()],
@@ -92,10 +102,6 @@ module.exports = function ($void) {
 
   link(proto, 'timestamp', function (utc) {
     return this.getTime()
-  })
-
-  link(proto, 'tz-offset', function () {
-    return this.getTimezoneOffset()
   })
 
   // support & override general operators

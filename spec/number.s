@@ -831,16 +831,6 @@
 ).
 
 (define "Number Conversion" (= ()
-  (should "abs returns the absolute value of this number." (= ()
-    (assert 0 (0 abs),
-    (assert 1 (-1 abs),
-    (assert 1 (1 abs),
-    (assert 1.5 (-1.5 abs),
-    (assert 1.5 (1.5 abs),
-    (assert (number invalid) ((number invalid) abs),
-    (assert (number infinity) ((number infinity) abs),
-    (assert (number infinity) ((number -infinity) abs),
-  ),
   (should "ceil returns the integer value great or equal this number." (= ()
     (assert 0 (0 ceil),
     (assert -1 (-1 ceil),

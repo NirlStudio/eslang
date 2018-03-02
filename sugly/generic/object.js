@@ -20,7 +20,7 @@ module.exports = function ($void) {
     var obj = createObject()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
-      if (source instanceof Object$) {
+      if (source instanceof Object$ || (source && source.type === Type)) {
         Object.assign(obj, source)
       }
     }
@@ -29,7 +29,7 @@ module.exports = function ($void) {
 
   // copy fields from source objects to the target object
   link(Type, 'assign', function (target) {
-    if (target instanceof Object$) {
+    if (target instanceof Object$ || (target && target.type === Type)) {
       for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i]
         if (source instanceof Object$) {
@@ -42,22 +42,46 @@ module.exports = function ($void) {
 
   // get the value of a field.
   link(Type, 'get', function (obj, name, value) {
-    return obj instanceof Object$ && typeof name === 'string'
+    return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
       ? typeof obj[name] === 'undefined' ? value : obj[name]
       : value
   })
   // set the value of a field.
   link(Type, 'set', function (obj, name, value) {
-    return obj instanceof Object$ && typeof name === 'string'
+    return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
       ? (obj[name] = (typeof value !== 'undefined' ? value : null))
       : null
   })
   // remove a field.
-  link(Type, 'unset', function (obj, name) {
-    if (obj instanceof Object$ && typeof name === 'string') {
-      var value = obj[name]
-      return delete obj[name] ? value : null
+  link(Type, 'reset', function (obj, name, more) {
+    if (!(obj instanceof Object$) && (!obj || obj.type !== Type)) {
+      return 0
     }
+    if (typeof more === 'undefined') {
+      if (typeof name === 'string') {
+        return delete obj[name] ? 1 : 0
+      }
+      return 0
+    }
+    var i = 1
+    var counter = 0
+    do {
+      if (typeof name === 'string' && (delete this[name])) {
+        counter++
+      }
+      name = arguments[i++]
+    } while (i < arguments.length)
+    return counter
+  })
+  // remove all fields.
+  link(Type, 'clear', function (obj) {
+    if (obj instanceof Object$ || (obj && obj.type === Type)) {
+      var names = Object.getOwnPropertyNames(obj)
+      for (var i = 0; i < names.length; i++) {
+        delete obj[names[i]]
+      }
+    }
+    return obj
   })
 
   // check the existence of a property
