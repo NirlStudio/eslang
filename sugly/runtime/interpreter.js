@@ -16,7 +16,7 @@ module.exports = function interpreter ($void) {
       baseUri = null
     }
     // save the base uri into environment.
-    $void.env('uri', baseUri)
+    $void.env('home-uri', baseUri)
     // create a module space.
     var scope = createAppSpace(baseUri)
     populateArguments(scope, args, true)

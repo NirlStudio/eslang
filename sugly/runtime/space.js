@@ -44,6 +44,16 @@ module.exports = function space ($void) {
     }
   })
 
+  $void.createAppSpace = function (uri) {
+    var app = Object.create($)
+    app['-app'] = uri
+    var local = Object.create(app)
+    local['-module'] = uri
+    var space = new Space$(local, null, null, app)
+    space.app = app
+    return space
+  }
+
   $void.createModuleSpace = function (uri, appSpace) {
     var app = appSpace && appSpace.app
     var local = Object.create(app || $)
@@ -53,16 +63,6 @@ module.exports = function space ($void) {
     if (app) {
       space.app = app
     }
-    return space
-  }
-
-  $void.createAppSpace = function (uri) {
-    var app = Object.create($)
-    app['-app'] = uri
-    var local = Object.create(app)
-    local['-module'] = uri
-    var space = new Space$(local, null, null, app)
-    space.app = app
     return space
   }
 

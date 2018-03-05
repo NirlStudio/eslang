@@ -183,7 +183,7 @@ function checkSuglyRuntime ($void) {
   ])
 
   checkObjects($void.$, '[Sugly / objects] ', [
-    '-runtime', 'uri', 'math', 'json', 'emitter', 'timer'
+    'uri', 'math', 'json', 'emitter', 'timer'
   ])
 
   checkFunctions($void.$, '[Sugly / functions] ', [

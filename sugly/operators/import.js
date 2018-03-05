@@ -82,8 +82,8 @@ module.exports = function import_ ($void) {
       baseUri, // under the same directory
       baseUri + '/modules' // local modules directory
     ] : []
-    if ($.env('uri') !== baseUri) {
-      dirs.push($.env('uri') + '/modules') // app shared modules
+    if ($.env('home-uri') !== baseUri) {
+      dirs.push($.env('home-uri') + '/modules') // app shared modules
     }
     if ($void.runtime('uri') !== baseUri) {
       dirs.push($void.runtime('uri') + '/modules') // runtime shared modules
@@ -161,7 +161,7 @@ module.exports = function import_ ($void) {
       source += '.js'
     }
     var dirs = [
-      $.env('uri') + '/modules', // app shared modules
+      $.env('home-uri') + '/modules', // app shared modules
       $void.runtime('uri') + '/modules' // runtime shared modules
     ]
     var uri = loader.resolve(source, dirs)

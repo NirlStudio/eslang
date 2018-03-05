@@ -17,6 +17,7 @@ module.exports = function all ($void) {
 
   // generic operators
   require('./quote')($void)
+  require('./app')($void)
   require('./assignment')($void)
   require('./control')($void)
 

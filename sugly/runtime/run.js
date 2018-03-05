@@ -14,7 +14,7 @@ module.exports = function run ($void) {
     }
     // try to resolve the base uri of the whole application
     if (typeof baseUri !== 'string') {
-      baseUri = $.env('uri')
+      baseUri = $.env('home-uri')
     }
     if (!source.endsWith('.s')) {
       source += '.s'

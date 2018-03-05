@@ -185,6 +185,9 @@ module.exports = function ($void) {
       padding = ''
     }
     if (this.plain && this.$.length === 1) { // unwrap a container block
+      if (list.length > 0) {
+        list.push(' ')
+      }
       if (this.$[0] instanceof Tuple$) {
         this.$[0]['to-list'](list, indent, padding)
       } else {
@@ -216,7 +219,7 @@ module.exports = function ($void) {
         if (item.plain) {
           if (item.$.length > 0) {
             item['to-list'](list, indent, padding + indent)
-            list.push(lineBreak)
+            item.$.length > 1 && list.push(lineBreak)
           }
         } else {
           first ? (first = false) : list.push(' ')

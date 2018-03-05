@@ -1,35 +1,48 @@
 (let color-of (import "colors" "js").
 
-(let display-as (=> (color)
-  (=> (feature comment)
-    (let color (:color ?? (= (text) text),
-    (print (color (+ "[" ((:do name) to-upper) "] ") feature (comment ? (" - " + comment) ""),
+(let display-as (= color
+  (:color ?? (let color (= () (arguments join ""),
+  (=> (feature)
+    (print (color ("[" + ((:do name) to-upper) "] ") feature),
 ).
 
-(let featured (display-as (color-of "green").
+(let version (= ver
+  (print "\n----" ver "----")
+  (let latest "")
+),
+
 (let new (display-as (color-of "green").
 (let modified (display-as (color-of "gray").
 (let removed (display-as (color-of "red").
 (let todo (display-as ).
 
-(print "---- Feb 6, 2017 ----")
-(featured "New Object/Class/Interface logics")
-(featured "New to-code/to-string logic" "a nested object can be serialized now.")
+(version "0.1.0")
+(new "The very ugly first release.")
 
-(new "extendable type Enum" "to manage a named value set")
-(new "extendable type Flags" "to manage a set of combinable integer values by bits.")
-(new "object:looks" "to test the similarity of two objects or if the object complys with an interface")
+(version "0.3.1")
+(removed "As a release, it had been cancelled.")
+(modified "But some of its code is refactored into 0.3.2.")
 
-(modified "operator let" "assign to existing module/local variable or create a new local variable")
-(modified "operator var" "assign value to or create a new local variable")
-(modified "Object/Class/Interface - Interface is static type and create only a descriptor object.")
+(version "0.3.2 (latest)")
+(new "re-designed type system.")
+(new "re-designed space/scope.")
+(new "re-designed operator.\n")
 
-(removed "operator $" "replaced by ':', but it's still reseved for future usage temporarily.")
-(removed "operator global" "deprecated for new let/var pattern")
-(removed "get-type" "deprecated for duplication with type property")
+(modified "to-code/to-string logic.")
+(modified "syntax of let, var and export.")
+(modified "iterator & iteration logic.")
+(modified "more minior features.\n")
 
-(todo "new code formatter")
-(todo "basic Data Structures" "Set and Map")
-(todo "new expandable type" "Device")
-(todo "debugging" "display a warning for a partial success evaluation")
-(todo "debugging" "stacktrace & break points")
+(removed "operator global - replaced by new app-export mechanisim.")
+(removed "(* get-type) for duplicating type property.")
+(removed "more functions and operators.\n")
+
+(todo "callstack optimisation.")
+(todo "stack tracing.")
+(todo "string formatting.")
+(todo "block comment like #( )#")
+(todo "run in browser.")
+(todo "basic Web UI elements.")
+(todo "debugging tool.")
+
+(print "\n  Enjoy the sugliness.\n")

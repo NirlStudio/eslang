@@ -71,7 +71,7 @@ module.exports = function function_ ($void) {
 
   $void.functionOf = function functionOf (space, clause, offset) {
     // compile code
-    var code = [$Symbol.lambda] // a function wil be encoded to a lambda too.
+    var code = [$Symbol.function]
     var params = formatParameters(clause.$[offset++], space)
     code.push(params[1])
     params = params[0]

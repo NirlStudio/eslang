@@ -36,8 +36,8 @@ module.exports = function load ($void) {
     var loader = $void.loader
     var baseUri = loader.dir(moduleUri)
     var dirs = baseUri ? [baseUri] : [] // under the same directory
-    if ($.env('uri') !== baseUri) {
-      dirs.push($.env('uri')) // the app directory
+    if ($.env('home-uri') !== baseUri) {
+      dirs.push($.env('home-uri')) // the app directory
     }
     // try to locate the sourcevar uri
     var uri

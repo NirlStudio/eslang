@@ -2,34 +2,31 @@
 
 module.exports = function runtime ($void) {
   var $ = $void.$
-  var Object$ = $void.Object
   var $export = $void.export
 
-  var runtime = $export($, '-runtime', new Object$({
-    'core': 'js',
-    'version': new Object$({
-      'major': 0,
-      'minor': 3,
-      'patch': 1
-    }),
-    'environment': new Object$({
-      'debugging': false
-    })
-  }))
+  var runtime = Object.assign(Object.create(null), {
+    'runtime-core': 'js',
+    'runtime-version': '0.3.2'
+  })
 
-  var environment = runtime.environment
+  var environment = Object.assign(Object.create(runtime), {
+    'is-debugging': false
+  })
+
   $export($, 'env', function (name, defaulue) {
     return typeof name === 'string' && typeof environment[name] !== 'undefined'
       ? environment[name]
-      : typeof defaulue === 'undefined' ? null : defaulue
+      : typeof defaulue !== 'undefined' ? defaulue : null
   })
 
   $void.env = function (name, value) {
-    return typeof value === 'undefined'
-      ? environment[name] : (environment[name] = value)
+    return typeof value === 'undefined' ? environment[name]
+      : typeof runtime[name] !== 'undefined' ? runtime[name]
+        : (environment[name] = value)
   }
 
   $void.runtime = function (name, value) {
+    name = 'runtime-' + name
     return typeof value === 'undefined'
       ? runtime[name] : (runtime[name] = value)
   }

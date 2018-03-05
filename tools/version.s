@@ -1,2 +1,5 @@
-(let ver (-runtime version).
-(print "sugly" (-runtime core) ((ver (arguments 0)) ?? ver).
+(print "Sugly" (@
+    core: (env "runtime-core")
+    version: (env "runtime-version")
+    released-by: "Nirl Studio, 2016 - 2018"
+).
