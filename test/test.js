@@ -129,6 +129,7 @@ module.exports = function ($void) {
       'emitter', 'timer'
     ])
 
+    // bootstrap tests
     checkTypeOf()
     checkIndexerOf()
 
@@ -338,11 +339,16 @@ module.exports = function ($void) {
     seval(function (a) {
       return a.length === 2 && a[0] === 1 && a[1] === 2
     }, '(array of 1 2)')
+    seval(2, '((@ 10 20) length)')
+    seval(20, '((@ 10 20) 1)')
 
     seval($.object, 'object')
     seval(function (obj) {
       return obj.x === 1 && obj.y === 2
     }, '(@ x: 1 y: 2)')
+    seval(10, '((@ x: 10 y: 20) x)')
+    seval(20, '((@ x: 10 y: 20) y)')
+    seval(200, '((@ x: 10 y: 20) "y" 200)')
 
     seval($.class, 'class')
     seval(function (c) {
@@ -420,14 +426,22 @@ module.exports = function ($void) {
     seval(0, '(if false 1 else 0)')
 
     seval(10, '(for x in (100 110) (++ i).')
+    seval(99, '(while ((++ i) < 100) i)')
+    seval(100, '(let i 0)(while ((i ++) < 100) i)')
     seval(100, '(while ((++ i) < 100). i')
+    seval(101, '(let i 0)(while ((i ++) < 100). i')
+    seval('done', '(while ((++ i) < 100) (if (i == 10) (break "done").')
   }
 
   function checkOperations () {
     console.log('\n  - Operations')
     seval(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b), (add x y)')
+
     seval(21, '(let z 100) (let add (= (x y) (x + y z), (add 1 20)')
+    seval(21, '(let z 100) (= (1 20): (x y) (x + y z).')
+
     seval(121, '(let z 100) (let add (=> (x y) (x + y z), (add 1 20)')
+    seval(121, '(let z 100) (=> (1 20): (x y) (x + y z).')
 
     seval(11, '(let summer (@:class add: (= () ((this x) + (this y), (let s (summer of (@ x: 1 y: 10), (s add)')
     seval(11, '(let summer (@:class static: (@ add: (= (x y ) (+ x y), (summer add 1 10)')
