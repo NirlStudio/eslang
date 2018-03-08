@@ -78,7 +78,7 @@ module.exports = function space ($void) {
 
   $void.createFunctionSpace = function (parent) {
     var space = new Space$(Object.create(parent.local),
-        parent.locals ? parent.locals.concat(parent.local) : [parent.local]
+      parent.locals ? parent.locals.concat(parent.local) : [parent.local]
     )
     if (parent.app) {
       space.app = parent.app
@@ -87,8 +87,9 @@ module.exports = function space ($void) {
   }
 
   // customized the behaviour of the space of an operator
+  $void.OperatorSpace = OperatorSpace$
   function OperatorSpace$ (parent) {
-     // save the real function context for embedded operator calls.
+    // save the real function context for embedded operator calls.
     this.fnContext = parent.fnContext || parent.context
     // ensure the calling function's context is accessible for this operator.
     this.context = Object.create(this.fnContext)

@@ -186,7 +186,7 @@ module.exports = function ($void) {
   // Indexer
   link(proto, ':', function (index) {
     return typeof index === 'string' ? proto[index]
-        : index instanceof Symbol$ ? proto[index.key] : null
+      : index instanceof Symbol$ ? proto[index.key] : null
   })
 
   // inject type

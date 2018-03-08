@@ -9,19 +9,23 @@ A simple &amp; ugly programming language
 
 Run from npm
 ------------
-- Install the package
+- Install the package:
 ```
 npm install -g sugly
 ```
-- Run self-test suite
+- Run self-test suite:
 ```
 sugly self-test
 ```
-- Run sugly code.
+- Run sugly code:
 ```
 sugly some-sugly-file[.s]
 ```
-- Use in Javascript code
+- Run sugly interactively:
+```
+sugly self-test
+```
+- Use in Javascript code:
 ```javascript
 var $ = require('sugly')
 $.run('your-app')

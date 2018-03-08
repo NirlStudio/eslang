@@ -7,9 +7,7 @@ var Constants = Object.assign(Object.create(null), {
   'null': null,
   'true': true,
   'false': false,
-  'NaN': NaN,
-  'Infinity': Infinity,
-  '-Infinity': -Infinity
+  'NaN': NaN
 })
 
 module.exports = function ($void) {

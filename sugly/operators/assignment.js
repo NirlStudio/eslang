@@ -24,8 +24,7 @@ module.exports = function assignment ($void) {
       var key = typeof sym === 'string' ? sym
         : sym instanceof Symbol$ ? sym.key : null
       return key ? space.export(key,
-          space.var(key, tryToUpdateName(evaluate(clist[2], space), key)))
-        : null
+        space.var(key, tryToUpdateName(evaluate(clist[2], space), key))) : null
     }
     // in normal context, the symbol part can only be a symbol
     sym = clist[1]

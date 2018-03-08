@@ -6,7 +6,7 @@ module.exports = function runtime ($void) {
 
   var runtime = Object.assign(Object.create(null), {
     'runtime-core': 'js',
-    'runtime-version': '0.3.2'
+    'runtime-version': '0.3.6'
   })
 
   var environment = Object.assign(Object.create(runtime), {

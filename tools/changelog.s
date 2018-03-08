@@ -6,15 +6,12 @@
     (print (color ("[" + ((:do name) to-upper) "] ") feature),
 ).
 
-(let version (= ver
-  (print "\n----" ver "----")
-  (let latest "")
-),
-
 (let new (display-as (color-of "green").
 (let modified (display-as (color-of "gray").
 (let removed (display-as (color-of "red").
-(let todo (display-as ).
+(let todo (display-as *).
+
+(let version (= ver (print "\n----" ver "----").
 
 (version "0.1.0")
 (new "The very ugly first release.")

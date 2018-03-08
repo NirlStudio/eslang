@@ -231,7 +231,7 @@ module.exports = function ($void) {
         : !isNaN(this) && !isNaN(another)
           ? this > another ? 1 : -1
           : isNaN(this) && isNaN(another)
-            ? 0    // NaN is equivalent with itself.
+            ? 0 // NaN is equivalent with itself.
             : null // NaN is not comparable with a real number.
   })
 
@@ -292,7 +292,7 @@ module.exports = function ($void) {
       default: return isNaN(this) ? '(number invalid)'
         : this === Number.POSITIVE_INFINITY ? '(number infinity)'
           : this === Number.NEGATIVE_INFINITY ? '(number -infinity)'
-          : this.toString()
+            : this.toString()
     }
   })
 

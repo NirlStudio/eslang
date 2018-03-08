@@ -158,7 +158,8 @@
   ),
   (var report (@
     summary: summary
-    failures: failures),
+    failures: failures
+  ),
   (clear )
   (return report)
 ).

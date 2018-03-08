@@ -242,7 +242,7 @@ module.exports = function ($void) {
   // Indexer
   link(proto, ':', function (index, end) {
     return typeof index === 'string' ? proto[index]
-        : index instanceof Symbol$ ? proto[index.key]
-          : array.slice.apply(this.$, arguments)
+      : index instanceof Symbol$ ? proto[index.key]
+        : array.slice.apply(this.$, arguments)
   })
 }

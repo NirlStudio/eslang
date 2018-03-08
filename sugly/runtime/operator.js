@@ -6,7 +6,6 @@ module.exports = function operators$operator ($void) {
   var Tuple$ = $void.Tuple
   var Space$ = $void.Space
   var Symbol$ = $void.Symbol
-  var lambda = $void.lambda
   var evaluate = $void.evaluate
   var operator = $void.operator
   var createOperatorSpace = $void.createOperatorSpace
@@ -24,7 +23,7 @@ module.exports = function operators$operator ($void) {
       return operator(createOperator(params, tbody), new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
-      return lambda(function () { // use an empty function
+      return operator(function () {
         return null
       }, new Tuple$(code))
     }

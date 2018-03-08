@@ -25,7 +25,7 @@ module.exports = function function_ ($void) {
       return lambda(createLambda(params, tbody, space.app), new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
-      return lambda(function () { // use an empty function
+      return lambda(function () {
         return null
       }, new Tuple$(code))
     }
@@ -83,7 +83,7 @@ module.exports = function function_ ($void) {
         new Tuple$(code))
     } else {
       code.push($Tuple.plain) // empty body
-      return function_(function () { // use an empty function
+      return function_(function () {
         return null
       }, new Tuple$(code))
     }

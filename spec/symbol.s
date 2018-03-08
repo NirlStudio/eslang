@@ -115,8 +115,8 @@
   (should "Other values is converted to true." (= ()
     (assert true (bool of 1),
     (assert true (bool of -1),
-    (assert true (bool of NaN),
-    (assert true (bool of Infinity),
+    (assert true (bool of (number invalid)),
+    (assert true (bool of (number infinity)),
     (assert true (bool of ""),
     (assert true (bool of "X"),
     (assert true (bool of (date of 0),

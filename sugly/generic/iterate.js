@@ -81,7 +81,7 @@ module.exports = function iterate ($void) {
       item = next()
       while (typeof item !== 'undefined' && item !== null) {
         if (Array.isArray(item)
-            ? filter.apply(subject, item) : filter.call(subject, item)) {
+          ? filter.apply(subject, item) : filter.call(subject, item)) {
           return item
         }
         item = next()
