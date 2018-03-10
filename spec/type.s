@@ -3,7 +3,9 @@
     (assert (type is type),
     (assert false (type is-not type),
   (should "type is not null" (= ()
+    (assert false (type is),
     (assert false (type is null),
+    (assert (type is-not),
     (assert (type is-not null),
 ).
 

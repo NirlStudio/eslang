@@ -9,10 +9,15 @@ module.exports = function ($void) {
   var link = $void.link
   var prepareOperation = $void.prepareOperation
 
-  // the empty function
-  link(Type, 'empty', $void.function(function () {
+  // the noop function
+  var noop = link(Type, 'noop', $void.function(function () {
     return null
   }, $Tuple.function))
+
+  // the empty function
+  link(Type, 'empty', function () {
+    return noop
+  })
 
   // prepare common type implementation.
   prepareOperation(Type, $Tuple.function)

@@ -29,13 +29,13 @@
     (let "expr" expected)
     (let "expected" true)
   ),
-  (++ assert-step)
+  (++ asserting-step)
   (let "expected" (expected),
   (var "value" (expr),
   (if (:value != expected)
     (return (@
       failed: true
-      step: assert-step
+      step: asserting-step
       expected: expected
       real: value
       expr: expr
@@ -153,7 +153,7 @@
       (print-a failure)
     ),
   ),
-  (if (C is-missing)
+  (if (colors is-missing)
     (print "\n  P.S. To prettify output, please run 'npm install'.\n")
   ),
   (var report (@

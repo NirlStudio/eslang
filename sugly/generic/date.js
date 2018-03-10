@@ -7,6 +7,7 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var numberCompare = $.number.proto.compare
+  var numberToString = $.number.proto['to-string']
 
   // empty value
   link(Type, 'empty', new Date(0))
@@ -165,7 +166,7 @@ module.exports = function ($void) {
   link(proto, 'to-string', function (format, localed) {
     if (typeof format === 'undefined') {
       // encoding as source code by default.
-      return '(date of ' + this.getTime() + ')'
+      return '(date of ' + numberToString.call(this.getTime()) + ')'
     }
     if (typeof format === 'boolean') {
       localed = format

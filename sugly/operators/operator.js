@@ -8,6 +8,6 @@ module.exports = function operator ($void) {
 
   // create the operator to define an operator
   staticOperator('=?', function (space, clause) {
-    return clause.$.length < 2 ? $Operator.empty : operatorOf(space, clause)
+    return clause.$.length < 2 ? $Operator.noop : operatorOf(space, clause)
   })
 }

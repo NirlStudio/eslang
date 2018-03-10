@@ -197,10 +197,8 @@ false(false false false: false :false false@ false @false false)false
 (symbol empty)
 (tuple empty)
 
-# meta.operator.empty.sugly
-(operator empty)
-
 # meta.function.empty.sugly
+(operator empty)
 (lambda empty)
 (function empty)
 (array empty)
@@ -209,6 +207,13 @@ false(false false false: false :false false@ false @false false)false
 
 # meta.function.other.empty.sugly
 (((empty empty) empty) empty y)
+
+# meta.operator.noop.sugly
+(operator noop)
+
+# meta.operator.noop.sugly
+(lambda noop)
+(function noop)
 
 # meta.function-collection-sugly: string, tuple, array
 length((length length) length)length
@@ -236,8 +241,8 @@ char-at((char-at char-at) char-at)char-at
 # meta.constant-number-sugly
 max((number max) max)
 min((number min) min)
-infinity((number infinity) infinity)
--infinity((number -infinity) -infinity)
+infinite((number infinite) infinite)
+-infinite((number -infinite) -infinite)
 max-int((number max-int) max-int)
 min-int((number min-int) min-int)
 bits((number bits) bits)

@@ -116,7 +116,7 @@
     (assert true (bool of 1),
     (assert true (bool of -1),
     (assert true (bool of (number invalid)),
-    (assert true (bool of (number infinity)),
+    (assert true (bool of (number infinite)),
     (assert true (bool of ""),
     (assert true (bool of "X"),
     (assert true (bool of (date of 0),

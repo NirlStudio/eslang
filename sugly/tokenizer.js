@@ -6,8 +6,7 @@ var RegexSpecialSymbol = /[(`@:$"#)',;\\\s]/
 var Constants = Object.assign(Object.create(null), {
   'null': null,
   'true': true,
-  'false': false,
-  'NaN': NaN
+  'false': false
 })
 
 module.exports = function ($void) {

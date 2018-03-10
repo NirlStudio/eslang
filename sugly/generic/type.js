@@ -39,6 +39,9 @@ module.exports = function ($void) {
     return name === 'proto' ? this.objectify() : this[name]
   })
 
+  // the type is its own empty value.
+  link(Type, 'empty', Type)
+
   // Retrieve the real type of an entity.
   link(Type, 'of', function (entity) {
     return typeof entity === 'undefined' || entity === null ? null : entity.type

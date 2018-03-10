@@ -195,9 +195,9 @@ module.exports = function ($void) {
     check('symbol', typeOf($.symbol.empty) === $.symbol)
     check('tuple', typeOf($.tuple.empty) === $.tuple)
 
-    check('operator', typeOf($.operator.empty) === $.operator)
-    check('lambda', typeOf($.lambda.empty) === $.lambda)
-    check('function', typeOf($.function.empty) === $.function)
+    check('operator', typeOf($.operator.empty()) === $.operator)
+    check('lambda', typeOf($.lambda.empty()) === $.lambda)
+    check('function', typeOf($.function.empty()) === $.function)
     check('function (generic)', typeOf(function () {}) === $.function)
 
     check('array', typeOf($.array.empty()) === $.array)
@@ -237,13 +237,13 @@ module.exports = function ($void) {
     check('symbol: empty', indexerOf($.symbol.empty) === $.symbol.proto[':'])
 
     check('operator', indexerOf($.operator) === $.operator[':'])
-    check('operator.empty', indexerOf($.operator.empty) === $.operator.proto[':'])
+    check('operator.empty', indexerOf($.operator.empty()) === $.operator.proto[':'])
 
     check('lambda', indexerOf($.lambda) === $.lambda[':'])
-    check('lambda: empty', indexerOf($.lambda.empty) === $.lambda.proto[':'])
+    check('lambda: empty', indexerOf($.lambda.empty()) === $.lambda.proto[':'])
 
     check('function', indexerOf($.function) === $.function[':'])
-    check('function: empty', indexerOf($.function.empty) === $.function.proto[':'])
+    check('function: empty', indexerOf($.function.empty()) === $.function.proto[':'])
     check('function: generic', indexerOf(function () {}) === $.function.proto[':'])
 
     check('array', indexerOf($.array) === $.array[':'])

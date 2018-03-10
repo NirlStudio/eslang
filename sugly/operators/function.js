@@ -13,10 +13,10 @@ module.exports = function function_ ($void) {
   var staticOperator = $void.staticOperator
 
   // create lambda operator
-  staticOperator('=', createOperator(lambdaOf, $Lambda.empty))
+  staticOperator('=', createOperator(lambdaOf, $Lambda.noop))
 
   // create function operator
-  staticOperator('=>', createOperator(functionOf, $Function.empty))
+  staticOperator('=>', createOperator(functionOf, $Function.noop))
 
   // call this function by tail-recursion (elimination)
   staticOperator('redo', signalOf('redo'))

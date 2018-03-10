@@ -17,8 +17,8 @@
       (assert ((date of 1) is-not (date of -1),
       (assert false ((date of 1) is (date of -1),
 
-      (assert ((date of NaN) is (date of NaN),
-      (assert false ((date of NaN) is-not (date of NaN),
+      (assert ((date of (number invalid)) is (date of (number invalid)),
+      (assert false ((date of (number invalid)) is-not (date of (number invalid)),
     ),
   ),
 
@@ -36,8 +36,8 @@
       (assert ((date of 1) not-equals (date of -1),
       (assert false ((date of 1) equals (date of -1),
 
-      (assert ((date of NaN) equals (date of NaN),
-      (assert false ((date of NaN) not-equals (date of NaN),
+      (assert ((date of (number invalid)) equals (date of (number invalid)),
+      (assert false ((date of (number invalid)) not-equals (date of (number invalid)),
     ),
   ),
 
@@ -55,8 +55,8 @@
       (assert ((date of 1) != (date of -1),
       (assert false ((date of 1) == (date of -1),
 
-      (assert ((date of NaN) == (date of NaN),
-      (assert false ((date of NaN) != (date of NaN),
+      (assert ((date of (number invalid)) == (date of (number invalid)),
+      (assert false ((date of (number invalid)) != (date of (number invalid)),
     ),
   ),
 
@@ -75,10 +75,10 @@
       (assert 0 ((date of -1) compare (date of -1),
     ),
     (should "an invalid date is not comparable with other valid dates." (=> ()
-      (assert 0 ((date of NaN) compare (date of NaN)),
-      (assert null ((date of NaN) compare (date of 0)),
-      (assert null ((date of NaN) compare (date of 1)),
-      (assert null ((date of NaN) compare (date of -1)),
+      (assert 0 ((date of (number invalid)) compare (date of (number invalid))),
+      (assert null ((date of (number invalid)) compare (date of 0)),
+      (assert null ((date of (number invalid)) compare (date of 1)),
+      (assert null ((date of (number invalid)) compare (date of -1)),
     ),
   ),
 
@@ -90,8 +90,8 @@
       (assert false ((date of 1) is-empty),
       (assert ((date of 1)  not-empty),
     (should "an invalid date is defined as empty." (=> ()
-      (assert ((date of NaN) is-empty),
-      (assert false ((date of NaN) not-empty),
+      (assert ((date of (number invalid)) is-empty),
+      (assert false ((date of (number invalid)) not-empty),
   ),
 
   (define "Encoding" (=> ()
@@ -99,7 +99,7 @@
       (assert (date of 0) ((date of 0) to-code),
       (assert (date of -1) ((date of -1) to-code),
       (assert (date of 1) ((date of 1) to-code),
-      (assert (date of NaN) ((date of NaN) to-code),
+      (assert (date of (number invalid)) ((date of (number invalid)) to-code),
     ),
   ),
 
@@ -108,16 +108,16 @@
       (assert "(date of 0)" ((date of 0) to-string),
       (assert "(date of 1)" ((date of 1) to-string),
       (assert "(date of -1)" ((date of -1) to-string),
-      (assert "(date of NaN)" ((date of NaN) to-string),
+      (assert "(date of (number invalid))" ((date of (number invalid)) to-string),
     ),
   ),
 ).
 
 (define "Value Conversion" (= ()
   (should "(date parse str) returns an invalid date." (= ()
-    (assert (date of NaN) (date parse),
-    (assert (date of NaN) (date parse ""),
-    (assert (date of NaN) (date parse "XXX"),
+    (assert (date of (number invalid)) (date parse),
+    (assert (date of (number invalid)) (date parse ""),
+    (assert (date of (number invalid)) (date parse "XXX"),
     (assert ((date parse "2017-3-3") is-valid),
     (assert ((date parse "2017/3/3") is-valid),
     (assert ((date parse "2017-3-3 5:10:10") is-valid),
@@ -127,8 +127,8 @@
     (assert ((date of) <= (date now)),
   ),
   (should "(date of str) returns the parsed result" (= ()
-    (assert (date of NaN) (date of ""),
-    (assert (date of NaN) (date of "XXX"),
+    (assert (date of (number invalid)) (date of ""),
+    (assert (date of (number invalid)) (date of "XXX"),
     (assert ((date of "2017-3-3") is-valid),
     (assert ((date of "2017/3/3 5:10:10") is-valid),
   ),
@@ -136,7 +136,7 @@
     (assert 0 ((date of 0) timestamp),
     (assert 1 ((date of 1) timestamp),
     (assert -1 ((date of -1) timestamp),
-    (assert NaN ((date of NaN) timestamp),
+    (assert (number invalid) ((date of (number invalid)) timestamp),
   ),
   (should "(date of year month ...) returns a date by fields." (= ()
     (assert 1900 (((date of 1900 1 2 3 4 5 6) the-date) 0),
@@ -187,8 +187,8 @@
       (assert ((date of 1) is-valid),
       (assert false ((date of 1) is-not-valid),
 
-      (assert false ((date of NaN) is-valid),
-      (assert true ((date of NaN) is-not-valid),
+      (assert false ((date of (number invalid)) is-valid),
+      (assert true ((date of (number invalid)) is-not-valid),
     ),
   ),
 ).
@@ -252,10 +252,10 @@
       (assert -1 ((date of -1) timestamp),
       (assert 1 ((date of 1) timestamp),
     ),
-    (should "(a-date timestamp) returns NaN for an invalid date." (= ()
-      (assert NaN ((date of NaN) timestamp),
-      (assert NaN ((date of "") timestamp),
-      (assert NaN ((date of "AAA") timestamp),
+    (should "(a-date timestamp) returns (number invalid) for an invalid date." (= ()
+      (assert (number invalid) ((date of (number invalid)) timestamp),
+      (assert (number invalid) ((date of "") timestamp),
+      (assert (number invalid) ((date of "AAA") timestamp),
     ),
   ),
   (define "timezone info" (= ()
@@ -263,10 +263,10 @@
       # (assert (((date timezone) name) is-a string),
       (assert (((date timezone) offset) is-a number)
     ),
-    (should "(a-date timestamp) returns NaN for an invalid date." (= ()
-      (assert NaN ((date of NaN) timestamp),
-      (assert NaN ((date of "") timestamp),
-      (assert NaN ((date of "AAA") timestamp),
+    (should "(a-date timestamp) returns (number invalid) for an invalid date." (= ()
+      (assert (number invalid) ((date of (number invalid)) timestamp),
+      (assert (number invalid) ((date of "") timestamp),
+      (assert (number invalid) ((date of "AAA") timestamp),
     ),
   ),
 ).
@@ -278,9 +278,9 @@
       (assert (date of 1) ((date of 0) + 1),
       (assert (date of -1) ((date of 0) + -1),
 
-      (assert (date of NaN) ((date of NaN) + 0),
-      (assert (date of NaN) ((date of NaN) + 1),
-      (assert (date of NaN) ((date of NaN) + -1),
+      (assert (date of (number invalid)) ((date of (number invalid)) + 0),
+      (assert (date of (number invalid)) ((date of (number invalid)) + 1),
+      (assert (date of (number invalid)) ((date of (number invalid)) + -1),
 
       (assert (date of 0) ((date of 0) + true),
       (assert (date of 0) ((date of 0) + ""),
@@ -293,9 +293,9 @@
       (assert (date of -1) ((date of 0) - 1),
       (assert (date of 1) ((date of 0) - -1),
 
-      (assert (date of NaN) ((date of NaN) - 0),
-      (assert (date of NaN) ((date of NaN) - 1),
-      (assert (date of NaN) ((date of NaN) - -1),
+      (assert (date of (number invalid)) ((date of (number invalid)) - 0),
+      (assert (date of (number invalid)) ((date of (number invalid)) - 1),
+      (assert (date of (number invalid)) ((date of (number invalid)) - -1),
 
       (assert (date of 0) ((date of 0) - true),
       (assert (date of 0) ((date of 0) - ""),
@@ -308,9 +308,9 @@
       (assert -1 ((date of 0) - (date of 1),
       (assert 1 ((date of 0) - (date of -1),
 
-      (assert NaN ((date of NaN) - (date of 0),
-      (assert NaN ((date of NaN) - (date of 1),
-      (assert NaN ((date of NaN) - (date of -1),
+      (assert (number invalid) ((date of (number invalid)) - (date of 0),
+      (assert (number invalid) ((date of (number invalid)) - (date of 1),
+      (assert (number invalid) ((date of (number invalid)) - (date of -1),
 
       (assert (date of 0) ((date of 0) - true),
       (assert (date of 0) ((date of 0) - ""),
@@ -326,13 +326,13 @@
       (assert false ((date of 0) > (date of 1),
       (assert ((date of 0) > (date of -1),
 
-      (assert null ((date of NaN) > (date of 0),
-      (assert null ((date of NaN) > (date of 1),
-      (assert null ((date of NaN) > (date of -1),
+      (assert null ((date of (number invalid)) > (date of 0),
+      (assert null ((date of (number invalid)) > (date of 1),
+      (assert null ((date of (number invalid)) > (date of -1),
 
-      (assert null ((date of 0) > (date of NaN),
-      (assert null ((date of 1) > (date of NaN),
-      (assert null ((date of 0) > (date of NaN),
+      (assert null ((date of 0) > (date of (number invalid)),
+      (assert null ((date of 1) > (date of (number invalid)),
+      (assert null ((date of 0) > (date of (number invalid)),
 
       (assert null ((date of 0) > true),
       (assert null ((date of 1) > ""),
@@ -344,13 +344,13 @@
       (assert false ((date of 0) >= (date of 1),
       (assert ((date of 0) >= (date of -1),
 
-      (assert null ((date of NaN) >= (date of 0),
-      (assert null ((date of NaN) >= (date of 1),
-      (assert null ((date of NaN) >= (date of -1),
+      (assert null ((date of (number invalid)) >= (date of 0),
+      (assert null ((date of (number invalid)) >= (date of 1),
+      (assert null ((date of (number invalid)) >= (date of -1),
 
-      (assert null ((date of 0) >= (date of NaN),
-      (assert null ((date of 1) >= (date of NaN),
-      (assert null ((date of 0) >= (date of NaN),
+      (assert null ((date of 0) >= (date of (number invalid)),
+      (assert null ((date of 1) >= (date of (number invalid)),
+      (assert null ((date of 0) >= (date of (number invalid)),
 
       (assert null ((date of 0) >= true),
       (assert null ((date of 1) >= ""),
@@ -362,13 +362,13 @@
       (assert ((date of 0) < (date of 1),
       (assert false ((date of 0) < (date of -1),
 
-      (assert null ((date of NaN) < (date of 0),
-      (assert null ((date of NaN) < (date of 1),
-      (assert null ((date of NaN) < (date of -1),
+      (assert null ((date of (number invalid)) < (date of 0),
+      (assert null ((date of (number invalid)) < (date of 1),
+      (assert null ((date of (number invalid)) < (date of -1),
 
-      (assert null ((date of 0) < (date of NaN),
-      (assert null ((date of 1) < (date of NaN),
-      (assert null ((date of 0) < (date of NaN),
+      (assert null ((date of 0) < (date of (number invalid)),
+      (assert null ((date of 1) < (date of (number invalid)),
+      (assert null ((date of 0) < (date of (number invalid)),
 
       (assert null ((date of 0) < true),
       (assert null ((date of 1) < ""),
@@ -380,13 +380,13 @@
       (assert ((date of 0) <= (date of 1),
       (assert false ((date of 0) <= (date of -1),
 
-      (assert null ((date of NaN) <= (date of 0),
-      (assert null ((date of NaN) <= (date of 1),
-      (assert null ((date of NaN) <= (date of -1),
+      (assert null ((date of (number invalid)) <= (date of 0),
+      (assert null ((date of (number invalid)) <= (date of 1),
+      (assert null ((date of (number invalid)) <= (date of -1),
 
-      (assert null ((date of 0) <= (date of NaN),
-      (assert null ((date of 1) <= (date of NaN),
-      (assert null ((date of 0) <= (date of NaN),
+      (assert null ((date of 0) <= (date of (number invalid)),
+      (assert null ((date of 1) <= (date of (number invalid)),
+      (assert null ((date of 0) <= (date of (number invalid)),
 
       (assert null ((date of 0) <= true),
       (assert null ((date of 1) <= ""),

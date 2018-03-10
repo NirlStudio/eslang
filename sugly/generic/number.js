@@ -115,8 +115,8 @@ module.exports = function ($void) {
   copyType(Type, Number, {
     MAX_VALUE: 'max',
     MIN_VALUE: 'min',
-    POSITIVE_INFINITY: 'infinity',
-    NEGATIVE_INFINITY: '-infinity'
+    POSITIVE_INFINITY: 'infinite',
+    NEGATIVE_INFINITY: '-infinite'
   })
 
   // the safe (valid) integer value range
@@ -135,15 +135,15 @@ module.exports = function ($void) {
   link(Type, 'invalid', NaN)
 
   // parse a string to its number value.
-  var regexParse = /\s*\(number\s+(invalid|[-]?infinity)\s*\)\s*/
+  var regexParse = /\s*\(number\s+(invalid|[-]?infinite)\s*\)\s*/
   var parse = link(Type, 'parse', function (value) {
     var keys = typeof value === 'string' ? value.match(regexParse) : null
     switch (keys && keys.length > 1 ? keys[1] : '') {
       case 'invalid':
         return NaN
-      case 'infinity':
+      case 'infinite':
         return Number.POSITIVE_INFINITY
-      case '-infinity':
+      case '-infinite':
         return Number.NEGATIVE_INFINITY
       default:
         return parseFloat(value)
@@ -290,8 +290,8 @@ module.exports = function ($void) {
       case 'o': case 'oct': return '0' + (this >> 0).toString(8)
       case 'b': case 'bin': return '0b' + (this >> 0).toString(2)
       default: return isNaN(this) ? '(number invalid)'
-        : this === Number.POSITIVE_INFINITY ? '(number infinity)'
-          : this === Number.NEGATIVE_INFINITY ? '(number -infinity)'
+        : this === Number.POSITIVE_INFINITY ? '(number infinite)'
+          : this === Number.NEGATIVE_INFINITY ? '(number -infinite)'
             : this.toString()
     }
   })
