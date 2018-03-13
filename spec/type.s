@@ -417,6 +417,7 @@
   ),
   (should "((type \"objectify\") ) returns all universal operations defined on null." (= ()
     (var t ((type "objectify") ),
+    (assert (t is-a object),
 
     (var fields (object fields-of t),
     (assert 20 (fields length),
