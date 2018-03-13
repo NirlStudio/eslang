@@ -80,28 +80,28 @@
     (assert (null is-not (= x x),
 
     (assert false (null is function),
-    (assert (null is-not type),
+    (assert (null is-not function),
     (assert false (null is (function empty),
     (assert (null is-not (function empty),
     (assert false (null is (=> x x),
     (assert (null is-not (=> x x),
 
     (assert false (null is array),
-    (assert (null is-not type),
+    (assert (null is-not array),
     (assert false (null is (array empty),
     (assert (null is-not (array empty),
     (assert false (null is (@ 1),
     (assert (null is-not (@ 1),
 
     (assert false (null is object),
-    (assert (null is-not type),
+    (assert (null is-not object),
     (assert false (null is (object empty),
     (assert (null is-not (object empty),
     (assert false (null is (@ x: 1),
     (assert (null is-not (@ x: 1),
 
     (assert false (null is class),
-    (assert (null is-not type),
+    (assert (null is-not class),
     (assert false (null is (class empty),
     (assert (null is-not (class empty),
 
@@ -125,6 +125,7 @@
   (should "null's equivalence is identical with its identity." (= ()
     (assert (:(null "equals") is (null "is"),
     (assert (:(null "not-equals") is (null "is-not"),
+  ),
 ).
 
 (define "Equivalence Operators" (= ()
@@ -210,6 +211,9 @@
     (assert false (null is-not-a),
     (assert false (null is-not-a null),
 
+    (assert false (null is-a type),
+    (assert (null is-not-a type),
+
     (assert false (null is-a bool),
     (assert (null is-not-a bool),
 
@@ -267,7 +271,12 @@
 ).
 
 (define "Indexer" (= ()
+  (should "the indexer is a lambda." (= ()
+    (assert (:(null ":") is-a lambda),
+  ),
   (should "null's type is null." (= ()
+    (assert null (null type),
+
     (assert null (null "type"),
     (assert null (null (`type),
 
@@ -276,6 +285,7 @@
 
     (assert null (null :"type" x),
     (assert null (null :(`type) x),
+  ),
 ).
 
 (define "Evaluation" (= ()

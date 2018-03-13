@@ -206,6 +206,7 @@ module.exports = function () {
   // export the ability of creation to enable an autonomous process.
   $void.createClass = function () {
     var class_ = Object.create($ClassProto)
+    class_.name = ''
     // a new type should have a new nature.
     class_.proto = Object.create($Instance)
     // a proto always intrinsically knows its container type.

@@ -5,10 +5,11 @@ module.exports = function ($void) {
   var Type = $.type
   var $Symbol = $.symbol
   var $Object = $.object
+  var Null = $void.null
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
-  var indexerOf = $void.indexerOf
   var link = $void.link
+  var ownsProperty = $void.ownsProperty
 
   /* The Supreme Prototype */
   var proto = Type.proto
@@ -35,7 +36,7 @@ module.exports = function ($void) {
   // all value types' protos must provide a customized indexer.
   link(proto, ':', function proto$indexer (index) {
     var name = typeof index === 'string' ? index
-      : index instanceof Symbol$ ? this[index.key] : ''
+      : index instanceof Symbol$ ? index.key : ''
     return name === 'proto' ? this.objectify() : this[name]
   })
 
@@ -44,24 +45,27 @@ module.exports = function ($void) {
 
   // Retrieve the real type of an entity.
   link(Type, 'of', function (entity) {
-    return typeof entity === 'undefined' || entity === null ? null : entity.type
+    var proto
+    return typeof entity === 'undefined' || entity === null ? null
+      : typeof entity !== 'object' || !ownsProperty(entity, 'type') ? entity.type
+        : (proto = Object.getPrototypeOf(entity)) ? proto.type : $Object
   })
-
-  // Retrieve the type indexer of an entity.
-  link(Type, 'indexer-of', indexerOf)
 
   // Type Reflection: Convert this type to a type descriptor object.
   link(Type, 'objectify', function () {
     var typeDef = $Object.empty()
+    if (typeof this === 'undefined' || this === null) {
+      return Object.assign(typeDef, Null)
+    }
     var name
     for (name in this.proto) {
-      if (name !== 'type') {
+      if (name !== 'type' && typeof proto[name] === 'undefined') {
         typeDef[name] = this.proto[name]
       }
     }
     var typeStatic = typeDef.static = $Object.empty()
     for (name in this) {
-      if (name !== 'proto') {
+      if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
         typeStatic[name] = this[name]
       }
     }

@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var $Lambda = $.lambda
+  var objectProto = $.object.proto
   var Null = $void.null
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
@@ -26,8 +27,14 @@ module.exports = function ($void) {
 
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
-    return (entity === null || typeof entity === 'undefined') ? Null[':']
-      : (entity.type && entity.type.proto[':']) || Null[':']
+    var proto
+    try {
+      return typeof entity === 'undefined' || entity === null ? Null[':']
+        : typeof entity !== 'object' || !ownsProperty(entity, 'type') ? entity.type.proto[':']
+          : (proto = Object.getPrototypeOf(entity)) ? proto[':'] : objectProto[':']
+    } catch (err) {
+      return typeof entity === 'object' ? objectProto[':'] : Null[':']
+    }
   }
 
   function thisCall (subject, methodName) {

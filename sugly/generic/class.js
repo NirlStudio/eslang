@@ -275,29 +275,27 @@ module.exports = function ($void) {
   })
 
   var indexer = link(instance, ':', function (index, value) {
-    // always return standard methods
-    if (typeof value === 'undefined') {
-      if (typeof index === 'string') {
-        value = instance[index]
-      } else if (index instanceof Symbol$) {
-        value = instance[index.key]
-      }
-      if (typeof value !== 'undefined') {
-        return value
-      }
-    }
-    // try to call overridden indexer
     var overriding = this[':']
-    if (overriding !== indexer) {
-      return overriding.apply(this, arguments)
+    // setter
+    if (typeof value !== 'undefined') {
+      return overriding !== indexer ? overriding.apply(this, arguments)
+        : typeof index === 'string' ? (this[index] = value)
+          : index instanceof Symbol$ ? (this[index.key] = value) : null
     }
+
+    // always return standard methods
+    if (typeof index === 'string') {
+      value = instance[index]
+    } else if (index instanceof Symbol$) {
+      value = instance[index.key]
+    }
+    if (typeof value === 'function') {
+      return value
+    }
+
     // default getter
-    if (typeof value === 'undefined') {
-      return typeof index === 'string' ? this[index]
+    return overriding !== indexer ? overriding.apply(this, arguments)
+      : typeof index === 'string' ? this[index]
         : index instanceof Symbol$ ? this[index.key] : null
-    }
-    // default setter
-    return typeof index === 'string' ? (this[index] = value)
-      : index instanceof Symbol$ ? (this[index.key] = value) : null
   })
 }

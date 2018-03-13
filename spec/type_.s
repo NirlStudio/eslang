@@ -1,10 +1,15 @@
+################################################################################
 # the shared test code for types
-# the-type: the type to be tested
-# the-value: a sample value to be tested.
+(the-type ?? (warn "the type to be tested is not defined.").
+(the-value ?? (warn "the sample value is not given.").
+(if (the-value is-empty)
+  (warn "the sample value should not be the empty value.")
+).
+# save the empty value
+(let the-empty (the-type empty).
+################################################################################
 
-(let the-type-name (the-type name).
-
-(define (the-type-name + " type") (=> ()
+(define ((the-type name) + " type") (=> ()
   (define "Identity" (=> ()
     (should "a type is only itself" (=> ()
       (assert (the-type is the-type),

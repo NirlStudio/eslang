@@ -63,9 +63,9 @@ operands(operands -operands operands operands- operands)operands
 # storage.type.generic.sugly
 (type type "bool")
 (bool bool "bool")
+(string string "string")
 (number number "number")
 (date date "date")
-(string string "string")
 (range range "range")
 (symbol symbol "symbol")
 (tuple tuple "tuple")
@@ -184,11 +184,11 @@ false(false false false: false :false false@ false @false false)false
 
 # meta.function.type.sugly (type)
 (((of of) of) of x)
-(((indexer-of indexer-of) indexer-of) indexer-of x)
 (((objectify objectify) objectify) objectify x)
 (((typify typify) typify) typify x)
 
 # meta.constant.empty.sugly
+(type empty)
 (bool empty)
 (string empty)
 (number empty)
