@@ -160,7 +160,6 @@ module.exports = function ($void) {
   })
 
   // Indexer:
-  // an object can provide a customized indexer.
   link(proto, ':', function (index, value) {
     if (typeof index !== 'string') {
       if (index instanceof Symbol$) {
@@ -169,7 +168,9 @@ module.exports = function ($void) {
         return null // unsupported property key.
       }
     }
-    return typeof value === 'undefined' ? this[index] : (this[index] = value)
+    return typeof value === 'undefined'
+      ? typeof proto[index] === 'function' ? proto[index] : this[index] // getting
+      : (this[index] = value) // setting
   })
 
   // inject type

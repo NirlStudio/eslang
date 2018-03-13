@@ -422,7 +422,7 @@
     (assert 20 (fields length),
 
     (for field in fields
-      (assert (null :field) (t :field),
+      (assert (null :field) (object get t field),
     ),
   ),
   (should "(type typify ...) extends type with type descriptor(s)." (= ()
