@@ -297,11 +297,14 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index, value) {
+  var indexer = link(proto, ':', function (index, value) {
     return typeof index === 'string' ? proto[index]
       : typeof index === 'number' ? $Range.of(this, index, value)
         : index instanceof Symbol$ ? proto[index.key] : null
   })
+
+  // export type indexer.
+  link(Type, 'indexer', indexer)
 
   // inject type
   Number.prototype.type = Type // eslint-disable-line no-extend-native

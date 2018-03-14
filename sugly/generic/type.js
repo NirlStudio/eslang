@@ -34,7 +34,7 @@ module.exports = function ($void) {
 
   // Indexer: default readonly accessor for all types.
   // all value types' protos must provide a customized indexer.
-  link(proto, ':', function proto$indexer (index) {
+  var indexer = link(proto, ':', function proto$indexer (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? index.key : ''
     return name === 'proto' ? this.objectify() : this[name]
@@ -46,10 +46,14 @@ module.exports = function ($void) {
   // Retrieve the real type of an entity.
   link(Type, 'of', function (entity) {
     var proto
-    return typeof entity === 'undefined' || entity === null ? null
-      : typeof entity !== 'object' || !ownsProperty(entity, 'type') ? entity.type
-        : (proto = Object.getPrototypeOf(entity)) ? proto.type : $Object
+    return entity === null || typeof entity === 'undefined' ? null
+      : typeof entity === 'object' && ownsProperty(entity, 'type')
+        ? (proto = Object.getPrototypeOf(entity)) ? proto.type : $Object
+        : entity.type
   })
+
+  // Retrieve the indexer for this type's instances.
+  link(Type, 'indexer', indexer)
 
   // Type Reflection: Convert this type to a type descriptor object.
   link(Type, 'objectify', function () {

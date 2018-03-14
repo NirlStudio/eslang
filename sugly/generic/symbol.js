@@ -78,8 +78,11 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index) {
+  var indexer = link(proto, ':', function (index) {
     return typeof index === 'string' ? this[index]
       : index instanceof Symbol$ ? this[index.key] : null
   })
+
+  // export type indexer.
+  link(Type, 'indexer', indexer)
 }

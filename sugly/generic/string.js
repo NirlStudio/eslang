@@ -218,7 +218,7 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index) {
+  var indexer = link(proto, ':', function (index) {
     return typeof index === 'string' ? proto[index]
       : index instanceof Symbol$ ? [proto.key]
         : typeof index !== 'number' ? null
@@ -226,6 +226,9 @@ module.exports = function ($void) {
             ? slice.apply(this, arguments) // chars in a range.
             : this.substr((index >>= 0) >= 0 ? index : index + this.length, 1)
   })
+
+  // export type indexer.
+  link(Type, 'indexer', indexer)
 
   // inject type
   String.prototype.type = Type // eslint-disable-line no-extend-native

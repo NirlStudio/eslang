@@ -2,8 +2,8 @@
 
 module.exports = function ($void) {
   var $ = $void.$
+  var $Type = $.type
   var $Lambda = $.lambda
-  var objectProto = $.object.proto
   var Null = $void.null
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
@@ -27,14 +27,8 @@ module.exports = function ($void) {
 
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
-    var proto
-    try {
-      return typeof entity === 'undefined' || entity === null ? Null[':']
-        : typeof entity !== 'object' || !ownsProperty(entity, 'type') ? entity.type.proto[':']
-          : (proto = Object.getPrototypeOf(entity)) ? proto[':'] : objectProto[':']
-    } catch (err) {
-      return typeof entity === 'object' ? objectProto[':'] : Null[':']
-    }
+    var type = $Type.of(entity)
+    return (type && type.indexer) || Null[':']
   }
 
   function thisCall (subject, methodName) {
@@ -138,9 +132,12 @@ module.exports = function ($void) {
     })
 
     // Indexer
-    link(proto, ':', function (index) {
+    var indexer = link(proto, ':', function (index) {
       return typeof index === 'string' ? proto[index]
         : index instanceof Symbol$ ? proto[index.key] : null
     })
+
+    // export type indexer.
+    link(type, 'indexer', indexer)
   }
 }

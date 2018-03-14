@@ -276,6 +276,13 @@
   (should "the indexer is a lambda." (= ()
     (assert (:(type ":") is-a lambda),
   ),
+  (should "the indexer is a readonly accessor." (= ()
+    (assert null (type :"__new_prop" 1),
+    (assert ((type "__new_prop") is null),
+
+    (assert null (type :"__new_method" (= x x),
+    (assert (:(type "__new_method") is null),
+  ),
   (should "type's type is type." (= ()
     (assert type (type type),
 
@@ -312,10 +319,11 @@
     (assert ((s type) is object),
     (assert ((s proto) is null),
 
-    (assert 5 ((object fields-of s) length),
+    (assert 6 ((object fields-of s) length),
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
     (assert (:(s "of") is-a lambda),
+    (assert (:(s "indexer") is-a lambda),
     (assert (:(s "objectify") is-a lambda),
     (assert (:(s "typify") is-a lambda),
   ),
@@ -396,6 +404,27 @@
     (assert ((sum type) is bool),
     (assert ((type of sum) is summer),
   ),
+  (should "(type \"indexer\") returns the indexer for all types." (= ()
+    (var i (type "indexer"),
+    (assert (:i is-a lambda),
+
+    (assert (:i is (bool ":"),
+    (assert (:i is (string ":"),
+    (assert (:i is (number ":"),
+    (assert (:i is (date ":"),
+    (assert (:i is (range ":"),
+    (assert (:i is (symbol ":"),
+    (assert (:i is (tuple ":"),
+
+    (assert (:i is (operator ":"),
+    (assert (:i is (lambda ":"),
+    (assert (:i is (function ":"),
+
+    (assert (:i is (array ":"),
+    (assert (:i is (object ":"),
+    (assert (:i is (class ":"),
+    (assert (:i is ((class empty) ":"),
+  ),
   (should "(type objectify) returns the object representation of type." (= ()
     (var t (type objectify),
     (assert (t is-a object),
@@ -406,12 +435,13 @@
     (assert (s is-a object),
     (assert ((s type) is object),
     (assert ((s proto) is null),
-    (assert 5 ((object fields-of s) length),
+    (assert 6 ((object fields-of s) length),
 
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
 
     (assert (:(s "of") is-a lambda),
+    (assert (:(s "indexer") is-a lambda),
     (assert (:(s "objectify") is-a lambda),
     (assert (:(s "typify") is-a lambda),
   ),
@@ -500,5 +530,5 @@
     (assert 1 ((class empty) "__inst_prop"),
     (assert (:((class empty) "__inst_method") is-a lambda),
     (assert 11 ((class empty) __inst_method 10),
-
+  ),
 ).

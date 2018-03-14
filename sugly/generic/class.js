@@ -298,4 +298,7 @@ module.exports = function ($void) {
       : typeof index === 'string' ? this[index]
         : index instanceof Symbol$ ? this[index.key] : null
   })
+
+  // export type indexer.
+  link(proto, 'indexer', indexer)
 }

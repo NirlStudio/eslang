@@ -160,7 +160,7 @@ module.exports = function ($void) {
   })
 
   // Indexer:
-  link(proto, ':', function (index, value) {
+  var indexer = link(proto, ':', function (index, value) {
     if (typeof index !== 'string') {
       if (index instanceof Symbol$) {
         index = index.key // use the key of a symbol
@@ -172,6 +172,9 @@ module.exports = function ($void) {
       ? typeof proto[index] === 'function' ? proto[index] : this[index] // getting
       : (this[index] = value) // setting
   })
+
+  // export type indexer.
+  link(Type, 'indexer', indexer)
 
   // inject type
   Object.prototype.type = Type // eslint-disable-line no-extend-native

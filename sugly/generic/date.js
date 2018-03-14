@@ -185,10 +185,13 @@ module.exports = function ($void) {
   })
 
   // Indexer
-  link(proto, ':', function (index) {
+  var indexer = link(proto, ':', function (index) {
     return typeof index === 'string' ? proto[index]
       : index instanceof Symbol$ ? proto[index.key] : null
   })
+
+  // export type indexer.
+  link(Type, 'indexer', indexer)
 
   // inject type
   Date.prototype.type = Type // eslint-disable-line no-extend-native
