@@ -39,7 +39,7 @@
       expected: expected
       real: value
       expr: expr
-      note: note)
+      note: (note))
 ).
 
 # test results

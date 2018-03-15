@@ -120,7 +120,14 @@ module.exports = function iterate ($void) {
     var sum = null
     var item = next()
     while (typeof item !== 'undefined' && item !== null) {
-      sum = accumulate(item, sum)
+      var args
+      if (Array.isArray(item)) {
+        args = [sum]
+        args.push.apply(args, item)
+      } else {
+        args = [sum, item]
+      }
+      sum = accumulate.apply(subject, args)
       item = next()
     }
     return sum

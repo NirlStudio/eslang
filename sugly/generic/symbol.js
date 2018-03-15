@@ -74,7 +74,7 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function () {
-    return this.key
+    return this.key || '(`)'
   })
 
   // Indexer

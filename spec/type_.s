@@ -1,31 +1,69 @@
 ################################################################################
 # the shared test code for all types
 (the-type ?? (warn "the type to be tested is not defined.").
-(? (:the-value is null) (warn "the sample value is not given.").
-(? (:the-value is-empty)
-  (warn "the sample value should not be the empty value." the-value)
+(var (the-value the-empty other-types) (=> :()
+  (var (choose) (import "samples/types"),
+  (var (target others) (choose the-type),
+  (@ ((target values) :0) (target "empty") others)
 ).
-# save the empty value
-(let the-empty (the-type empty).
 ################################################################################
-
 (define ((the-type name) + " type") (=> ()
+  (define "Type & Value." (=> ()
+    (should "a type's type is the type." (=> ()
+      (assert (the-type is-a type),
+      (assert false (the-type is-not-a type),
+
+      (assert false (the-type is-a null),
+      (assert (the-type is-not-a null),
+
+      (assert false (the-type is-a),
+      (assert (the-type is-not-a),
+    ),
+    (should "the type of the value is the type." (=> ()
+      (assert (:the-value is-a the-type),
+      (assert false (:the-value is-not-a the-type),
+
+      (assert ((:the-value type) is the-type),
+      (assert false ((:the-value type) is-not the-type),
+    ),
+    (should "the type of the empty value is the type." (=> ()
+      (assert (:the-empty is-a the-type),
+      (assert false (:the-empty is-not-a the-type),
+
+      (assert ((:the-empty type) is the-type),
+      (assert false ((:the-empty type) is-not the-type),
+    ),
+  ),
+
   (define "Identity" (=> ()
-    (should "a type is only itself" (=> ()
+    (should "a type is itself." (=> ()
       (assert (the-type is the-type),
       (assert false (the-type is-not the-type),
-
-    (should "a type is not null" (=> ()
+    ),
+    (should "a type is not null." (=> ()
       (assert false (the-type is null),
       (assert (the-type is-not null),
 
-    (should "a type is not type" (=> ()
+      (assert false (the-type is),
+      (assert (the-type is-not),
+    ),
+    (should "a type is not the type." (=> ()
       (assert false (the-type is type),
       (assert (the-type is-not type),
+    ),
+  ),
+
+  (define "Identity Operators" (= ()
+    (should "'===' is 'is'." (= ()
+      (assert (:(the-type "===") is (the-type "is"),
+    ),
+    (should "'!==' is 'is-not'." (= ()
+      (assert (:(the-type "!==") is (the-type "is-not"),
+    ),
   ),
 
   (define "Equivalence" (=> ()
-    (should "type is equivalent with itself" (=> ()
+    (should "type is equivalent with itself." (=> ()
       (assert (the-type equals the-type),
       (assert false (the-type not-equals the-type),
 

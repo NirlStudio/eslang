@@ -5,7 +5,6 @@ module.exports = function ($void) {
   var Type = $.class
   var $Type = $.type
   var $Tuple = $.tuple
-  var $Symbol = $.symbol
   var $Object = $.object
   var link = $void.link
   var Tuple$ = $void.Tuple
@@ -150,8 +149,8 @@ module.exports = function ($void) {
 
   // Encoding
   link(proto, 'to-code', function () {
-    return typeof this.name === 'string'
-      ? sharedSymbolOf(this.name) : $Symbol.empty
+    return typeof this.name === 'string' && this.name
+      ? sharedSymbolOf(this.name) : $Tuple.class
   })
 
   // Description

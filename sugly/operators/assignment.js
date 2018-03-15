@@ -80,7 +80,7 @@ module.exports = function assignment ($void) {
 
   // 'var' explicitly declares a local variable in current function's context.
   // in function: (var var-name value), or
-  //              (var (@ var-name ...) values), or
+  //              (var (var-name ...) values), or
   //              (var (field-name ...) object)
   // in operator: (var name-expr value-expr)
   staticOperator('var', createOperatorFor('var'))
