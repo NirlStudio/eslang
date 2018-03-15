@@ -1,5 +1,5 @@
-(let the-type bool)
-(let the-value false)
+(var the-type bool)
+(var the-value true)
 (include "type_")
 
 (define "Common Behaviours" (= ()

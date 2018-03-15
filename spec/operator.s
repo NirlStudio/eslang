@@ -1,5 +1,5 @@
-(let the-type operator)
-(let the-value (=?).
+(var the-type operator)
+(var the-value (=? (X Y) (+ (X) (Y).
 (include "type_")
 
 (define "operater usage" (= ()

@@ -1,9 +1,9 @@
 ################################################################################
-# the shared test code for types
+# the shared test code for all types
 (the-type ?? (warn "the type to be tested is not defined.").
-(the-value ?? (warn "the sample value is not given.").
-(if (the-value is-empty)
-  (warn "the sample value should not be the empty value.")
+(? (:the-value is null) (warn "the sample value is not given.").
+(? (:the-value is-empty)
+  (warn "the sample value should not be the empty value." the-value)
 ).
 # save the empty value
 (let the-empty (the-type empty).

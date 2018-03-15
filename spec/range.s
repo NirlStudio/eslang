@@ -1,5 +1,5 @@
-(let the-type range)
-(let the-value (0 0 1),
+(var the-type range)
+(var the-value (1 10 2),
 (include "type_")
 
 (define "Common Behaviours" (= ()

@@ -1,5 +1,5 @@
-(let the-type string)
-(let the-value "")
+(var the-type string)
+(var the-value "ABC")
 (include "type_")
 
 (define "Common Behaviours" (= ()

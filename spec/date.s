@@ -1,5 +1,5 @@
-(let the-type date)
-(let the-value (date of 0),
+(var the-type date)
+(var the-value (date now),
 (include "type_")
 
 (define "Common Behaviours" (= ()

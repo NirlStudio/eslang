@@ -1,5 +1,5 @@
-(let the-type symbol)
-(let the-value (` x).
+(var the-type symbol)
+(var the-value (` x).
 (include "type_")
 
 (define "Common Behaviours" (= ()
