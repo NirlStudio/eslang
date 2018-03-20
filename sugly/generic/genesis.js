@@ -52,13 +52,10 @@ module.exports = function () {
   $void.Type.prototype = Type
 
   /* It's ready to create primitive types, */
-  function create (name, superType) {
-    if (!superType) {
-      superType = Type
-    }
-    var type = Object.create(superType)
+  function create (name) {
+    var type = Object.create(Type)
     // a new type should have a new nature.
-    type.proto = Object.create(superType.proto)
+    type.proto = Object.create(Type.proto)
     // a proto always intrinsically knows its container type.
     type.proto.type = type
     // give a name to the new type.
@@ -163,7 +160,7 @@ module.exports = function () {
   // and persistent in running. So its overall state is mutable.
   // For the existence of the context, a function cannot be fully encoded. But
   // it may be automatically downgraded to a lambda when the encoding is required.
-  create('function', $.lambda)
+  create('function')
   $void.function = function (impl, code) {
     impl.type = $.function
     impl.code = code
@@ -194,6 +191,7 @@ module.exports = function () {
 
   // the prototype of classes is also a type.
   var $ClassProto = $Class.proto = Object.create(Type)
+  $ClassProto.name = ''
   $ClassProto.type = $Class
 
   // A fake constructor for instanceof checking for a class.
@@ -206,7 +204,6 @@ module.exports = function () {
   // export the ability of creation to enable an autonomous process.
   $void.createClass = function () {
     var class_ = Object.create($ClassProto)
-    class_.name = ''
     // a new type should have a new nature.
     class_.proto = Object.create($Instance)
     // a proto always intrinsically knows its container type.

@@ -21,7 +21,7 @@ module.exports = function ($void) {
   link(Type, 'of', function (a, b, c, d, e, f, g) {
     switch (arguments.length) {
       case 0: // now
-        return new Date()
+        return new Date(0)
       case 1: // string or timestamp
         return new Date(a)
       case 2:
@@ -41,6 +41,9 @@ module.exports = function ($void) {
 
   // compose a date object with utc values of its fields
   link(Type, 'of-utc', function () {
+    if (arguments.length < 1) {
+      return new Date(0)
+    }
     var fields = Array.prototype.slice.call(arguments)
     if (typeof fields[1] === 'number') {
       fields[1] -= 1

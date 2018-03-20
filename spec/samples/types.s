@@ -2,7 +2,7 @@
 # Common sample data of priamry types.
 ################################################################################
 (export samples (@).
-(let e.g. (=> (a-type a-value ...)
+(let e.g. (=> (a-type value ...)
   (samples push (@
     the-type: a-type
     empty: (a-type empty)
@@ -15,12 +15,13 @@
   "A" "AB" "ABC"
 ).
 (e.g. number
+  -0
   0.5 -0.5
   1 -1 100 -100
   (number min) (number max)
   (number min-int) (number max-int)
   (number min-bits) (number max-bits)
-  (number infinite) (number -infinite)
+  (number -infinite) (number infinite)
   (number invalid)
 ).
 (e.g. date

@@ -84,14 +84,27 @@ module.exports = function ($void) {
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
       var func = target[mapping[name]] = src[name]
-      if (typeof func === 'function' && !func.$name) {
-        func.$name = mapping[name]
+      if (typeof func === 'function') {
+        func.type = $Lambda
+        if (!func.$name) {
+          func.$name = mapping[name]
+        }
       }
     }
     return target
   }
 
-  $void.prepareOperation = function prepareOperation (type, emptyCode) {
+  $void.prepareOperation = function prepareOperation (type, noop, emptyCode) {
+    // the empty function
+    link(type, 'empty', function () {
+      return noop
+    })
+
+    // a placeholder of function
+    link(type, 'of', function () {
+      return noop
+    })
+
     var proto = type.proto
     // return operation's name
     link(proto, 'name', function () {

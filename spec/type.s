@@ -53,12 +53,18 @@
 
     (assert null (type compare),
     (assert null (type compare null),
+    (assert null (null compare type),
 
     (for t in types
       (assert null (type compare (t the-type),
+      (assert null ((t the-type) compare type),
+
       (assert null (type compare (t "empty"),
+      (assert null ((t "empty") compare type),
+
       (for v in (t values)
         (assert null (type compare v),
+        (assert null (:v compare type),
       ),
 ).
 
@@ -170,7 +176,9 @@
     (var indexer (type "indexer"),
     (assert (:indexer is-a lambda),
     (for t in types
-      (assert (:indexer is ((t the-type) ":"),
+      (if ((t the-type) is-not-a class)
+        (assert (:indexer is ((t the-type) ":"),
+      )
     ),
   ),
   (should "(type objectify) returns the object representation of type." (= ()

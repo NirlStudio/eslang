@@ -14,23 +14,12 @@ module.exports = function ($void) {
     return null
   }, $Tuple.function))
 
-  // the empty function
-  link(Type, 'empty', function () {
-    return noop
-  })
-
   // prepare common type implementation.
-  prepareOperation(Type, $Tuple.function)
+  prepareOperation(Type, noop, $Tuple.function)
 
   var proto = Type.proto
-
-  // type verification: a function is also a lambda
-  link(proto, 'is-a', function (t) {
-    return t === Type || t === $Lambda
-  })
-  link(proto, 'is-not-a', function (t) {
-    return t !== Type && t !== $Lambda
-  })
+  // apply a function and expand arguments from an array.
+  link(proto, 'apply', $Lambda.proto.apply)
 
   // Desccription
   link(proto, 'to-string', function () {

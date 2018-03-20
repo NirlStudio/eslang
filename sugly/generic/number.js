@@ -292,7 +292,7 @@ module.exports = function ($void) {
       default: return isNaN(this) ? '(number invalid)'
         : this === Number.POSITIVE_INFINITY ? '(number infinite)'
           : this === Number.NEGATIVE_INFINITY ? '(number -infinite)'
-            : this.toString()
+            : Object.is(this, -0) ? '-0' : this.toString()
     }
   })
 

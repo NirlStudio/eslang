@@ -1,5 +1,4 @@
 (var the-type date)
-(var the-value (date now),
 (include "type_")
 
 (define "Common Behaviours" (= ()

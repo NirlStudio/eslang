@@ -13,13 +13,8 @@ module.exports = function ($void) {
     return null
   }, $Tuple.operator))
 
-  // the empty function
-  link(Type, 'empty', function () {
-    return noop
-  })
-
   // prepare common type implementation.
-  prepareOperation(Type, $Tuple.operator)
+  prepareOperation(Type, noop, $Tuple.operator)
 
   var proto = Type.proto
   // Desccription

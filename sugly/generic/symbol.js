@@ -11,7 +11,7 @@ module.exports = function ($void) {
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty symbol.
-  link(Type, 'empty', sharedSymbolOf(''))
+  var empty = link(Type, 'empty', sharedSymbolOf(''))
 
   // a sepcial empty symbol to indicate "etc." or "more" for parser and operator
   link(Type, 'etc', sharedSymbolOf('...'))
@@ -37,11 +37,15 @@ module.exports = function ($void) {
 
   // create a symbol from a key.
   link(Type, 'of', function (key) {
-    return sharedSymbols[key] || new Symbol$(key)
+    return typeof key !== 'string' ? empty
+      : sharedSymbols[key] || new Symbol$(key)
   })
 
   // create a shared symbol from a key.
-  link(Type, 'of-shared', sharedSymbolOf)
+  link(Type, 'of-shared', function (key) {
+    return typeof key !== 'string' ? empty
+      : sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
+  })
 
   var proto = Type.proto
 

@@ -141,10 +141,10 @@ module.exports = function ($void) {
 
   // Emptiness: shared by all classes.
   link(proto, 'is-empty', function () {
-    return Object.getOwnPropertyNames(this.proto).length < 1
+    return Object.getOwnPropertyNames(this.proto).length < 2
   })
   link(proto, 'not-empty', function () {
-    return Object.getOwnPropertyNames(this.proto).length > 0
+    return Object.getOwnPropertyNames(this.proto).length > 1
   })
 
   // Encoding
@@ -157,6 +157,18 @@ module.exports = function ($void) {
   link(proto, 'to-string', function () {
     return typeof this.name === 'string' ? this.name : '?class'
   })
+
+  var classIndexer = link(proto, ':', function (index, value) {
+    var name = typeof index === 'string' ? index
+      : index instanceof Symbol$ ? index.key : ''
+    return name === 'proto' ? this.objectify()
+      : typeof proto[name] !== 'undefined' ? this[name]
+        : typeof value === 'undefined' ? this[name]
+          : (this[name] = value) // allow to add new class properties directly.
+  })
+
+  // export class indexer.
+  link(Type, 'indexer', classIndexer)
 
   // the prototype of class instances
   var instance = proto.proto

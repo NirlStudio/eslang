@@ -34,7 +34,7 @@ module.exports = function ($void) {
 
   // Indexer: default readonly accessor for all types.
   // all value types' protos must provide a customized indexer.
-  var indexer = link(proto, ':', function proto$indexer (index) {
+  var indexer = link(proto, ':', function (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? index.key : ''
     return name === 'proto' ? this.objectify() : this[name]

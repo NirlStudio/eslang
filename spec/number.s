@@ -1,5 +1,4 @@
 (var the-type number)
-(var the-value 100)
 (include "type_")
 
 (define "Common Behaviours" (= ()
