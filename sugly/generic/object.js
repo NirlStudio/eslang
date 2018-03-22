@@ -169,7 +169,7 @@ module.exports = function ($void) {
       }
     }
     return typeof value === 'undefined'
-      ? typeof proto[index] === 'function' ? proto[index] : this[index] // getting
+      ? typeof proto[index] === 'undefined' ? this[index] : proto[index] // getting
       : (this[index] = value) // setting
   })
 

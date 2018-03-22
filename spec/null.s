@@ -128,3 +128,151 @@
       ),
   ),
 ).
+
+(define "Arithmetic Operators" (=> ()
+  (should "(++ null) returns 1." (=> ()
+    (assert 1 (++),
+    (assert 1 (++ null),
+
+    (var n null)
+    (assert 1 (++ n),
+    (assert 1 n),
+  ),
+  (should "(-- null) returns -1." (=> ()
+    (assert -1 (--),
+    (assert -1 (-- null),
+
+    (var n null)
+    (assert -1 (-- n),
+    (assert -1 n),
+  ),
+).
+
+(define "Bitwise Operators" (=> ()
+  (should "(~ null) returns (~ 0)." (=> ()
+    (assert (~ 0) (~),
+    (assert (~ 0) (~ null),
+
+    (var n null)
+    (assert (~ 0) (~ n),
+  ),
+).
+
+(define "General Operators" (=> ()
+  (should "(+ null) returns 'null'." (=> ()
+    (assert 0 (+),
+    (assert "null" (+ null),
+    (assert "nullnull" (+ null null),
+
+    (var n null)
+    (assert "null" (+ n),
+    (assert "nullnull" (+ n n),
+  ),
+).
+
+(define "Logical Operators" (=> ()
+  (should "(! null) returns true." (=> ()
+    (assert true (!),
+    (assert true (! null),
+
+    (var n null)
+    (assert true (! n),
+  ),
+  (should "(not null) returns true." (=> ()
+    (assert true (not),
+    (assert true (not null),
+
+    (var n null)
+    (assert true (not n),
+  ),
+).
+
+(define "Global Operators" (=> ()
+  (define "Logical AND: (null && ...)" (=> ()
+    (should "(null &&) returns null." (=> ()
+      (assert null (null &&),
+      (var n null)
+      (assert null (n &&),
+    ),
+    (should "(null && x) returns null." (=> ()
+      (assert null (null && true),
+      (var n null)
+      (assert null (n && true),
+    ),
+    (should "(null && x y) returns null." (=> ()
+      (assert null (null && true true),
+      (var n null)
+      (assert null (n && true true),
+    ),
+  ),
+  (define "Logical OR: (null || ...)" (=> ()
+    (should "(null ||) returns null." (=> ()
+      (assert null (null ||),
+      (var n null)
+      (assert null (n ||),
+    ),
+    (should "(null || x) returns x." (=> ()
+      (assert 1 (null || 1),
+      (var n null)
+      (assert 1 (n || 1),
+    ),
+    (should "(null || null x) returns x." (=> ()
+      (assert 1 (null || null 1),
+      (var n null)
+      (assert 1 (n || null 1),
+    ),
+  ),
+  (define "Boolean Test: (null ? ...)" (=> ()
+    (should "Booeanize: (null ?) returns false." (=> ()
+      (assert false (null ?),
+      (var n null)
+      (assert false (n ?),
+    ),
+    (should "Boolean Fallback: (null ? x) returns x." (=> ()
+      (assert 1 (null ? 1),
+      (assert 1 (null ? (1),
+      (var n null)
+      (assert 1 (n ? 1),
+      (assert 1 (n ? (1),
+    ),
+    (should "Boolean Switch: (null ? x y) returns y." (=> ()
+      (var x -1)
+      (var y  1)
+      (assert 1 (null ? (-- x) y),
+      (assert -1 x)
+
+      (assert 2 (null ? (-- 0) (++ y),
+      (assert -1 x)
+      (assert 2 y)
+    ),
+  ),
+  (define "Null fallback: (null ?? ...)" (=> ()
+    (should "(null ??) returns null." (=> ()
+      (assert null (null ??),
+      (var n null)
+      (assert null (n ??),
+    ),
+    (should "(null ?? x) returns x." (=> ()
+      (assert 1 (null ?? 1),
+      (assert 2 (null ?? (++ 1),
+      (var n null)
+      (assert 1 (n ?? 1),
+      (assert 2 (n ?? (++ 1),
+    ),
+    (should "(null ?? x y) returns x." (=> ()
+      (let x 1)
+      (let y -1)
+      (assert 1 (null ?? x y),
+      (assert 2 (null ?? (++ x) (-- y),
+      (assert 2 x)
+      (assert -1 y)
+    ),
+    (should "(null ?? null x) returns x." (=> ()
+      (assert 2 (null ?? null 2),
+      (assert 2 (null ?? (null) (2),
+      (var n null)
+      (assert 2 (n ?? n 2),
+      (assert 2 (n ?? (n) (2),
+    ),
+  ),
+).

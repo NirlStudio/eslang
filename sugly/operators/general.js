@@ -18,8 +18,9 @@ module.exports = function general ($void) {
     var length = clist.length
     if (length > 1) {
       var base = evaluate(clist[1], space)
-      return length === 2 ? base : typeof base === 'number'
-        ? sum(space, base, clist) : concat(space, base, clist)
+      return typeof base === 'number'
+        ? sum(space, base, clist)
+        : concat(space, base, clist)
     }
     return 0
   })

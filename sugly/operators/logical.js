@@ -13,7 +13,7 @@ module.exports = function logical ($void) {
   var not = staticOperator('!', function (space, clause) {
     if (clause.$.length > 1) {
       var value = evaluate(clause.$[1], space)
-      return value === false || value === 0 || value === null || typeof value === 'undefined'
+      return value === false || value === null || value === 0 || typeof value === 'undefined'
     }
     return true
   })
@@ -26,29 +26,29 @@ module.exports = function logical ($void) {
       return null
     }
     var clist = clause.$
-    if (typeof operant === 'undefined' || clist.length < 2) {
-      return true // The value of AND is defined as true.
+    if (typeof operant === 'undefined') {
+      return null
     }
     if (operant === false || operant === null || operant === 0) {
-      return false
+      return operant
     }
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (value === false || value === null || value === 0) {
-        return false
+        return value
       }
     }
-    return true
+    return operant
   }, $Tuple.operator))
 
   // global logical OR operator
   link(Null, '||', operator(function (space, clause, operant) {
     var clist = clause && clause.$
-    if (typeof operant === 'undefined' || !clist.length || clist.length < 2) {
-      return false // the value of OR is defined as False
+    if (typeof operant === 'undefined') {
+      operant = null
     }
     if (operant !== false && operant !== null && operant !== 0) {
-      return true
+      return operant
     }
     if (!(space instanceof Space$)) {
       return null
@@ -56,10 +56,10 @@ module.exports = function logical ($void) {
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (value !== false && value !== null && value !== 0) {
-        return true
+        return value
       }
     }
-    return false
+    return operant
   }, $Tuple.operator))
 
   // Boolean Test: only for null.
