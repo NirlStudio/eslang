@@ -160,6 +160,146 @@
   ),
 ).
 
+(define "Evaluation" (=> ()
+  (should "type is evaluated to type." (=> ()
+    (assert type (type),
+    (assert type (type null),
+  ),
+).
+
+(define "Arithmetic Operators" (=> ()
+  (should "(++ type) returns 1." (=> ()
+    (var x type)
+    (assert 1 (++ x),
+    (assert 1 x),
+  ),
+  (should "(-- type) returns -1." (=> ()
+    (var x type)
+    (assert -1 (-- x),
+    (assert -1 x),
+  ),
+).
+
+(define "Bitwise Operators" (=> ()
+  (should "(~ type) returns (~ 0)." (=> ()
+    (assert (~ 0) (~ type),
+
+    (var x type)
+    (assert (~ 0) (~ x),
+  ),
+).
+
+(define "General Operators" (=> ()
+  (should "(+ type) returns 'type'." (=> ()
+    (assert "type" (+ type),
+    (assert "typetype" (+ type type),
+
+    (var x type)
+    (assert "type" (+ x),
+    (assert "typetype" (+ x x),
+  ),
+).
+
+(define "Logical Operators" (=> ()
+  (should "(! type) returns false." (=> ()
+    (assert false (! type),
+    (var x type)
+    (assert false (! x),
+  ),
+  (should "(not type) returns false." (=> ()
+    (assert false (not type),
+    (var x type)
+    (assert false (not x),
+  ),
+).
+
+(define "Global Operators" (=> ()
+  (define "Logical AND: (type && ...)" (=> ()
+    (should "(type &&) returns type." (=> ()
+      (assert type (type &&),
+      (var x type)
+      (assert type (x &&),
+    ),
+    (should "(type && x) returns x." (=> ()
+      (assert true (type && true),
+      (var x type)
+      (assert true (x && true),
+    ),
+    (should "(type && x y) returns y." (=> ()
+      (assert false (type && true false),
+      (var x type)
+      (assert false (x && true false),
+    ),
+  ),
+  (define "Logical OR: (type || ...)" (=> ()
+    (should "(type ||) returns type." (=> ()
+      (assert type (type ||),
+      (var x type)
+      (assert type (x ||),
+    ),
+    (should "(type || x) returns type." (=> ()
+      (assert type (type || 1),
+      (var x type)
+      (assert type (x || 1),
+    ),
+    (should "(type || x y) returns type." (=> ()
+      (assert type (type || 1 2),
+      (var x type)
+      (assert type (x || 1 2),
+    ),
+  ),
+  (define "Boolean Test: (type ? ...)" (=> ()
+    (should "Booeanize: (type ?) returns true." (=> ()
+      (assert true (type ?),
+      (var x type)
+      (assert true (x ?),
+    ),
+    (should "Boolean Fallback: (type ? x) returns type." (=> ()
+      (assert type (type ? 1),
+      (assert type (type ? (1),
+      (var x type)
+      (assert type (x ? 1),
+      (assert type (x ? (1),
+    ),
+    (should "Boolean Switch: (type ? x y) returns x." (=> ()
+      (var x -1)
+      (var y  1)
+      (assert -1 (type ? x (++ y),
+      (assert 1 y)
+
+      (assert -2 (type ? (-- x) (++ y),
+      (assert -2 x)
+      (assert 1 y)
+    ),
+  ),
+  (define "Null fallback: (type ?? ...)" (=> ()
+    (should "(type ??) returns type." (=> ()
+      (assert type (type ??),
+      (var x type)
+      (assert type (x ??),
+    ),
+    (should "(type ?? x) returns type." (=> ()
+      (var c 0)
+      (assert type (type ?? 1),
+      (assert type (type ?? (++ c),
+      (assert 0 c)
+
+      (var x type)
+      (assert type (x ?? 1),
+      (assert type (x ?? (++ c),
+      (assert 0 c)
+    ),
+    (should "(type ?? x y) returns type." (=> ()
+      (let x 1)
+      (let y -1)
+      (assert type (type ?? x y),
+      (assert type (type ?? (++ x) (-- y),
+      (assert 1 x)
+      (assert -1 y)
+    ),
+  ),
+).
+
 (define "Type Reflection" (=> ()
   (should "(type of value) returns the real type of a value." (=> ()
     (assert ((type of null) is null),

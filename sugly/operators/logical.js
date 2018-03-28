@@ -32,13 +32,14 @@ module.exports = function logical ($void) {
     if (operant === false || operant === null || operant === 0) {
       return operant
     }
+    var value = operant
     for (var i = 2; i < clist.length; i++) {
-      var value = evaluate(clist[i], space)
+      value = evaluate(clist[i], space)
       if (value === false || value === null || value === 0) {
         return value
       }
     }
-    return operant
+    return value
   }, $Tuple.operator))
 
   // global logical OR operator
@@ -53,13 +54,14 @@ module.exports = function logical ($void) {
     if (!(space instanceof Space$)) {
       return null
     }
+    var value
     for (var i = 2; i < clist.length; i++) {
-      var value = evaluate(clist[i], space)
+      value = evaluate(clist[i], space)
       if (value !== false && value !== null && value !== 0) {
         return value
       }
     }
-    return operant
+    return value
   }, $Tuple.operator))
 
   // Boolean Test: only for null.

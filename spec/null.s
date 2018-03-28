@@ -116,6 +116,7 @@
 (define "Evaluation" (=> ()
   (should "null is evaluated to null." (=> ()
     (assert null (null),
+    (assert null ((` ())),
     (assert null (null null),
 
     (assert null (null type),
@@ -241,7 +242,7 @@
       (assert 1 (null ? (-- x) y),
       (assert -1 x)
 
-      (assert 2 (null ? (-- 0) (++ y),
+      (assert 2 (null ? (-- x) (++ y),
       (assert -1 x)
       (assert 2 y)
     ),
