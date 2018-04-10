@@ -50,12 +50,12 @@ module.exports = function ($void) {
   var proto = Type.proto
 
   // Identity and Equivalence is determined by the key
-  link(proto, ['is', 'equals', '=='], function (another) {
+  link(proto, ['is', '===', 'equals', '=='], function (another) {
     return this === another || (
       another instanceof Symbol$ && this.key === another.key
     )
   })
-  link(proto, ['is-not', 'not-equals', '!='], function (another) {
+  link(proto, ['is-not', '!==', 'not-equals', '!='], function (another) {
     return this !== another && (
       !(another instanceof Symbol$) || this.key !== another.key
     )

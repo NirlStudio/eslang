@@ -1,5 +1,5 @@
 (var the-type tuple)
-(include "type_")
+(include "share/type")
 
 (define "tuple values" (= ()
 ).

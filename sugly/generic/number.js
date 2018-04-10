@@ -255,10 +255,14 @@ module.exports = function ($void) {
 
   // override equivalence logic since 0 != -0 != +0 by identity-base test.
   link(proto, ['equals', '=='], function (another) {
-    return this === another || (isNaN(this) && isNaN(another))
+    return typeof another === 'number' && (
+      this === another || (isNaN(this) && isNaN(another))
+    )
   })
   link(proto, ['not-equals', '!='], function (another) {
-    return this !== another && (!isNaN(this) || !isNaN(another))
+    return typeof another !== 'number' || (
+      this !== another && (!isNaN(this) || !isNaN(another))
+    )
   })
 
   // support common math operations

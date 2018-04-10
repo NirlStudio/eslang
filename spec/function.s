@@ -1,5 +1,5 @@
 (var the-type function)
-(include "type_")
+(include "share/type")
 
 (define "function usage" (= ()
 ).

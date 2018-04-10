@@ -1,5 +1,5 @@
 (var the-type operator)
-(include "type_")
+(include "share/type")
 
 (define "operater usage" (= ()
 ).

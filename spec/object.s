@@ -1,5 +1,5 @@
 (var the-type object)
-(include "type_")
+(include "share/type")
 
 (define "object usage" (= ()
 ).

@@ -130,10 +130,10 @@ module.exports = function ($void) {
   })
 
   // override Identity and Equivalence logic to test by timestamp value
-  link(proto, ['is', 'equals', '=='], function (another) {
+  link(proto, ['is', '===', 'equals', '=='], function (another) {
     return this === another || compare.call(this, another) === 0
   })
-  link(proto, ['is-not', 'not-equals', '!='], function (another) {
+  link(proto, ['is-not', '!==', 'not-equals', '!='], function (another) {
     return this !== another && compare.call(this, another) !== 0
   })
 

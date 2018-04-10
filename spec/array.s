@@ -1,5 +1,5 @@
 (var the-type array)
-(include "type_")
+(include "share/type")
 
 (define "Type" (= ()
 

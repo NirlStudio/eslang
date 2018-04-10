@@ -1,5 +1,5 @@
 (var the-type number)
-(include "type_")
+(include "share/type")
 
 (define "Common Behaviours" (= ()
   (define "Identity" (=> ()

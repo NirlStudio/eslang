@@ -2,12 +2,14 @@
 
 module.exports = function logical ($void) {
   var $ = $void.$
+  var $Type = $.type
   var $Tuple = $.tuple
   var Null = $void.null
   var link = $void.link
   var Space$ = $void.Space
   var operator = $void.operator
   var evaluate = $void.evaluate
+  var symbolPairing = $.symbol.pairing
   var staticOperator = $void.staticOperator
 
   var not = staticOperator('!', function (space, clause) {
@@ -33,7 +35,8 @@ module.exports = function logical ($void) {
       return operant
     }
     var value = operant
-    for (var i = 2; i < clist.length; i++) {
+    var i = clist[0] === symbolPairing ? 3 : 2
+    for (; i < clist.length; i++) {
       value = evaluate(clist[i], space)
       if (value === false || value === null || value === 0) {
         return value
@@ -54,8 +57,9 @@ module.exports = function logical ($void) {
     if (!(space instanceof Space$)) {
       return null
     }
-    var value
-    for (var i = 2; i < clist.length; i++) {
+    var value = operant
+    var i = clist[0] === symbolPairing ? 3 : 2
+    for (; i < clist.length; i++) {
       value = evaluate(clist[i], space)
       if (value !== false && value !== null && value !== 0) {
         return value
@@ -73,42 +77,45 @@ module.exports = function logical ($void) {
     if (!clist || !clist.length || clist.length < 2) {
       return null // invalid call
     }
+    var base = clist[0] === symbolPairing ? 3 : 2
     if (typeof operant !== 'undefined' && operant !== false && operant !== null && operant !== 0) {
-      switch (clist.length) { // true logic
-        case 2:
+      switch (clist.length - base) { // true logic
+        case 0:
           return true
-        case 3:
+        case 1:
           return operant
         default:
-          return space instanceof Space$ ? evaluate(clist[2], space) : null
+          return space instanceof Space$ ? evaluate(clist[base], space) : null
       }
     }
-    switch (clist.length) { // false logic
-      case 2:
+    switch (clist.length - base) { // false logic
+      case 0:
         return false
-      case 3:
-        return space instanceof Space$ ? evaluate(clist[2], space) : null
+      case 1:
+        return space instanceof Space$ ? evaluate(clist[base], space) : null
       default:
-        return space instanceof Space$ ? evaluate(clist[3], space) : null
+        return space instanceof Space$ ? evaluate(clist[base + 1], space) : null
     }
   }, $Tuple.operator))
 
-  // Null Fallback: only for null.
-  // (x ?? y z ...) returns the first non-null value after it if x is null.
+  // Null Fallback
+  // (null ?? y z ...) returns the first non-null value after it if x is null.
   link(Null, '??', operator(function (space, clause, operant) {
-    if (typeof operant !== 'undefined' && operant !== null) {
-      return operant // shortcut
-    }
     if (!(space instanceof Space$)) {
-      return null // the value of OR is defined as False
+      return null
     }
     var clist = clause.$
-    for (var i = 2; i < clist.length; i++) {
+    var i = clist[0] === symbolPairing ? 3 : 2
+    for (; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (value !== null) {
         return value
       }
     }
     return null
+  }, $Tuple.operator))
+  // (non-null ?? ...) return non-null.
+  link($Type.proto, '??', operator(function (space, clause, operant) {
+    return operant
   }, $Tuple.operator))
 }

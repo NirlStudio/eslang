@@ -46,14 +46,14 @@ module.exports = function ($void) {
   })
 
   // Identity and Equivalence: to be determined by field values.
-  link(proto, ['is', 'equals', '=='], function (another) {
+  link(proto, ['is', '===', 'equals', '=='], function (another) {
     return this === another || (
       another instanceof Range$ &&
       this.begin === another.begin &&
       this.end === another.end &&
       this.step === another.step)
   })
-  link(proto, ['is-not', 'not-equals', '!='], function (another) {
+  link(proto, ['is-not', '!==', 'not-equals', '!='], function (another) {
     return this !== another && (
       !(another instanceof Range$) ||
       this.begin !== another.begin ||

@@ -201,19 +201,18 @@
 ).
 
 (define "Logical Operators" (=> ()
-  (should "(! type) returns false." (=> ()
-    (assert false (! type),
-    (var x type)
-    (assert false (! x),
+  (define "Logical NOT: (! type)" (=> ()
+    (should "(! type) returns false." (=> ()
+      (assert false (! type),
+      (var x type)
+      (assert false (! x),
+    ),
+    (should "(not type) returns false." (=> ()
+      (assert false (not type),
+      (var x type)
+      (assert false (not x),
+    ),
   ),
-  (should "(not type) returns false." (=> ()
-    (assert false (not type),
-    (var x type)
-    (assert false (not x),
-  ),
-).
-
-(define "Global Operators" (=> ()
   (define "Logical AND: (type && ...)" (=> ()
     (should "(type &&) returns type." (=> ()
       (assert type (type &&),
@@ -272,6 +271,9 @@
       (assert 1 y)
     ),
   ),
+).
+
+(define "Global Operators" (=> ()
   (define "Null fallback: (type ?? ...)" (=> ()
     (should "(type ??) returns type." (=> ()
       (assert type (type ??),

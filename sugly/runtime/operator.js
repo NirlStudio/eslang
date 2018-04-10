@@ -8,6 +8,7 @@ module.exports = function operators$operator ($void) {
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
   var operator = $void.operator
+  var symbolPairing = $Symbol.pairing
   var createOperatorSpace = $void.createOperatorSpace
 
   $void.operatorOf = function operatorOf (space, clause) {
@@ -38,6 +39,9 @@ module.exports = function operators$operator ($void) {
       // populate operands
       var clist = clause.$
       var offset = typeof operant !== 'undefined' ? 2 : 1
+      if (clist[0] === symbolPairing) {
+        offset += 1
+      }
       for (var i = 0; i < params.length; i++) {
         var j = i + offset
         scope.context[params[i]] = j < clist.length ? clist[j] : null

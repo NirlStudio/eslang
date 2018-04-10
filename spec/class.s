@@ -1,5 +1,5 @@
 (var the-type class)
-(include "type_")
+(include "share/type")
 
 (define "Type" (= ()
 

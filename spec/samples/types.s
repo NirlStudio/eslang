@@ -27,8 +27,8 @@
 (e.g. date
   (date of -100000)
   (date now)
-  ((date now) - (* 24 60 60 1000),
-  ((date now) + (* 24 60 60 1000),
+  ((date now) - (24 * 60 60 1000),
+  ((date now) + (24 * 60 60 1000),
 ).
 (e.g. range
   (0 10) (0 10 2) (0 10 -2)
@@ -48,11 +48,16 @@
 (e.g. array (@ 1) (@ 1 2).
 (e.g. object (@ x: 1) (@ x: 1 y: 2).
 
+(var spring (@:class
+  z: 100
+  add: (= (x y) (+ x y (this z),
+).
+(e.g. class spring)
+
 (var summer (@:class
   z: 100
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. class summer)
 (e.g. summer
   (summer default)
   (summer of (@ z: 1000),

@@ -1,5 +1,5 @@
 (var the-type lambda)
-(include "type_")
+(include "share/type")
 
 (define "lambda usage" (= ()
 ).

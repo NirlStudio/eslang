@@ -188,6 +188,7 @@
     (should "a common type's empty value must be an empty value." (=> ()
       (assert (:the-empty is-empty),
       (assert false (:the-empty not-empty),
+    )
   ),
 
   (define "Encoding" (=> ()
@@ -301,19 +302,18 @@
   ),
 
   (define "Logical Operators" (=> ()
-    (should "(! the-type) returns false." (=> ()
-      (assert false (! the-type),
-      (var x the-type)
-      (assert false (! x),
+    (define "Logical NOT: (! the-type)" (=> ()
+      (should "(! the-type) returns false." (=> ()
+        (assert false (! the-type),
+        (var x the-type)
+        (assert false (! x),
+      ),
+      (should "(not the-type) returns false." (=> ()
+        (assert false (not the-type),
+        (var x the-type)
+        (assert false (not x),
+      ),
     ),
-    (should "(not type) returns false." (=> ()
-      (assert false (not the-type),
-      (var x the-type)
-      (assert false (not x),
-    ),
-  ),
-
-  (define "Global Operators" (=> ()
     (define "Logical AND: (the-type && ...)" (=> ()
       (should "(the-type &&) returns the-type." (=> ()
         (assert the-type (the-type &&),
@@ -354,7 +354,7 @@
         (var x the-type)
         (assert true (x ?),
       ),
-      (should "Boolean Fallback: (the-type ? x) returns type." (=> ()
+      (should "Boolean Fallback: (the-type ? x) returns the-type." (=> ()
         (assert the-type (the-type ? 1),
         (assert the-type (the-type ? (1),
         (var x the-type)
@@ -372,24 +372,27 @@
         (assert 1 y)
       ),
     ),
+  ),
+
+  (define "Global Operators" (=> ()
     (define "Null fallback: (the-type ?? ...)" (=> ()
       (should "(the-type ??) returns the-type." (=> ()
         (assert the-type (the-type ??),
         (var x the-type)
         (assert the-type (x ??),
       ),
-      (should "(the-type ?? x) returns type." (=> ()
+      (should "(the-type ?? x) returns the-type." (=> ()
         (var c 0)
         (assert the-type (the-type ?? 1),
         (assert the-type (the-type ?? (++ c),
         (assert 0 c)
-        
+
         (var x the-type)
         (assert the-type (x ?? 1),
         (assert the-type (x ?? (++ c),
         (assert 0 c)
       ),
-      (should "(type ?? x y) returns type." (=> ()
+      (should "(the-type ?? x y) returns the-type." (=> ()
         (let x 1)
         (let y -1)
         (assert the-type (the-type ?? x y),
@@ -428,53 +431,15 @@
       (assert (:(the-type "typify") is (type "typify"),
     ),
   ),
+).
 
-  (define "Values" (=> ()
-    (should "the values are not the default empty value." (=> ()
-      (for v in the-values
-        (assert (:v is-not (the-type empty),
-        (assert false (:v is (the-type empty),
-      ),
-    ),
-    (should "the values' type is this type." (=> ()
-      (for v in the-values
-        (assert (:v is-a the-type),
-        (assert false (:v is-not-a the-type),
-        (assert ((:v type) is the-type),
-      ),
-    ),
-    (should "the other type's values' type is not this type" (=> ()
-      (for t in other-types
-        (for v in (t values)
-          (assert false (:v is-a the-type),
-          (assert (:v is-not-a the-type),
-          (assert ((:v type) is-not the-type),
-        ),
-      ),
-    ),
-    (should "the other type's values' do not equal any of this type's values" (=> ()
-      (for t in other-types
-        (for v in (t values)
-          (assert (:the-empty is-not v),
-          (assert (:v is-not the-empty),
-          (assert false (:the-empty is v),
-          (assert false (:v is the-empty),
-        ),
-      ),
-      (for v1 in the-values
-        (for t in other-types
-          (assert (:v1 is-not (t empty),
-          (assert (:(t empty) is-not v1),
-          (assert false (:v1 is (t empty)),
-          (assert false (:(t empty) is v1),
-          (for v2 in (t values)
-            (assert (:v1 is-not v2),
-            (assert (:v2 is-not v1),
-            (assert false (:v1 is v2),
-            (assert false (:v2 is v1),
-          ),
-        ),
-      ),
-    ),
+# verify general logic for sample values.
+(var all-values (the-values concat (the-type empty).
+(for i in (0 (all-values length))
+  (var the-value (all-values:i))
+  (var other-values ((all-values copy) splice i 1)),
+  (=> (the-value other-values) : (the-value other-values)
+    (define (+ "value: " the-value) (=> ()
+      (include "share/value")
   ),
 ).
