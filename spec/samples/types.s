@@ -52,15 +52,19 @@
   z: 100
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. class spring)
-
 (var summer (@:class
-  z: 100
+  z: 200
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. summer
-  (summer default)
-  (summer of (@ z: 1000),
+(e.g. class spring)
+
+(var winter (@:class
+  z: 400
+  add: (= (x y) (+ x y (this z),
+).
+(e.g. winter
+  (winter default)
+  (winter of (@ z: 4000),
 ).
 
 (export choose (=> matched (@

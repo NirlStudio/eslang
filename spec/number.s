@@ -3,6 +3,12 @@
 
 (define "Common Behaviours" (= ()
   (define "Identity" (=> ()
+    (should "-0 is not 0." (= ()
+      (assert false (0 is -0),
+      (assert (0 is-not -0),
+      (assert false (-0 is 0),
+      (assert (-0 is-not 0),
+    ),
     (should "a number is its value" (= ()
       (assert (0 is 0),
       (assert false (0 is-not 0),
@@ -28,6 +34,13 @@
   ),
 
   (define "Equivalence" (=> ()
+    (should "-0 equals 0." (=> ()
+      (assert (-0 equals 0),
+      (assert (0 equals -0),
+
+      (assert false (-0 not-equals 0),
+      (assert false (0 not-equals -0),
+    ),
     (should "a number is equivalent with its value" (=> ()
       (assert (0 equals 0),
       (assert false (0 not-equals 0),

@@ -1,7 +1,7 @@
 (var the-type bool)
 (include "share/type")
 
-(define "Common Behaviours" (= ()
+(define "Value Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "true is true." (= ()
       (assert (true is true),
@@ -38,12 +38,10 @@
     (should "true is only comparable with itself." (=> ()
       (assert 0 (true compare true),
       (assert null (true compare false),
-      # to compare with all other types and their values.
     ),
     (should "false is only comparable with itself." (=> ()
       (assert 0 (false compare false),
       (assert null (false compare true),
-      # to compare with all other types and their values.
     ),
   ),
 
@@ -52,11 +50,11 @@
       (assert ((bool empty) is false),
       (assert false ((bool empty) is-not false),
 
-      (assert (false is-empty),
-      (assert false (false  not-empty),
-
       (assert false (true is-empty),
       (assert (true  not-empty),
+
+      (assert (false is-empty),
+      (assert false (false not-empty),
   ),
 
   (define "Encoding" (=> ()
@@ -79,7 +77,7 @@
   ),
 ).
 
-(define "Value Conversion" (= ()
+(define "Value Conversion" (=> ()
   (should "true is converted to true." (= ()
     (assert true (bool of true),
   ),
@@ -87,14 +85,30 @@
     (assert false (bool of false),
   ),
   (should "null is converted to false." (= ()
-    (assert false (bool of null),
     (assert false (bool of),
+    (assert false (bool of null),
   ),
   (should "0 is converted to false." (= ()
     (assert false (bool of 0),
+    (assert false (bool of -0),
+    (assert false (bool of +0),
   ),
-  (should "other values will be converted to true." (= ()
-    # TODO
+  (should "other values will be converted to true." (=> ()
+    (for a-type in other-types
+      (for a-value in ((a-type values) concat (a-type "empty"))
+        (assert (0 not-equals a-value) (bool of a-value),
+      ),
+    ),
+  ),
+).
+
+(define "Value Indexer" (= ()
+  (should "bool value's indexer is read-only." (= ()
+    (assert null (true "__prop" "value"),
+    (assert null (false "__prop" "value"),
+
+    (assert null (true : "__prop" "value"),
+    (assert null (false : "__prop" "value"),
   ),
 ).
 
@@ -128,7 +142,7 @@
     ),
   ),
   (define "NOT: not / !" (= ()
-    (should "the empty not op is defined as true" (= ()
+    (should "the empty not operator is defined as true" (= ()
       (assert (not),
       (assert (!),
     ),
