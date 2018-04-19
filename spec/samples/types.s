@@ -11,6 +11,7 @@
 
 (e.g. bool true)
 (e.g. string
+  " " "\t" "\n"
   "a" "ab" "abc"
   "A" "AB" "ABC"
 ).

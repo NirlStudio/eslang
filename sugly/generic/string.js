@@ -60,21 +60,30 @@ module.exports = function ($void) {
   link(proto, 'last', function (count) {
     return typeof count === 'undefined'
       ? this.length > 0 ? this.charAt(this.length - 1) : null
-      : this.substr(this.length - (count >>= 0), count)
+      : this.substr(Math.max(0, this.length - (count >>= 0)), count)
   })
   // retrieve the last char or the index of the last occurence of value.
   link(proto, 'last-of', function (value, from) {
-    return this.lastIndexOf(value, typeof from !== 'number' ? this.length : from)
+    return typeof value === 'undefined' ? -1
+      : typeof value !== 'string' || !value ? this.length
+        : this.lastIndexOf(value,
+          (from = typeof from === 'undefined' ? this.length : from >> 0) < 0
+            ? from + this.length : from
+        )
   })
 
-  link(proto, 'starts-with', String.prototype.startsWith)
-  link(proto, 'ends-with', String.prototype.endsWith)
+  link(proto, 'starts-with', function (prefix) {
+    return typeof prefix === 'string' && this.startsWith(prefix)
+  })
+  link(proto, 'ends-with', function (suffix) {
+    return typeof suffix === 'string' && this.endsWith(suffix)
+  })
 
   // Converting
   // generate sub-string from this string.
-  link(proto, 'copy', function (begin, count) {
+  var copy = link(proto, 'copy', function (begin, count) {
     begin >>= 0
-    count = typeof count === 'undefined' ? this.length : count >> 0
+    count = typeof count === 'undefined' ? Infinity : count >> 0
     if (count < 0) {
       begin += count
       count = -count
@@ -82,6 +91,7 @@ module.exports = function ($void) {
     if (begin < 0) {
       begin += this.length
       if (begin < 0) {
+        count += begin
         begin = 0
       }
     }
@@ -95,9 +105,8 @@ module.exports = function ($void) {
         begin = 0
       }
     }
-    if (typeof end !== 'number') {
-      end = this.length
-    } else if (end < 0) {
+    end = typeof end === 'undefined' ? this.length : end >> 0
+    if (end < 0) {
       end += this.length
       if (end < 0) {
         end = 0
@@ -118,10 +127,10 @@ module.exports = function ($void) {
       )
   })
   link(proto, 'to-upper', function (localed) {
-    return localed === true ? this.toUpperCase() : this.toLocaleUpperCase()
+    return localed === true ? this.toLocaleUpperCase() : this.toUpperCase()
   })
   link(proto, 'to-lower', function (localed) {
-    return localed === true ? this.toLowerCase() : this.toLocaleLowerCase()
+    return localed === true ? this.toLocaleLowerCase() : this.toLowerCase()
   })
 
   // combination and splitting of strings
@@ -181,13 +190,10 @@ module.exports = function ($void) {
     return isNaN(code) ? null : code
   })
 
-  // Equivalence inherits from null.
-
   // Ordering: override general comparison logic.
-  link(proto, 'compare', function (another, localed) {
+  link(proto, 'compare', function (another) {
     return typeof another !== 'string' ? null
-      : localed === true ? this.localeCompare(another)
-        : this === another ? 0 : this > another ? 1 : -1
+      : this === another ? 0 : this > another ? 1 : -1
   })
 
   // comparing operators
@@ -224,7 +230,7 @@ module.exports = function ($void) {
         : typeof index !== 'number' ? null
           : arguments.length > 1
             ? slice.apply(this, arguments) // chars in a range.
-            : this.substr((index >>= 0) >= 0 ? index : index + this.length, 1)
+            : copy.apply(this, [index, 1])
   })
 
   // export type indexer.

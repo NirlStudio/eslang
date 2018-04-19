@@ -53,7 +53,7 @@ module.exports = function ($void) {
   })
 
   var append = function () {
-    var args = Array.prototype.slice(arguments)
+    var args = Array.prototype.slice.call(arguments)
     for (var i = 0; i < args.length; i++) {
       args[i] = atomOf(args[i])
     }

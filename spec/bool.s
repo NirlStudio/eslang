@@ -1,7 +1,7 @@
 (var the-type bool)
 (include "share/type")
 
-(define "Value Common Behaviours" (= ()
+(define "String Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "true is true." (= ()
       (assert (true is true),
@@ -19,19 +19,19 @@
   ),
 
   (define "Equivalence" (=> ()
-    (should "true is equivalent with true." (=> ()
-      (assert (true equals true),
-      (assert false (true not-equals true),
+    (should "bool equivalence is the same of identity." (=> ()
+      (assert (:(true "is") is (true "equals")),
+      (assert (:(true "is") is (false "equals")),
 
-      (assert (true not-equals false),
-      (assert false (true equals false),
+      (assert (:(false "is") is (true "equals")),
+      (assert (:(false "is") is (false "equals")),
+
+      (assert (:(true "equals") is (true "is")),
+      (assert (:(true "equals") is (false "is")),
+
+      (assert (:(false "equals") is (true "is")),
+      (assert (:(false "equals") is (false "is")),
     ),
-    (should "false is equivalent with false." (=> ()
-      (assert (false equals false),
-      (assert false (false not-equals false),
-
-      (assert (false not-equals true),
-      (assert false (false equals true),
   ),
 
   (define "Ordering" (=> ()

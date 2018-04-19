@@ -42,18 +42,21 @@ module.exports = function ($void) {
 
   // get the value of a field.
   link(Type, 'get', function (obj, name, value) {
+    // TODO: name may be a symbol
     return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
       ? typeof obj[name] === 'undefined' ? value : obj[name]
       : value
   })
   // set the value of a field.
   link(Type, 'set', function (obj, name, value) {
+    // TODO: name may be a symbol
     return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
       ? (obj[name] = (typeof value !== 'undefined' ? value : null))
       : null
   })
   // remove a field.
   link(Type, 'reset', function (obj, name, more) {
+    // TODO: name may be a symbol
     if (!(obj instanceof Object$) && (!obj || obj.type !== Type)) {
       return 0
     }
