@@ -110,7 +110,7 @@
   (should "(string of) returns an empty string." (= ()
     (assert "" (string of),
   ),
-  (should "a string is converted to itself." (= ()
+  (should "(string of str) returns str." (= ()
     (assert "" (string of ""),
     (assert "a" (string of "a"),
     (assert "A" (string of "A"),
@@ -119,7 +119,7 @@
     (assert "\r" (string of "\r"),
     (assert "\n" (string of "\n"),
   ),
-  (should "a value is converted to a string by calling its to-string." (= ()
+  (should "(string of value) returns (value to-string)." (= ()
     (assert "null" (string of null),
 
     (assert "type" (string of type),
@@ -141,6 +141,7 @@
     (assert "false" (string of false),
 
     (assert "0" (string of 0),
+    (assert "-0" (string of -0),
     (assert "-1" (string of -1),
     (assert "1" (string of 1),
 
@@ -163,9 +164,10 @@
     (var spring (@:class),
     (assert "spring" (string of spring),
   ),
-  (should "multiple values are joined together." (= ()
-    (assert "aa" (string of "a" "a"),
-    (assert "a a" (string of "a" " " "a"),
+  (should "(string of value ...) concatenates the string value of values" (= ()
+    (assert "" (string of "" ""),
+    (assert "aA" (string of "a" "A"),
+    (assert "a A" (string of "a" " " "A"),
     (assert "a false" (string of "a " false),
   ),
 ).

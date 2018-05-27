@@ -20,7 +20,7 @@
 
   # operators
   "quote" "assignment" "control"
-  "logical" "arithmetic" "bitwise" "general"
+  "logical" "arithmetic" "general"
   "load" "import" "include"
 
   # libs

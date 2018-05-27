@@ -28,6 +28,14 @@ module.exports = function ($void) {
   })
 
   var proto = Type.proto
+  link(proto, 'count', function () {
+    return this.step > 0
+      ? this.begin >= this.end ? 0
+        : (Math.trunc((this.end - this.begin) / this.step) + 1)
+      : this.begin <= this.end ? 0
+        : (Math.trunc((this.end - this.begin) / this.step) + 1)
+  })
+
   // generate an iterator function
   link(proto, 'iterate', function () {
     var range = this

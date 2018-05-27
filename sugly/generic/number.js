@@ -1,10 +1,10 @@
 'use strict'
 
-function createValueOf ($void, parse) {
+function createValueOf ($void, parse, parseInteger) {
   return function (input, defaultValue) {
     var value
     if (typeof input === 'string') {
-      value = parse(input)
+      value = input.startsWith('0x') || input.startsWith('0b') ? parseInteger(input) : parse(input)
     } else if (typeof input === 'boolean') {
       value = input ? 1 : 0
     } else if (input instanceof Date) {
@@ -25,11 +25,9 @@ function createIntValueOf ($void, parse) {
     var result
     if (typeof input === 'string') {
       result = parse(input)
-    }
-    if (typeof input === 'number') {
+    } else if (typeof input === 'number') {
       result = Math.trunc(input)
-    }
-    if (typeof input === 'boolean') {
+    } else if (typeof input === 'boolean') {
       return input ? 1 : 0
     }
     return Number.isSafeInteger(result) ? result
@@ -39,8 +37,13 @@ function createIntValueOf ($void, parse) {
 
 function createIntParser ($void) {
   return function (input) {
+    var value
     if (typeof input !== 'string') {
-      return NaN
+      return typeof input !== 'number' ? NaN
+        : !input ? 0 : isNaN(input) ? NaN
+          : (value = Math.trunc(input))
+            ? Number.isSafeInteger(value) ? value : NaN
+            : 0
     }
     var radix
     if (input.startsWith('0x')) {
@@ -49,13 +52,16 @@ function createIntParser ($void) {
     } else if (input.startsWith('0b')) {
       radix = 2
       input = input.substring(2)
-    } else if (input.startsWith('0') && input.length > 1) {
-      radix = 8
-      input = input.substring(1)
     } else {
       radix = 10
+      var offset = input.indexOf('.')
+      if (offset >= 0) {
+        input = input.substr(0, offset)
+      }
     }
-    return parseInt(input, radix)
+    value = parseInt(input, radix)
+    return value === 0 ? 0
+      : Number.isSafeInteger(value) ? value : NaN
   }
 }
 
@@ -103,6 +109,10 @@ function numberDivide (valueOf) {
   }
 }
 
+function normalize (value) {
+  return value >= 0 ? Math.trunc(value) : (0x100000000 + (value >> 0))
+}
+
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.number
@@ -114,19 +124,18 @@ module.exports = function ($void) {
   // the value range and constant values.
   copyType(Type, Number, {
     MAX_VALUE: 'max',
-    MIN_VALUE: 'min',
+    MIN_VALUE: 'smallest',
+    MAX_SAFE_INTEGER: 'max-int',
+    MIN_SAFE_INTEGER: 'min-int',
     POSITIVE_INFINITY: 'infinite',
     NEGATIVE_INFINITY: '-infinite'
   })
-
-  // the safe (valid) integer value range
-  link(Type, 'max-int', Number.MAX_SAFE_INTEGER)
-  link(Type, 'min-int', Number.MIN_SAFE_INTEGER)
+  link(Type, 'min', -Number.MAX_VALUE)
 
   // support bitwise operations for 32-bit integer values.
   link(Type, 'bits', 32)
-  var maxBits = link(Type, 'max-bits', Math.pow(2, 31) - 1)
-  var minBits = link(Type, 'min-bits', -Math.pow(2, 31))
+  var maxBits = link(Type, 'max-bits', 0x7FFFFFFF)
+  var minBits = link(Type, 'min-bits', 0x80000000 >> 0)
 
   // The empty value
   link(Type, 'empty', 0)
@@ -137,7 +146,10 @@ module.exports = function ($void) {
   // parse a string to its number value.
   var regexParse = /\s*\(number\s+(invalid|[-]?infinite)\s*\)\s*/
   var parse = link(Type, 'parse', function (value) {
-    var keys = typeof value === 'string' ? value.match(regexParse) : null
+    if (typeof value !== 'string') {
+      return typeof value === 'number' ? value : NaN
+    }
+    var keys = value.match(regexParse)
     switch (keys && keys.length > 1 ? keys[1] : '') {
       case 'invalid':
         return NaN
@@ -154,14 +166,14 @@ module.exports = function ($void) {
   var parseInteger = link(Type, 'parse-int', createIntParser($void))
 
   // get a number value from the input
-  var valueOf = link(Type, 'of', createValueOf($void, parse))
+  var valueOf = link(Type, 'of', createValueOf($void, parse, parseInteger))
 
   // get an integer value from the input
   var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger))
 
   // get an signed integer value which is stable with bitwise operation.
-  link(Type, 'of-bits', function (input, defaultValue) {
-    return intOf(input, defaultValue) >> 0
+  link(Type, 'of-bits', function (input) {
+    return intOf(input) >> 0
   })
 
   var proto = Type.proto
@@ -172,35 +184,50 @@ module.exports = function ($void) {
   link(proto, 'is-invalid', function () {
     return isNaN(this)
   })
-  link(proto, 'is-int', function () {
-    return Number.isSafeInteger(this)
-  })
-  link(proto, 'is-not-int', function () {
-    return !Number.isSafeInteger(this)
-  })
-  link(proto, 'is-bits', function () {
-    return this >= minBits && this <= maxBits
-  })
-  link(proto, 'is-not-bits', function () {
-    return this < minBits || this > maxBits
-  })
+  // test for special value ranges
   link(proto, 'is-finite', function () {
     return isFinite(this)
   })
   link(proto, 'is-infinite', function () {
     return !isFinite(this)
   })
+  link(proto, 'is-int', function () {
+    return Number.isSafeInteger(this) && (this !== 0 || 1 / this === Infinity)
+  })
+  link(proto, 'is-not-int', function () {
+    return !Number.isSafeInteger(this) || (this === 0 && 1 / this !== Infinity)
+  })
+  link(proto, 'is-bits', function () {
+    return Number.isSafeInteger(this) &&
+      this >= minBits && this <= maxBits &&
+      (this !== 0 || 1 / this === Infinity)
+  })
+  link(proto, 'is-not-bits', function () {
+    return !Number.isSafeInteger(this) ||
+      this < minBits || this > maxBits ||
+      (this === 0 && 1 / this !== Infinity)
+  })
+
+  // convert to special sub-types
+  link(proto, 'as-int', function () {
+    var intValue = Number.isSafeInteger(this) ? this
+      : isNaN(this) ? 0
+        : this >= Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER
+          : this <= Number.MIN_SAFE_INTEGER ? Number.MIN_SAFE_INTEGER
+            : Math.trunc(this)
+    return intValue === 0 ? 0 : intValue
+  })
+  link(proto, 'as-bits', function () {
+    return this >> 0
+  })
 
   // support basic arithmetic operations
-  link(proto, ['+', 'and'], numberAnd(valueOf))
+  link(proto, ['+', 'plus'], numberAnd(valueOf))
   link(proto, ['-', 'minus'], numberSubtract(valueOf))
   link(proto, ['*', 'times'], numberTimes(valueOf))
   link(proto, ['/', 'divided-by'], numberDivide(valueOf))
 
   // bitwise operations
-  link(proto, '~', function () {
-    return ~this
-  })
   link(proto, '&', function (value) {
     return this & value
   })
@@ -211,15 +238,22 @@ module.exports = function ($void) {
     return this ^ value
   })
   link(proto, '<<', function (offset) {
-    return this << offset
+    offset >>= 0
+    return offset <= 0 ? this << 0
+      : offset >= 32 ? 0 : this << offset
   })
   // signed right-shift.
   link(proto, '>>', function (offset) {
-    return this >> offset
+    offset >>= 0
+    return offset <= 0 ? this >> 0
+      : offset >= 32 ? (this >> 0) >= 0 ? 0 : -1
+        : this >> offset
   })
   // zero-based right shift.
   link(proto, '>>>', function (offset) {
-    return this >>> offset
+    offset >>= 0
+    return offset <= 0 ? this >> 0
+      : offset >= 32 ? 0 : this >>> offset
   })
 
   // support ordering logic - comparable
@@ -238,22 +272,22 @@ module.exports = function ($void) {
   // comparing operators for instance values
   link(proto, '>', function (another) {
     var order = compare.call(this, another)
-    return typeof order === 'number' ? order > 0 : null
+    return order !== null ? order > 0 : null
   })
   link(proto, '>=', function (another) {
     var order = compare.call(this, another)
-    return typeof order === 'number' ? order >= 0 : null
+    return order !== null ? order >= 0 : null
   })
   link(proto, '<', function (another) {
     var order = compare.call(this, another)
-    return typeof order === 'number' ? order < 0 : null
+    return order !== null ? order < 0 : null
   })
   link(proto, '<=', function (another) {
     var order = compare.call(this, another)
-    return typeof order === 'number' ? order <= 0 : null
+    return order !== null ? order <= 0 : null
   })
 
-  // override equivalence logic since 0 != -0 != +0 by identity-base test.
+  // override equivalence logic since 0 != -0 by identity-base test.
   link(proto, ['equals', '=='], function (another) {
     return typeof another === 'number' && (
       this === another || (isNaN(this) && isNaN(another))
@@ -261,7 +295,7 @@ module.exports = function ($void) {
   })
   link(proto, ['not-equals', '!='], function (another) {
     return typeof another !== 'number' || (
-      this !== another && (!isNaN(this) || !isNaN(another))
+      this !== another && !(isNaN(this) && isNaN(another))
     )
   })
 
@@ -289,14 +323,25 @@ module.exports = function ($void) {
 
   // Representation & Description
   link(proto, 'to-string', function (format) {
+    if (isNaN(this)) {
+      return '(number invalid)'
+    } else if (this === Number.POSITIVE_INFINITY) {
+      return '(number infinite)'
+    } else if (this === Number.NEGATIVE_INFINITY) {
+      return '(number -infinite)'
+    } else if (!format) {
+      return Object.is(this, -0) ? '-0' : this.toString()
+    }
+
     switch (format) {
-      case 'h': case 'hex': return '0x' + (this >> 0).toString(16)
-      case 'o': case 'oct': return '0' + (this >> 0).toString(8)
-      case 'b': case 'bin': return '0b' + (this >> 0).toString(2)
-      default: return isNaN(this) ? '(number invalid)'
-        : this === Number.POSITIVE_INFINITY ? '(number infinite)'
-          : this === Number.NEGATIVE_INFINITY ? '(number -infinite)'
-            : Object.is(this, -0) ? '-0' : this.toString()
+      case 'hex':
+        return '0x' + normalize(this).toString(16)
+      case 'oct':
+        return '0' + normalize(this).toString(8)
+      case 'bin':
+        return '0b' + normalize(this).toString(2)
+      default:
+        return this.toString()
     }
   })
 

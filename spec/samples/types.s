@@ -19,6 +19,7 @@
   -0
   0.5 -0.5
   1 -1 100 -100
+  (number smallest)
   (number min) (number max)
   (number min-int) (number max-int)
   (number min-bits) (number max-bits)
