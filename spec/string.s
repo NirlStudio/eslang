@@ -145,7 +145,7 @@
     (assert "-1" (string of -1),
     (assert "1" (string of 1),
 
-    (assert "(date of 0)" (string of (date of 0),
+    (assert "(date empty)" (string of (date of 0),
 
     (assert "(0 0 1)" (string of (range of 0 0 1),
 

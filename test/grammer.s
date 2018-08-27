@@ -275,6 +275,8 @@ floor((n floor) floor)
 round((n round) round)
 trunc((n trunc) trunc)
 
+# meta.constant-date-sugly
+invalid((date invalid) invalid)
 # meta.function-date-type-sugly
 parse((date parse) parse)
 of-utc((date of-utc) of-utc)
@@ -282,9 +284,12 @@ now((date now) now)
 timestamp((date timestamp) timestamp)
 timezone((date timezone) timezone)
 # meta.function-date-sugly
-the-date((d the-date) the-date)
-the-time((d the-time) the-time)
+is-valid((d is-valid) is-valid)
+is-invalid((d is-invalid) is-invalid)
+date-fields((d date-fields) date-fields)
+time-fields((d time-fields) time-fields)
 all-fields((d all-fields) all-fields)
+week-day((d week-day) week-day)
 timestamp((d timestamp) timestamp)
 
 # meta.constant-symbol-sugly

@@ -1,7 +1,7 @@
 (var the-type number)
 (include "share/type")
 
-(define "Number Common Behaviours" (= ()
+(define "Number Common Behaviours" (=> ()
   (define "Identity" (=> ()
     (should "-0 is not 0." (= ()
       (assert false (0 is -0),
@@ -94,16 +94,8 @@
       ),
     ),
     (should "(number invalid) is not comparable with other common numbers." (=> ()
-      (var values (@
-        0
-        0.5 -0.5
-        1 -1
-        (number max) (number min)
-        (number max-int) (number min-int)
-        (number max-bits) (number min-bits)
-        (number infinite) (number -infinite)
-      ),
-      (for value in values
+      (for value
+          in ((the-values remove (number invalid)) append 0),
         (assert null ((number invalid) compare value),
         (assert null (value compare (number invalid),
       ),
@@ -125,16 +117,8 @@
       (assert false ((number invalid) not-empty),
     ),
     (should "Other values are not empty." (=> ()
-      (var values (@
-        0.5 -0.5
-        1 -1
-        (number smallest)
-        (number max) (number min)
-        (number max-int) (number min-int)
-        (number max-bits) (number min-bits)
-        (number infinite) (number -infinite)
-      ),
-      (for value in values
+      (for value
+          in (the-values remove -0 (number invalid),
         (assert (value not-empty),
         (assert false (value is-empty),
       ),
@@ -143,18 +127,8 @@
 
   (define "Encoding" (=> ()
     (should "a number is encoded to itself." (=> ()
-      (var values (@
-        0 -0
-        0.5 -0.5
-        1 -1
-        (number smallest)
-        (number max) (number min)
-        (number max-int) (number min-int)
-        (number max-bits) (number min-bits)
-        (number infinite) (number -infinite)
-        (number invalid)
-      ),
-      (for value in values
+      (for value
+          in (the-values concat (number empty),
         (assert value (value to-code),
       ),
     ),
@@ -196,7 +170,7 @@
 ).
 
 (define "Constant Values" (= ()
-  (let basic-arith-ops (= value
+  (var basic-arith-ops (= value
     (assert value (value + 0),
     (assert value (value - 0),
     (assert 0 (value - value),

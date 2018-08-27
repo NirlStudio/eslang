@@ -27,7 +27,11 @@
   (number invalid)
 ).
 (e.g. date
-  (date of -100000)
+  (date of 1)
+  (date of -1)
+  (date of 100)
+  (date of -100)
+  (date invalid)
   (date now)
   ((date now) - (24 * 60 60 1000),
   ((date now) + (24 * 60 60 1000),

@@ -73,7 +73,7 @@ module.exports = function ($void) {
     var next = 0
     return function (inSitu) {
       return current !== null && inSitu === true ? current
-        : next >= list.length ? null : (current = [list[next++]])
+        : next >= list.length ? null : (current = [list[next], next++])
     }
   })
 
@@ -145,11 +145,47 @@ module.exports = function ($void) {
     }
     return counter
   })
-  // remove all entries.
-  link(proto, 'clear', function () {
-    this.splice(0)
+  // remove one or more values to create a new array.
+  link(proto, 'remove', function (value) {
+    var argc = arguments.length
+    var result = []
+    for (var i = 0; i < this.length; i++) {
+      var keep = true
+      for (var j = 0; j < argc; j++) {
+        if (thisCall(this[i], 'equals', arguments[j])) {
+          keep = false
+          break
+        }
+      }
+      keep && result.push(this[i])
+    }
+    return result
+  })
+
+  // remove all entries or some values from this array.
+  link(proto, 'clear', function (value) {
+    if (typeof value === 'undefined') {
+      this.splice(0)
+      return this
+    }
+
+    var argc = arguments.length
+    var indices = []
+    var i = 0
+    for (; i < this.length; i++) {
+      for (var j = 0; j < argc; j++) {
+        if (thisCall(this[i], 'equals', arguments[j])) {
+          indices.push(i)
+          break
+        }
+      }
+    }
+    for (i = indices.length - 1; i >= 0; i--) {
+      this.splice(indices[i], 1)
+    }
     return this
   })
+
   // check the existence of an entry
   link(proto, 'has', function (offset) {
     return typeof this[offset >> 0] !== 'undefined'

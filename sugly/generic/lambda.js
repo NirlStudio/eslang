@@ -5,7 +5,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.lambda
   var $Tuple = $.tuple
-  var $Array = $.Array
+  var $Array = $.array
   var link = $void.link
   var prepareOperation = $void.prepareOperation
 
