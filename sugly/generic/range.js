@@ -29,11 +29,10 @@ module.exports = function ($void) {
 
   var proto = Type.proto
   link(proto, 'count', function () {
-    return this.step > 0
-      ? this.begin >= this.end ? 0
-        : (Math.trunc((this.end - this.begin) / this.step) + 1)
-      : this.begin <= this.end ? 0
-        : (Math.trunc((this.end - this.begin) / this.step) + 1)
+    var diff = this.end - this.begin
+    var count = Math.trunc(diff / this.step)
+    var remainder = diff % this.step
+    return count < 0 ? 0 : remainder ? count + 1 : count
   })
 
   // generate an iterator function
@@ -59,27 +58,35 @@ module.exports = function ($void) {
       another instanceof Range$ &&
       this.begin === another.begin &&
       this.end === another.end &&
-      this.step === another.step)
+      this.step === another.step
+    )
   })
   link(proto, ['is-not', '!==', 'not-equals', '!='], function (another) {
     return this !== another && (
       !(another instanceof Range$) ||
       this.begin !== another.begin ||
       this.end !== another.end ||
-      this.step !== another.step)
+      this.step !== another.step
+    )
   })
 
   // override comparison logic to keep consistent with Identity & Equivalence.
   link(proto, 'compare', function (another) {
     return this === another ? 0
-      : another instanceof Range$ && this.step === another.step
-        ? this.begin < another.begin
-          ? this.end >= another.end ? 1 : null
-          : this.begin === another.begin
-            ? this.end < another.end ? -1
-              : this.end === another.end ? 0 : 1
-            : this.end <= another.end ? -1 : null
-        : null
+      : !(another instanceof Range$) || this.step !== another.step ? null
+        : this.step > 0
+          ? this.begin < another.begin
+            ? this.end >= another.end ? 1 : null
+            : this.begin === another.begin
+              ? this.end < another.end ? -1
+                : this.end === another.end ? 0 : 1
+              : this.end <= another.end ? -1 : null
+          : this.begin > another.begin
+            ? this.end <= another.end ? 1 : null
+            : this.begin === another.begin
+              ? this.end > another.end ? -1
+                : this.end === another.end ? 0 : 1
+              : this.end >= another.end ? -1 : null
   })
 
   // range is empty if it cannot iterate at least once.

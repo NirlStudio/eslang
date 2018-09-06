@@ -8,7 +8,12 @@ function getTimezoneName () {
     options.timeZone
   ) || (
     process && process.env.TZ
-  ) || ((new Date()).getTimezoneOffset() / 60).toString()
+  ) || UtcTimezoneOffset()
+}
+
+function UtcTimezoneOffset () {
+  var offset = (new Date()).getTimezoneOffset() / 60
+  return offset >= 0 ? 'UTC+' + offset.toString() : 'UTC' + offset.toString()
 }
 
 module.exports = function ($void) {

@@ -87,6 +87,7 @@
       (for value
           in (the-values concat (date empty),
         (assert value (value to-code),
+      ),
     ),
   ),
 
@@ -105,7 +106,7 @@
       (assert "(date invalid)" ((date invalid) to-string),
     ),
   ),
-).
+),
 
 (define "Constant and Special Values" (= ()
   (define "(date empty)" (= ()
