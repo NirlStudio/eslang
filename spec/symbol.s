@@ -1,174 +1,527 @@
 (var the-type symbol)
 (include "share/type")
 
-(define "Common Behaviours" (= ()
-  (define "Identity" (=> ()
-    (should "true is true" (= ()
-      (assert (true is true),
-      (assert false (true is-not true),
+(define "Symbol Common Behaviours" (=> ()
+  (define "Identity" (= ()
+    (should "a symbol is indentified by its string value." (= ()
+      (assert ((symbol of "x") is (` x),
+      (assert ((` x) is (symbol of "x"),
 
-      (assert (true is-not false),
-      (assert false (true is false),
-    ),
-    (should "false is false" (=> ()
-      (assert (false is false),
-      (assert false (false is-not false),
+      (assert ((symbol of "x1") is (` x1),
+      (assert ((` x1) is (symbol of "x1"),
 
-      (assert (false is-not true),
-      (assert false (false is true),
-  ),
+      (assert ((symbol of "x-") is (` x-),
+      (assert ((` x-) is (symbol of "x-"),
 
-  (define "Equivalence" (=> ()
-    (should "true is equivalent with true" (=> ()
-      (assert (true equals true),
-      (assert false (true not-equals true),
-
-      (assert (true not-equals false),
-      (assert false (true equals false),
-    ),
-    (should "false is equivalent with false" (=> ()
-      (assert (false equals false),
-      (assert false (false not-equals false),
-
-      (assert (false not-equals true),
-      (assert false (false equals true),
-  ),
-
-  (define "Equivalence (operators)" (=> ()
-    (should "true is equivalent with true" (=> ()
-      (assert (true == true),
-      (assert false (true != true),
-
-      (assert (true != false),
-      (assert false (true == false),
-    ),
-    (should "false is equivalent with false" (=> ()
-      (assert (false == false),
-      (assert false (false != false),
-
-      (assert (false != true),
-      (assert false (false == true),
-  ),
-
-  (define "Ordering" (=> ()
-    (should "true is only comparable with itself." (=> ()
-      (assert 0 (true compare true),
-      (assert null (true compare false),
-      (assert null (true compare type),
-      (assert null (true compare null),
-      (assert null (true compare 0),
-      (assert null (true compare ""),
-      (assert null (true compare (@:),
-    ),
-    (should "false is only comparable with itself." (=> ()
-      (assert 0 (false compare false),
-      (assert null (false compare true),
-      (assert null (false compare type),
-      (assert null (false compare null),
-      (assert null (false compare 0),
-      (assert null (false compare ""),
-      (assert null (false compare (@:),
+      (assert ((symbol of "-x") is (` -x),
+      (assert ((` -x) is (symbol of "-x"),
     ),
   ),
 
-  (define "Emptiness" (=> ()
-    (should "false is defined as the empty value." (=> ()
-      (assert false (bool empty),
-      (assert false (true is-empty),
-      (assert (true  not-empty),
-      (assert (false is-empty),
-      (assert false (false  not-empty),
+  (define "Equivalence" (= ()
+    (should "a symbol's equivalence is defined as the same of its identity." (= ()
+      (var s (symbol of "xyz"),
+      (assert (:(s "is") is (s "equals"),
+      (assert (:(s "is-not") is (s "not-equals"),
+    ),
+  ),
+
+  (define "Ordering" (= ()
+    (should "an empty symbol is less than any non-empty symbol." (= ()
+      (assert -1 ((symbol empty) compare (` a),
+      (assert -1 ((symbol empty) compare (` A),
+      (assert -1 ((symbol empty) compare (` z),
+      (assert -1 ((symbol empty) compare (` z),
+      (assert -1 ((symbol empty) compare (` -),
+      (assert -1 ((symbol empty) compare (` _),
+    ),
+    (should "non-empty symbols are compared by their string values." (= ()
+      (var key-pairs (@
+        (@ "a" "a") (@ "A" "A") (@ "a" "A")
+        (@ "a" "b")
+        (@ "a" "aa")
+        (@ "aa" "ab")
+        (@ "aaa" "aab")
+        (@ "aa" "bb")
+        (@ "aaa" "bbb")
+      ),
+      (for pair in key-pairs
+        (assert
+          ((pair 0) compare (pair 1),
+          ((symbol of (pair 0)) compare (symbol of (pair 1),
+        ),
+        (assert
+          ((pair 1) compare (pair 0),
+          ((symbol of (pair 1)) compare (symbol of (pair 0),
+        ),
+      ),
+    ),
+  ),
+
+  (define "Emptiness" (= ()
+    (should "a symbol is defined as empty when its string value is (string empty)." (= ()
+      (assert (string empty) ((symbol empty) to-string),
+
+      (assert ((symbol of (string empty)) is-empty),
+      (assert false ((symbol of (string empty)) not-empty),
+    )
+    (should "（symbol invalid) is defined as empty." (= ()
+      (assert ((symbol invalid) is-empty),
+      (assert false ((symbol invalid) not-empty),
+    )
   ),
 
   (define "Encoding" (=> ()
-    (should "true is encoded to itself." (=> ()
-      (assert true (true to-code),
+    (should "a symbol is encoded to itself." (=> ()
+      (for value
+          in (the-values concat (symbol empty),
+        (assert value (value to-code),
+      ),
     ),
-    (should "false is encoded to itself." (=> ()
-      (assert false (false to-code),
   ),
 
-  (define "Representation" (=> ()
-    (should "true is represented as 'true'." (=> ()
-      (assert "true" (true to-string),
+  (define "Representation" (= ()
+    (should "a symbol is represented as its string value." (= ()
+      (var keys (@ "" "x" "x1" "-x" "x-" "x-y" "x-1" "_x" "x_" "x_y" "x_1"),
+      (for key in keys
+        (assert key ((symbol of key) to-string),
+      ),
     ),
-    (should "false is represented as 'false'." (=> ()
-      (assert "false" (false to-string),
+    (should "（symbol invalid) is represented as \"\\t\"." (= ()
+      (assert "\t" ((symbol invalid) to-string),
+    )
   ),
 ).
 
-(define "Value Conversion" (= ()
-  (should "true is converted to true." (= ()
-    (assert true (bool of true),
+(define "Constant and Special Values" (= ()
+  (define "(symbol empty)" (= ()
+    (should "its key value is (string empty)." (= ()
+      (assert (string empty) ((symbol empty) key),
+    ),
+    (should "it is evaluated to null." (= ()
+      (assert null ((symbol empty)),
+    ),
+    (should "it is taken as a valid symbol." (= ()
+      (assert ((symbol empty) is-valid),
+      (assert false ((symbol empty) is-invalid),
+    ),
+    (should "it may be generated with a key value of (string empty)." (= ()
+      (assert (symbol empty) (symbol of (string empty),
+    ),
+    (should "it may be generated with a key value of pure whitespace characters." (= ()
+      (assert (symbol empty) (symbol of " "),
+      (assert (symbol empty) (symbol of "  "),
+      (assert (symbol empty) (symbol of "\t"),
+      (assert (symbol empty) (symbol of "\t "),
+      (assert (symbol empty) (symbol of " \t"),
+      (assert (symbol empty) (symbol of " \t "),
+      (assert (symbol empty) (symbol of "\r"),
+      (assert (symbol empty) (symbol of "\n"),
+    ),
   ),
-  (should "false is converted to false." (= ()
-    (assert false (bool of false),
+  (define "(symbol invalid)" (= ()
+    (should "its key value is \"\\t\"." (= ()
+      (assert "\t" ((symbol invalid) key),
+      (assert "\t" ((symbol invalid) to-string),
+    ),
+    (should "it is evaluated to null." (= ()
+      (assert null ((symbol invalid)),
+    ),
+    (should "it is taken as an invalid symbol." (= ()
+      (assert false ((symbol invalid) is-valid),
+      (assert ((symbol invalid) is-invalid),
+    ),
+    (should "it may be generated with a key value of any combination of whitespace & non-whitespace characters." (= ()
+      (assert (symbol invalid) (symbol of " a"),
+      (assert (symbol invalid) (symbol of "a "),
+      (assert (symbol invalid) (symbol of "a a"),
+      (assert (symbol invalid) (symbol of "\ta"),
+      (assert (symbol invalid) (symbol of "a\t"),
+      (assert (symbol invalid) (symbol of "a\ta"),
+      (assert (symbol invalid) (symbol of "a\r"),
+      (assert (symbol invalid) (symbol of "a\n"),
+    ),
   ),
-  (should "null is converted to false." (= ()
-    (assert false (bool of null),
-    (assert false (bool of),
+  (define "(symbol etc)" (= ()
+    (should "its key value is \"...\"." (= ()
+      (assert "..." ((symbol etc) key),
+      (assert "..." ((symbol etc) to-string),
+      (assert ((symbol of "...") is (symbol etc),
+    ),
+    (should "it is evaluated to null." (= ()
+      (assert null ((symbol etc)),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol etc) is-valid),
+      (assert false ((symbol etc) is-invalid),
+    ),
   ),
-  (should "0 is converted to false." (= ()
-    (assert false (bool of 0),
+  (define "(symbol all)" (= ()
+    (should "its key value is \"*\"." (= ()
+      (assert "*" ((symbol all) key),
+      (assert "*" ((symbol all) to-string),
+      (assert ((symbol of "*") is (symbol all),
+    ),
+    (should "it is evaluated to null." (= ()
+      (assert null ((symbol all)),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol all) is-valid),
+      (assert false ((symbol all) is-invalid),
+    ),
   ),
-  (should "Other values is converted to true." (= ()
-    (assert true (bool of 1),
-    (assert true (bool of -1),
-    (assert true (bool of (number invalid)),
-    (assert true (bool of (number infinite)),
-    (assert true (bool of ""),
-    (assert true (bool of "X"),
-    (assert true (bool of (date of 0),
-    (assert true (bool of (range of 0),
-    (assert true (bool of (symbol of "X"),
-    (assert true (bool of (tuple of (@ 1 2),
-    (assert true (bool of (@),
-    (assert true (bool of (@ 1 2),
-    (assert true (bool of (@:),
-    (assert true (bool of (@ x:1),
+  (define "(symbol any)" (= ()
+    (should "(symbol any) is (symbol all); They are identical." (= ()
+      (assert ((symbol any) is (symbol all),
+      (assert ((symbol all) is (symbol any),
+    ),
   ),
-).
+  (define "(symbol quote)" (= ()
+    (should "its key value is \"`\"." (= ()
+      (assert "`" ((symbol quote) key),
+      (assert "`" ((symbol quote) to-string),
+      (assert ((symbol of "`") is (symbol quote),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol quote)) is (symbol quote),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol quote) is-valid),
+      (assert false ((symbol quote) is-invalid),
+    ),
+  ),
+  (define "(symbol lambda)" (= ()
+    (should "its key value is \"=\"." (= ()
+      (assert "=" ((symbol lambda) key),
+      (assert "=" ((symbol lambda) to-string),
+      (assert ((symbol of "=") is (symbol lambda),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol lambda)) is (symbol lambda),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol lambda) is-valid),
+      (assert false ((symbol lambda) is-invalid),
+    ),
+  ),
+  (define "(symbol function)" (= ()
+    (should "its key value is \"=>\"." (= ()
+      (assert "=>" ((symbol function) key),
+      (assert "=>" ((symbol function) to-string),
+      (assert ((symbol of "=>") is (symbol function),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol function)) is (symbol function),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol function) is-valid),
+      (assert false ((symbol function) is-invalid),
+    ),
+  ),
+  (define "(symbol operator)" (= ()
+    (should "its key value is \"=?\"." (= ()
+      (assert "=?" ((symbol operator) key),
+      (assert "=?" ((symbol operator) to-string),
+      (assert ((symbol of "=?") is (symbol operator),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol operator)) is (symbol operator),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol operator) is-valid),
+      (assert false ((symbol operator) is-invalid),
+    ),
+  ),
+  (define "(symbol let)" (= ()
+    (should "its key value is \"let\"." (= ()
+      (assert "let" ((symbol let) key),
+      (assert "let" ((symbol let) to-string),
+      (assert ((symbol of "let") is (symbol let),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol let)) is (symbol let),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol let) is-valid),
+      (assert false ((symbol let) is-invalid),
+    ),
+  ),
+  (define "(symbol var)" (= ()
+    (should "its key value is \"var\"." (= ()
+      (assert "var" ((symbol var) key),
+      (assert "var" ((symbol var) to-string),
+      (assert ((symbol of "var") is (symbol var),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol var)) is (symbol var),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol let) is-valid),
+      (assert false ((symbol var) is-invalid),
+    ),
+  ),
+  (define "(symbol export)" (= ()
+    (should "its key value is \"export\"." (= ()
+      (assert "export" ((symbol export) key),
+      (assert "export" ((symbol export) to-string),
+      (assert ((symbol of "export") is (symbol export),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol export)) is (symbol export),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol export) is-valid),
+      (assert false ((symbol export) is-invalid),
+    ),
+  ),
+  (define "(symbol import)" (= ()
+    (should "its key value is \"import\"." (= ()
+      (assert "import" ((symbol import) key),
+      (assert "import" ((symbol import) to-string),
+      (assert ((symbol of "import") is (symbol import),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol import)) is (symbol import),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol import) is-valid),
+      (assert false ((symbol import) is-invalid),
+    ),
+  ),
+  (define "(symbol include)" (= ()
+    (should "its key value is \"include\"." (= ()
+      (assert "include" ((symbol include) key),
+      (assert "include" ((symbol include) to-string),
+      (assert ((symbol of "include") is (symbol include),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol include)) is (symbol include),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol include) is-valid),
+      (assert false ((symbol include) is-invalid),
+    ),
+  ),
+  (define "(symbol load)" (= ()
+    (should "its key value is \"load\"." (= ()
+      (assert "load" ((symbol load) key),
+      (assert "load" ((symbol load) to-string),
+      (assert ((symbol of "load") is (symbol load),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol load)) is (symbol load),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol load) is-valid),
+      (assert false ((symbol load) is-invalid),
+    ),
+  ),
+  (define "(symbol begin)" (= ()
+    (should "its key value is \"(\"." (= ()
+      (assert "(" ((symbol begin) key),
+      (assert "(" ((symbol begin) to-string),
+      (assert ((symbol of "(") is (symbol begin),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol begin)) is (symbol begin),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol begin) is-valid),
+      (assert false ((symbol begin) is-invalid),
+    ),
+  ),
+  (define "(symbol end)" (= ()
+    (should "its key value is \")\"." (= ()
+      (assert ")" ((symbol end) key),
+      (assert ")" ((symbol end) to-string),
+      (assert ((symbol of ")") is (symbol end),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol end)) is (symbol end),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol end) is-valid),
+      (assert false ((symbol end) is-invalid),
+    ),
+  ),
+  (define "(symbol comma)" (= ()
+    (should "its key value is \",\"." (= ()
+      (assert "," ((symbol comma) key),
+      (assert "," ((symbol comma) to-string),
+      (assert ((symbol of ",") is (symbol comma),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol comma)) is (symbol comma),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol comma) is-valid),
+      (assert false ((symbol comma) is-invalid),
+    ),
+  ),
+  (define "(symbol semicolon)" (= ()
+    (should "its key value is \";\"." (= ()
+      (assert ";" ((symbol semicolon) key),
+      (assert ";" ((symbol semicolon) to-string),
+      (assert ((symbol of ";") is (symbol semicolon),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol semicolon)) is (symbol semicolon),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol semicolon) is-valid),
+      (assert false ((symbol semicolon) is-invalid),
+    ),
+  ),
+  (define "(symbol period)" (= ()
+    (should "its key value is \".\"." (= ()
+      (assert "." ((symbol period) key),
+      (assert "." ((symbol period) to-string),
+      (assert ((symbol of ".") is (symbol period),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol period)) is (symbol period),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol period) is-valid),
+      (assert false ((symbol period) is-invalid),
+    ),
+  ),
+  (define "(symbol object)" (= ()
+    (should "its key value is \"@\"." (= ()
+      (assert "@" ((symbol object) key),
+      (assert "@" ((symbol object) to-string),
+      (assert ((symbol of "@") is (symbol object),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol object)) is (symbol object),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol object) is-valid),
+      (assert false ((symbol object) is-invalid),
+    ),
+  ),
+  (define "(symbol pairing)" (= ()
+    (should "its key value is \":\"." (= ()
+      (assert ":" ((symbol pairing) key),
+      (assert ":" ((symbol pairing) to-string),
+      (assert ((symbol of ":") is (symbol pairing),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol pairing)) is (symbol pairing),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol pairing) is-valid),
+      (assert false ((symbol pairing) is-invalid),
+    ),
+  ),
+  (define "(symbol comment)" (= ()
+    (should "its key value is \"#\"." (= ()
+      (assert "#" ((symbol comment) key),
+      (assert "#" ((symbol comment) to-string),
+      (assert ((symbol of "#") is (symbol comment),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol comment)) is (symbol comment),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol comment) is-valid),
+      (assert false ((symbol comment) is-invalid),
+    ),
+  ),
+  (define "(symbol in)" (= ()
+    (should "its key value is \"in\"." (= ()
+      (assert "in" ((symbol in) key),
+      (assert "in" ((symbol in) to-string),
+      (assert ((symbol of "in") is (symbol in),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol in)) is (symbol in),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol in) is-valid),
+      (assert false ((symbol in) is-invalid),
+    ),
+  ),
+  (define "(symbol else)" (= ()
+    (should "its key value is \"else\"." (= ()
+      (assert "else" ((symbol else) key),
+      (assert "else" ((symbol else) to-string),
+      (assert ((symbol of "else") is (symbol else),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol else)) is (symbol else),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol else) is-valid),
+      (assert false ((symbol else) is-invalid),
+    ),
+  ),
+),
 
-(define "Logical Operations" (= ()
-  (define "AND: &&" (= ()
-    (should "true and true is true" (= ()
-      (assert (true && true),
+(define "(symbol of ...)" (= ()
+  (should "(symbol of) and (symbol of null) return (symbol empty)." (= ()
+    (assert (symbol empty) (symbol of),
+    (assert (symbol empty) (symbol of null),
+    (assert (symbol empty) (symbol of null null),
+    (assert (symbol empty) (symbol of null null null),
+  ),
+  (should "(symbol of key-str) returns a symbol with a key value of key-str)." (= ()
+    (var keys (@
+      "a" "-" "." "aa" ".." "--" "a." ".a" "-." ".-" "a-" "-a"
     ),
-    (should "true and false is false" (= ()
-      (assert false (true && false),
+    (for key in keys
+      (var sym (symbol of key),
+      (assert (sym is-a symbol),
+      (assert key (sym key),
+      (assert key (sym to-string),
     ),
-    (should "false and true is false" (= ()
-      (assert false (false && true),
+    (assert (symbol empty) (symbol of null null),
+    (assert (symbol empty) (symbol of null null null),
+  ),
+  (should "(symbol of sym) returns sym." (= ()
+    (var sym (` x),
+    (assert sym (symbol of sym),
+  ),
+),
+
+(define "(symbol of-shared ...)" (= ()
+  (should "(symbol of-shared key-str) declares and returns a shared symbol with the key value of key-str." (= ()
+    (assert (`a) (symbol of-shared "a"),
+    (assert (`.) (symbol of-shared "."),
+    (assert (`-) (symbol of-shared "-"),
+  ),
+  (should "(symbol of-shared) returns (symbol invalid)." (= ()
+    (assert (symbol invalid) (symbol of-shared),
+  ),
+  (should "(symbol of-shared other-value) returns (symbol invalid)." (= ()
+    (var invalid-keys (@
+      null type
+      bool true false
+      string "" " " " a" "a "
+      number -1 0 1
+      date (date empty) (date now)
+      range (range empty)
+      symbol (symbol empty)
+      tuple (tuple empty)
+      operator (operator empty)
+      lambda (lambda empty)
+      function (function empty)
+      array (array empty)
+      object (object empty)
+      class (class empty) ((class empty) empty)
     ),
-    (should "false and false is false" (= ()
-      (assert false (false && false),
+    (for key in invalid-keys
+      (assert (symbol invalid) (symbol of-shared key),
     ),
   ),
-  (define "OR: ||" (= ()
-    (should "true or true is true" (= ()
-      (assert (true || true),
-    ),
-    (should "true or false is true" (= ()
-      (assert (true || false),
-    ),
-    (should "false or true is true" (= ()
-      (assert (false || true),
-    ),
-    (should "false or false is false" (= ()
-      (assert false (false || false),
-    ),
+),
+
+(define "(symbol to-string symbol)" (= ()
+  (should "(symbol to-string symbol) returns a string of an symbol expression." (= ()
+    (assert "(`)" ((symbol empty) to-string symbol),
+    (assert "(`a)" ((symbol of "a") to-string symbol),
+    (assert "(`.)" ((symbol of ".") to-string symbol),
+    (assert "(`-)" ((symbol of "-") to-string symbol),
+    (assert "(symbol invalid)" ((symbol invalid) to-string symbol),
   ),
-  (define "NOT: not / !" (= ()
-    (should "the empty not op is defined as true" (= ()
-      (assert (not),
-      (assert (!),
-    ),
-    (should "the not value of true is false" (= ()
-      (assert false (not true),
-      (assert false (! true),
-    ),
-    (should "the not value of false is true" (= ()
-      (assert (not false),
-      (assert (! false),
-    ),
-).
+),

@@ -19,6 +19,9 @@ quote(quote -quote quote quote- quote)quote
 let(let -let let let- let)let
 var(var -var var var- var)var
 export(export -export export export- export)export
+import(import -import import import- import)import
+include(include -include include include- include)include
+load(load -load load load- load)load
 
 # keyword.control.flow.sugly
 if
@@ -293,18 +296,30 @@ week-day((d week-day) week-day)
 timestamp((d timestamp) timestamp)
 
 # meta.constant-symbol-sugly
-((symbol etc) etc)
-((symbol all) all)
-((symbol quote) quote)
-((symbol lambda) lambda)
-((symbol function) function)
-((symbol operator) operator)
-((symbol let) let)
-((symbol var) var)
-((symbol export) export)
-((symbol object) object)
-((symbol pairing) pairing)
-((symbol comment) comment)
+invalid((symbol invalid) invalid)
+etc((symbol etc) etc)
+all((symbol all) all)
+any((symbol any) any)
+quote((symbol quote) quote)
+lambda((symbol lambda) lambda)
+function((symbol function) function)
+operator((symbol operator) operator)
+let((symbol let) let)
+var((symbol var) var)
+export((symbol export) export)
+import((symbol import) import)
+import((symbol include) include)
+load((symbol load) load)
+begin((symbol begin) begin)
+end((symbol end) end)
+comma((symbol comma) comma)
+semicolon((symbol semicolon) semicolon)
+period((symbol period) period)
+object((symbol object) object)
+pairing((symbol pairing) pairing)
+comment((symbol comment) comment)
+in((symbol in) in)
+else((symbol else) else)
 # meta.function-symbol-type-sugly
 ((symbol of-shared) of-shared)
 
@@ -391,13 +406,10 @@ activator((i activator) activator)
 (tokenizer)
 (interpreter)
 (eval)
-(import)
-(load)
-(include)
 (run)
 
 # meta.function.lib.sugly
-(encode)
+(encode) # to be removed.
 (print)
 (warn)
 

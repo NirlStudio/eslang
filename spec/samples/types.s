@@ -44,8 +44,15 @@
   (-10 10) (-10 10 2) (-10 10 -2)
   (10 -10) (10 -10 -2) (10 -10 2)
 ).
-(e.g. symbol (` x) (` x1) (` x1-).
-(e.g. tuple (` (x)) (` (x 1)) (` (x 1 true)) (` (x 1 true "abc").
+(e.g. symbol
+  (` x) (` x1)
+  (` x-) (` -x) (` x-1)
+  (` x_) (` _x) (` x_1)
+).
+
+(e.g. tuple
+  (` (x)) (` (x 1)) (` (x 1 true)) (` (x 1 true "abc")
+).
 
 (e.g. operator (=? (X Y) (+ (X) (Y).
 (e.g. lambda (= (x y) (+ x y).

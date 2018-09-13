@@ -25,9 +25,10 @@ module.exports = function ($void) {
   var numberCompare = $.number.proto.compare
   var numberToString = $.number.proto['to-string']
 
-  // empty value
+  // the empty value
   var empty = link(Type, 'empty', new Date(0))
 
+  // the invalid value.
   var invalid = link(Type, 'invalid', new Date(NaN))
 
   // parse a date/time string representation to a date object.
@@ -41,7 +42,7 @@ module.exports = function ($void) {
       case 0:
         return empty
       case 1: // string or timestamp
-        return new Date(a)
+        return a instanceof Date ? a : new Date(a)
       case 2:
         return new Date(a, b - 1)
       case 3:

@@ -141,11 +141,11 @@
   (for case in cases
     (test-a case),
   ),
-  (let t2 (date now),
+  (let ts ((date now) - t1),
 
   (print
     (green "\n  passing: " passing),
-    (gray " (" (t2 - t1) "ms)"),
+    (gray " (" ((ts > 1000)? (ts / 1000) ts) ((ts > 1000)? "s)" "ms)"),
   ),
   (if failing
     (print (red "  failing: " failing "\n"),

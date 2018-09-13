@@ -127,7 +127,7 @@
       (assert (date invalid) (date of (number -infinite),
     ),
   ),
-).
+),
 
 (var blank-strings (@
   ""
@@ -205,10 +205,15 @@
 ),
 
 (define "(date of ...)" (=> ()
-  (should "(date of) returns (date empty)" (= ()
+  (should "(date of) returns (date empty)." (= ()
     (assert (date empty) (date of),
   ),
-  (should "(date of str) works like (date parse str)" (=> ()
+  (should "(date of a-date) return a-date." (=> ()
+    (for value
+      in ((the-values concat (date empty) (date invalid),
+      (assert value (date of value),
+  ),
+  (should "(date of str) works like (date parse str)." (=> ()
     (for str in (blank-strings + rfc2822-strings iso8601-strings)
       (assert (date parse str) (date of str),
     )

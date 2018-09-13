@@ -8,15 +8,29 @@ module.exports = function ($void) {
   // an empty symbol to be resolve to null.
   $export($, '', null)
 
+  // an invalid symbol to be resolve to null.
+  $export($, '\t', null)
+
   // special empty symbols
   $export($, '*', null)
   $export($, '...', null)
 
   // constant values
+  $export($, 'null', null)
   $export($, 'true', true)
   $export($, 'false', false)
 
-  // Other Pure Symbols
+  // punctuations pure Symbols
+  $export($, '(', sharedSymbolOf('('))
+  $export($, ')', sharedSymbolOf(')'))
+  $export($, ',', sharedSymbolOf(','))
+  $export($, ';', sharedSymbolOf(';'))
+  $export($, '.', sharedSymbolOf('.'))
+  $export($, '@', sharedSymbolOf('@'))
+  $export($, ':', sharedSymbolOf(':'))
+  $export($, '#', sharedSymbolOf('#'))
+
+  // other pure symbols
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
 }

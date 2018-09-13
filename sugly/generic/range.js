@@ -12,6 +12,9 @@ module.exports = function ($void) {
 
   // create a range
   link(Type, 'of', function (begin, end, step) {
+    if (begin instanceof Range$) {
+      return begin // null op for the same type.
+    }
     if (typeof begin !== 'number' || isNaN(begin) || !isFinite(begin)) {
       begin = 0
     }

@@ -114,7 +114,7 @@
 ),
 
 (define "(range of ...)" (= ()
-  (should "(range of) or (range of null) returns (range empty)." (= ()
+  (should "(range of) and (range of null) return (range empty)." (= ()
     (assert (range empty) (range of),
     (assert (range empty) (range of null),
     (assert (range empty) (range of null null),

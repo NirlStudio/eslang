@@ -8,7 +8,7 @@ module.exports = function load ($void) {
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
 
-  // import: a module from source.
+  // load: a module from source.
   staticOperator('load', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
