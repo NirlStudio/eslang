@@ -5,7 +5,6 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.lambda
   var $Tuple = $.tuple
-  var $Array = $.array
   var link = $void.link
   var prepareOperation = $void.prepareOperation
 
@@ -22,14 +21,13 @@ module.exports = function ($void) {
   // apply a function and expand arguments from an array.
   link(proto, 'apply', function (subject, args) {
     return typeof subject === 'undefined' ? this.apply(null)
-      : Array.isArray(args)
-        ? this.apply(subject, args)
-        : this.apply(subject, $Array.from(args))
+      : Array.isArray(args) ? this.apply(subject, args)
+        : typeof args === 'undefined' ? this.call(subject)
+          : this.call(subject, args)
   })
 
   // Desccription
   link(proto, 'to-string', function () {
-    return (this.$name ? '#( ' + this.$name + ' )#\n' : '') +
-        (this.code || $Tuple.lambda)['to-string']()
+    return (this.code || $Tuple.lambda)['to-string']()
   })
 }

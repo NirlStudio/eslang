@@ -91,7 +91,7 @@
       (assert "\t" ((symbol invalid) to-string),
     )
   ),
-).
+),
 
 (define "Constant and Special Values" (= ()
   (define "(symbol empty)" (= ()

@@ -1,8 +1,9 @@
 'use strict'
 
 module.exports = function operators$operator ($void) {
-  var $Tuple = $void.$.tuple
-  var $Symbol = $void.$.symbol
+  var $ = $void.$
+  var $Tuple = $.tuple
+  var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var Space$ = $void.Space
   var Symbol$ = $void.Symbol
@@ -23,8 +24,8 @@ module.exports = function operators$operator ($void) {
       code.push(tbody)
       return operator(createOperator(params, tbody), new Tuple$(code))
     } else {
-      code.push($Tuple.plain) // empty body
-      return operator(function () {
+      code.push($Tuple.blank) // empty body
+      return params.length < 1 ? $.operator.noop : operator(function () {
         return null
       }, new Tuple$(code))
     }

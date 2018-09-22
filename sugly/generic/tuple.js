@@ -95,6 +95,12 @@ module.exports = function ($void) {
     return this.plain !== true
   })
 
+  // generate a plain tuple.
+  link(proto, 'as-plain', function () {
+    return this.plain === true ? this
+      : this.$.length < 1 ? blank : new Tuple$(this.$, true)
+  })
+
   // the source map of this tuple.
   link(proto, 'source-map', function () {
     return this.source

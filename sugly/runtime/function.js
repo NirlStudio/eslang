@@ -1,8 +1,9 @@
 'use strict'
 
 module.exports = function function_ ($void) {
-  var $Tuple = $void.$.tuple
-  var $Symbol = $void.$.symbol
+  var $ = $void.$
+  var $Tuple = $.tuple
+  var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
@@ -24,8 +25,8 @@ module.exports = function function_ ($void) {
       code.push(tbody)
       return lambda(createLambda(params, tbody, space.app), new Tuple$(code))
     } else {
-      code.push($Tuple.plain) // empty body
-      return lambda(function () {
+      code.push($Tuple.blank) // empty body
+      return params.length < 1 ? $.lambda.noop : lambda(function () {
         return null
       }, new Tuple$(code))
     }
@@ -82,8 +83,8 @@ module.exports = function function_ ($void) {
       return function_(createFunction(params, tbody, space.local, space.locas, space.app),
         new Tuple$(code))
     } else {
-      code.push($Tuple.plain) // empty body
-      return function_(function () {
+      code.push($Tuple.blank) // empty body
+      return params.length < 1 ? $.function.noop : function_(function () {
         return null
       }, new Tuple$(code))
     }

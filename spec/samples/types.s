@@ -65,9 +65,29 @@
   (tuple of-plain (` x) null 1 true "abc")
 ).
 
-(e.g. operator (=? (X Y) (+ (X) (Y).
-(e.g. lambda (= (x y) (+ x y).
-(e.g. function (=> (x y) (+ x y z).
+(e.g. operator
+  (=? (X Y) (+ (X) (Y)
+).
+
+(e.g. lambda
+  (= x)
+  (= x null)
+  (= x x)
+  (= (x y),
+  (= (x y) null),
+  (= (x y) (+ x y),
+  (= (x y) (var z) (+ x y z),
+).
+
+(e.g. function
+  (=> x)
+  (=> x null)
+  (=> x x)
+  (=> (x y),
+  (=> (x y) null),
+  (=> (x y) (+ x y),
+  (=> (x y) (var z) (+ x y z),
+).
 
 (e.g. array (@ 1) (@ 1 2).
 (e.g. object (@ x: 1) (@ x: 1 y: 2).

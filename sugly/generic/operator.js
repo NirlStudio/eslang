@@ -19,7 +19,6 @@ module.exports = function ($void) {
   var proto = Type.proto
   // Desccription
   link(proto, 'to-string', function () {
-    return (this.$name ? '#( ' + this.$name + ' )#\n' : '') +
-        (this.code || $Tuple.operator)['to-string']()
+    return (this.code || $Tuple.operator)['to-string']()
   })
 }

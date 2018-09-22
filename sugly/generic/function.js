@@ -23,8 +23,7 @@ module.exports = function ($void) {
 
   // Desccription
   link(proto, 'to-string', function () {
-    return (this.$name ? '#( ' + this.$name + ' )#\n' : '') +
-        (this.code || $Tuple.function)['to-string']()
+    return (this.code || $Tuple.function)['to-string']()
   })
 
   // inject type

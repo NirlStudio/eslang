@@ -96,29 +96,28 @@ module.exports = function ($void) {
 
   $void.prepareOperation = function prepareOperation (type, noop, emptyCode) {
     // the empty function
-    link(type, 'empty', function () {
+    noop.$name = 'noop'
+    var empty = link(type, 'empty', function () {
       return noop
     })
 
     // a placeholder of function
-    link(type, 'of', function () {
-      return noop
-    })
+    link(type, 'of', empty)
 
     var proto = type.proto
     // return operation's name
     link(proto, 'name', function () {
-      return this.$name
+      return this.$name || ''
     })
 
     // return operation's parameters
     link(proto, 'parameters', function () {
-      return (this.code || emptyCode)[1]
+      return (this.code || emptyCode).$[1]
     })
 
     // return operation's body
     link(proto, 'body', function () {
-      return (this.code || emptyCode)[2]
+      return (this.code || emptyCode).$[2]
     })
 
     // test if the operation is a generic one.
