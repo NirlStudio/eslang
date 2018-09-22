@@ -211,12 +211,12 @@ module.exports = function ($void) {
   })
 
   link(proto, 'first', function (count) {
-    count >>= 0
-    return count > 1 ? this.slice(0, count) : this[0]
+    return typeof count === 'undefined' ? this[0]
+      : this.slice(0, count < 0 ? 0 : (count >>= 0))
   })
   link(proto, 'first-of', function (value) {
     if (typeof value === 'undefined') {
-      value = null
+      return null
     }
     for (var i = 0; i < this.length; i++) {
       var v = this[i]
@@ -227,13 +227,16 @@ module.exports = function ($void) {
     return null
   })
   link(proto, 'last', function (count) {
+    if (typeof count === 'undefined') {
+      return this[this.length - 1]
+    }
     count >>= 0
-    return count > 1 ? this.slice(this.length - count, this.length)
-      : this[this.length - 1]
+    return count >= this.length ? this.slice()
+      : this.slice(this.length - count, this.length)
   })
   link(proto, 'last-of', function (value) {
     if (typeof value === 'undefined') {
-      value = null
+      return null
     }
     for (var i = this.length - 1; i >= 0; i--) {
       var v = this[i]
@@ -251,10 +254,18 @@ module.exports = function ($void) {
   })
 
   // stack operations.
-  proto.pop = Array.prototype.pop
   link(proto, 'push', function () {
     Array.prototype.push.apply(this, arguments)
     return this
+  })
+  proto.pop = Array.prototype.pop
+
+  // queue operations.
+  proto.enqueue = proto.push
+  link(proto, 'dequeue', function () {
+    var value = this[0]
+    this.splice(0, 1)
+    return value
   })
 
   // reverse

@@ -110,7 +110,7 @@
 
 (define "Constant and Special Values" (= ()
   (define "(date empty)" (= ()
-    (should "it may be generated from timestamp value of either 0 or -0." (=
+    (should "it may be generated from timestamp value of either 0 or -0." (= ()
       (assert (date empty) (date of 0),
       (assert (date empty) (date of -0),
     ),

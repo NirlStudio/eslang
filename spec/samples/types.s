@@ -51,7 +51,18 @@
 ).
 
 (e.g. tuple
-  (` (x)) (` (x 1)) (` (x 1 true)) (` (x 1 true "abc")
+  (` (null),
+  (` (x),
+  (` (x null),
+  (` (x null 1),
+  (` (x null 1 true),
+  (` (x null 1 true "abc"),
+  (tuple of-plain null)
+  (tuple of-plain (` x),
+  (tuple of-plain (` x) null)
+  (tuple of-plain (` x) null 1)
+  (tuple of-plain (` x) null 1 true)
+  (tuple of-plain (` x) null 1 true "abc")
 ).
 
 (e.g. operator (=? (X Y) (+ (X) (Y).

@@ -324,7 +324,7 @@ else((symbol else) else)
 ((symbol of-shared) of-shared)
 
 # meta.constant-tuple-sugly
-((tuple plain) plain)
+((tuple blank) blank)
 ((tuple unknown) unknown)
 ((tuple lambda) lambda)
 ((tuple function) function)
@@ -339,11 +339,11 @@ else((symbol else) else)
 ((tuple from-plain) from-plain)
 # meta.function-tuple-sugly
 is-plain((t is-plain) is-plain)
+not-plain((t not-plain) not-plain)
 source-map((t source-map) source-map)
 iterate((t iterate) iterate)
 merge((t merge) merge)
 to-array((t to-array) to-array)
-to-list((t to-list) to-list)
 
 # meta.function-operation-sugly
 parameters((f parameters) parameters)

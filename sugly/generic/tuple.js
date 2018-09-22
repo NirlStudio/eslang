@@ -14,14 +14,14 @@ module.exports = function ($void) {
   // the empty value
   var empty = link(Type, 'empty', new Tuple$([]))
   // the empty value for a plain tuple.
-  var plain = link(Type, 'plain', new Tuple$([], true))
-  // an unkown structure.
+  var blank = link(Type, 'blank', new Tuple$([], true))
+  // an unknown structure.
   var unknown = link(Type, 'unknown', new Tuple$([$Symbol.etc]))
 
   // empty operations
-  link(Type, 'lambda', new Tuple$([$Symbol.lambda, empty, plain]))
-  link(Type, 'function', new Tuple$([$Symbol.function, empty, plain]))
-  link(Type, 'operator', new Tuple$([$Symbol.operator, empty, plain]))
+  link(Type, 'lambda', new Tuple$([$Symbol.lambda, empty, blank]))
+  link(Type, 'function', new Tuple$([$Symbol.function, empty, blank]))
+  link(Type, 'operator', new Tuple$([$Symbol.operator, empty, blank]))
 
   // empty objects
   link(Type, 'array', new Tuple$([$Symbol.object]))
@@ -53,22 +53,23 @@ module.exports = function ($void) {
   })
 
   var append = function () {
-    var args = Array.prototype.slice.call(arguments)
-    for (var i = 0; i < args.length; i++) {
-      args[i] = atomOf(args[i])
+    var i = this.length
+    this.push.apply(this, arguments)
+    for (; i < this.length; i++) {
+      this[i] = atomOf(this[i])
     }
-    this.push.apply(this, args)
     return this
   }
 
   // create a common tuple (statement) of the argument values.
   link(Type, 'of', function () {
-    return new Tuple$(append.apply([], arguments))
+    return arguments.length ? new Tuple$(append.apply([], arguments)) : empty
   })
 
   // create a plain tuple (code block or list of statements) of the argument values
   link(Type, 'of-plain', function () {
-    return new Tuple$(append.apply([], arguments), true)
+    return arguments.length
+      ? new Tuple$(append.apply([], arguments), true) : blank
   })
 
   // create a tuple by elements from the iterable arguments or the argument
@@ -77,7 +78,7 @@ module.exports = function ($void) {
     return merge.apply(empty, arguments)
   })
   link(Type, 'from-plain', function () {
-    return merge.apply(plain, arguments)
+    return merge.apply(blank, arguments)
   })
 
   var proto = Type.proto
@@ -88,7 +89,10 @@ module.exports = function ($void) {
 
   // the flag of a plain tuple.
   link(proto, 'is-plain', function () {
-    return this.plain
+    return this.plain === true
+  })
+  link(proto, 'not-plain', function () {
+    return this.plain !== true
   })
 
   // the source map of this tuple.
@@ -102,23 +106,28 @@ module.exports = function ($void) {
     return array.iterate.apply(this.$, arguments)
   })
 
-  // make a new copy with all items or some in a range.
+  // make a new copy with all items or some in a range of (begin, begin + count).
   link(proto, 'copy', function (begin, count) {
     var s = array.copy.apply(this.$, arguments)
     return s && s.length > 0
       ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
-      : this.plain ? plain : empty
+      : this.plain ? blank : empty
   })
+  // make a new copy with all items or some in a range of (begin, end).
   link(proto, 'slice', function (begin, end) {
-    var s = array.in.apply(this.$, arguments)
+    var s = array.slice.apply(this.$, arguments)
     return s && s.length > 0
       ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
-      : this.plain ? plain : empty
+      : this.plain ? blank : empty
   })
 
   // retrieve the first element.
   link(proto, 'first', function (count) {
-    return array.first.apply(this.$, arguments)
+    var s = array.first.apply(this.$, arguments)
+    return typeof count === 'undefined' ? s
+      : s && s.length > 0
+        ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
+        : this.plain ? blank : empty
   })
   link(proto, 'first-of', function (value) {
     return array['first-of'].apply(this.$, arguments)
@@ -126,7 +135,11 @@ module.exports = function ($void) {
 
   // retrieve the last element.
   link(proto, 'last', function (count) {
-    return array.last.apply(this.$, arguments)
+    var s = array.last.apply(this.$, arguments)
+    return typeof count === 'undefined' ? s
+      : s && s.length > 0
+        ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
+        : this.plain ? blank : empty
   })
   link(proto, 'last-of', function (value) {
     return array['last-of'].apply(this.$, arguments)
@@ -138,24 +151,17 @@ module.exports = function ($void) {
     return list.length > this.$.length ? new Tuple$(list, this.plain) : this
   })
 
-  // merge this tuple and items from the argument tuples.
+  // merge this tuple and items from the argument tuples or arrays.
   var merge = link(proto, ['merge', '+'], function () {
     var list = this.$.slice(0)
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
-      if (source instanceof Tuple$) {
+      if (Array.isArray(source)) {
+        append.apply(list, source)
+      } else if (source instanceof Tuple$) {
         list.push.apply(list, source.$)
-        continue
-      }
-      var next = thisCall(source, 'iterate')
-      if (typeof next !== 'function') {
+      } else {
         list.push(atomOf(source))
-        continue
-      }
-      var item = next()
-      while (typeof item !== 'undefined' && item !== null) {
-        list.push(atomOf(Array.isArray(item) ? item[0] : item))
-        item = next()
       }
     }
     return list.length > this.$.length ? new Tuple$(list, this.plain) : this
@@ -164,6 +170,34 @@ module.exports = function ($void) {
   // convert to an array, the items will be left as they're.
   link(proto, 'to-array', function () {
     return this.$.slice(0)
+  })
+
+  // Equivalence: to be determined by field values.
+  var equals = link(proto, ['equals', '=='], function (another) {
+    if (this === another) {
+      return true
+    }
+    if (!(another instanceof Tuple$) ||
+      this.plain !== another.plain ||
+      this.$.length !== another.$.length) {
+      return false
+    }
+    var t$ = this.$
+    var a$ = another.$
+    for (var i = t$.length - 1; i >= 0; i--) {
+      if (!thisCall(t$[i], 'equals', a$[i])) {
+        return false
+      }
+    }
+    return true
+  })
+  link(proto, ['not-equals', '!='], function (another) {
+    return !equals.call(this, another)
+  })
+
+  // override comparison logic to keep consistent with Equivalence.
+  link(proto, 'compare', function (another) {
+    return equals.call(this, another) ? 0 : null
   })
 
   // Emptiness: an empty tuple has no items.
@@ -175,7 +209,7 @@ module.exports = function ($void) {
   })
 
   // expand to a string list as an enclosed expression or a series of expressions.
-  link(proto, 'to-list', function (list, indent, padding) {
+  var encode = function (list, indent, padding) {
     if (!Array.isArray(list)) {
       list = []
     }
@@ -190,7 +224,7 @@ module.exports = function ($void) {
         list.push(' ')
       }
       if (this.$[0] instanceof Tuple$) {
-        this.$[0]['to-list'](list, indent, padding)
+        encode.call(this.$[0], list, indent, padding)
       } else {
         list.push(thisCall(this.$[0], 'to-string'))
       }
@@ -204,7 +238,7 @@ module.exports = function ($void) {
         list.push(lineBreak)
         item = this.$[i]
         if (item instanceof Tuple$) {
-          item['to-list'](list, indent, padding)
+          encode.call(item, list, indent, padding)
         } else {
           list.push(thisCall(item, 'to-string'))
         }
@@ -219,12 +253,12 @@ module.exports = function ($void) {
       if (item instanceof Tuple$) {
         if (item.plain) {
           if (item.$.length > 0) {
-            item['to-list'](list, indent, padding + indent)
+            encode.call(item, list, indent, padding + indent)
             item.$.length > 1 && list.push(lineBreak)
           }
         } else {
           first ? (first = false) : list.push(' ')
-          item['to-list'](list, indent, padding)
+          encode.call(item, list, indent, padding)
         }
       } else {
         first || item === $Symbol.pairing ? (first = false) : list.push(' ')
@@ -233,18 +267,20 @@ module.exports = function ($void) {
     }
     list.push(')')
     return list
-  })
+  }
 
   // Representation: as an enclosed expression or a plain series of expression.
   link(proto, 'to-string', function (indent, padding) {
-    return this['to-list']([], indent, padding).join('')
+    return encode.call(this, [], indent, padding).join('')
   })
 
   // Indexer
   var indexer = link(proto, ':', function (index, end) {
     return typeof index === 'string' ? proto[index]
       : index instanceof Symbol$ ? proto[index.key]
-        : array.slice.apply(this.$, arguments)
+        : typeof index !== 'number' ? null
+          : typeof end === 'undefined' ? this.$[index]
+            : array.slice.apply(this.$, arguments)
   })
 
   // export type indexer.
