@@ -66,7 +66,13 @@
 ).
 
 (e.g. operator
-  (=? (X Y) (+ (X) (Y)
+  (=? X)
+  (=? X null)
+  (=? X (X))
+  (=? (X Y),
+  (=? (X Y) null),
+  (=? (X Y) (+ (X) (Y),
+  (=? (X Y) (var z 100) (+ (X) (Y) z),
 ).
 
 (e.g. lambda
