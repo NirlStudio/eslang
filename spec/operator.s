@@ -529,7 +529,7 @@
 ),
 
 (define "(var ...): variable declaration" (= ()
-  (should "(var \"x\" value) in an operator defines a new variable 'x' in the operator's context." (= ()
+  (should "(var (`x) value) in an operator defines a new variable 'x' in calling scope." (= ()
     (var x 1)
     (var y 2)
     (var decl (=? (X V)
@@ -538,21 +538,27 @@
     ),
 
     (assert 100 (decl x 100),
-    (assert 1 x)
+    (assert 100 x)
 
     (assert 1000 (decl y 1000),
-    (assert 2 y)
+    (assert 1000 y)
 
-    (assert 10 (=:() (var x 10) (decl x 100) x),
-    (assert 1 x)
+    (assert 101 (=(decl):(decl) (var x 10) (decl x 101) x),
+    (assert 100 x)
 
-    (assert 11 (=>:() (var y 11) (decl y 100) y),
-    (assert 2 y)
+    (assert 110 (=>:() (var y 11) (decl y 110) y),
+    (assert 1000 y)
+
+    (assert 101 (=(decl):(decl) (decl x 101) x),
+    (assert 100 x)
+
+    (assert 110 (=>:() (decl y 110) y),
+    (assert 1000 y)
   ),
 ),
 
 (define "(let ...): value assignment" (= ()
-  (should "(let \"x\" value) in an operator defines a variable 'x' in its immediate calling scope." (= ()
+  (should "(let (`x) value) in an operator defines a variable 'x' in its immediate calling scope." (= ()
     (var decl (=? (X V) (let X (V),
     (decl x 100),
     (assert 100 x)
@@ -569,7 +575,7 @@
     (assert 1000 (=>:() (decl z (10 * x),
     (assert null z)
   ),
-  (should "(let \"x\" value) in an operator can update the existing variable 'x' in its calling function." (= ()
+  (should "(let (`x) value) in an operator can update the existing variable 'x' in its calling function." (= ()
     (var decl (=? (X V) (let X (V),
     (decl x 100),
     (assert 100 x)
@@ -582,5 +588,28 @@
 
     (assert 100000 (=>:() (=>:() (=>:() (decl x (10 * x),
     (assert 100000 x)
+  ),
+),
+
+(define "(local ...): operator variable declaration" (= ()
+  (should "(local (`x) value) defines a new variable 'x' in the operator's context." (= ()
+    (var x 1)
+    (var y 2)
+    (var decl (=? (X V)
+      (local X (V),
+      (X)
+    ),
+
+    (assert 100 (decl x 100),
+    (assert 1 x)
+
+    (assert 1000 (decl y 1000),
+    (assert 2 y)
+
+    (assert 10 (=:() (var x 10) (decl x 100) x),
+    (assert 1 x)
+
+    (assert 11 (=>:() (var y 11) (decl y 100) y),
+    (assert 2 y)
   ),
 ),

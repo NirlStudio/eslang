@@ -256,8 +256,22 @@
       (assert (((symbol var)) is (symbol var),
     ),
     (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol let) is-valid),
+      (assert ((symbol var) is-valid),
       (assert false ((symbol var) is-invalid),
+    ),
+  ),
+  (define "(symbol local)" (= ()
+    (should "its key value is \"local\"." (= ()
+      (assert "local" ((symbol local) key),
+      (assert "local" ((symbol local) to-string),
+      (assert ((symbol of "local") is (symbol local),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol local)) is (symbol local),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol local) is-valid),
+      (assert false ((symbol local) is-invalid),
     ),
   ),
   (define "(symbol export)" (= ()

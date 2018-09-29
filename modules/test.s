@@ -26,12 +26,12 @@
 
 (export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
   (if (expr is-empty)
-    (var "expr" expected)
-    (var "expected" true)
+    (local "expr" expected)
+    (local "expected" true)
   ),
   (++ asserting-step)
-  (var "expected" (expected),
-  (var "value" (expr),
+  (local "expected" (expected),
+  (local "value" (expr),
   (if (:value != expected)
     (return (@
       failed: true

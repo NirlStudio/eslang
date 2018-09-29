@@ -17,8 +17,8 @@
   (print "the value of z is 300?" z),
   (let "sum" (+ (a) (b) (c) z),
   (let "x" 10)
-  (let "y" 20)
-  (var "z" 30)
+  (var "y" 20)
+  (local "z" 30)
   (print "z in opeerator's scope is 30?" z)
   (sum).
 (and x (y + 1000) 1000).

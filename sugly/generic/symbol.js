@@ -32,6 +32,7 @@ module.exports = function ($void) {
 
   link(Type, 'let', sharedSymbolOf('let'))
   link(Type, 'var', sharedSymbolOf('var'))
+  link(Type, 'local', sharedSymbolOf('local'))
   link(Type, 'export', sharedSymbolOf('export'))
   link(Type, 'import', sharedSymbolOf('import'))
   link(Type, 'include', sharedSymbolOf('include'))

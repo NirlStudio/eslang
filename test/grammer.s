@@ -18,6 +18,7 @@ quote(quote -quote quote quote- quote)quote
 # keyword.operator.assignment.sugly
 let(let -let let let- let)let
 var(var -var var var- var)var
+local(local -local local local- local)local
 export(export -export export export- export)export
 import(import -import import import- import)import
 include(include -include include include- include)include
@@ -308,6 +309,7 @@ function((symbol function) function)
 operator((symbol operator) operator)
 let((symbol let) let)
 var((symbol var) var)
+local((symbol local) local)
 export((symbol export) export)
 import((symbol import) import)
 import((symbol include) include)

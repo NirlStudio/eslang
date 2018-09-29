@@ -103,7 +103,7 @@ module.exports = function space ($void) {
   }
   OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {
     inop: true, // indicates this is an operator space.
-    var: function (key, value) {
+    opvar: function (key, value) {
       // to make explicit vars restricted in the operator's scope.
       return (this.context[key] = value)
     }

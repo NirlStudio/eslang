@@ -150,4 +150,20 @@ module.exports = function assignment ($void) {
       return values
     }
   }
+
+  // only in operator: (var name-expr value-expr)
+  staticOperator('local', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
+    if (length < 2 || !space.inop) {
+      return null
+    }
+    var sym = clist[1]
+    var values = length < 3 ? null : evaluate(clist[2], space)
+    sym = evaluate(sym, space)
+    var key = typeof sym === 'string' ? sym
+      : sym instanceof Symbol$ ? sym.key : null
+    return !key ? null
+      : space.opvar(key, tryToUpdateName(values, key))
+  })
 }
