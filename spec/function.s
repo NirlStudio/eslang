@@ -3,65 +3,65 @@
 
 (define "Function Common Behaviours" (=> ()
   (define "Identity" (= ()
-    (should "an empty function is always the same." (= ()
-      (var l1 (=>),
-      (var l2 (=> (),
-      (var l3 (=> x),
-      (var l4 (=> (x),
-      (assert (:l1 is-a function),
-      (assert (:l2 is-a function),
-      (assert (:l3 is-a function),
-      (assert (:l4 is-a function),
-      (assert (:l1 is l2),
+    (should "an empty function without parameters is always the same." (= ()
+      (var f1 (=>),
+      (var f2 (=> (),
+      (var f3 (=> x),
+      (var f4 (=> (x),
+      (assert (:f1 is-a function),
+      (assert (:f2 is-a function),
+      (assert (:f3 is-a function),
+      (assert (:f4 is-a function),
+      (assert (:f1 is f2),
       (assert false (:l1 is-not l2),
 
-      (assert (:l1 is-not l3),
-      (assert (:l2 is-not l3),
-      (assert (:l1 is-not l4),
-      (assert (:l2 is-not l4),
+      (assert (:f1 is-not f3),
+      (assert (:f2 is-not f3),
+      (assert (:f1 is-not f4),
+      (assert (:f2 is-not f4),
 
-      (assert (:l3 is-not l4),
-      (assert (:l4 is-not l3),
+      (assert (:f3 is-not f4),
+      (assert (:f4 is-not f3),
     ),
-    (should "non-empty function code generates different function in each evaluation." (= ()
+    (should "non-empty function code generates different operators in each evaluation." (= ()
       (var code (` (=> x x),
-      (var l1 (code),
-      (var l2 (code),
-      (:l1 is-a function)
-      (:l2 is-a function)
-      (assert (:l1 is-not l2),
-      (assert false (:l1 is l2),
+      (var f1 (code),
+      (var f2 (code),
+      (assert (:f1 is-a function),
+      (assert (:f2 is-a function),
+      (assert (:f1 is-not f2),
+      (assert false (:f1 is f2),
     ),
   ),
 
   (define "Equivalence" (= ()
     (should "a function's equivalence is defined as its identity." (= ()
-      (var l (=> x x),
-      (assert (:l is-a function),
-      (assert (:(:l "is") is (:l "equals"),
-      (assert (:(:l "is-not") is (:l "not-equals"),
+      (var f (=> x x),
+      (assert (:f is-a function),
+      (assert (:(:f "is") is (:f "equals"),
+      (assert (:(:f "is-not") is (:f "not-equals"),
     ),
   ),
 
   (define "Ordering" (= ()
     (should "comparing a function with itself returns 0." (= ()
-      (var l (=> x x),
-      (assert (:l is-a function),
-      (assert 0 (:l compare l),
+      (var f (=> x x),
+      (assert (:f is-a function),
+      (assert 0 (:f compare f),
       (assert 0 (:(function empty) compare (function empty),
     ),
     (should "comparison of two functions returns null." (=> ()
-      (var l1 (=> () null),
-      (var l2 (=> () null),
-      (assert (:l1 is-a function),
-      (assert (:l2 is-a function),
-      (assert null (:l1 compare l2),
+      (var f1 (=> () null),
+      (var f2 (=> () null),
+      (assert (:f1 is-a function),
+      (assert (:f2 is-a function),
+      (assert null (:f1 compare f2),
 
-      (let l1 (=> x x),
-      (let l2 (=> x x),
-      (assert (:l1 is-a function),
-      (assert (:l2 is-a function),
-      (assert null (:l1 compare l2),
+      (let f1 (=> x x),
+      (let f2 (=> x x),
+      (assert (:f1 is-a function),
+      (assert (:f2 is-a function),
+      (assert null (:f1 compare f2),
     ),
   ),
 
@@ -115,6 +115,7 @@
     (should "a function is represented as its string value of its code." (=> ()
       (for value
           in (the-values concat (function empty),
+        (assert (:value is-a function),
         (var code (:value to-code),
         (assert (code to-string) (:value to-string),
       ),
@@ -124,7 +125,7 @@
 
 (define "Constant Value" (= ()
   (define "(function noop)" (= ()
-    (should "(function \"noop\") is a function with an empty parameters and an empty body." (= ()
+    (should "(function \"noop\") is a function with empty parameters and an empty body." (= ()
       (assert (:(function "noop") is-a function),
       (assert "noop" (:(function "noop") name),
 
@@ -494,85 +495,187 @@
   ),
   (should "'redo' can be used to elminate tail recursion call." (= ()
     (var base 0)
-    (assert 5000050000 (=> 100000: x
+    (assert 50005000 (=> 10000: x
       (base += x)
       ((x <= 1) ? base (redo (x - 1),
     ),
-    (assert 5000050000 base)
+    (assert 50005000 base)
     (var sum (=> x
       (base += x)
       ((x <= 1) ? base (redo (x - 1),
     ),
     (let base 1)
-    (assert 5000050001 (sum 100000),
-    (assert 5000050001 base)
+    (assert 50005001 (sum 10000),
+    (assert 50005001 base)
   ),
 ),
 
-(define "variable scope" (= ()
-  (should "a function is impacted by variables in its owner scope." (= ()
-    (var x 1)
-    (=>:() (assert 1 x),
+(define "resolve function context symbols" (= ()
+  (should "'this' is resolved to the subject value of calling expression." (= ()
+    (var f (=> () (+ this 2),
+    (assert "null2" (f),
+    (assert "null2" (f 1),
+    (assert 3 (1 (:f),
+    (assert 3 (1 (:f) 2),
+    (assert "x2" ("x" (:f),
+    (assert "x2" ("x" (:f) 2 "y"),
   ),
-  (should "a function is impacted by variables in its owner scope." (= ()
-    (var x 1)
-    (=>:() (assert 1 x),
+  (should "'arguments' is resolved according to the arguments used in calling current function." (= ()
+    (var f (=> () arguments),
+    (assert 0 ((f) length),
+    (assert null ((f) 0),
+    (assert 1 ((f 2) length),
+    (assert 2 ((f 2) 0),
+    (assert null ((f 2) 1),
+    (assert 2 ((f 2 "x") length),
+    (assert 2 ((f 2 "x") 0),
+    (assert "x" ((f 2 "x") 1),
+    (assert null ((f 2 "x") 2),
   ),
-  (should "a function is impacted by variables in its outer owner scope." (= ()
+  (should "'do' is resolved to the calling function itself." (= ()
+    (var f (= () do),
+    (assert (:(f) is f),
+    (assert (:(1 (:f)) is f),
+    (assert (:("x" (:f) 2) is f),
+    (assert (:((@) (:f) 2 "x") is f),
+  ),
+),
+
+(define "resolve other symbols" (= ()
+  (should "a function encloses its creating scope." (= ()
+    (var x 100)
+    (assert 1000 (=>:() (10 * (x ?? 11),
+    (assert 1000 (=>:() (=>:() (10 * (x ?? 11),
+    (assert 1000 (=>:() (=>:() (=>:() (10 * (x ?? 11),
+
+    (assert 110 (=:() (=>:() (10 * (x ?? 11),
+    (assert 110 (=>:() (=:() (=>:() (10 * (x ?? 11),
+  ),
+  (should "all symbols are resolved in function's own and its parent scopes." (= ()
     (var x 1)
-    (=>:()
+    (assert 1 (=>:() (x + y),
+
+    (assert 3 (=>:()
+      (var y 2)
+      (=>:() (x + y),
+    ),
+
+    (assert 6 (=>:()
       (var y 2)
       (=>:()
-        (assert 1 x)
-        (assert 2 y)
-      ),
+        (var z 3)
+        (=>:() (x + y z),
     ),
   ),
-  (should "a function may impact other variables in its own scope." (= ()
+),
+
+(define "(var ...): variable declaration" (= ()
+  (should "(var \"x\" value) defines a new local variable 'x' in current function's scope." (= ()
     (var x 1)
-    (var y)
-    (var result (=>:()
-      (var xx x)
-      (let x 100)
-      (let y 200)
-      (let z 300)
-      xx
+
+    (assert 10 (=>:() (var x 10) x),
+    (assert 1 x)
+
+    (assert 100 (=>:()
+      (var x 100)
+      (=>:() (var x 101),
+      x
     ),
-    (assert 100 x)
-    (assert 200 y)
-    (assert null z)
-    (assert 1 result)
+    (assert 1 x)
+
+    (assert 1000 (=>:()
+      (var x 1000)
+      (=>:() (=>:() (var x 1001),
+      x
+    ),
+    (assert 1 x)
   ),
-  (should "a function may impact other variables in its outer own scope." (= ()
+  (should "(var \"x\" value) can update an existing local variable 'x' in current function's scope." (= ()
     (var x 1)
-    (var x_ 1)
-    (var result (=>:()
-      (var xx x)
-      (assert 1 x "inner x(1) should be 1.")
-      (assert 1 x_ "inner x_(1) should be 1.")
-      (var x_)
-      (assert null x_ "inner x_(2) should be null.")
-      (let x_ 100)
-      (assert 100 x_ "inner x_(3) should be 100.")
-      (var y 2)
-      (let x 100)
-      (assert 100 x "inner x(2) should be 100.")
-      (=>:()
-        (let xxx x)
-        (let x 1000)
-        (assert 1000 x "inner most x should be 1000.")
-        (let y 2000)
-        (assert 2000 y "inner most y should be 2000.")
-        (let z 3000)
-        (assert 3000 z "inner most z should be 3000.")
+
+    (assert 10 (=>(x):(x) (var x (x * 10)) x),
+    (assert 1 x)
+
+    (assert 10 (=>:()
+      (var x (x * 10),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 10 (=>:()
+      (var x (x * 10),
+      x
+    ),
+    (assert 1 x)
+  ),
+),
+
+(define "(let ...): value assignment" (= ()
+  (should "(let \"x\" value) defines a new local variable 'x' in current function." (= ()
+    (var x 1)
+    (assert 10 (=>:() (let y (x * 10),
+    (assert 1 x),
+    (assert null y),
+
+    (assert 10 (=>:() (=>:() (let y (x * 10),
+    (assert 1 x),
+    (assert null y),
+
+    (assert 10 (=>:() (=>:() (=>:() (let y (x * 10),
+    (assert 1 x),
+    (assert null y),
+  ),
+  (should "(let \"x\" value) in an operator updates the existing variable 'x' in its calling function." (= ()
+    (var x 1)
+    (assert 10 (=>:() (let x (x * 10),
+    (assert 10 x),
+
+    (assert 100 (=>:() (=>:() (let x (x * 10),
+    (assert 100 x),
+
+    (assert 1000 (=>:() (=>:() (=>:() (let x (x * 10),
+    (assert 1000 x),
+  ),
+  (should "an enclosed scope is shared by all the functions generated in the same call." (= ()
+    (var gen (=()
+      (var x 10), (@
+        (=> () (let x (x + 1),
+        (=> () (let x (x + 2),
       ),
     ),
-    (assert null result)
-    (assert 1000 x)
-    (assert 1 x_)
-    (assert null xx)
-    (assert null xxx)
-    (assert null y)
-    (assert null z)
+    (var (add11 add12) (gen),
+    (assert 11 (add11),
+    (assert 13 (add12),
+    (assert 14 (add11),
+    (assert 16 (add12),
+
+    (var (add21 add22) (gen),
+    (assert 11 (add21),
+    (assert 13 (add22),
+    (assert 14 (add21),
+    (assert 16 (add22),
+
+    (assert 17 (add11),
+    (assert 19 (add12),
+    (assert 20 (add11),
+    (assert 22 (add12),
+  ),
+),
+
+(define "y-combinator" (= ()
+  (should "y-combinator can implement recusive call for anonymous functions." (= ()
+    (var Y (= f
+      ((= x (x x))
+        (=> x
+          (f (=> y
+            ((x x) y),
+    ),
+    (var factorial (Y
+      (= f
+        (=> n
+          ((n == 0) ? 1 (n * (f (n - 1),
+    ),
+    (assert 120 (factorial 5),
+    (assert 1307674368000 (factorial 15),
   ),
 ),

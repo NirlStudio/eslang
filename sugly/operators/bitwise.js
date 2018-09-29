@@ -2,7 +2,6 @@
 
 module.exports = function bitwise ($void) {
   var $ = $void.$
-  var $Tuple = $.tuple
   var $Number = $.number
   var link = $void.link
   var Space$ = $void.Space
@@ -20,27 +19,27 @@ module.exports = function bitwise ($void) {
   })
 
   // bitwise AND and assign it back to the same variable
-  link($Number.proto, '&=', operator(function (space, clause, operant) {
+  link($Number.proto, '&=', operator(function (space, clause, that) {
     var clist = clause.$
-    if (typeof operant !== 'number' || clist.length < 3) {
+    if (typeof that !== 'number' || clist.length < 3) {
       return 0
     }
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
     var value = evaluate(clist[2], space)
-    operant &= typeof value === 'number' ? value : 0
+    that &= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // bitwise OR and assign it back to the same variable
-  link($Number.proto, '|=', operator(function (space, clause, operant) {
-    if (typeof operant !== 'number') {
+  link($Number.proto, '|=', operator(function (space, clause, that) {
+    if (typeof that !== 'number') {
       return 0
     }
     if (!(space instanceof Space$)) {
@@ -49,18 +48,18 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var value = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    operant |= typeof value === 'number' ? value : 0
+    that |= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // bitwise XOR and assign it back to the same variable
-  link($Number.proto, '^=', operator(function (space, clause, operant) {
-    if (typeof operant !== 'number') {
+  link($Number.proto, '^=', operator(function (space, clause, that) {
+    if (typeof that !== 'number') {
       return 0
     }
     if (!(space instanceof Space$)) {
@@ -69,18 +68,18 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var value = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    operant ^= typeof value === 'number' ? value : 0
+    that ^= typeof value === 'number' ? value : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // bitwise left-shift and assign it back to the same variable
-  link($Number.proto, '<<=', operator(function (space, clause, operant) {
-    if (typeof operant !== 'number') {
+  link($Number.proto, '<<=', operator(function (space, clause, that) {
+    if (typeof that !== 'number') {
       return 0
     }
     if (!(space instanceof Space$)) {
@@ -89,18 +88,18 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    operant <<= typeof offset === 'number' ? offset : 0
+    that <<= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // bitwise right-shift and assign it back to the same variable
-  link($Number.proto, '>>=', operator(function (space, clause, operant) {
-    if (typeof operant !== 'number') {
+  link($Number.proto, '>>=', operator(function (space, clause, that) {
+    if (typeof that !== 'number') {
       return 0
     }
     if (!(space instanceof Space$)) {
@@ -109,18 +108,18 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    operant >>= typeof offset === 'number' ? offset : 0
+    that >>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // bitwise zero-fill right-shift and assign it back to the same variable
-  link($Number.proto, '>>>=', operator(function (space, clause, operant) {
-    if (typeof operant !== 'number') {
+  link($Number.proto, '>>>=', operator(function (space, clause, that) {
+    if (typeof that !== 'number') {
       return 0
     }
     if (!(space instanceof Space$)) {
@@ -129,12 +128,12 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    operant >>>= typeof offset === 'number' ? offset : 0
+    that >>>= typeof offset === 'number' ? offset : 0
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 }

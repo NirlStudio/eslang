@@ -26,11 +26,11 @@
 
 (export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
   (if (expr is-empty)
-    (let "expr" expected)
-    (let "expected" true)
+    (var "expr" expected)
+    (var "expected" true)
   ),
   (++ asserting-step)
-  (let "expected" (expected),
+  (var "expected" (expected),
   (var "value" (expr),
   (if (:value != expected)
     (return (@

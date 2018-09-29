@@ -2,7 +2,6 @@
 
 module.exports = function general ($void) {
   var $ = $void.$
-  var $Tuple = $.tuple
   var $String = $.string
   var link = $void.link
   var Space$ = $void.Space
@@ -51,60 +50,60 @@ module.exports = function general ($void) {
   }
 
   // (str += str ... )
-  link($String.proto, '+=', operator(function (space, clause, operant) {
+  link($String.proto, '+=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'string') {
-      operant = ''
+    if (typeof that !== 'string') {
+      that = ''
     }
     var clist = clause && clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
-        operant += value
+        that += value
       } else {
-        operant += thisCall(value, 'to-string')
+        that += thisCall(value, 'to-string')
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // (str -= str ... ) or (str -= num)
-  link($String.proto, '-=', operator(function (space, clause, operant) {
+  link($String.proto, '-=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'string') {
+    if (typeof that !== 'string') {
       return null
     }
-    if (operant.length < 1) {
-      return operant
+    if (that.length < 1) {
+      return that
     }
     var clist = clause && clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
-        if (operant.endsWith(value)) {
-          operant = operant.substring(0, operant.length - value.length)
+        if (that.endsWith(value)) {
+          that = that.substring(0, that.length - value.length)
         }
       } else if (typeof value === 'number') {
-        operant = operant.substring(0, operant.length - value)
+        that = that.substring(0, that.length - value)
       } else {
         value = thisCall(value, 'to-string')
-        if (operant.endsWith(value)) {
-          operant = operant.substring(0, operant.length - value.length)
+        if (that.endsWith(value)) {
+          that = that.substring(0, that.length - value.length)
         }
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 }

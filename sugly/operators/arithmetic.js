@@ -2,7 +2,6 @@
 
 module.exports = function arithmetic ($void) {
   var $ = $void.$
-  var $Tuple = $.tuple
   var $Number = $.number
   var link = $void.link
   var Space$ = $void.Space
@@ -44,120 +43,120 @@ module.exports = function arithmetic ($void) {
   })
 
   // increment a value by one and assign it back to the same variable
-  link($Number.proto, '++', operator(function (space, clause, operant) {
+  link($Number.proto, '++', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number' || !clause || !clause.$ || !clause.$.length) {
-      operant = 0
+    if (typeof that !== 'number' || !clause || !clause.$ || !clause.$.length) {
+      that = 0
     }
     var sym = clause.$[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant + 1)
+      space.let(sym.key, that + 1)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // increment a value by one and assign it back to the same variable
-  link($Number.proto, '--', operator(function (space, clause, operant) {
+  link($Number.proto, '--', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number' || !clause || !clause.$ || !clause.$.length) {
-      operant = 0
+    if (typeof that !== 'number' || !clause || !clause.$ || !clause.$.length) {
+      that = 0
     }
     var sym = clause.$[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant - 1)
+      space.let(sym.key, that - 1)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // (num += num ... )
-  link($Number.proto, '+=', operator(function (space, clause, operant) {
+  link($Number.proto, '+=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
-      operant = 0
+    if (typeof that !== 'number') {
+      that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
-        operant += value
+        that += value
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // (num -= num ... )
-  link($Number.proto, '-=', operator(function (space, clause, operant) {
+  link($Number.proto, '-=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
-      operant = 0
+    if (typeof that !== 'number') {
+      that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
-        operant -= value
+        that -= value
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // (num *= num ... )
-  link($Number.proto, '*=', operator(function (space, clause, operant) {
+  link($Number.proto, '*=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
-      operant = 0
+    if (typeof that !== 'number') {
+      that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
-        operant *= value
+        that *= value
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 
   // (num /= num ...)
-  link($Number.proto, '/=', operator(function (space, clause, operant) {
+  link($Number.proto, '/=', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return 0 // The value of this operator is defined as 0.
     }
-    if (typeof operant !== 'number') {
-      operant = 0
+    if (typeof that !== 'number') {
+      that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
     for (var i = 2; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
-        operant /= value
+        that /= value
       }
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
-      space.let(sym.key, operant)
+      space.let(sym.key, that)
     }
-    return operant
-  }, $Tuple.operator))
+    return that
+  }))
 }

@@ -9,10 +9,11 @@
   "tokenizer" "compiler"
 
   # generic
-  "null" "type" "bool" "string" "number" "date" "range" "symbol" "tuple"
-  "operator" "lambda" "function" "object"
-  "module" "array" "class" "device"
-  "iterate" "global"
+  "null" "type"
+  "bool" "string" "number" "date" "range" "symbol" "tuple"
+  "operator" "lambda" "function"
+  "array" "object" "class"
+  "module" "iterate" "global"
 
   # runtime
   "runtime" "space" "signal" "evaluate"
@@ -24,7 +25,7 @@
   "load" "import" "include"
 
   # libs
-  "encode" "print" "math" "uri" "json" "timer"
+  "print" "math" "uri" "json" "timer"
 ).
 
 # run given specs or all.

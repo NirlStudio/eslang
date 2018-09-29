@@ -3,7 +3,7 @@
 
 (define "Lambda Common Behaviours" (=> ()
   (define "Identity" (= ()
-    (should "an empty lambda is always the same." (= ()
+    (should "an empty lambda without parameters is always the same." (= ()
       (var l1 (=),
       (var l2 (= (),
       (var l3 (= x),
@@ -27,8 +27,8 @@
       (var code (` (= x x),
       (var l1 (code),
       (var l2 (code),
-      (:l1 is-a lambda)
-      (:l2 is-a lambda)
+      (assert (:l1 is-a lambda),
+      (assert (:l2 is-a lambda),
       (assert (:l1 is-not l2),
       (assert false (:l1 is l2),
     ),
@@ -115,6 +115,7 @@
     (should "a lambda is represented as its string value of its code." (=> ()
       (for value
           in (the-values concat (lambda empty),
+        (assert (:value is-a lambda),
         (var code (:value to-code),
         (assert (code to-string) (:value to-string),
       ),
@@ -124,7 +125,7 @@
 
 (define "Constant Value" (= ()
   (define "(lambda noop)" (= ()
-    (should "(lambda \"noop\") is a lambda with an empty parameters and an empty body." (= ()
+    (should "(lambda \"noop\") is a lambda with empty parameters and an empty body." (= ()
       (assert (:(lambda "noop") is-a lambda),
       (assert "noop" (:(lambda "noop") name),
 
@@ -187,7 +188,7 @@
   ),
 ),
 
-(define "(a-lambda name)" (= ()
+(define "(:a-lambda name)" (= ()
   (should "(:a-lambda name) returns (string empty) for an anonymous lambda." (= ()
     (assert "" (:(= x) name),
   ),
@@ -199,7 +200,7 @@
   ),
 ),
 
-(define "(a-lambda parameters)" (= ()
+(define "(:a-lambda parameters)" (= ()
   (should "(:a-lambda parameters) returns (tuple empty) for a lambda without any parameter." (= ()
     (assert ((:(= () null) parameters) is (tuple empty),
   ),
@@ -215,7 +216,7 @@
   ),
 ),
 
-(define "(a-lambda body)" (= ()
+(define "(:a-lambda body)" (= ()
   (should "(:a-lambda body) returns (tuple blank) for an empty lambda." (= ()
     (assert ((:(=) body) is (tuple blank),
     (assert ((:(= ()) body) is (tuple blank),
@@ -228,7 +229,7 @@
   ),
 ),
 
-(define "(a-lambda is-generic)" (= ()
+(define "(:a-lambda is-generic)" (= ()
   (should "(:a-lambda is-generic) returns true for most type & instance methods." (= ()
     (assert (:(:(=) "apply") is-a lambda),
     (assert (:(:(=) "apply") is-generic),
@@ -242,7 +243,7 @@
   ),
 ),
 
-(define "(a-lambda not-generic)" (= ()
+(define "(:a-lambda not-generic)" (= ()
   (should "(:a-lambda not-generic) returns false for some runtime lambdas." (= ()
     (assert (:(:(=) "apply") is-a lambda),
     (assert false (:(:(=) "apply") not-generic),
@@ -256,7 +257,7 @@
   ),
 ),
 
-(define "(a-lambda apply ...)" (= ()
+(define "(:a-lambda apply ...)" (= ()
   (should "(:a-lambda apply) call the lambda with null as this and an empty argument list." (= ()
     (var l (= x
       (assert null this)
@@ -486,7 +487,7 @@
     (f)
   ),
   (should "'redo' can be used to elminate tail recursion call." (= ()
-    (assert 5000050000 (= 100000: (x base)
+    (assert 50005000 (= 10000: (x base)
       ((x <= 1) ? (x + base)
         (redo (x - 1) (x + base),
       ),
@@ -496,35 +497,178 @@
         (redo (x - 1) (x + base),
       ),
     ),
-    (assert 5000050000 (sum 100000),
+    (assert 50005000 (sum 10000),
   ),
 ),
 
-(define "variable scope" (= ()
-  (should "a lambda is not impacted by variables out of its own scope." (= ()
-    (var x 1)
-    (=:()
-      (var y 20)
-      (=:()
-        (assert null x)
-        (assert null y)
-    ),
+(define "resolve lambda context symbols" (= ()
+  (should "'this' is resolved to the subject value of calling expression." (= ()
+    (var l (= () (+ this 2),
+    (assert "null2" (l),
+    (assert "null2" (l 1),
+    (assert 3 (1 (:l),
+    (assert 3 (1 (:l) 2),
+    (assert "x2" ("x" (:l),
+    (assert "x2" ("x" (:l) 2 "y"),
   ),
-  (should "a lambda does not impact other variables out of its own scope." (= ()
+  (should "'arguments' is resolved according to the arguments used in calling current lambda." (= ()
+    (var l (= () arguments),
+    (assert 0 ((l) length),
+    (assert null ((l) 0),
+    (assert 1 ((l 2) length),
+    (assert 2 ((l 2) 0),
+    (assert null ((l 2) 1),
+    (assert 2 ((l 2 "x") length),
+    (assert 2 ((l 2 "x") 0),
+    (assert "x" ((l 2 "x") 1),
+    (assert null ((l 2 "x") 2),
+  ),
+  (should "'do' is resolved to the calling lambda itself." (= ()
+    (var l (= () do),
+    (assert (:(l) is l),
+    (assert (:(1 (:l)) is l),
+    (assert (:("x" (:l) 2) is l),
+    (assert (:((@) (:l) 2 "x") is l),
+  ),
+),
+
+(define "resolve other symbols" (= ()
+  (should "a lambda is independent of its creating scope." (= ()
+    (var x 100)
+    (assert 110 (=:() (10 * (x ?? 11),
+  ),
+  (should "other symbols are resolved in lambda's scope." (= ()
+    (var x 120)
+    (assert null (=:() x),
+    (assert 200 (=(20):(x) (10 * x),
+    (assert 6000 (=(20 30):(x y) (10 * x y),
+  ),
+),
+
+(define "(var ...): variable declaration" (= ()
+  (should "(var \"x\" value) defines a new local variable 'x' in current lambda's scope." (= ()
     (var x 1)
-    (var result (=:()
-      (let x 10)
-      (var y 20)
-      (=:()
-        (assert null x)
-        (assert null y)
-        (let x 100)
-        (var y 200)
-        (assert 100 x)
-        (assert 200 y)
-    ),
-    (assert null result)
+
+    (assert 10 (=:() (var x 10) x),
     (assert 1 x)
-    (assert null y)
+
+    (assert 100 (=:()
+      (var x 100)
+      (=:() (var x 101),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 1000 (=:()
+      (var x 1000)
+      (=:() (=:() (var x 1001),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 100 (=>:()
+      (var x 100)
+      (=:() (var x 101),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 1000 (=>:()
+      (var x 1000)
+      (=:() (=:() (var x 1001),
+      x
+    ),
+    (assert 1 x)
+  ),
+  (should "(var \"x\" value) can update an existing local variable 'x' in current lambda's scope." (= ()
+    (var x 1)
+
+    (assert 10 (=(x):(x) (var x (x * 10)) x),
+    (assert 1 x)
+
+    (assert 10 (=:()
+      (var x 1)
+      (var x (x * 10),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 10 (=:()
+      (let x 1)
+      (var x (x * 10),
+      x
+    ),
+    (assert 1 x)
+  ),
+),
+
+(define "(let ...): value assignment" (= ()
+  (should "(let \"x\" value) defines a new local variable 'x' in current lambda's scope." (= ()
+    (var x 1)
+
+    (assert 10 (=:() (let x 10) x),
+    (assert 1 x)
+
+    (assert 100 (=:()
+      (var x 100)
+      (=:() (let x 101),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 100 (=:()
+      (let x 100)
+      (=:() (let x 101),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 1000 (=:()
+      (var x 1000)
+      (=:() (=:() (let x 1001),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 1000 (=:()
+      (let x 1000)
+      (=:() (=:() (let x 1001),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 100 (=>:()
+      (var x 100)
+      (=:() (let x 101),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 1000 (=>:()
+      (var x 1000)
+      (=:() (=:() (let x 1001),
+      x
+    ),
+    (assert 1 x)
+  ),
+  (should "(let \"x\" value) can update an existing local variable 'x' in current lambda's scope." (= ()
+    (var x 1)
+
+    (assert 10 (=(x):(x) (let x (x * 10)) x),
+    (assert 1 x)
+
+    (assert 10 (=:()
+      (var x 1)
+      (let x (x * 10),
+      x
+    ),
+    (assert 1 x)
+
+    (assert 10 (=:()
+      (let x 1)
+      (let x (x * 10),
+      x
+    ),
+    (assert 1 x)
   ),
 ),

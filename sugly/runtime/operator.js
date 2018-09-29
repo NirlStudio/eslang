@@ -32,14 +32,14 @@ module.exports = function operators$operator ($void) {
   }
 
   function createOperator (params, tbody) {
-    return function (space, clause, operant) {
+    return function (space, clause, that) {
       if (!(space instanceof Space$)) {
         return null // invalid call.
       }
       var scope = createOperatorSpace(space)
       // populate operands
       var clist = clause.$
-      var offset = typeof operant !== 'undefined' ? 2 : 1
+      var offset = typeof that !== 'undefined' ? 2 : 1
       if (clist[0] === symbolPairing) {
         offset += 1
       }
@@ -47,8 +47,9 @@ module.exports = function operators$operator ($void) {
         var j = i + offset
         scope.context[params[i]] = j < clist.length ? clist[j] : null
       }
-      scope.context['operands'] = clause
-      scope.context['operant'] = typeof operant !== 'undefined' ? operant : null
+      scope.context['operation'] = clause
+      scope.context['operand'] = offset
+      scope.context['that'] = typeof that !== 'undefined' ? that : null
       // execution
       return evaluate(tbody, scope)
     }
@@ -73,6 +74,8 @@ module.exports = function operators$operator ($void) {
         code.push(param)
       }
     }
-    return oprs.length < 1 ? [[], $Tuple.empty] : [oprs, new Tuple$(code)]
+    return oprs.length < 1 ? [[], $Tuple.empty]
+      : oprs.length === 1 ? [oprs, code[0]]
+        : [oprs, new Tuple$(code)]
   }
 }

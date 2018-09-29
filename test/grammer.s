@@ -58,10 +58,12 @@ this
 this(this -this this this- this)this
 arguments
 arguments(arguments -arguments arguments arguments- arguments)arguments
-operant
-operant(operant -operant operant operant- operant)operant
-operands
-operands(operands -operands operands operands- operands)operands
+that
+that(that -that that that- that)that
+operation
+operation(operation -operation operation operation- operation)operation
+operand
+operand(operand -operand operand operand- operand)operand
 
 # storage.type.generic.sugly
 (type type "bool")
