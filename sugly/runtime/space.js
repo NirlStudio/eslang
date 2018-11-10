@@ -25,6 +25,9 @@ module.exports = function space ($void) {
     var: function (key, value) {
       return (this.local[key] = value)
     },
+    cvar: function (key, value) {
+      return (this.context[key] = value)
+    },
     let: function (key, value) {
       if (ownsProperty(this.local, key) || !this.locals) {
         return (this.local[key] = value)
@@ -102,11 +105,7 @@ module.exports = function space ($void) {
     }
   }
   OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {
-    inop: true, // indicates this is an operator space.
-    opvar: function (key, value) {
-      // to make explicit vars restricted in the operator's scope.
-      return (this.context[key] = value)
-    }
+    inop: true // indicates this is an operator space.
   })
 
   $void.createOperatorSpace = function (parent) {

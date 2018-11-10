@@ -25,7 +25,7 @@ module.exports = function () {
     // The primal type is derived from the supreme prototype.
     this.proto = Prototype
     // The primal type is the container type of the supreme prototype.
-    Prototype.type = this
+    defineTypeProperty(Prototype, this)
   }
   Type$.prototype = Prototype
 
@@ -133,7 +133,7 @@ module.exports = function () {
   // means no evaluation happens to arguments before the invocation, to allow
   // more syntax structures can be defined.
   // An operator is an immutable entity and can be fully encoded.
-  create('operator')
+  var operator = create('operator')
   $void.operator = function (impl, code) {
     impl.type = $.operator
     impl.code = code
@@ -167,12 +167,24 @@ module.exports = function () {
     return impl
   }
 
+  // an operator is not a first-class value, so it can only be a direct predicate.
+  $void.isApplicable = function (func) {
+    return typeof func === 'function' && func.type !== operator
+  }
+
   /* Compound Types */
   /* Generally, all compound entities are mutable. */
   /* All compound entities are also fixed points of evaluation funtion. */
 
   // A collection of values indexed by zero-based integers.
   create('array')
+
+  // A special type to wrap an iterate function.
+  create('iterator')
+  var Iterator$ = $void.Iterator = function (next) {
+    this.next = next
+  }
+  Iterator$.prototype = $.iterator.proto
 
   // The object is the fundamental type of all compound entities.
   create('object')
@@ -207,8 +219,25 @@ module.exports = function () {
     // a new type should have a new nature.
     class_.proto = Object.create($Instance)
     // a proto always intrinsically knows its container type.
-    class_.proto.type = class_
+    defineTypeProperty(class_.proto, class_)
     return class_
+  }
+
+  // type is not enumerable.
+  $void.defineProperty = defineProperty
+  function defineProperty (obj, name, value) {
+    Object.defineProperty ? Object.defineProperty(obj, name, {
+      enumerable: false,
+      configurable: false,
+      writable: true,
+      value: value
+    }) : (obj[name] = value)
+    return value
+  }
+
+  $void.defineTypeProperty = defineTypeProperty
+  function defineTypeProperty (proto, type) {
+    return defineProperty(proto, 'type', type)
   }
 
   return $void

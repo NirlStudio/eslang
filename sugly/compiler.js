@@ -166,8 +166,10 @@ module.exports = function ($void) {
         if (indent >= 0 && indent <= endingIndent) {
           if (indent === endingIndent) {
             endTopWith(lastSource, source)
-          } // otherwise, no matched indent found. It is still tolerable but
-            // not a good practice.
+          } /*
+            otherwise, no matched indent found. It is still tolerable but
+            not a good practice.
+          */
           break
         }
         endTopWith(lastSource, source)

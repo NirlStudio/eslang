@@ -24,6 +24,7 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var numberCompare = $.number.proto.compare
   var numberToString = $.number.proto['to-string']
+  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value
   var empty = link(Type, 'empty', new Date(0))
@@ -227,5 +228,5 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // inject type
-  Date.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(Date.prototype, Type)
 }

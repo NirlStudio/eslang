@@ -9,8 +9,9 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var thisCall = $void.thisCall
-  var EncodingContext$ = $void.EncodingContext
   var ownsProperty = $void.ownsProperty
+  var EncodingContext$ = $void.EncodingContext
+  var defineTypeProperty = $void.defineTypeProperty
 
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
@@ -76,12 +77,44 @@ module.exports = function ($void) {
     } while (i < arguments.length)
     return counter
   })
-  // remove all fields.
+
+  // make a copy with selected or all fields.
+  link(Type, 'copy', function (src) {
+    if (!(src instanceof Object$) && (!src || src.type !== Type)) {
+      return null
+    }
+    var obj = Object.create(src.type.proto)
+    var names = arguments.length > 1
+      ? Array.prototype.slice.call(arguments, 1)
+      : Object.getOwnPropertyNames(src)
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i]
+      if (name instanceof Symbol$) {
+        name = name.key
+      }
+      if (typeof name === 'string') {
+        obj[name] = src[name]
+      }
+    }
+    var activator = src.type.proto.activator
+    if (typeof activator === 'function') {
+      activator.call(obj, obj)
+    }
+    return obj
+  })
+  // remove given or all fields.
   link(Type, 'clear', function (obj) {
     if (obj instanceof Object$ || (obj && obj.type === Type)) {
-      var names = Object.getOwnPropertyNames(obj)
+      var names = arguments.length > 0 ? Array.prototype.slice.call(arguments)
+        : Object.getOwnPropertyNames(obj)
       for (var i = 0; i < names.length; i++) {
-        delete obj[names[i]]
+        var name = names[i]
+        if (name instanceof Symbol$) {
+          name = name.key
+        }
+        if (typeof name === 'string') {
+          delete obj[name]
+        }
       }
     }
     return obj
@@ -137,29 +170,28 @@ module.exports = function ($void) {
 
   // Encoding
   // encoding logic for all object instances.
-  link(proto, 'to-code', function (ctx) {
+  var toCode = link(proto, 'to-code', function (ctx) {
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
-      if (sym) {
-        return sym
-      }
+      if (sym) { return sym }
     } else {
       ctx = new EncodingContext$(this)
     }
     var props = Object.getOwnPropertyNames(this)
     var code = [$Symbol.object]
     for (var i = 0; i < props.length; i++) {
-      code.push($Symbol.of(props[i]), $Symbol.pairing, thisCall(this[props[i]], 'to-code', ctx))
+      var name = props[i]
+      code.push($Symbol.of(name), $Symbol.pairing, ctx.encode(this[name]))
     }
     if (code.length < 2) {
-      code.push($Symbol.pairing)
+      code.push($Symbol.pairing) // (@:) for empty object
     }
     return ctx.end(this, Type, new Tuple$(code))
   })
 
   // Description
   link(proto, 'to-string', function () {
-    return thisCall(thisCall(this, 'to-code'), 'to-string')
+    return thisCall(toCode.call(this), 'to-string')
   })
 
   // Indexer:
@@ -180,5 +212,5 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // inject type
-  Object.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(Object.prototype, Type)
 }

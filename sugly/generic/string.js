@@ -6,6 +6,7 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var thisCall = $void.thisCall
+  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value
   link(Type, 'empty', '')
@@ -237,5 +238,5 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // inject type
-  String.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(String.prototype, Type)
 }

@@ -146,6 +146,9 @@ false(false false false: false :false false@ false @false false)false
 /((1 / 2)/ 3)
 /=((1 /= 2)/= 3)
 
+%(% (1 % 2)% 3)
+%=((1 %= 2)%= 3)
+
 # meta.operator.bitwise.sugly
 &(& (a & b)& c)
 &=(&= (a &= b)&= c)
@@ -207,6 +210,7 @@ false(false false false: false :false false@ false @false false)false
 (operator empty)
 (lambda empty)
 (function empty)
+(iterator empty)
 (array empty)
 (object empty)
 (class empty)
@@ -356,22 +360,53 @@ is-generic((f is-generic) is-generic)
 not-generic((f not-generic) not-generic)
 apply((f apply) apply)
 
+# meta.function-iterator-type-sugly
+((iterator of-unsafe) of-unsafe)
+# meta.function-iterator-sugly
+skip((iter skip) skip)
+keep((iter keep) keep)
+select((iter select) select)
+map((iter map) map)
+reduce((iter reduce) reduce)
+count((iter count) count)
+sum((iter sum) sum)
+join((iter join) join)
+collect((iter collect) collect)
+finish((iter finish) finish)
+average((iter average) average)
+
+# meta.function.iteration.sugly
+iterate((iterate iterate) iterate)
+safely-iterate((safely-iterate safely-iterate) safely-iterate)
+
 # meta.function-array-type-sugly
 ((array from) from)
 # meta.function-array-sugly
-count((a count) count)
+is-sparse((a is-sparse) is-sparse)
+not-sparse((a not-sparse) not-sparse)
+as-sparse((a as-sparse) as-sparse)
+trace((a trace) trace)
+retrace((a retrace) retrace)
+append((t append) append)
 get((a get) get)
 set((a set) set)
 reset((a reset) reset)
 clear((a clear) clear)
+remove((a remove) remove)
+replace((a replace) replace)
 has((a has) has)
+contains((a contains) contains)
 swap((a swap) swap)
+insert((a insert) insert)
+delete((a delete) delete)
 splice((a splice) splice)
-pop((a pop) pop)
 push((a push) push)
+pop((a pop) pop)
+enqueue((a enqueue) enqueue)
+dequeue((a dequeue) dequeue)
 reverse((a reverse) reverse)
 sort((a sort) sort)
-join((a join) join)
+find((a find) find)
 
 # meta.function-object-type-sugly
 ((object assign) assign)
@@ -392,16 +427,6 @@ from((c from) from)
 to-object((c to-object) to-object)
 constructor((i constructor) constructor)
 activator((i activator) activator)
-
-# meta.function.iteration.sugly
-(iterate)
-(iterator)
-(select)
-(selector)
-(collect)
-(collector)
-(reduce)
-(reducer)
 
 # meta.function.runtime.sugly
 (compile)

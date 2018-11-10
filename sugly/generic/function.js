@@ -8,6 +8,7 @@ module.exports = function ($void) {
   var $Tuple = $.tuple
   var link = $void.link
   var prepareOperation = $void.prepareOperation
+  var defineTypeProperty = $void.defineTypeProperty
 
   // the noop function
   var noop = link(Type, 'noop', $void.function(function () {
@@ -27,5 +28,5 @@ module.exports = function ($void) {
   })
 
   // inject type
-  Function.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(Function.prototype, Type)
 }

@@ -127,28 +127,33 @@ module.exports = function ($void) {
       : this.plain ? blank : empty
   })
 
-  // retrieve the first element.
+  // retrieve the first n element(s).
   link(proto, 'first', function (count) {
-    var s = array.first.apply(this.$, arguments)
-    return typeof count === 'undefined' ? s
-      : s && s.length > 0
-        ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
-        : this.plain ? blank : empty
+    if (typeof count === 'undefined') {
+      return array.first.call(this.$)
+    }
+    var s = array.first.call(this.$, count >> 0)
+    return s && s.length > 0
+      ? s.length >= this.$.length ? this : new Tuple$(s, this.plain)
+      : this.plain ? blank : empty
   })
+  // find the first occurance of a value.
   link(proto, 'first-of', function (value) {
-    return array['first-of'].apply(this.$, arguments)
+    return array['first-of'].call(this.$, value)
   })
-
-  // retrieve the last element.
+  // retrieve the last n element(s).
   link(proto, 'last', function (count) {
-    var s = array.last.apply(this.$, arguments)
-    return typeof count === 'undefined' ? s
-      : s && s.length > 0
-        ? s.length === this.$.length ? this : new Tuple$(s, this.plain)
-        : this.plain ? blank : empty
+    if (typeof count === 'undefined') {
+      return array.last.call(this.$)
+    }
+    var s = array.last.call(this.$, count >> 0)
+    return s && s.length > 0
+      ? s.length >= this.$.length ? this : new Tuple$(s, this.plain)
+      : this.plain ? blank : empty
   })
+  // find the last occurance of a value.
   link(proto, 'last-of', function (value) {
-    return array['last-of'].apply(this.$, arguments)
+    return array['last-of'].call(this.$, value)
   })
 
   // merge this tuple's items and argument values to create a new one.
@@ -163,7 +168,7 @@ module.exports = function ($void) {
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       if (Array.isArray(source)) {
-        append.apply(list, source)
+        append.apply(list, array.select.call(source)) // compress discrete array.
       } else if (source instanceof Tuple$) {
         list.push.apply(list, source.$)
       } else {
@@ -208,10 +213,10 @@ module.exports = function ($void) {
 
   // Emptiness: an empty tuple has no items.
   link(proto, 'is-empty', function () {
-    return this.$.length < 1
+    return !(this.$.length > 0)
   })
   link(proto, 'not-empty', function () {
-    return !(this.$.length < 1)
+    return this.$.length > 0
   })
 
   // expand to a string list as an enclosed expression or a series of expressions.
@@ -286,7 +291,7 @@ module.exports = function ($void) {
       : index instanceof Symbol$ ? proto[index.key]
         : typeof index !== 'number' ? null
           : typeof end === 'undefined' ? this.$[index]
-            : array.slice.apply(this.$, arguments)
+            : new Tuple$(array.slice.apply(this.$, arguments), this.plain)
   })
 
   // export type indexer.

@@ -40,10 +40,9 @@ function createIntParser ($void) {
     var value
     if (typeof input !== 'string') {
       return typeof input !== 'number' ? NaN
-        : !input ? 0 : isNaN(input) ? NaN
-          : (value = Math.trunc(input))
-            ? Number.isSafeInteger(value) ? value : NaN
-            : 0
+        : input === 0 ? 0 : isNaN(input) ? NaN
+          : (value = Math.trunc(input)) === 0 ? 0
+            : Number.isSafeInteger(value) ? value : NaN
     }
     var radix
     if (input.startsWith('0x')) {
@@ -120,6 +119,7 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var copyType = $void.copyType
+  var defineTypeProperty = $void.defineTypeProperty
 
   // the value range and constant values.
   copyType(Type, Number, {
@@ -226,6 +226,13 @@ module.exports = function ($void) {
   link(proto, ['-', 'minus'], numberSubtract(valueOf))
   link(proto, ['*', 'times'], numberTimes(valueOf))
   link(proto, ['/', 'divided-by'], numberDivide(valueOf))
+
+  // remainder / modulus
+  link(proto, '%', function (base) {
+    return typeof base === 'undefined' ? this
+      : isNaN(base) || typeof base !== 'number' ? NaN
+        : isFinite(base) ? this % valueOf(base) : this
+  })
 
   // bitwise operations
   link(proto, '&', function (value) {
@@ -356,5 +363,5 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // inject type
-  Number.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(Number.prototype, Type)
 }

@@ -22,12 +22,12 @@ function initializeSpace ($void) {
   require('./generic/lambda')($void)
   require('./generic/function')($void)
 
+  require('./generic/iterator')($void)
   require('./generic/array')($void)
   require('./generic/object')($void)
   require('./generic/class')($void)
 
   require('./generic/global')($void)
-  require('./generic/iterate')($void)
 
   require('./lib/encode')($void, JS)
   require('./lib/print')($void, JS)

@@ -3,7 +3,7 @@
 
 (define "Tuple Common Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "a tuple is identitied by its instance.)" (= ()
+    (should "a tuple is identitied by its instance." (= ()
       (assert ((` (x y)) is-not (` (x y),
       (assert false ((` (x y)) is (` (x y),
 
@@ -707,6 +707,21 @@
       (assert (items:i) v),
     ),
   ),
+  (should "a tuple can be used in a for loop to traverse all its items." (= ()
+    (var items (@ null true 1 "a" (date of 1) (0 1) (` x) (` (x y),
+    (var t (tuple from items),
+    (var i 0)
+    (for v in t
+      (assert (items: (i ++)) v),
+    ),
+  ),
+  (should "a tuple can be used in a for loop to traverse all its items and indices." (= ()
+    (var items (@ null true 1 "a" (date of 1) (0 1) (` x) (` (x y),
+    (var t (tuple from items),
+    (for (v i) in t
+      (assert (items:i) v),
+    ),
+  ),
 ),
 
 (define "(a-tuple copy ...)" (= ()
@@ -715,17 +730,40 @@
     (var c (t copy),
     (assert ((c 0) is (`x),
     (assert ((c 1) is (`y),
-    (assert ((c copy) is t),
+    (assert (c is t),
   ),
   (should "(a-tuple copy begin) returns the elements in range of begin to end." (= ()
     (var t (` (x y),
     (var c (t copy 0),
+    (assert 2 (c length),
     (assert ((c 0) is (`x),
     (assert ((c 1) is (`y),
     (assert (c is t),
+
+    (var c (t copy -2),
+    (assert 2 (c length),
+    (assert ((c 0) is (`x),
+    (assert ((c 1) is (`y),
+    (assert (c is t),
+
+    (var c (t copy -3),
+    (assert 2 (c length),
+    (assert ((c 0) is (`x),
+    (assert ((c 1) is (`y),
+    (assert (c is t),
+
     (let c (t copy 1),
     (assert 1 (c length),
     (assert ((c 0) is (`y),
+
+    (let c (t copy -1),
+    (assert 1 (c length),
+    (assert ((c 0) is (`y),
+
+    (let c (t copy 2),
+    (assert 0 (c length),
+    (let c (t copy 3),
+    (assert 0 (c length),
   ),
   (should "(a-tuple copy begin count) returns the first <count> elements from begin." (= ()
     (var t (` (x y z),
@@ -735,7 +773,17 @@
     (assert ((c 2) is (`z),
     (assert (c is t),
 
+    (let c (t copy -3 3),
+    (assert ((c 0) is (`x),
+    (assert ((c 1) is (`y),
+    (assert ((c 2) is (`z),
+    (assert (c is t),
+
     (let c (t copy 2 1),
+    (assert 1 (c length),
+    (assert ((c 0) is (`z),
+
+    (let c (t copy -1 1),
     (assert 1 (c length),
     (assert ((c 0) is (`z),
 
@@ -743,14 +791,25 @@
     (assert 1 (c length),
     (assert ((c 0) is (`z),
 
+    (let c (t copy -1 4),
+    (assert 1 (c length),
+    (assert ((c 0) is (`z),
+
     (let c (t copy 1 1),
     (assert 1 (c length),
     (assert ((c 0) is (`y),
+
+    (let c (t copy -2 2),
+    (assert 2 (c length),
+    (assert ((c 0) is (`y),
+    (assert ((c 1) is (`z),
   ),
   (should "(a-tuple copy begin count) returns (tuple empty) if count is not great than 0." (= ()
     (var t (` (x y z),
-    (var (tuple empty) (t copy 0 0),
-    (var (tuple empty) (t copy 0 -1),
+    (assert (tuple empty) (t copy 0 0),
+    (assert (tuple empty) (t copy 0 -1),
+    (assert (tuple empty) (t copy -3 0),
+    (assert (tuple empty) (t copy -2 -1),
   ),
 ),
 
@@ -764,11 +823,27 @@
   ),
   (should "(a-tuple slice begin) returns the elements in range of begin to end." (= ()
     (var t (` (x y),
+
     (var s (t slice 0),
     (assert ((s 0) is (`x),
     (assert ((s 1) is (`y),
     (assert (s is t),
+
+    (let s (t slice -2),
+    (assert ((s 0) is (`x),
+    (assert ((s 1) is (`y),
+    (assert (s is t),
+
+    (let s (t slice -3),
+    (assert ((s 0) is (`x),
+    (assert ((s 1) is (`y),
+    (assert (s is t),
+
     (let s (t slice 1),
+    (assert 1 (s length),
+    (assert ((s 0) is (`y),
+
+    (let s (t slice -1),
     (assert 1 (s length),
     (assert ((s 0) is (`y),
   ),
@@ -780,7 +855,23 @@
     (assert ((s 2) is (`z),
     (assert (s is t),
 
+    (let s (t slice -3 3),
+    (assert ((s 0) is (`x),
+    (assert ((s 1) is (`y),
+    (assert ((s 2) is (`z),
+    (assert (s is t),
+
+    (let s (t slice -4 3),
+    (assert ((s 0) is (`x),
+    (assert ((s 1) is (`y),
+    (assert ((s 2) is (`z),
+    (assert (s is t),
+
     (let s (t slice 2 3),
+    (assert 1 (s length),
+    (assert ((s 0) is (`z),
+
+    (let s (t slice -1 3),
     (assert 1 (s length),
     (assert ((s 0) is (`z),
 
@@ -788,13 +879,28 @@
     (assert 1 (s length),
     (assert ((s 0) is (`z),
 
+    (let s (t slice -1 4),
+    (assert 1 (s length),
+    (assert ((s 0) is (`z),
+
     (let s (t slice 1 2),
     (assert 1 (s length),
     (assert ((s 0) is (`y),
+
+    (let s (t slice -2 2),
+    (assert 1 (s length),
+    (assert ((s 0) is (`y),
   ),
-  (should "(a-tuple slice begin end) returns (tuple empty) if begin >= end)." (= ()
+  (should "(a-tuple slice begin end) returns (tuple empty) if begin is after end." (= ()
     (var t (` (x y z),
-    (var (tuple empty) (t slice 0 0),
+    (assert (tuple empty) (t slice 0 0),
+    (assert (tuple empty) (t slice 1 0),
+    (assert (tuple empty) (t slice 1 1),
+    (assert (tuple empty) (t slice 3 2),
+    (assert (tuple empty) (t slice -2 0),
+    (assert (tuple empty) (t slice -1 1),
+    (assert (tuple empty) (t slice -1 -1),
+    (assert (tuple empty) (t slice -1 -2),
   ),
 ),
 
@@ -864,7 +970,7 @@
     (var t (` (x y),
     (assert null (t first-of),
   ),
-  (should "(a-tuple first-of value) returns the index value of the first occurance of value." (= ()
+  (should "(a-tuple first-of value) returns the offset of the first occurance of value." (= ()
     (var t (` (x y x z x y),
     (assert 0 (t first-of (`x),
     (assert 1 (t first-of (`y),
@@ -944,7 +1050,7 @@
     (var t (` (x y),
     (assert null (t last-of),
   ),
-  (should "(a-tuple last-of value) returns the index value of the first occurance of value." (= ()
+  (should "(a-tuple last-of value) returns the offset of the first occurance of value." (= ()
     (var t (` (x y x z x y x),
     (assert 6 (t last-of (`x),
     (assert 5 (t last-of (`y),
@@ -984,9 +1090,9 @@
 ),
 
 (define "(a-tuple merge ...)" (= ()
-  (should "(a-tuple concat) returns the original tuple." (= ()
+  (should "(a-tuple merge) returns the original tuple." (= ()
     (var t (` (x y),
-    (assert ((t concat) is t),
+    (assert ((t merge) is t),
   ),
   (should "(a-tuple merge b-tuple) returns a new tuple appending b-tuple elements to a-tuple." (= ()
     (var t1 (` (x y),

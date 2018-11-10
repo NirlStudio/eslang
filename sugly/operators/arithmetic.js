@@ -3,6 +3,7 @@
 module.exports = function arithmetic ($void) {
   var $ = $void.$
   var $Number = $.number
+  var mod = $Number.proto['%']
   var link = $void.link
   var Space$ = $void.Space
   var Symbol$ = $void.Symbol
@@ -152,6 +153,25 @@ module.exports = function arithmetic ($void) {
       if (typeof value === 'number') {
         that /= value
       }
+    }
+    var sym = clist[0]
+    if (sym instanceof Symbol$) {
+      space.let(sym.key, that)
+    }
+    return that
+  }))
+
+  // (num %= num ...)
+  link($Number.proto, '%=', operator(function (space, clause, that) {
+    if (!(space instanceof Space$)) {
+      return 0 // The value of this operator is defined as 0.
+    }
+    if (typeof that !== 'number') {
+      that = 0
+    }
+    var clist = clause.$ && clause.$.length ? clause.$ : []
+    if (clist.length > 2) {
+      that = mod.call(that, evaluate(clist[2], space))
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {

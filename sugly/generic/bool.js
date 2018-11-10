@@ -5,6 +5,7 @@ module.exports = function ($void) {
   var Type = $.bool
   var link = $void.link
   var Symbol$ = $void.Symbol
+  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value of bool is the false.
   link(Type, 'empty', false)
@@ -38,5 +39,5 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // inject type
-  Boolean.prototype.type = Type // eslint-disable-line no-extend-native
+  defineTypeProperty(Boolean.prototype, Type)
 }

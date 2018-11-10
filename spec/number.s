@@ -447,6 +447,9 @@
     (assert (number invalid) (number parse-int (((number min-int) - 1) to-string),
     (assert (number invalid) (number parse-int (((number max-int) + 1) to-string),
   ),
+  (should "(number parse-int (number invalid)) returns (number invalid)" (= ()
+    (assert (number invalid) (number parse-int (number invalid),
+  ),
   (should "(number parse-int invalid-int-str) returns (number invalid)." (= ()
     (assert (number invalid) (number parse-int ""),
     (assert (number invalid) (number parse-int "a"),
@@ -2211,6 +2214,109 @@
     (assert (:((number -infinite) "divided-by") is ((number -infinite) "/"),
 
     (assert (:((number invalid) "divided-by") is ((number invalid) "/"),
+  ),
+).
+
+(define "Remainder/Modulus: (a-number % base)" (= ()
+  (should "(num %) return num." (= ()
+    (assert ((0 %) is 0),
+    (assert ((-0 %) is -0),
+
+    (assert ((1 %) is 1),
+    (assert ((-1 %) is -1),
+
+    (assert ((1.5 %) is 1.5),
+    (assert ((-1.5 %) is -1.5),
+
+    (assert (((number max) %) is (number max),
+    (assert (((number min) %) is (number min),
+
+    (assert (((number infinite) %) is (number infinite),
+    (assert (((number -infinite) %) is (number -infinite),
+
+    (assert (((number invalid) %) is (number invalid),
+  ),
+  (should "(num % (number infinite)) return num." (= ()
+    (assert ((0 % (number infinite)) is 0),
+    (assert ((-0 % (number infinite)) is -0),
+
+    (assert ((1 % (number infinite)) is 1),
+    (assert ((-1 % (number infinite)) is -1),
+
+    (assert ((1.5 % (number infinite)) is 1.5),
+    (assert ((-1.5 % (number infinite)) is -1.5),
+
+    (assert (((number max) % (number infinite)) is (number max),
+    (assert (((number min) % (number infinite)) is (number min),
+
+    (assert (((number infinite) % (number infinite)) is (number infinite),
+    (assert (((number -infinite) % (number infinite)) is (number -infinite),
+
+    (assert (((number invalid) % (number infinite)) is (number invalid),
+  ),
+  (should "(num % (number -infinite)) return num." (= ()
+    (assert ((0 % (number -infinite)) is 0),
+    (assert ((-0 % (number -infinite)) is -0),
+
+    (assert ((1 % (number -infinite)) is 1),
+    (assert ((-1 % (number -infinite)) is -1),
+
+    (assert ((1.5 % (number -infinite)) is 1.5),
+    (assert ((-1.5 % (number -infinite)) is -1.5),
+
+    (assert (((number max) % (number -infinite)) is (number max),
+    (assert (((number min) % (number -infinite)) is (number min),
+
+    (assert (((number infinite) % (number -infinite)) is (number infinite),
+    (assert (((number -infinite) % (number -infinite)) is (number -infinite),
+
+    (assert (((number invalid) % (number -infinite)) is (number invalid),
+  ),
+  (should "(num % base) returns the remainder of num over base." (= ()
+    (assert 0 (0 % 1),
+    (assert 0 (0 % -1),
+
+    (assert 0 (1 % 1),
+    (assert 0 (1 % -1),
+
+    (assert 0 (-1 % 1),
+    (assert 0 (-1 % -1),
+
+    (assert 0 (2 % 1),
+    (assert 0 (2 % -1),
+
+    (assert 0 (-2 % 1),
+    (assert 0 (-2 % -1),
+
+    (assert 1 (3 % 2),
+    (assert 1 (3 % -2),
+
+    (assert -1 (-3 % 2),
+    (assert -1 (-3 % -2),
+
+    (assert (1.1 - 1) (1.1 % 1),
+    (assert (1.1 - 1) (1.1 % -1),
+
+    (assert (-1.1 + 1) (-1.1 % 1),
+    (assert (-1.1 + 1) (-1.1 % -1),
+  ),
+  (should "(num % 0) returns (number invalid)." (= ()
+    (assert (number invalid) (0 % 0),
+    (assert (number invalid) (1 % 0),
+    (assert (number invalid) (-1 % 0),
+
+    (assert (number invalid) ((number infinite) % 0),
+    (assert (number invalid) ((number -infinite) % 0),
+    (assert (number invalid) ((number invalid) % 0),
+  ),
+  (should "(num % (number invalid)) returns (number invalid)." (= ()
+    (assert (number invalid) (0 % (number invalid),
+    (assert (number invalid) (1 % (number invalid),
+    (assert (number invalid) (-1 % (number invalid),
+
+    (assert (number invalid) ((number infinite) % (number invalid),
+    (assert (number invalid) ((number -infinite) % (number invalid),
+    (assert (number invalid) ((number invalid) % (number invalid),
   ),
 ).
 

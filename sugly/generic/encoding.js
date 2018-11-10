@@ -1,9 +1,8 @@
 'use strict'
 
 // for any object, the object.proto.to-code will always be called firstly,
-// in the default to-code, the object.to-code will be called. remove the resolve logic.
+// in the default to-code, the object.to-code will be called.
 // the same for the constructor: to ensure the instance will always be returned.
-// immediately call to an operator, lambda or function.
 // for object:
 //  - anything defined in type cannot be overridden in instance
 //  - object.proto.* will allow the overridden and ensure the consistency and type safe.
@@ -34,10 +33,7 @@ var createIndex = typeof Map === 'function' ? function () {
     },
     set: function (key, value) {
       var offset = keys.indexOf(key)
-      if (offset >= 0) {
-        return (values[offset] = value)
-      }
-      return this.add(key, value)
+      return offset >= 0 ? (values[offset] = value) : this.add(key, value)
     },
     add: function (key, value) {
       keys.push(key)
@@ -74,98 +70,111 @@ var createIndex = typeof Map === 'function' ? function () {
 
 module.exports = function ($void) {
   var Tuple$ = $void.Tuple
+  var Object$ = $void.Object
+  var $Type = $void.$.type
   var $Tuple = $void.$.tuple
   var $Array = $void.$.array
-  var $Symbol = $void.$.symbol
   var $Object = $void.$.object
+  var $Symbol = $void.$.symbol
+  var thisCall = $void.thisCall
   var sharedSymbolOf = $void.sharedSymbolOf
+
+  var symbolLocals = sharedSymbolOf('_')
+  var createInst = function (type) {
+    return type === $Array ? $Tuple.array
+      : type === $Object ? $Tuple.object
+        : new Tuple$([$Symbol.object, $Symbol.pairing, type['to-code']()])
+  }
+  var updateInst = function (ref, type, code) {
+    return type === $Array
+      ? new Tuple$([ref, $Symbol.of('append'), code])
+      : type === $Object
+        ? new Tuple$([$Symbol.object, $Symbol.of('assign'), ref, code])
+        : new Tuple$([$Symbol.class, $Symbol.of('attach'), ref, code])
+  }
 
   $void.EncodingContext = function (root) {
     this.objs = createIndex()
     this.objs.add(this.root = root, null)
     this.clist = []
-    this.counter = 0
+    this.shared = []
   }
   $void.EncodingContext.prototype = {
-    _createVar: function () {
-      return ++this.counter > 256
-        ? $Symbol.of('_' + this.counter) : sharedSymbolOf('_' + this.counter)
-    },
-    _declareVar: function (type) {
-      return type === $Array ? $Tuple.array
-        : type === $Object ? $Tuple.object
-          : new Tuple$([$Symbol.object, $Symbol.pairing, type['to-code']()])
-    },
-    _updateVar: function (record) {
-      var type = record[2]
-      return type === $Array
-        ? new Tuple$([record[1], $Symbol.of('append'), record[3]])
-        : type === $Object
-          ? new Tuple$([$Symbol.object, $Symbol.of('assign'), record[1], record[3]])
-          : new Tuple$([$Symbol.class, $Symbol.of('attach'), record[1], record[3]])
+    _createRef: function (offset) {
+      var ref = new Tuple$([symbolLocals, this.shared.length])
+      this.shared.push(offset)
+      return ref
     },
     begin: function (obj) {
       var offset = this.objs.get(obj)
       if (typeof offset === 'undefined') { // first touch
         return this.objs.add(obj, null)
       }
-      var sym
-      if (offset === null) { // recursive reference.
-        sym = this._createVar()
-        this.objs.set(obj, this.clist.length)
-        this.clist.push([0, sym, null])
-        return sym
+      var ref
+      if (offset === null) { // to be recursively reused.
+        offset = this.clist.length
+        ref = this._createRef(offset)
+        this.objs.set(obj, offset)
+        this.clist.push([ref, null, null])
+        return ref
       }
-      // repeated reference
       var record = this.clist[offset]
-      if (!record[0] || record[1]) { // recursive or referred twice
-        return record[1]
+      ref = record[0]
+      if (!ref) { // to be reused.
+        ref = record[0] = this._createRef(offset)
+        var code = record[2]
+        var newCode = new Tuple$(code.$) // copy code of value.
+        code.$ = ref.$ // update orginal code from value to ref.
+        record[2] = newCode // save the new code of value.
       }
-      var code = record[2]
-      if (!(code instanceof Tuple$) || code.$.length < 1) { // an atom value
-        return code
-      }
-      // code must be a plain tuple!!!
-      // allocate a var name
-      sym = record[1] = this._createVar()
-      record[2] = new Tuple$(code.$) // duplicate whole tuple
-      code.$ = [sym] // update value tuple to a reference
-      return sym
+      return ref
+    },
+    encode: function (obj) {
+      return typeof obj === 'undefined' || obj === null ? null
+        : typeof obj === 'number' || typeof obj === 'string' ? obj
+          : (Array.isArray(obj) || $Type.of(obj) === $Object ||
+            obj instanceof Object$ // class instances
+          ) ? thisCall(obj, 'to-code', this) : thisCall(obj, 'to-code')
     },
     end: function (obj, type, code) {
-      code = new Tuple$([code], true)
+      // assert(code instanceof Tuple$)
+      code = new Tuple$(code.$)
       var offset = this.objs.get(obj)
+      // assert(typeof offset !== 'undefined')
       if (offset === null) {
-        this.objs.set(obj, this.clist.length)
-        this.clist.push([1, null, code])
-        return obj === this.root ? this.finalize() : code
+        offset = this.clist.length
+        this.objs.set(obj, offset)
+        this.clist.push([null, type, code])
+        return obj === this.root ? this._finalize(offset) : code
       }
       // recursive reference
-      this.clist[offset][2] = type
-      this.clist.push([2, this.clist[offset][1], type, code])
-      return obj === this.root ? this.finalize() : this.clist[offset][1]
+      var record = this.clist[offset]
+      record[1] = type
+      record[2] = code
+      return obj === this.root ? this._finalize(offset) : record[0]
     },
-    finalize: function () {
-      if (this.counter < 1) {
-        return this.clist[this.clist.length - 1][2]
+    _finalize: function (rootOffset) {
+      if (this.shared.length < 1) {
+        // no circular or shared array/object.
+        return this.clist[rootOffset][2]
       }
-      var code = [$Symbol.lambda, $Tuple.object]
-      for (var i = 0; i < this.clist.length; i++) {
-        var record = this.clist[i]
-        switch (record[0]) {
-          case 0: // declare empty array or object
-            code.push(new Tuple$([$Symbol.var, record[1], this._declareVar(record[2])]))
-            break
-          case 1: // declare array or object
-            if (record[1]) {
-              code.push(new Tuple$([$Symbol.var, record[1], record[2]]))
-            }
-            break
-          default: // update empty array or object to its value
-            code.push(this._updateVar(record))
-        }
+      var args = [$Symbol.object] // (@ ...)
+      var body = [new Tuple$([ // (local _ args) ...
+        $Symbol.local, symbolLocals, new Tuple$(args)
+      ])]
+      var root
+      for (var i = 0; i < this.shared.length; i++) {
+        var offset = this.shared[i]
+        var record = this.clist[offset]
+        args.push(createInst(record[1]))
+        offset === rootOffset
+          ? (root = updateInst.apply(null, record))
+          : body.push(updateInst.apply(null, record))
       }
-      return new Tuple$(code)
+      body.push(root || this.clist[rootOffset][2])
+      return new Tuple$([ // (=:() (arguments push ...) ...)
+        $Symbol.lambda, $Symbol.pairing, $Tuple.empty, new Tuple$(body, true)
+      ])
     }
   }
 }

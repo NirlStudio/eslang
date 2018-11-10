@@ -85,6 +85,13 @@ module.exports = function assignment ($void) {
   // in operator: (var name-expr value-expr)
   staticOperator('var', createOperatorFor('var'))
 
+  // 'local' explicitly declares a context variable in and only in current function's context.
+  // in function: (local var-name value), or
+  //              (local (var-name ...) values), or
+  //              (local (field-name ...) object)
+  // in operator: (local name-expr value-expr)
+  staticOperator('local', createOperatorFor('cvar'))
+
   function createOperatorFor (method) {
     return function (space, clause) {
       var clist = clause.$
@@ -150,20 +157,4 @@ module.exports = function assignment ($void) {
       return values
     }
   }
-
-  // only in operator: (var name-expr value-expr)
-  staticOperator('local', function (space, clause) {
-    var clist = clause.$
-    var length = clist.length
-    if (length < 2 || !space.inop) {
-      return null
-    }
-    var sym = clist[1]
-    var values = length < 3 ? null : evaluate(clist[2], space)
-    sym = evaluate(sym, space)
-    var key = typeof sym === 'string' ? sym
-      : sym instanceof Symbol$ ? sym.key : null
-    return !key ? null
-      : space.opvar(key, tryToUpdateName(values, key))
-  })
 }

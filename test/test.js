@@ -104,12 +104,12 @@ module.exports = function ($void) {
       'bool', 'string', 'number', 'date', 'range',
       'symbol', 'tuple',
       'operator', 'lambda', 'function',
-      'array', 'object', 'class'
+      'array', 'iterator', 'object', 'class'
     ])
 
     checkFunctions($, '[Sugly / functions] ', [
       // genesis
-      'iterate', 'iterator', 'select', 'selector', 'collect', 'collector', 'reduce', 'reducer',
+      'iterate', 'safely-iterate',
       // runtime
       'env', 'eval', 'run', 'interpreter',
       // startup

@@ -206,7 +206,7 @@
   (define "Indexer" (=> ()
     (should "the indexer is a lambda." (=> ()
       (assert (:(the-type ":") is-a lambda),
-      (assert (:(the-type ":") is (type ":")),
+      (assert (:(the-type ":") is (type ":"),
     ),
     (should "the indexer is a readonly accessor." (=> ()
       (assert null (the-type :"__new_prop" 1),
@@ -258,6 +258,12 @@
       (assert (:(s "indexer") is-a lambda),
       (assert (:(s "objectify") is-a lambda),
       (assert (:(s "typify") is-a lambda),
+    ),
+  ),
+
+  (define "Proto Indexer" (=> ()
+    (should "(a-type \"indexer\") is a lambda." (=> ()
+      (assert (:(the-type "indexer") is-a lambda),
     ),
   ),
 
@@ -437,7 +443,7 @@
 (var all-values (the-values concat (the-type empty).
 (for i in (0 (all-values length))
   (var the-value (all-values:i))
-  (var other-values ((all-values copy) splice i 1)),
+  (var other-values ((all-values copy) delete i),
   (=> (the-value other-values) : (the-value other-values)
     (define (+ "value: " the-value) (=> ()
       (include "share/value")

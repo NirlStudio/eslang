@@ -3,7 +3,7 @@
     (assert (! the-value),
     (var x the-value)
     (assert (! x),
-  ).
+  ),
   (should "(not the-value) returns true." (=> ()
     (assert (not the-value),
     (var x the-value)

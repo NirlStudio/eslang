@@ -10,6 +10,7 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var link = $void.link
   var ownsProperty = $void.ownsProperty
+  var sharedSymbolOf = $void.sharedSymbolOf
 
   /* The Supreme Prototype */
   var proto = Type.proto
@@ -123,7 +124,7 @@ module.exports = function ($void) {
   // Encoding a type by its name
   link(Type, 'to-code', function () {
     return typeof this.name === 'string'
-      ? $Symbol['of-shared'](this.name) : $Symbol.empty
+      ? sharedSymbolOf(this.name) : $Symbol.empty
   })
 
   // Description for all types

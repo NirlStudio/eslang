@@ -45,7 +45,7 @@
   ),
 
   (define "Emptiness" (= ()
-    (should "A range is defined as empty if its end equals its begin." (= ()
+    (should "a range is defined as empty if its end equals its begin." (= ()
       (assert ((range of 0 0) is-empty),
       (assert false ((range of 0 0) not-empty),
 
@@ -55,7 +55,7 @@
       (assert ((range of -1 -1) is-empty),
       (assert false ((range of -1 -1) not-empty),
     ),
-    (should "A range is defined as empty if its end is less than its begin, when its step > 0." (= ()
+    (should "a range is defined as empty if its end is less than its begin, when its step > 0." (= ()
       (assert ((range of 0 -10 1) is-empty),
       (assert false ((range of 0 -10 1) not-empty),
 
@@ -65,7 +65,7 @@
       (assert ((range of 10 -10 1) is-empty),
       (assert false ((range of 10 -10 1) not-empty),
     ),
-    (should "A range is defined as empty if its end is greater than its begin, when its step < 0." (= ()
+    (should "a range is defined as empty if its end is greater than its begin, when its step < 0." (= ()
       (assert ((range of 0 10 -1) is-empty),
       (assert false ((range of 0 10 -1) not-empty),
 

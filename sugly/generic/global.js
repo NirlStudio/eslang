@@ -33,4 +33,9 @@ module.exports = function ($void) {
   // other pure symbols
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
+
+  // global common variables.
+  $export($, sharedSymbolOf('descending').key, 1)
+  $export($, sharedSymbolOf('equivalent').key, 0)
+  $export($, sharedSymbolOf('ascending').key, -1)
 }

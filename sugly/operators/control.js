@@ -6,7 +6,7 @@ module.exports = function control ($void) {
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
   var signalOf = $void.signalOf
-  var thisCall = $void.thisCall
+  var iterateOf = $void.iterateOf
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
   var symbolElse = sharedSymbolOf('else')
@@ -150,11 +150,9 @@ module.exports = function control ($void) {
     }
     // evaluate the iterator
     var next = evaluate(clist[3], space)
-    if (typeof next !== 'function') {
-      next = thisCall(next, 'iterate')
-      if (typeof next !== 'function') {
-        return null // no iterator.
-      }
+    next = iterateOf(next)
+    if (!next) {
+      return null // no iterator.
     }
     // start to loop
     var result = null

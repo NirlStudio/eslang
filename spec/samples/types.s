@@ -67,7 +67,9 @@
 
 (e.g. operator
   (=? X)
+  (=? X)
   (=? X null)
+  (=? X (X))
   (=? X (X))
   (=? (X Y),
   (=? (X Y) null),
@@ -77,7 +79,9 @@
 
 (e.g. lambda
   (= x)
+  (= x)
   (= x null)
+  (= x x)
   (= x x)
   (= (x y),
   (= (x y) null),
@@ -87,7 +91,9 @@
 
 (e.g. function
   (=> x)
+  (=> x)
   (=> x null)
+  (=> x x)
   (=> x x)
   (=> (x y),
   (=> (x y) null),
@@ -95,8 +101,17 @@
   (=> (x y) (var z) (+ x y z),
 ).
 
-(e.g. array (@ 1) (@ 1 2).
-(e.g. object (@ x: 1) (@ x: 1 y: 2).
+(e.g. array
+  (@ null) (@ null)
+  (@ 1) (@ 1)
+  (@ 1 2) (@ 1 2)
+  (@ 1 2 true "x" (@) (@ x:1))
+).
+
+(e.g. object
+  (@ x: 1) (@ x: 1)
+  (@ x: 1 y: 2) (@ x: 1 y: 2)
+).
 
 (var spring (@:class
   z: 100
@@ -119,6 +134,6 @@
 
 (export choose (=> matched (@
     others: (var others (@))
-    target: (collect samples (=> (target sample)
+    target: (samples reduce (=> (target sample)
       (if ((sample the-type) is matched) sample else (others push sample) target),
 ).

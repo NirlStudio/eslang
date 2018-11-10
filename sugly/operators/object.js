@@ -8,14 +8,24 @@ module.exports = function object ($void) {
   var Symbol$ = $void.Symbol
   var ClassType$ = $void.ClassType
   var evaluate = $void.evaluate
+  var arraySet = $.array.proto.set
   var staticOperator = $void.staticOperator
 
   // (@ value ...)
   function arrayCreate (space, clist, offset) {
     var result = []
+    var index, value
     while (offset < clist.length) {
-      result.push(evaluate(clist[offset], space))
+      value = evaluate(clist[offset], space)
       offset += 1
+      if (offset < clist.length && clist[offset] === $Symbol.pairing) {
+        index = value >> 0; offset += 1
+        arraySet.call(result, index, offset >= clist.length ? null
+          : evaluate(clist[offset++], space)
+        )
+      } else {
+        result.push(value)
+      }
     }
     return result
   }

@@ -11,6 +11,7 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var ClassType$ = $void.ClassType
+  var thisCall = $void.thisCall
   var createClass = $void.createClass
   var sharedSymbolOf = $void.sharedSymbolOf
   var EncodingContext$ = $void.EncodingContext
@@ -259,29 +260,33 @@ module.exports = function ($void) {
   })
 
   // Enable the customization of Encoding.
+  var objectToCode = $Object.proto['to-code']
   var toCode = link(instance, 'to-code', function (ctx) {
     var overriding = this['to-code']
-    if (overriding === toCode) {
-      return $Object.proto['to-code'].call(this, ctx)
+    if (overriding === toCode) { // not overridden
+      return objectToCode.call(this, ctx)
     }
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
-      if (sym) {
-        return sym
-      }
+      if (sym) { return sym }
     } else {
       ctx = new EncodingContext$(this)
     }
     var code = overriding.call(this)
     return ctx.end(this, this.type,
-      code instanceof Tuple$ ? code : $Tuple.object)
+      $Type.of(code) === $Object
+        ? objectToCode.call(code) // downgrading to a common object
+        : code instanceof Tuple$ && !code.plain
+          ? code // valid object code
+          : objectToCode.call(this) // ingore invalid overriding method.
+    )
   })
 
   // Enable the customization of Description.
   var toString = link(instance, 'to-string', function () {
     var overriding = this['to-string']
     return overriding === toString
-      ? toCode.call(this)['to-string']()
+      ? thisCall(toCode.call(this), 'to-string')
       : overriding.apply(this, arguments)
   })
 
