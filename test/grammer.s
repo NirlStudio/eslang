@@ -370,14 +370,10 @@ map((iter map) map)
 reduce((iter reduce) reduce)
 count((iter count) count)
 sum((iter sum) sum)
+average((iter average) average)
 join((iter join) join)
 collect((iter collect) collect)
 finish((iter finish) finish)
-average((iter average) average)
-
-# meta.function.iteration.sugly
-iterate((iterate iterate) iterate)
-safely-iterate((safely-iterate safely-iterate) safely-iterate)
 
 # meta.function-array-type-sugly
 ((array from) from)

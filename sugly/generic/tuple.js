@@ -10,6 +10,7 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var link = $void.link
   var thisCall = $void.thisCall
+  var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty value
   var empty = link(Type, 'empty', new Tuple$([]))
@@ -26,7 +27,9 @@ module.exports = function ($void) {
   // empty objects
   link(Type, 'array', new Tuple$([$Symbol.object]))
   link(Type, 'object', new Tuple$([$Symbol.object, $Symbol.pairing]))
-  link(Type, 'class', new Tuple$([$Symbol.object, $Symbol.pairing, $Symbol['of-shared']('class')]))
+  link(Type, 'class', new Tuple$([
+    $Symbol.object, $Symbol.pairing, sharedSymbolOf('class')
+  ]))
 
   // check if the value can be accepted as an element of a tuple.
   link(Type, 'accepts', function (value) {

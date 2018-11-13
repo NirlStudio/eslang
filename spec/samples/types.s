@@ -108,6 +108,14 @@
   (@ 1 2 true "x" (@) (@ x:1))
 ).
 
+(e.g. iterator
+  (iterator of (@),
+  (iterator of (@ null),
+  (iterator of (@ 1 2),
+  (iterator of (@ 1 2 10:10),
+  (iterator of (@ 1 2 100:100),
+).
+
 (e.g. object
   (@ x: 1) (@ x: 1)
   (@ x: 1 y: 2) (@ x: 1 y: 2)

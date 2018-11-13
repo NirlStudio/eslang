@@ -12,8 +12,8 @@
   "null" "type"
   "bool" "string" "number" "date" "range" "symbol" "tuple"
   "operator" "lambda" "function"
-  "array" "object" "class"
-  "module" "iterate" "global"
+  "iterator" "array" "object" "class"
+  "module" "global"
 
   # runtime
   "runtime" "space" "signal" "evaluate"

@@ -176,15 +176,15 @@ module.exports = function () {
   /* Generally, all compound entities are mutable. */
   /* All compound entities are also fixed points of evaluation funtion. */
 
-  // A collection of values indexed by zero-based integers.
-  create('array')
-
   // A special type to wrap an iterate function.
   create('iterator')
   var Iterator$ = $void.Iterator = function (next) {
     this.next = next
   }
   Iterator$.prototype = $.iterator.proto
+
+  // A collection of values indexed by zero-based integers.
+  create('array')
 
   // The object is the fundamental type of all compound entities.
   create('object')

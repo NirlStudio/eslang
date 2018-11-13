@@ -138,7 +138,6 @@ module.exports = function ($void) {
     },
     end: function (obj, type, code) {
       // assert(code instanceof Tuple$)
-      code = new Tuple$(code.$)
       var offset = this.objs.get(obj)
       // assert(typeof offset !== 'undefined')
       if (offset === null) {

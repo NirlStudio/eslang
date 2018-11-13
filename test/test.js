@@ -108,8 +108,6 @@ module.exports = function ($void) {
     ])
 
     checkFunctions($, '[Sugly / functions] ', [
-      // genesis
-      'iterate', 'safely-iterate',
       // runtime
       'env', 'eval', 'run', 'interpreter',
       // startup

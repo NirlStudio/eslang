@@ -214,13 +214,12 @@ module.exports = function ($void) {
     if (this.compare === compare) {
       return null // no overridden
     }
-    switch (this.compare(another)) {
+    var ordering = this.compare(another)
+    switch (ordering) {
       case 0:
-        return 0
       case 1:
-        return 1
       case -1:
-        return -1
+        return ordering
       default:
         return null
     }
@@ -277,7 +276,7 @@ module.exports = function ($void) {
       $Type.of(code) === $Object
         ? objectToCode.call(code) // downgrading to a common object
         : code instanceof Tuple$ && !code.plain
-          ? code // valid object code
+          ? new Tuple$(code.$) // copy to avoid to corrupt shared tuples.
           : objectToCode.call(this) // ingore invalid overriding method.
     )
   })

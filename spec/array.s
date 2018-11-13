@@ -1,7 +1,7 @@
 (var the-type array)
 (include "share/type")
 
-(define "Tuple Common Behaviours" (=> ()
+(define "Array Common Behaviours" (=> ()
   (define "Identity" (=> ()
     (should "an empty array is also identitied by its instance." (= ()
       (assert ((@) is-not (@),
