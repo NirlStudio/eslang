@@ -74,7 +74,8 @@ module.exports = function object ($void) {
     if (length < 2) { // (@)
       return []
     }
-    if (clist[1] === $Symbol.pairing) {
+    var indicator = clist[1]
+    if (indicator === $Symbol.pairing) {
       if (length < 3) { // (@:)
         return Object.create($Object.proto)
       }
@@ -88,7 +89,7 @@ module.exports = function object ($void) {
             : objectCreate(space, clist, $Object, 3)
     }
     if (length > 2 && clist[2] === $Symbol.pairing &&
-        typeof clist[1] !== 'number'
+        (typeof indicator === 'string' || indicator instanceof Symbol$)
     ) { // (@ ? :)
       return objectCreate(space, clist, $Object, 1)
     } else { // as array
