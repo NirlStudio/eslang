@@ -152,12 +152,14 @@
     ),
     (should "any other type's value's type is not the type." (=> ()
       (for t in other-types
-        (for v in (t values)
-          (assert false (:v is-a the-type),
-          (assert (:v is-not-a the-type),
+        (if ((the-type is-not object) || ((t the-type) is-not-a class))
+          (for v in (t values)
+            (assert false (:v is-a the-type),
+            (assert (:v is-not-a the-type),
 
-          (assert false ((:v type) is the-type),
-          (assert ((:v type) is-not the-type),
+            (assert false ((:v type) is the-type),
+            (assert ((:v type) is-not the-type),
+          ),
         ),
       ),
     ),
@@ -170,12 +172,14 @@
     ),
     (should "any other type's empty value's type is not the type." (=> ()
       (for t in other-types
-        (var e (t "empty"),
-        (assert false (:e is-a the-type),
-        (assert (:e is-not-a the-type),
+        (if ((the-type is-not object) || ((t the-type) is-not-a class))
+          (var e (t "empty"),
+          (assert false (:e is-a the-type),
+          (assert (:e is-not-a the-type),
 
-        (assert false ((:e type) is the-type),
-        (assert ((:e type) is-not the-type),
+          (assert false ((:e type) is the-type),
+          (assert ((:e type) is-not the-type),
+        ),
       ),
     ),
   ),

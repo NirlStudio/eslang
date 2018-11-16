@@ -80,6 +80,9 @@ module.exports = function ($void) {
   var sharedSymbolOf = $void.sharedSymbolOf
 
   var symbolLocals = sharedSymbolOf('_')
+  var symbolObject = sharedSymbolOf('object')
+  var symbolClass = sharedSymbolOf('class')
+
   var createInst = function (type) {
     return type === $Array ? $Tuple.array
       : type === $Object ? $Tuple.object
@@ -89,8 +92,8 @@ module.exports = function ($void) {
     return type === $Array
       ? new Tuple$([ref, $Symbol.of('append'), code])
       : type === $Object
-        ? new Tuple$([$Symbol.object, $Symbol.of('assign'), ref, code])
-        : new Tuple$([$Symbol.class, $Symbol.of('attach'), ref, code])
+        ? new Tuple$([symbolObject, $Symbol.of('assign'), ref, code])
+        : new Tuple$([symbolClass, $Symbol.of('attach'), ref, code])
   }
 
   $void.EncodingContext = function (root) {

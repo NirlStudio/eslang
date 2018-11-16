@@ -49,7 +49,8 @@ module.exports = function ($void) {
     var proto
     return entity === null || typeof entity === 'undefined' ? null
       : typeof entity === 'object' && ownsProperty(entity, 'type')
-        ? (proto = Object.getPrototypeOf(entity)) ? proto.type : $Object
+        ? (proto = Object.getPrototypeOf(entity)) !== null
+          ? proto.type : $Object
         : entity.type
   })
 

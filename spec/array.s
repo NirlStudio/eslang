@@ -7,6 +7,9 @@
       (assert ((@) is-not (@),
       (assert false ((@) is (@),
 
+      (assert ((@:array) is-not (@:array),
+      (assert false ((@:array) is (@:array),
+
       (assert ((array empty) is-not (array empty),
       (assert false ((array empty) is (array empty),
 
@@ -87,7 +90,7 @@
 ),
 
 (define "(array of ...)" (= ()
-  (should "(array of) returns (array empty)." (= ()
+  (should "(array of) returns a new empty array." (= ()
     (assert 0 ((array of) length),
     (assert ((array of) is-empty),
   ),
@@ -110,7 +113,7 @@
 ),
 
 (define "(array from ...)" (= ()
-  (should "(array from) returns (array empty)." (= ()
+  (should "(array from) returns a new empty array." (= ()
     (assert 0 ((array from) length),
     (assert ((array from) is-empty),
   ),
@@ -5078,6 +5081,11 @@ f
     (assert "(@ 1 2 3)" (code to-string),
   ),
   (should "(an-array to-code) returns the code of an discrete array if it's discrete." (= ()
+    (var code ((@ 10:10 2 100:100) to-code),
+    (assert (code is-a tuple),
+    (assert 8 (code length),
+    (assert "(@ 10: 10 2 100: 100)" (code to-string),
+
     (var arr (@ 1 2),
     (arr 10 10)
     (var code (arr to-code),
@@ -5131,7 +5139,7 @@ f
     (assert 2 (arr 1),
     (assert arr (arr 2),
   ),
-  (should "(a--array to-code) returns the code of a lambda if it contains multiple copies if another array." (= ()
+  (should "(an-array to-code) returns the code of a lambda if it contains multiple copies of another array." (= ()
     (var item (@ 1 2),
     (let arr (@ item item),
     (var code (arr to-code),
@@ -5152,7 +5160,7 @@ f
     (assert item (arr 0),
     (assert item (arr 1),
   ),
-  (should "(a--array to-code) returns the code of a lambda if it's a composite array." (= ()
+  (should "(an-array to-code) returns the code of a lambda if it's a composite array." (= ()
     (var arr (@),
     (var item (@ 1 arr 2),
     (arr push 1 item (@ 2 item),
@@ -5180,8 +5188,8 @@ f
   ),
 ),
 
-(define "(an-array: ...)" (= ()
-  (should "(an-array: value) returns the offset of the first occurance of value which is not number, string or symbol." (= ()
+(define "(an-object: ...)" (= ()
+  (should "(an-object: field value) returns the offset of the first occurance of value which is not number, string or symbol." (= ()
     (var r (1 10),
     (var t (`(1 2),
     (var l (= x x),

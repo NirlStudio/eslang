@@ -13,6 +13,10 @@ module.exports = function ($void) {
   var EncodingContext$ = $void.EncodingContext
   var defineTypeProperty = $void.defineTypeProperty
 
+  var isObject = function (obj) {
+    return obj instanceof Object$ || (!!obj && obj.type === Type)
+  }
+
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
 
@@ -21,7 +25,7 @@ module.exports = function ($void) {
     var obj = createObject()
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
-      if (source instanceof Object$ || (source && source.type === Type)) {
+      if (isObject(source)) {
         Object.assign(obj, source)
       }
     }
@@ -30,57 +34,66 @@ module.exports = function ($void) {
 
   // copy fields from source objects to the target object
   link(Type, 'assign', function (target) {
-    if (target instanceof Object$ || (target && target.type === Type)) {
+    if (isObject(target)) {
       for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i]
         if (source instanceof Object$) {
           Object.assign(target, source)
         }
       }
+      return target
     }
-    return target
+    return null
   })
 
   // get the value of a field.
   link(Type, 'get', function (obj, name, value) {
-    // TODO: name may be a symbol
-    return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
-      ? typeof obj[name] === 'undefined' ? value : obj[name]
-      : value
+    if (name instanceof Symbol$) {
+      name = name.key
+    } else if (typeof name !== 'string') {
+      return value
+    }
+    return !isObject(obj) ? value
+      : typeof obj[name] === 'undefined' ? value : obj[name]
   })
   // set the value of a field.
   link(Type, 'set', function (obj, name, value) {
-    // TODO: name may be a symbol
-    return (obj instanceof Object$ || (obj && obj.type === Type)) && typeof name === 'string'
-      ? (obj[name] = (typeof value !== 'undefined' ? value : null))
-      : null
+    if (name instanceof Symbol$) {
+      name = name.key
+    } else if (typeof name !== 'string') {
+      return null
+    }
+    return !isObject(obj) ? null
+      : (obj[name] = (typeof value !== 'undefined' ? value : null))
   })
   // remove a field.
   link(Type, 'reset', function (obj, name, more) {
-    // TODO: name may be a symbol
-    if (!(obj instanceof Object$) && (!obj || obj.type !== Type)) {
+    if (!isObject(obj)) {
       return 0
     }
     if (typeof more === 'undefined') {
-      if (typeof name === 'string') {
-        return delete obj[name] ? 1 : 0
+      if (name instanceof Symbol$) {
+        name = name.key
       }
-      return 0
+      return typeof name !== 'string' ? 0
+        : delete obj[name] ? 1 : 0
     }
     var i = 1
     var counter = 0
     do {
-      if (typeof name === 'string' && (delete this[name])) {
-        counter++
+      if (typeof name === 'string') {
+        (delete obj[name]) && counter++
+      } else if (name instanceof Symbol$) {
+        (delete obj[name.key]) && counter++
       }
-      name = arguments[i++]
+      name = arguments[++i]
     } while (i < arguments.length)
     return counter
   })
 
   // make a copy with selected or all fields.
-  link(Type, 'copy', function (src) {
-    if (!(src instanceof Object$) && (!src || src.type !== Type)) {
+  link(Type, 'copy', function (src, fields) {
+    if (!isObject(src)) {
       return null
     }
     var obj = Object.create(src.type.proto)
@@ -103,38 +116,72 @@ module.exports = function ($void) {
     return obj
   })
   // remove given or all fields.
-  link(Type, 'clear', function (obj) {
-    if (obj instanceof Object$ || (obj && obj.type === Type)) {
-      var names = arguments.length > 0 ? Array.prototype.slice.call(arguments)
-        : Object.getOwnPropertyNames(obj)
-      for (var i = 0; i < names.length; i++) {
-        var name = names[i]
-        if (name instanceof Symbol$) {
-          name = name.key
-        }
-        if (typeof name === 'string') {
-          delete obj[name]
-        }
+  link(Type, 'clear', function (obj, fields) {
+    if (!isObject(obj)) {
+      return null
+    }
+    var names = arguments.length > 1
+      ? Array.prototype.slice.call(arguments, 1)
+      : Object.getOwnPropertyNames(obj)
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i]
+      if (typeof name === 'string') {
+        delete obj[name]
+      } else if (name instanceof Symbol$) {
+        delete obj[name.key]
       }
+    }
+    return obj
+  })
+  // remove one or more values to create a new array.
+  link(Type, 'remove', function (src, fields) {
+    // TODO: fields can be another object
+    if (!isObject(src)) {
+      return null
+    }
+    var obj = Object.assign(Object.create(src.type.proto), src)
+    var names = arguments.length <= 1 ? []
+      : Array.prototype.slice.call(arguments, 1)
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i]
+      if (typeof name === 'string') {
+        delete obj[name]
+      } else if (name instanceof Symbol$) {
+        delete obj[name.key]
+      }
+    }
+    var activator = src.type.proto.activator
+    if (typeof activator === 'function') {
+      activator.call(obj, obj)
     }
     return obj
   })
 
   // check the existence of a property
   link(Type, 'has', function (obj, name) {
-    return obj instanceof Object$ && typeof name === 'string'
-      ? typeof obj[name] !== 'undefined'
-      : false
+    if (typeof name !== 'string') {
+      if (name instanceof Symbol$) {
+        name = name.key
+      } else {
+        return false
+      }
+    }
+    return isObject(obj) && typeof obj[name] !== 'undefined'
   })
   // check the existence of a field
   link(Type, 'owns', function (obj, name) {
-    return obj instanceof Object$ && typeof name === 'string'
-      ? ownsProperty(obj, name)
-      : false
+    if (typeof name !== 'string') {
+      if (name instanceof Symbol$) {
+        name = name.key
+      } else {
+        return false
+      }
+    }
+    return isObject(obj) && ownsProperty(obj, name)
   })
   // retrieve field names.
   link(Type, 'fields-of', function (obj) {
-    return obj instanceof Object$ ? Object.getOwnPropertyNames(obj) : []
+    return isObject(obj) ? Object.getOwnPropertyNames(obj) : []
   })
 
   var proto = Type.proto

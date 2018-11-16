@@ -2,9 +2,11 @@
 
 module.exports = function object ($void) {
   var $ = $void.$
+  var $Array = $.array
   var $Class = $.class
   var $Object = $.object
   var $Symbol = $.symbol
+  var symbolOf = $Symbol.of
   var Symbol$ = $void.Symbol
   var ClassType$ = $void.ClassType
   var evaluate = $void.evaluate
@@ -34,25 +36,29 @@ module.exports = function object ($void) {
   function objectCreate (space, clist, type, offset) {
     var obj = type.empty()
     var length = clist.length
-    offset += 1 // moving to the first ':'
     while (offset < length) {
-      if (clist[offset] !== $Symbol.pairing) {
-        offset += 1; continue // look for next colon
-      }
-      var name = clist[offset - 1]
+      var name = clist[offset++]
       if (name instanceof Symbol$) {
+        if (name === $Symbol.pairing) {
+          continue
+        }
         name = name.key
       } else if (typeof name !== 'string') {
         name = evaluate(name, space)
         if (name instanceof Symbol$) {
+          if (name === $Symbol.pairing) {
+            continue
+          }
           name = name.key
         } else if (typeof name !== 'string') {
-          offset += 3; continue // try next pair
+          continue
         }
       }
-      offset += 1
-      obj[name] = offset < length ? evaluate(clist[offset], space) : null
-      offset += 2 // jump to next ':'
+      if (clist[offset] === $Symbol.pairing) {
+        obj[name] = ++offset < length ? evaluate(clist[offset++], space) : null
+      } else {
+        obj[name] = evaluate(symbolOf(name), space)
+      }
     }
     // activate a typed object
     var activator = type.proto.activator
@@ -77,9 +83,13 @@ module.exports = function object ($void) {
         ? $Class.of(objectCreate(space, clist, $Object, 3))
         : type instanceof ClassType$
           ? objectCreate(space, clist, type, 3)
-          : objectCreate(space, clist, $Object, 3)
+          : type === $Array
+            ? arrayCreate(space, clist, 3)
+            : objectCreate(space, clist, $Object, 3)
     }
-    if (length > 2 && clist[2] === $Symbol.pairing) { // (@ ? :)
+    if (length > 2 && clist[2] === $Symbol.pairing &&
+        typeof clist[1] !== 'number'
+    ) { // (@ ? :)
       return objectCreate(space, clist, $Object, 1)
     } else { // as array
       return arrayCreate(space, clist, 1)

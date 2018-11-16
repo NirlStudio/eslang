@@ -12,7 +12,9 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var ClassType$ = $void.ClassType
   var thisCall = $void.thisCall
+  var boolValueOf = $void.boolValueOf
   var createClass = $void.createClass
+  var isApplicable = $void.isApplicable
   var sharedSymbolOf = $void.sharedSymbolOf
   var EncodingContext$ = $void.EncodingContext
 
@@ -195,43 +197,31 @@ module.exports = function ($void) {
   })
 
   // Enable the customization of Identity.
-  var is = link(instance, 'is', function (another) {
-    return this.is === is ? this === another
-      : this === another || this.is(another) === true
-  })
-  link(instance, '===', function (another) {
-    return is.call(this, another)
+  var is = link(instance, ['is', '==='], function (another) {
+    return (this === another) || (
+      this.is !== is && isApplicable(this.is) && boolValueOf(this.is(another))
+    )
   })
   link(instance, ['is-not', '!=='], function (another) {
     return !is.call(this, another)
   })
 
-  // Enable the customization of Ordering.
+  // Enable the customizaztion of Ordering.
   var compare = link(instance, 'compare', function (another) {
-    if (this === another) {
-      return 0
-    }
-    if (this.compare === compare) {
-      return null // no overridden
-    }
-    var ordering = this.compare(another)
-    switch (ordering) {
-      case 0:
-      case 1:
-      case -1:
-        return ordering
-      default:
-        return null
-    }
+    var ordering
+    return this === another || is.call(this, another) ? 0
+      : this.compare === compare ? null
+        : (ordering = this.compare(another)) > 0 ? 1
+          : ordering < 0 ? -1
+            : ordering === 0 ? 0 : null
   })
 
   // Enable the customization of Equivalence.
-  var equals = link(instance, 'equals', function (another) {
-    return this.equals === equals ? this === another
-      : this === another || this.equals(another) === true
-  })
-  link(instance, '==', function (another) {
-    return equals.call(this, another)
+  var equals = link(instance, ['equals', '=='], function (another) {
+    return this === another || is.call(this, another) || (
+      this.equals !== equals && isApplicable(this.equals) &&
+        boolValueOf(this.equals(another))
+    )
   })
   link(instance, ['not-equals', '!='], function (another) {
     return !equals.call(this, another)
@@ -240,9 +230,9 @@ module.exports = function ($void) {
   // Emptiness: allow customization.
   var isEmpty = link(instance, 'is-empty', function () {
     var overriding = this['is-empty']
-    return overriding === isEmpty
-      ? Object.getOwnPropertyNames(this).length < 1
-      : overriding.call(this) === true
+    return overriding !== isEmpty && isApplicable(overriding)
+      ? boolValueOf(overriding.call(this))
+      : Object.getOwnPropertyNames(this).length < 1
   })
   link(instance, 'not-empty', function () {
     return !isEmpty.call(this)
@@ -250,9 +240,12 @@ module.exports = function ($void) {
 
   // Type Verification
   var isA = link(instance, 'is-a', function (t) {
+    if (t === $Object || t === this.type) {
+      return true
+    }
     var overriding = this['is-a']
-    return overriding === isA ? this.type === t
-      : this.type === t || overriding.call(this, t) === true
+    return overriding !== isA && isApplicable(overriding) &&
+      boolValueOf(overriding.call(this, t))
   })
   link(instance, 'is-not-a', function (t) {
     return !isA.call(this, t)
