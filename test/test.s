@@ -12,7 +12,7 @@
   "null" "type"
   "bool" "string" "number" "date" "range" "symbol" "tuple"
   "operator" "lambda" "function"
-  "iterator" "array" "object" "class"
+  "iterator" "array" "object" "class" "instance"
   "module" "global"
 
   # runtime

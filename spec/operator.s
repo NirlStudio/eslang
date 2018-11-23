@@ -571,7 +571,6 @@
       (decl x (10 * (y ?? 11),
     ),
     (assert 100 x),
-
     (assert 1000 (=>:() (decl z (10 * x),
     (assert null z)
   ),

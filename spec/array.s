@@ -5188,8 +5188,8 @@ f
   ),
 ),
 
-(define "(an-object: ...)" (= ()
-  (should "(an-object: field value) returns the offset of the first occurance of value which is not number, string or symbol." (= ()
+(define "(an-array: ...)" (= ()
+  (should "(an-array: field value) returns the offset of the first occurance of value which is not number, string or symbol." (= ()
     (var r (1 10),
     (var t (`(1 2),
     (var l (= x x),

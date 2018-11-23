@@ -4,8 +4,10 @@ module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
   var $Lambda = $.lambda
+  var $Object = $.object
   var Null = $void.null
   var Tuple$ = $void.Tuple
+  var Object$ = $void.Object
   var Symbol$ = $void.Symbol
   var ClassType$ = $void.ClassType
 
@@ -23,6 +25,11 @@ module.exports = function ($void) {
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
   $void.sharedSymbolOf = function (key) {
     return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
+  }
+
+  // to check if an value is a compatible object.
+  $void.isObject = function (obj) {
+    return obj instanceof Object$ || (!!obj && obj.type === $Object)
   }
 
   // retrieve the system indexer of an entity.

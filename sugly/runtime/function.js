@@ -135,8 +135,8 @@ module.exports = function function_ ($void) {
 
   // to prepare a new context for redo
   function prepareToRedo (scope, me, t, params, value, count) {
-    scope.context['do'] = me
-    scope.context['this'] = typeof t === 'undefined' ? null : t
+    scope.context.do = me
+    scope.context.this = typeof t === 'undefined' ? null : t
     var args = scope.context['arguments'] = count === 0 ? []
       : count === 1 ? [value] : value
     for (var i = 0; i < params.length; i++) {

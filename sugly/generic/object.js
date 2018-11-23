@@ -8,14 +8,11 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
+  var isObject = $void.isObject
   var thisCall = $void.thisCall
   var ownsProperty = $void.ownsProperty
   var EncodingContext$ = $void.EncodingContext
   var defineTypeProperty = $void.defineTypeProperty
-
-  var isObject = function (obj) {
-    return obj instanceof Object$ || (!!obj && obj.type === Type)
-  }
 
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
@@ -251,7 +248,8 @@ module.exports = function ($void) {
       }
     }
     return typeof value === 'undefined'
-      ? typeof proto[index] === 'undefined' ? this[index] : proto[index] // getting
+      ? typeof proto[index] === 'undefined' || index === 'type'
+        ? this[index] : proto[index] // getting
       : (this[index] = value) // setting
   })
 

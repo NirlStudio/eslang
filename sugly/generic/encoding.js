@@ -83,15 +83,20 @@ module.exports = function ($void) {
   var symbolObject = sharedSymbolOf('object')
   var symbolClass = sharedSymbolOf('class')
 
+  var normalize = function (type) {
+    type = type['to-code']()
+    return type === $Symbol.empty ? symbolObject : type
+  }
   var createInst = function (type) {
     return type === $Array ? $Tuple.array
-      : type === $Object ? $Tuple.object
-        : new Tuple$([$Symbol.object, $Symbol.pairing, type['to-code']()])
+      : type === $Object || (type = normalize(type)) === symbolObject
+        ? $Tuple.object
+        : new Tuple$([$Symbol.object, $Symbol.pairing, type])
   }
   var updateInst = function (ref, type, code) {
     return type === $Array
       ? new Tuple$([ref, $Symbol.of('append'), code])
-      : type === $Object
+      : type === $Object || (type = normalize(type)) === symbolObject
         ? new Tuple$([symbolObject, $Symbol.of('assign'), ref, code])
         : new Tuple$([symbolClass, $Symbol.of('attach'), ref, code])
   }

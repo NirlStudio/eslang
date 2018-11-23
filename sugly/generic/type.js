@@ -69,7 +69,7 @@ module.exports = function ($void) {
         typeDef[name] = this.proto[name]
       }
     }
-    var typeStatic = typeDef.static = $Object.empty()
+    var typeStatic = typeDef.type = $Object.empty()
     for (name in this) {
       if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
         typeStatic[name] = this[name]
@@ -86,8 +86,8 @@ module.exports = function ($void) {
         ? Object.getOwnPropertyNames(typeDef) : []
       for (var j = 0; j < props.length; j++) {
         var prop = props[j]
-        if (prop === 'static') {
-          var typeStatic = typeDef.static
+        if (prop === 'type') {
+          var typeStatic = typeDef.type
           var sprops = typeStatic instanceof Object$
             ? Object.getOwnPropertyNames(typeStatic) : []
           for (var k = 0; k < sprops.length; k++) {

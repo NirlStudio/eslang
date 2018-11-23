@@ -3,7 +3,10 @@
 module.exports = function space ($void) {
   var $ = $void.$
   var $Object = $.object
+  var ClassInst$ = $void.ClassInst
   var $export = $void.export
+  var isObject = $void.isObject
+  var indexerOf = $void.indexerOf
   var ownsProperty = $void.ownsProperty
 
   $void.Space = Space$
@@ -20,7 +23,12 @@ module.exports = function space ($void) {
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
       var value = this.context[key]
-      return typeof value === 'undefined' ? null : value
+      if (typeof value !== 'undefined') {
+        return value
+      }
+      var this_ = this.context.this
+      return typeof this_ === 'undefined' || this_ === null ? null
+        : indexerOf(this_).call(this_, key)
     },
     var: function (key, value) {
       return (this.local[key] = value)
@@ -29,7 +37,7 @@ module.exports = function space ($void) {
       return (this.context[key] = value)
     },
     let: function (key, value) {
-      if (ownsProperty(this.local, key) || !this.locals) {
+      if (ownsProperty(this.local, key)) {
         return (this.local[key] = value)
       }
       if (this.locals) {
@@ -38,6 +46,14 @@ module.exports = function space ($void) {
             return (this.locals[i][key] = value)
           }
         }
+      }
+      var this_ = this.context.this
+      if (isObject(this_) && (ownsProperty(this_, key) || (
+        (this_ instanceof ClassInst$) && key !== 'type' &&
+        ownsProperty(this_.type.proto, key)
+      ))) {
+        // auto field assignment only works for an existing field of an object.
+        return indexerOf(this_).call(this_, key, value)
       }
       return (this.local[key] = value)
     },

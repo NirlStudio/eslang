@@ -212,6 +212,9 @@ module.exports = function () {
 
   // the prototype of class instances is object.proto.
   var $Instance = $ClassProto.proto = Object.create($.object.proto)
+  // A fake constructor for instanceof checking for an instance of a class.
+  var ClassInst$ = $void.ClassInst = function () {}
+  ClassInst$.prototype = $Instance
 
   // export the ability of creation to enable an autonomous process.
   $void.createClass = function () {

@@ -141,11 +141,12 @@
   (should "type's proto returns the objectified type." (= ()
     (var t (type proto),
     (assert (t is-a object),
-    (assert ((t type) is object),
+    (assert ((t type) is-a object),
+    (assert ((type of t) is object),
 
     (assert 1 ((object fields-of t) length),
 
-    (var s (t static),
+    (var s (object get t "type"),
     (assert (s is-a object),
     (assert ((s type) is object),
     (assert ((s proto) is null),
@@ -326,10 +327,11 @@
   (should "(type objectify) returns the object representation of type." (= ()
     (var t (type objectify),
     (assert (t is-a object),
-    (assert ((t type) is object),
+    (assert ((t type) is-a object),
+    (assert ((type of t) is object),
     (assert 1 ((object fields-of t) length),
 
-    (var s (t static),
+    (var s (object get t "type"),
     (assert (s is-a object),
     (assert ((s type) is object),
     (assert ((s proto) is null),
@@ -364,7 +366,7 @@
     (type typify (@
       __inst_prop: 1
       __inst_method: (= x (+ x (:this __inst_prop),
-      static: (@
+      type: (@
         __type_prop: 10
         __type_method: (=> y (+ y (this __type_prop),
     ),

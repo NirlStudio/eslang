@@ -1084,7 +1084,7 @@
     (for field in (@
         "is" "===" "is-not" "!==" "equals" "==" "not-equals" "!="
         "compare" "is-empty" "not-empty" "is-a" "is-not-a"
-        "to-code" "to-string" ":" "type"
+        "to-code" "to-string" ":"
       )
       (assert (object has obj field),
       (assert false (object owns obj field),

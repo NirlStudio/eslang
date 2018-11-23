@@ -5,16 +5,19 @@ module.exports = function ($void) {
   var Type = $.class
   var $Type = $.type
   var $Tuple = $.tuple
+  var $Symbol = $.symbol
   var $Object = $.object
   var link = $void.link
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var Object$ = $void.Object
   var ClassType$ = $void.ClassType
+  var ClassInst$ = $void.ClassInst
+  var isObject = $void.isObject
   var thisCall = $void.thisCall
   var boolValueOf = $void.boolValueOf
   var createClass = $void.createClass
   var isApplicable = $void.isApplicable
+  var ownsProperty = $void.ownsProperty
   var sharedSymbolOf = $void.sharedSymbolOf
   var EncodingContext$ = $void.EncodingContext
 
@@ -27,17 +30,20 @@ module.exports = function ($void) {
   })
 
   // copy fields from source objects to the target class instance or an object.
+  var objectAssign = $Object.assign
   link(Type, 'attach', function (target) {
-    if (target instanceof Object$) {
+    if (target instanceof ClassInst$) {
       for (var i = 1; i < arguments.length; i++) {
         var src = arguments[i]
-        if (src instanceof Object$ || (src && src.type === $Object)) {
+        if (isObject(src)) {
           Object.assign(target, src)
           activate.call(target, src)
         }
       }
+      return target
     }
-    return target
+    // fallback to object assign for the class may not exist on target context.
+    return objectAssign.apply($Object, arguments)
   })
 
   // the prototype of classes
@@ -53,47 +59,6 @@ module.exports = function ($void) {
     return construct.call(Object.create(this.proto))
   })
 
-  // make this class to act as other classes and/or class descriptors.
-  var as = link(proto, 'as', function () {
-    var type_ = Object.create(null)
-    var proto_ = Object.create(null)
-    for (var i = 0; i < arguments.length; i++) {
-      var src = arguments[i]
-      var t, p
-      if (src instanceof ClassType$) {
-        t = src
-        p = src.proto
-      } else if (src instanceof Object$) {
-        p = src
-        if (src.static instanceof Object$) {
-          t = src.static
-        } else {
-          t = {}
-        }
-      } else {
-        t = {}; p = {}
-      }
-      var j, key
-      var names = Object.getOwnPropertyNames(t)
-      for (j = 0; j < names.length; j++) {
-        key = names[j]
-        if (typeof proto[key] === 'undefined') {
-          type_[key] = t[key]
-        }
-      }
-      names = Object.getOwnPropertyNames(p)
-      for (j = 0; j < names.length; j++) {
-        key = names[j]
-        if (key !== 'type' && key !== 'static') {
-          proto_[key] = p[key]
-        }
-      }
-    }
-    Object.assign(this, type_)
-    Object.assign(this.proto, proto_)
-    return this
-  })
-
   // static construction: create an instance by arguments.
   link(proto, 'of', function () {
     return construct.apply(Object.create(this.proto), arguments)
@@ -104,16 +69,53 @@ module.exports = function ($void) {
     var inst = Object.create(this.proto)
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
-      if (src instanceof Object$) {
+      if (isObject(src)) {
         Object.assign(inst, src)
         activate.call(inst, src)
       }
     }
-    return activate.call(inst, inst)
+    return inst
+  })
+
+  // make this class to act as other classes and/or class descriptors.
+  var as = link(proto, 'as', function () {
+    var type_ = Object.create(null)
+    var proto_ = Object.create(null)
+    for (var i = arguments.length - 1; i >= 0; i--) {
+      var src = arguments[i]
+      var t, p
+      if (src instanceof ClassType$) {
+        t = src
+        p = src.proto
+      } else if (isObject(src)) {
+        p = src
+        t = isObject(src.type) ? src.type : {}
+      } else {
+        t = {}; p = {}
+      }
+      var j, key
+      var names = Object.getOwnPropertyNames(t)
+      for (j = 0; j < names.length; j++) {
+        key = names[j]
+        if (typeof this[key] === 'undefined' || key === 'name') {
+          type_[key] = t[key]
+        }
+      }
+      names = Object.getOwnPropertyNames(p)
+      for (j = 0; j < names.length; j++) {
+        key = names[j]
+        if (key !== 'type' && key !== 'static' && !ownsProperty(this.proto, key)) {
+          proto_[key] = p[key]
+        }
+      }
+    }
+    Object.assign(this, type_)
+    Object.assign(this.proto, proto_)
+    return this
   })
 
   // Convert this class's definition to a type descriptor object.
-  link(proto, 'to-object', function () {
+  var toObject = link(proto, 'to-object', function () {
     var typeDef = $Object.empty()
     var names = Object.getOwnPropertyNames(this.proto)
     var i, name
@@ -123,14 +125,17 @@ module.exports = function ($void) {
         typeDef[name] = this.proto[name]
       }
     }
-    var typeStatic = typeDef.static = $Object.empty()
+    var typeStatic = $Object.empty()
+    var hasStatic = false
     names = Object.getOwnPropertyNames(this)
     for (i = 0; i < names.length; i++) {
       name = names[i]
       if (name !== 'proto') {
         typeStatic[name] = this[name]
+        hasStatic = true
       }
     }
+    hasStatic && (typeDef.type = typeStatic)
     return typeDef
   })
 
@@ -144,21 +149,44 @@ module.exports = function ($void) {
 
   // Emptiness: shared by all classes.
   link(proto, 'is-empty', function () {
-    return Object.getOwnPropertyNames(this.proto).length < 2
+    return !(Object.getOwnPropertyNames(this.proto).length > 1) && !(
+      Object.getOwnPropertyNames(this).length > (
+        ownsProperty(this, 'name') ? 2 : 1
+      )
+    )
   })
   link(proto, 'not-empty', function () {
-    return Object.getOwnPropertyNames(this.proto).length > 1
+    return Object.getOwnPropertyNames(this.proto).length > 1 || (
+      Object.getOwnPropertyNames(this).length > (
+        ownsProperty(this, 'name') ? 2 : 1
+      )
+    )
   })
 
   // Encoding
-  link(proto, 'to-code', function () {
+  var protoToCode = link(proto, 'to-code', function () {
     return typeof this.name === 'string' && this.name
-      ? sharedSymbolOf(this.name) : $Tuple.class
+      ? sharedSymbolOf(this.name.trim()) : $Symbol.empty
   })
 
   // Description
+  var symbolClass = sharedSymbolOf('class')
+  var symbolOf = sharedSymbolOf('of')
+  var objectToCode = $Object.proto['to-code']
+  var tupleToString = $Tuple.proto['to-string']
   link(proto, 'to-string', function () {
-    return typeof this.name === 'string' ? this.name : '?class'
+    var code = protoToCode.call(this)
+    if (code !== $Symbol.empty) {
+      return thisCall(code, 'to-string')
+    }
+    code = objectToCode.call(toObject.call(this))
+    if (code.$[0] === $Symbol.object) {
+      code.$[1] === $Symbol.pairing ? code.$.splice(2, 0, symbolClass)
+        : code.$.splice(1, 0, $Symbol.pairing, symbolClass)
+    } else {
+      code = new Tuple$([symbolClass, symbolOf, code])
+    }
+    return tupleToString.call(code)
   })
 
   var classIndexer = link(proto, ':', function (index, value) {
@@ -252,7 +280,6 @@ module.exports = function ($void) {
   })
 
   // Enable the customization of Encoding.
-  var objectToCode = $Object.proto['to-code']
   var toCode = link(instance, 'to-code', function (ctx) {
     var overriding = this['to-code']
     if (overriding === toCode) { // not overridden

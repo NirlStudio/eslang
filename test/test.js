@@ -442,6 +442,6 @@ module.exports = function ($void) {
     seval(121, '(let z 100) (=> (1 20): (x y) (x + y z).')
 
     seval(11, '(let summer (@:class add: (= () ((this x) + (this y), (let s (summer of (@ x: 1 y: 10), (s add)')
-    seval(11, '(let summer (@:class static: (@ add: (= (x y ) (+ x y), (summer add 1 10)')
+    seval(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y), (summer add 1 10)')
   }
 }

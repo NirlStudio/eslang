@@ -133,17 +133,30 @@
 ).
 (var summer (@:class
   z: 200
+  constructor: (= z (this "z" z),
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. class spring)
+(var autumn (@:class
+  z: 400
+  constructor: (= z (this "z" z),
+  activator: (=) (src) (),
+  add: (= (x y) (+ x y (this z),
+).
+(e.g. class
+  spring summer autumn
+).
 
 (var winter (@:class
   z: 400
+  activator: (=) (src) (this "z" (src z),
+  constructor: (= z (this "z" z),
   add: (= (x y) (+ x y (this z),
 ).
 (e.g. winter
   (winter default)
+  (winter of (@ z: 401),
   (winter of (@ z: 4000),
+  (@:winter z: 4001)
 ).
 
 (export choose (=> matched (@

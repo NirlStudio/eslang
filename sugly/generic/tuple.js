@@ -275,7 +275,9 @@ module.exports = function ($void) {
           encode.call(item, list, indent, padding)
         }
       } else {
-        first || item === $Symbol.pairing ? (first = false) : list.push(' ')
+        first || item === $Symbol.pairing || (
+          i === 2 && list[1] === '@' && list[2] === ':'
+        ) ? (first = false) : list.push(' ')
         list.push($void.thisCall(item, 'to-string'))
       }
     }
