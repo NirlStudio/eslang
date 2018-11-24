@@ -9,6 +9,8 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
   var link = $void.link
+  var thisCall = $void.thisCall
+  var isApplicable = $void.isApplicable
   var ownsProperty = $void.ownsProperty
   var sharedSymbolOf = $void.sharedSymbolOf
 
@@ -63,16 +65,22 @@ module.exports = function ($void) {
     if (typeof this === 'undefined' || this === null) {
       return Object.assign(typeDef, Null)
     }
-    var name
+    var name, value, thisEmpty
     for (name in this.proto) {
       if (name !== 'type' && typeof proto[name] === 'undefined') {
-        typeDef[name] = this.proto[name]
+        value = this.proto[name]
+        typeDef[name] = !isApplicable(value) ? value
+          : thisCall(value, 'bind', typeof thisEmpty !== 'undefined' ? thisEmpty
+            : isApplicable(this.empty) ? this.empty() : this.empty
+          )
       }
     }
     var typeStatic = typeDef.type = $Object.empty()
     for (name in this) {
       if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
-        typeStatic[name] = this[name]
+        value = this[name]
+        typeStatic[name] = !isApplicable(value) ? value
+          : thisCall(value, 'bind', this)
       }
     }
     return typeDef

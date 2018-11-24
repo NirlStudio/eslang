@@ -358,7 +358,10 @@ parameters((f parameters) parameters)
 body((f body) body)
 is-generic((f is-generic) is-generic)
 not-generic((f not-generic) not-generic)
+is-bound((f is-bound) is-bound)
+not-bound((f not-bound) not-bound)
 apply((f apply) apply)
+bind((f bind) bind)
 
 # meta.function-iterator-type-sugly
 ((iterator of-unsafe) of-unsafe)

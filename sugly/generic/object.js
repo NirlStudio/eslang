@@ -10,6 +10,7 @@ module.exports = function ($void) {
   var Object$ = $void.Object
   var isObject = $void.isObject
   var thisCall = $void.thisCall
+  var ClassType$ = $void.ClassType
   var ownsProperty = $void.ownsProperty
   var EncodingContext$ = $void.EncodingContext
   var defineTypeProperty = $void.defineTypeProperty
@@ -214,6 +215,7 @@ module.exports = function ($void) {
 
   // Encoding
   // encoding logic for all object instances.
+  var typeOf = $.type.of
   var toCode = link(proto, 'to-code', function (ctx) {
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
@@ -230,7 +232,8 @@ module.exports = function ($void) {
     if (code.length < 2) {
       code.push($Symbol.pairing) // (@:) for empty object
     }
-    return ctx.end(this, Type, new Tuple$(code))
+    var type = this.type instanceof ClassType$ ? this.type : typeOf(this)
+    return ctx.end(this, type, new Tuple$(code))
   })
 
   // Description

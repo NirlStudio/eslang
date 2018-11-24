@@ -203,7 +203,7 @@ module.exports = function () {
 
   // the prototype of classes is also a type.
   var $ClassProto = $Class.proto = Object.create(Type)
-  $ClassProto.name = ''
+  $ClassProto.name = undefined
   $ClassProto.type = $Class
 
   // A fake constructor for instanceof checking for a class.

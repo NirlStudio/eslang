@@ -4,10 +4,10 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.function
-  var $Lambda = $.lambda
   var $Tuple = $.tuple
   var link = $void.link
   var prepareOperation = $void.prepareOperation
+  var prepareApplicable = $void.prepareApplicable
   var defineTypeProperty = $void.defineTypeProperty
 
   // the noop function
@@ -15,18 +15,12 @@ module.exports = function ($void) {
     return null
   }, $Tuple.function))
 
-  // prepare common type implementation.
+  // implement common operation features.
   prepareOperation(Type, noop, $Tuple.function)
 
-  var proto = Type.proto
-  // apply a function and expand arguments from an array.
-  link(proto, 'apply', $Lambda.proto.apply)
+  // implement applicable operation features.
+  prepareApplicable(Type, $Tuple.function)
 
-  // Desccription
-  link(proto, 'to-string', function () {
-    return (this.code || $Tuple.function)['to-string']()
-  })
-
-  // inject type
+  // inject function as the default type for native functions.
   defineTypeProperty(Function.prototype, Type)
 }

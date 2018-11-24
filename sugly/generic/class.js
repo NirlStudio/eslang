@@ -81,15 +81,23 @@ module.exports = function ($void) {
   var as = link(proto, 'as', function () {
     var type_ = Object.create(null)
     var proto_ = Object.create(null)
-    for (var i = arguments.length - 1; i >= 0; i--) {
-      var src = arguments[i]
+    var args = Array.prototype.slice.call(arguments)
+    for (var i = 0; i < args.length; i++) {
+      var src = args[i]
       var t, p
       if (src instanceof ClassType$) {
         t = src
         p = src.proto
       } else if (isObject(src)) {
         p = src
-        t = isObject(src.type) ? src.type : {}
+        if (isObject(src.type)) {
+          t = src.type
+        } else {
+          if (src.type instanceof ClassType$) {
+            args.splice(i + 1, 0, src.type)
+          }
+          t = {}
+        }
       } else {
         t = {}; p = {}
       }
@@ -97,14 +105,17 @@ module.exports = function ($void) {
       var names = Object.getOwnPropertyNames(t)
       for (j = 0; j < names.length; j++) {
         key = names[j]
-        if (typeof this[key] === 'undefined' || key === 'name') {
-          type_[key] = t[key]
+        if ((typeof this[key] === 'undefined') && !ownsProperty(type_, key)) {
+          // not to copy a type's name, but copy a definition name field
+          if (key !== 'name' || !(t instanceof ClassType$)) {
+            type_[key] = t[key]
+          }
         }
       }
       names = Object.getOwnPropertyNames(p)
       for (j = 0; j < names.length; j++) {
         key = names[j]
-        if (key !== 'type' && key !== 'static' && !ownsProperty(this.proto, key)) {
+        if (key !== 'type' && !ownsProperty(this.proto, key) && !ownsProperty(proto_, key)) {
           proto_[key] = p[key]
         }
       }
@@ -116,13 +127,20 @@ module.exports = function ($void) {
 
   // Convert this class's definition to a type descriptor object.
   var toObject = link(proto, 'to-object', function () {
+    if (!(this instanceof ClassType$)) {
+      return null
+    }
     var typeDef = $Object.empty()
     var names = Object.getOwnPropertyNames(this.proto)
-    var i, name
+    var i, name, value, thisEmpty
     for (i = 0; i < names.length; i++) {
       name = names[i]
       if (name !== 'type') {
-        typeDef[name] = this.proto[name]
+        value = this.proto[name]
+        typeDef[name] = !isApplicable(value) ? value
+          : thisCall(value, 'bind', typeof thisEmpty !== 'undefined'
+            ? thisEmpty : (thisEmpty = this.empty())
+          )
       }
     }
     var typeStatic = $Object.empty()
@@ -131,7 +149,9 @@ module.exports = function ($void) {
     for (i = 0; i < names.length; i++) {
       name = names[i]
       if (name !== 'proto') {
-        typeStatic[name] = this[name]
+        value = this[name]
+        typeStatic[name] = !isApplicable(value) ? value
+          : thisCall(value, 'bind', this)
         hasStatic = true
       }
     }
@@ -189,18 +209,6 @@ module.exports = function ($void) {
     return tupleToString.call(code)
   })
 
-  var classIndexer = link(proto, ':', function (index, value) {
-    var name = typeof index === 'string' ? index
-      : index instanceof Symbol$ ? index.key : ''
-    return name === 'proto' ? this.objectify()
-      : typeof proto[name] !== 'undefined' ? this[name]
-        : typeof value === 'undefined' ? this[name]
-          : (this[name] = value) // allow to add new class properties directly.
-  })
-
-  // export class indexer.
-  link(Type, 'indexer', classIndexer)
-
   // the prototype of class instances
   var instance = proto.proto
 
@@ -222,6 +230,23 @@ module.exports = function ($void) {
       this.activator(source)
     }
     return this
+  })
+
+  // Generate a persona to act like another class.
+  link(instance, ['as'], function (cls) {
+    if (!(cls instanceof ClassType$)) {
+      return null
+    }
+
+    var names = Object.getOwnPropertyNames(cls.proto)
+    var persona = Object.create($Object.proto)
+    for (var i = 0; i < names.length; i++) {
+      var name = name[i]
+      var value = cls.proto[name]
+      persona[name] = !isApplicable(value) ? value
+        : thisCall(value, 'bind', this)
+    }
+    return persona
   })
 
   // Enable the customization of Identity.

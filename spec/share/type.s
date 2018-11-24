@@ -3,7 +3,7 @@
 (the-type ?? (warn "the type to be tested is not defined.").
 (var (the-values the-empty other-types) (=> :()
   (var (choose) (import "samples/types"),
-  (var (target others) (choose the-type),
+  (var (target others) (choose the-type the-values),
   (@ (target values) (target "empty") others)
 ).
 ################################################################################
@@ -115,8 +115,12 @@
       (assert (the-type is-a type),
       (assert false (the-type is-not-a type),
 
-      (assert ((the-type type) is type),
-      (assert false ((the-type type) is-not type),
+      (if (the-type is-not-a class)
+        (assert ((the-type type) is type),
+        (assert false ((the-type type) is-not type),
+      else
+        (assert ((the-type type) is class),
+        (assert false ((the-type type) is-not class),
     ),
     (should "a common type is not an instance of itself." (=> ()
       (assert false (the-type is-a the-type),
@@ -219,17 +223,31 @@
       (assert null (the-type :"__new_method" (= x x),
       (assert (:(the-type "__new_method") is null),
     ),
-    (should "type's type is type." (=> ()
-      (assert type (the-type type),
+    ((the-type is-a class) ?
+      (should "a class's type is class." (=> ()
+        (assert class (the-type type),
 
-      (assert type (the-type "type"),
-      (assert type (the-type (`type),
+        (assert class (the-type "type"),
+        (assert class (the-type (`type),
 
-      (assert type (the-type :"type"),
-      (assert type (the-type :(`type),
+        (assert class (the-type :"type"),
+        (assert class (the-type :(`type),
 
-      (assert type (the-type :"type" x),
-      (assert type (the-type :(`type) x),
+        (assert class (the-type :"type" x),
+        (assert class (the-type :(`type) x),
+      ),
+      (should "type's type is type." (=> ()
+        (assert type (the-type type),
+
+        (assert type (the-type "type"),
+        (assert type (the-type (`type),
+
+        (assert type (the-type :"type"),
+        (assert type (the-type :(`type),
+
+        (assert type (the-type :"type" x),
+        (assert type (the-type :(`type) x),
+      ),
     ),
     (should "type's proto is a descriptor object." (=> ()
       (assert ((the-type proto) is-a object),
@@ -432,8 +450,9 @@
       (assert (:(the-type of) is-a the-type),
       (assert false (:(the-type of) is-not-a the-type),
     ),
-    (should "each type has its own indexer." (=> ()
-      (assert (:(the-type "indexer") is-not (type "indexer"),
+    (if (the-type is-not class)
+      (should "each primary type has its own instance indexer." (=> ()
+        (assert (:(the-type "indexer") is-not (type "indexer"),
     ),
     (should "a common type's objectify function inherits type's." (=> ()
       (assert (:(the-type "objectify") is (type "objectify"),

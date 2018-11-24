@@ -101,7 +101,7 @@ module.exports = function ($void) {
     return target
   }
 
-  $void.prepareOperation = function prepareOperation (type, noop, emptyCode) {
+  $void.prepareOperation = function (type, noop, emptyCode) {
     // the empty function
     noop.$name = 'noop'
     var empty = link(type, 'empty', function () {
@@ -150,6 +150,11 @@ module.exports = function ($void) {
       return this.code || emptyCode
     })
 
+    // Desccription
+    link(proto, 'to-string', function () {
+      return (this.code || emptyCode)['to-string']()
+    })
+
     // Indexer
     var indexer = link(proto, ':', function (index) {
       return typeof index === 'string' ? proto[index]
@@ -158,5 +163,44 @@ module.exports = function ($void) {
 
     // export type indexer.
     link(type, 'indexer', indexer)
+  }
+
+  $void.prepareApplicable = function (type, emptyCode) {
+    var proto = type.proto
+
+    // test if the lambda/function has been bound to a subject.
+    link(proto, 'is-bound', function () {
+      return this.bound === true
+    })
+    link(proto, 'not-bound', function () {
+      return this.bound !== true
+    })
+
+    // return operation's parameters
+    link(proto, 'this', function () {
+      return this.bound === true ? this.this : null
+    })
+
+    // apply a function and expand arguments from an array.
+    link(proto, 'apply', function (subject, args) {
+      return typeof subject === 'undefined' ? this.apply(null)
+        : Array.isArray(args) ? this.apply(subject, args)
+          : typeof args === 'undefined'
+            ? this.call(subject)
+            : this.call(subject, args)
+    })
+
+    // bind a function to a fixed subject.
+    link(proto, 'bind', function ($this) {
+      if (typeof $this === 'undefined' || this.bound === true) {
+        return this // binding can only happen once.
+      }
+      var bound = this.bind($this)
+      bound.type = type
+      bound.code = this.code || emptyCode
+      bound.bound = true
+      bound.this = $this
+      return bound
+    })
   }
 }

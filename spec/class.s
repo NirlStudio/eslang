@@ -568,30 +568,3 @@
     (assert null (obj y),
   ),
 ),
-
-(define "(a-class: ...)" (= ()
-  (should "(a-class proto) reflects this class type by calling (a-class objectify)." (= ()
-    (var cls (@:class x: 1 type: (@ y: 2),
-    (var obj1 (cls objectify),
-    (var obj2 (cls proto),
-    (assert (obj1 is-not obj2),
-    (assert (obj1 to-string) (obj2 to-string),
-
-    (let obj2 (cls "proto"),
-    (assert (obj1 is-not obj2),
-    (assert (obj1 to-string) (obj2 to-string),
-
-    (let obj2 (cls: "proto"),
-    (assert (obj1 is-not obj2),
-    (assert (obj1 to-string) (obj2 to-string),
-  ),
-  (should "(a-class: member value) can extend current class if member is not a primary member." (= ()
-    (var cls (@:class x: 1 type: (@ y: 2),
-    (cls: "x" 11)
-    (cls: "y" 22)
-    (cls: "empty" 22)
-    (assert 11 (cls x),
-    (assert 22 (cls y),
-    (assert (:(cls "empty") is-a lambda)
-  ),
-),

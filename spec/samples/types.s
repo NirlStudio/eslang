@@ -131,36 +131,42 @@
   z: 100
   add: (= (x y) (+ x y (this z),
 ).
-(var summer (@:class
+(var summer (@:class type: null
   z: 200
   constructor: (= z (this "z" z),
   add: (= (x y) (+ x y (this z),
 ).
-(var autumn (@:class
+(var autumn (@:class type: (@ x: 1)
   z: 400
   constructor: (= z (this "z" z),
   activator: (=) (src) (),
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. class
-  spring summer autumn
-).
-
 (var winter (@:class
+  type: (@
+    x: 1
+    add: (= (x y) (+ x y),
+  ),
   z: 400
   activator: (=) (src) (this "z" (src z),
   constructor: (= z (this "z" z),
   add: (= (x y) (+ x y (this z),
 ).
-(e.g. winter
-  (winter default)
-  (winter of (@ z: 401),
-  (winter of (@ z: 4000),
-  (@:winter z: 4001)
+(e.g. class
+  spring summer autumn winter
 ).
 
-(export choose (=> matched (@
+(export choose (=> (matched values) (@
     others: (var others (@))
-    target: (samples reduce (=> (target sample)
-      (if ((sample the-type) is matched) sample else (others push sample) target),
+    target: (samples reduce
+      (@ the-type: matched
+        empty: (matched empty)
+        values: (values ?? (@),
+      ),
+      (=> (target sample)
+        (if ((sample the-type) is matched)
+          sample
+        else
+          (if (matched is-not-a (sample the-type)) (others push sample),
+          target
 ).

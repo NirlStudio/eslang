@@ -13,12 +13,6 @@ module.exports = function ($void) {
     return null
   }, $Tuple.operator))
 
-  // prepare common type implementation.
+  // implement common operation features.
   prepareOperation(Type, noop, $Tuple.operator)
-
-  var proto = Type.proto
-  // Desccription
-  link(proto, 'to-string', function () {
-    return (this.code || $Tuple.operator)['to-string']()
-  })
 }

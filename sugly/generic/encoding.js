@@ -161,15 +161,23 @@ module.exports = function ($void) {
       return obj === this.root ? this._finalize(offset) : record[0]
     },
     _finalize: function (rootOffset) {
+      var root
       if (this.shared.length < 1) {
         // no circular or shared array/object.
-        return this.clist[rootOffset][2]
+        root = this.clist[rootOffset]
+        var type = root[1]
+        var code = root[2]
+        if (type !== $Array && type !== $Object && type.name) {
+          code.$[1] === $Symbol.pairing
+            ? code.$.splice(2, 0, sharedSymbolOf(type.name))
+            : code.$.splice(1, 0, $Symbol.pairing, sharedSymbolOf(type.name))
+        }
+        return code
       }
       var args = [$Symbol.object] // (@ ...)
       var body = [new Tuple$([ // (local _ args) ...
         $Symbol.local, symbolLocals, new Tuple$(args)
       ])]
-      var root
       for (var i = 0; i < this.shared.length; i++) {
         var offset = this.shared[i]
         var record = this.clist[offset]

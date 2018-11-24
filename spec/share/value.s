@@ -120,11 +120,12 @@
   ),
   (should "a value's type is not any other type." (=> ()
     (for a-type in other-types
-      (assert false (:the-value is-a (a-type the-type),
-      (assert (:the-value is-not-a (a-type the-type),
+      (if ((the-type is-not-a class) && (a-type is-not object))
+        (assert false (:the-value is-a (a-type the-type),
+        (assert (:the-value is-not-a (a-type the-type),
 
-      (assert false ((:the-value type) is (a-type the-type),
-      (assert ((:the-value type) is-not (a-type the-type),
+        (assert false ((:the-value type) is (a-type the-type),
+        (assert ((:the-value type) is-not (a-type the-type),
     ),
   ),
 ).
