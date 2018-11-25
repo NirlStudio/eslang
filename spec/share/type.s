@@ -265,8 +265,9 @@
       (var t (the-type proto),
       # a type descriptor is an common object.
       (assert (t is-a object),
-      (assert ((t type) is-a object),
       (assert ((type of t) is object),
+      (assert ((t type) is-a object),
+      (assert the-type ((t type) indexer "type"),
 
       (var s (t type),
       # a type's type descriptor is an common object.

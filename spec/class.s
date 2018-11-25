@@ -114,11 +114,10 @@
     ),
     (should "An anonymous class with nested values is represented as (class of (@ ...))." (=> ()
       (var obj (@ x: 1),
-      (assert (((@:class o1: obj o2: obj) to-string) starts-with "(class of "),
+      (assert (((@:class type: (@ o1: obj o2: obj)) to-string) starts-with "(class of "),
 
-      (var obj (@ x: 1),
       (obj "self" obj),
-      (assert (((@:class obj) to-string) starts-with "(class of "),
+      (assert (((@:class type: (@ o: obj)) to-string) starts-with "(class of "),
     ),
     (should "A named class is represented by its name." (=> ()
       (var Cat (@:class),
@@ -529,7 +528,7 @@
     (assert 1 (inst x),
     (assert null (inst y),
   ),
-  (should "(a-class as extensions ...) applys all extensions on this class and retuns it." (= ()
+  (should "(a-class as extensions ...) applys all extensions on this class and returns it." (= ()
     (var cls (@:class y: 1 type: (@ q: 1),
     (assert cls (cls as
       (@ x: 1 y: 2 type: (@ p: 3 q: 4),
@@ -558,7 +557,7 @@
     (assert (obj is-a object),
     (assert (obj is-empty),
   ),
-  (should "(a-class to-object) retuns an object holding both type and instance members." (= ()
+  (should "(a-class to-object) returns an object holding both type and instance members." (= ()
     (var cls (@:class x: 1 type: (@ y: 2),
     (var obj (cls to-object),
     (assert (obj is-a object),

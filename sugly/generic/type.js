@@ -71,7 +71,7 @@ module.exports = function ($void) {
         value = this.proto[name]
         typeDef[name] = !isApplicable(value) ? value
           : thisCall(value, 'bind', typeof thisEmpty !== 'undefined' ? thisEmpty
-            : isApplicable(this.empty) ? this.empty() : this.empty
+            : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
           )
       }
     }
@@ -80,7 +80,10 @@ module.exports = function ($void) {
       if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
         value = this[name]
         typeStatic[name] = !isApplicable(value) ? value
-          : thisCall(value, 'bind', this)
+          : thisCall(value, 'bind', name !== 'indexer' ? this
+            : typeof thisEmpty !== 'undefined' ? thisEmpty
+              : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
+          )
       }
     }
     return typeDef

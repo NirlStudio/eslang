@@ -78,6 +78,7 @@ module.exports = function ($void) {
   })
 
   // make this class to act as other classes and/or class descriptors.
+  var isAtom = $Tuple.accepts
   var as = link(proto, 'as', function () {
     var type_ = Object.create(null)
     var proto_ = Object.create(null)
@@ -113,10 +114,12 @@ module.exports = function ($void) {
         }
       }
       names = Object.getOwnPropertyNames(p)
+      var value
       for (j = 0; j < names.length; j++) {
         key = names[j]
         if (key !== 'type' && !ownsProperty(this.proto, key) && !ownsProperty(proto_, key)) {
-          proto_[key] = p[key]
+          value = p[key]
+          proto_[key] = isAtom(value) || (typeof value === 'function') ? value : null
         }
       }
     }
@@ -233,16 +236,27 @@ module.exports = function ($void) {
   })
 
   // Generate a persona to act like another class.
-  link(instance, ['as'], function (cls) {
+  link(instance, 'as', function (cls, member) {
     if (!(cls instanceof ClassType$)) {
       return null
+    }
+    if (member instanceof Symbol$) {
+      member = member.key
+    } else if (typeof member !== 'string' || !member) {
+      member = null
+    }
+
+    var value
+    if (member) {
+      value = cls.proto[member]
+      return isApplicable(value) ? thisCall(value, 'bind', this) : value
     }
 
     var names = Object.getOwnPropertyNames(cls.proto)
     var persona = Object.create($Object.proto)
     for (var i = 0; i < names.length; i++) {
-      var name = name[i]
-      var value = cls.proto[name]
+      var name = names[i]
+      value = cls.proto[name]
       persona[name] = !isApplicable(value) ? value
         : thisCall(value, 'bind', this)
     }
@@ -259,16 +273,6 @@ module.exports = function ($void) {
     return !is.call(this, another)
   })
 
-  // Enable the customizaztion of Ordering.
-  var compare = link(instance, 'compare', function (another) {
-    var ordering
-    return this === another || is.call(this, another) ? 0
-      : this.compare === compare ? null
-        : (ordering = this.compare(another)) > 0 ? 1
-          : ordering < 0 ? -1
-            : ordering === 0 ? 0 : null
-  })
-
   // Enable the customization of Equivalence.
   var equals = link(instance, ['equals', '=='], function (another) {
     return this === another || is.call(this, another) || (
@@ -278,6 +282,16 @@ module.exports = function ($void) {
   })
   link(instance, ['not-equals', '!='], function (another) {
     return !equals.call(this, another)
+  })
+
+  // Enable the customizaztion of Ordering.
+  var compare = link(instance, 'compare', function (another) {
+    var ordering
+    return this === another || equals.call(this, another) ? 0
+      : this.compare === compare || !isApplicable(this.compare) ? null
+        : (ordering = this.compare(another)) > 0 ? 1
+          : ordering < 0 ? -1
+            : ordering === 0 ? 0 : null
   })
 
   // Emptiness: allow customization.
@@ -317,13 +331,11 @@ module.exports = function ($void) {
       ctx = new EncodingContext$(this)
     }
     var code = overriding.call(this)
-    return ctx.end(this, this.type,
-      $Type.of(code) === $Object
-        ? objectToCode.call(code) // downgrading to a common object
-        : code instanceof Tuple$ && !code.plain
-          ? new Tuple$(code.$) // copy to avoid to corrupt shared tuples.
-          : objectToCode.call(this) // ingore invalid overriding method.
-    )
+    return $Type.of(code) === $Object
+      ? ctx.end(this, this.type, objectToCode.call(code))
+      : code instanceof Tuple$ && code.plain !== true
+        ? ctx.end(this, $Object, code) // app handle its type information.
+        : ctx.end(this, this.type, objectToCode.call(this))
   })
 
   // Enable the customization of Description.

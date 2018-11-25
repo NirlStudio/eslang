@@ -168,9 +168,11 @@ module.exports = function ($void) {
         var type = root[1]
         var code = root[2]
         if (type !== $Array && type !== $Object && type.name) {
-          code.$[1] === $Symbol.pairing
-            ? code.$.splice(2, 0, sharedSymbolOf(type.name))
-            : code.$.splice(1, 0, $Symbol.pairing, sharedSymbolOf(type.name))
+          if (code.$[1] !== $Symbol.pairing) {
+            code.$.splice(1, 0, $Symbol.pairing, sharedSymbolOf(type.name))
+          } else if (code.$.length < 3) {
+            code.$.splice(2, 0, sharedSymbolOf(type.name))
+          }
         }
         return code
       }
