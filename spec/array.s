@@ -5124,7 +5124,7 @@ f
     (arr push(arr),
     (var code (arr to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@)))\n"
       "  ((_ 0) append (@ 1 2 (_ 0)))\n"
       ")"
@@ -5144,7 +5144,7 @@ f
     (let arr (@ item item),
     (var code (arr to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@)))\n"
       "  ((_ 0) append (@ 1 2))\n"
       "  (@ (_ 0) (_ 0))\n"
@@ -5166,7 +5166,7 @@ f
     (arr push 1 item (@ 2 item),
     (var code (arr to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@) (@)))\n"
       "  ((_ 1) append (@ 1 (_ 0) 2))\n"
       "  ((_ 0) append (@ 1 (_ 1) (@ 2 (_ 1))))\n"

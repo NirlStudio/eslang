@@ -98,13 +98,33 @@
       ),
     ),
     (should "a complex instance is represented as a lambda tuple." (=> ()
+      (var obj (@ x: 1),
+      (obj "self" obj),
       (var kitty1 (cat of 1 10 1.5),
       (var kitty2 (cat of 2 20 2.5),
+      (kitty2 "self" (@ obj kitty2),
       (kitty1 "friend" kitty2),
       (kitty2 "friend" kitty1),
 
       (var code (kitty1 to-code),
       (var k1 (code),
+      (var k2 (k1 friend),
+      (assert (k1 is-a cat),
+      (assert (k2 is-a cat),
+      (assert k1 (k2 friend),
+
+      (let k1 (cat from k1),
+      (let k2 (cat from k2),
+
+      (assert 1 (k1 age),
+      (assert 10 (k1 height),
+      (assert 1.5 (k1 weight),
+
+      (assert 2 (k2 age),
+      (assert 20 (k2 height),
+      (assert 2.5 (k2 weight),
+
+      (var k1 (eval code),
       (var k2 (k1 friend),
       (assert false (k1 is-a cat),
       (assert false (k2 is-a cat),
@@ -520,7 +540,6 @@
     (should "the default value of an instance member can only be an atomic value or operation." (=> ()
       (var cls (@:class x: 1 a: (@) o: (@:) c: (@:cat),
       (var inst (@:cls),
-      (print ((inst a) type) (inst o) (inst c))
       (assert 1 (inst x),
       (assert null (inst o),
       (assert null (inst a),

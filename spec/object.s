@@ -974,7 +974,7 @@
     (obj "obj" obj),
     (var code (obj to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@:)))\n"
       "  (object assign (_ 0) (@ x: 1 y: 2 obj: (_ 0)))\n"
       ")"
@@ -994,7 +994,7 @@
     (let obj (@ z: 3 v1: val v2: val),
     (var code (obj to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@:)))\n"
       "  (object assign (_ 0) (@ x: 1 y: 2))\n"
       "  (@ z: 3 v1: (_ 0) v2: (_ 0))\n"
@@ -1017,7 +1017,7 @@
     (obj "obj" (@ y: 2 arr: arr),
     (var code (obj to-code),
     (var str (+
-      "(=: ()\n"
+      "(=>: ()\n"
       "  (local _ (@ (@:) (@)))\n"
       "  ((_ 1) append (@ 1 (_ 0) 2))\n"
       "  (object assign (_ 0) (@ x: 1 arr: (_ 1) obj: (@ y: 2 arr: (_ 1))))\n"

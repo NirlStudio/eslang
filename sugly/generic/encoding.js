@@ -69,13 +69,15 @@ var createIndex = typeof Map === 'function' ? function () {
 }
 
 module.exports = function ($void) {
+  var $ = $void.$
+  var $Type = $.type
+  var $Tuple = $.tuple
+  var $Array = $.array
+  var $Object = $.object
+  var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
-  var $Type = $void.$.type
-  var $Tuple = $void.$.tuple
-  var $Array = $void.$.array
-  var $Object = $void.$.object
-  var $Symbol = $void.$.symbol
+  var Symbol$ = $void.Symbol
   var thisCall = $void.thisCall
   var sharedSymbolOf = $void.sharedSymbolOf
 
@@ -94,6 +96,16 @@ module.exports = function ($void) {
         : new Tuple$([$Symbol.object, $Symbol.pairing, type])
   }
   var updateInst = function (ref, type, code) {
+    // remove unnecessary activation for data entity.
+    var items = code.$
+    if (items.length > 2 && items[0] === $Symbol.object &&
+      items[1] === $Symbol.pairing && (items[2] instanceof Symbol$)
+    ) {
+      var cls = items[2].key
+      if (cls !== 'array' && cls !== 'object' && cls !== 'class') {
+        items.length > 3 ? items.splice(1, 2) : items.splice(2, 1)
+      }
+    }
     return type === $Array
       ? new Tuple$([ref, $Symbol.of('append'), code])
       : type === $Object || (type = normalize(type)) === symbolObject
@@ -145,6 +157,14 @@ module.exports = function ($void) {
           ) ? thisCall(obj, 'to-code', this) : thisCall(obj, 'to-code')
     },
     end: function (obj, type, code) {
+      // try to supplement type to code
+      if (type !== $Array && type !== $Object && type.name) {
+        if (code.$[1] !== $Symbol.pairing) {
+          code.$.splice(1, 0, $Symbol.pairing, sharedSymbolOf(type.name))
+        } else if (code.$.length < 3) {
+          code.$.splice(2, 0, sharedSymbolOf(type.name))
+        }
+      }
       // assert(code instanceof Tuple$)
       var offset = this.objs.get(obj)
       // assert(typeof offset !== 'undefined')
@@ -161,25 +181,15 @@ module.exports = function ($void) {
       return obj === this.root ? this._finalize(offset) : record[0]
     },
     _finalize: function (rootOffset) {
-      var root
       if (this.shared.length < 1) {
         // no circular or shared array/object.
-        root = this.clist[rootOffset]
-        var type = root[1]
-        var code = root[2]
-        if (type !== $Array && type !== $Object && type.name) {
-          if (code.$[1] !== $Symbol.pairing) {
-            code.$.splice(1, 0, $Symbol.pairing, sharedSymbolOf(type.name))
-          } else if (code.$.length < 3) {
-            code.$.splice(2, 0, sharedSymbolOf(type.name))
-          }
-        }
-        return code
+        return this.clist[rootOffset][2]
       }
       var args = [$Symbol.object] // (@ ...)
       var body = [new Tuple$([ // (local _ args) ...
         $Symbol.local, symbolLocals, new Tuple$(args)
       ])]
+      var root
       for (var i = 0; i < this.shared.length; i++) {
         var offset = this.shared[i]
         var record = this.clist[offset]
@@ -190,7 +200,7 @@ module.exports = function ($void) {
       }
       body.push(root || this.clist[rootOffset][2])
       return new Tuple$([ // (=:() (arguments push ...) ...)
-        $Symbol.lambda, $Symbol.pairing, $Tuple.empty, new Tuple$(body, true)
+        $Symbol.function, $Symbol.pairing, $Tuple.empty, new Tuple$(body, true)
       ])
     }
   }
