@@ -282,12 +282,15 @@
     (assert 1 (object get obj (`y),
     (assert null (object get obj y),
 
-    (var pair (@:class x: 1
-      constructor: (= y (this "y" y),
+    (var pair (@:class x: 1 z: null
+      constructor: (= y (this "y" y) (let z 3),
     ),
     (let obj (pair of 2),
+    (assert 1 (obj "x"),
+    (assert 1 (obj x),
     (assert 1 (object get obj "x"),
     (assert 2 (object get obj (`y),
+    (assert 3 (object get obj "z"),
 
     (assert null (object get obj true),
     (assert null (object get obj 1),

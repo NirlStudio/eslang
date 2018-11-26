@@ -20,7 +20,7 @@ module.exports = function ($void) {
   $export($, 'true', true)
   $export($, 'false', false)
 
-  // punctuations pure Symbols
+  // punctuation pure Symbols
   $export($, '(', sharedSymbolOf('('))
   $export($, ')', sharedSymbolOf(')'))
   $export($, ',', sharedSymbolOf(','))
@@ -34,7 +34,7 @@ module.exports = function ($void) {
   $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
 
-  // global common variables.
+  // global enum value.
   $export($, sharedSymbolOf('descending').key, 1)
   $export($, sharedSymbolOf('equivalent').key, 0)
   $export($, sharedSymbolOf('ascending').key, -1)

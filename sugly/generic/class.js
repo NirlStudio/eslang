@@ -51,21 +51,28 @@ module.exports = function ($void) {
 
   // generate an empty instance.
   link(proto, 'empty', function () {
-    return Object.create(this.proto)
+    return this instanceof ClassType$ ? Object.create(this.proto) : null
   })
 
   // generate an instance without arguments.
   link(proto, 'default', function () {
-    return construct.call(Object.create(this.proto))
+    return this instanceof ClassType$
+      ? construct.call(Object.create(this.proto))
+      : null
   })
 
   // static construction: create an instance by arguments.
   link(proto, 'of', function () {
-    return construct.apply(Object.create(this.proto), arguments)
+    return this instanceof ClassType$
+      ? construct.apply(Object.create(this.proto), arguments)
+      : null
   })
 
   // static activation: restore an instance by one or more property set.
   link(proto, 'from', function () {
+    if (!(this instanceof ClassType$)) {
+      return null
+    }
     var inst = Object.create(this.proto)
     for (var i = 0; i < arguments.length; i++) {
       var src = arguments[i]
@@ -80,6 +87,9 @@ module.exports = function ($void) {
   // make this class to act as other classes and/or class descriptors.
   var isAtom = $Tuple.accepts
   var as = link(proto, 'as', function () {
+    if (!(this instanceof ClassType$)) {
+      return null
+    }
     var type_ = Object.create(null)
     var proto_ = Object.create(null)
     var args = Array.prototype.slice.call(arguments)
@@ -172,6 +182,9 @@ module.exports = function ($void) {
 
   // Emptiness: shared by all classes.
   link(proto, 'is-empty', function () {
+    if (!(this instanceof ClassType$)) {
+      return true
+    }
     return !(Object.getOwnPropertyNames(this.proto).length > 1) && !(
       Object.getOwnPropertyNames(this).length > (
         ownsProperty(this, 'name') ? 2 : 1
@@ -179,6 +192,9 @@ module.exports = function ($void) {
     )
   })
   link(proto, 'not-empty', function () {
+    if (!(this instanceof ClassType$)) {
+      return false
+    }
     return Object.getOwnPropertyNames(this.proto).length > 1 || (
       Object.getOwnPropertyNames(this).length > (
         ownsProperty(this, 'name') ? 2 : 1
@@ -188,7 +204,8 @@ module.exports = function ($void) {
 
   // Encoding
   var protoToCode = link(proto, 'to-code', function () {
-    return typeof this.name === 'string' && this.name
+    return this instanceof ClassType$ &&
+      typeof this.name === 'string' && this.name
       ? sharedSymbolOf(this.name.trim()) : $Symbol.empty
   })
 
@@ -201,6 +218,9 @@ module.exports = function ($void) {
     var code = protoToCode.call(this)
     if (code !== $Symbol.empty) {
       return thisCall(code, 'to-string')
+    }
+    if (!(this instanceof ClassType$)) {
+      return null
     }
     code = objectToCode.call(toObject.call(this))
     if (code.$[0] === $Symbol.object) {
