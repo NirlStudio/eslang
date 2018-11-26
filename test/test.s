@@ -20,7 +20,7 @@
   "eval" "run" "interpreter"
 
   # operators
-  "quote" "assignment" "control"
+  "operators/all" "quote" "assignment" "control"
   "logical" "arithmetic" "general"
   "load" "import" "include"
 

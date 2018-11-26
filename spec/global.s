@@ -76,10 +76,10 @@
   (should "(` descending) is resolved to 1." (= ()
     (assert 1 descending),
   ),
-  (should "(` ascending) is resolved to -1." (= ()
-    (assert -1 ascending),
-  ),
   (should "(` equivalent) is resolved to 0." (= ()
     (assert 0 equivalent),
+  ),
+  (should "(` ascending) is resolved to -1." (= ()
+    (assert -1 ascending),
   ),
 ),
