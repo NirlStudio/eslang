@@ -1,14 +1,6 @@
-(include "operators/app")
-(include "operators/arithmetic")
-(include "operators/assignment")
-(include "operators/bitwise")
-(include "operators/control")
-(include "operators/function")
-(include "operators/general")
-(include "operators/import")
-(include "operators/include")
-(include "operators/load")
-(include "operators/logical")
-(include "operators/object")
-(include "operators/operator")
-(include "operators/quote")
+(for spec in (@
+    "app" "arithmetic" "assignment" "bitwise" "control" "function" "general"
+    "import" "include" "load" "logical" "object" "operator" "quote"
+  )
+  (load ("operators/" + spec)
+),

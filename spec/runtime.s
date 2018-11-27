@@ -1,7 +1,5 @@
-(include "runtime/eval")
-(include "runtime/evaluate")
-(include "runtime/interpreter")
-(include "runtime/run")
-(include "runtime/runtime")
-(include "runtime/signal")
-(include "runtime/space")
+(for spec in (@
+    "eval" "evaluate" "interpreter" "run" "runtime" "signal" "space"
+  )
+  (load ("runtime/" + spec)
+),

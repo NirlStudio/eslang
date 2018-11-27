@@ -89,6 +89,12 @@ true
 true(true true true: true :true true@ true @true true)true
 false
 false(false false false: false :false false@ false @false false)false
+descending
+descending(descending descending descending: descending :descending descending@ descending @descending descending)descending
+equivalent
+equivalent(equivalent equivalent equivalent: equivalent :equivalent equivalent@ equivalent @equivalent equivalent)equivalent
+ascending
+ascending(ascending ascending ascending: ascending :ascending ascending@ ascending @ascending ascending)ascending
 
 # meta.operator.operator-decl.sugly
 =?(=?(=? x )=? )

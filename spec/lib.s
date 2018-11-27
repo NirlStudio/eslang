@@ -1,5 +1,5 @@
-(include "lib/json")
-(include "lib/math")
-(include "lib/print")
-(include "lib/timer")
-(include "lib/uri")
+(for spec in (@
+    "json" "math" "print" "timer" "uri"
+  )
+  (load ("lib/" + spec)
+),

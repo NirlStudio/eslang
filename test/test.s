@@ -8,21 +8,9 @@
   # bootstrap
   "tokenizer" "compiler"
 
-  # generic
-  "null" "type"
-  "bool" "string" "number" "date" "range" "symbol" "tuple"
-  "operator" "lambda" "function"
-  "iterator" "array" "object" "class" "instance"
-  "module" "global"
-
-  # runtime
-  "runtime" "space" "signal" "evaluate"
-  "eval" "run" "interpreter"
-
-  # operators
+  "generic"
+  "runtime"
   "operators"
-
-  # lib
   "lib"
 ).
 
