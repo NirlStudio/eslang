@@ -1,4 +1,4 @@
-(define "operator ($ ...)" (= ()
+(define "app resolving: $" (= ()
   (should "$ is a pure symbol." (= ()
     (assert $ (symbol of "$"),
   ),

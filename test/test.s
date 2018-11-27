@@ -20,12 +20,10 @@
   "eval" "run" "interpreter"
 
   # operators
-  "operators/all" "quote" "assignment" "control"
-  "logical" "arithmetic" "general"
-  "load" "import" "include"
+  "operators"
 
-  # libs
-  "print" "math" "uri" "json" "timer"
+  # lib
+  "lib"
 ).
 
 # run given specs or all.
