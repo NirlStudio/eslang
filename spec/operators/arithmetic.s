@@ -207,8 +207,9 @@
 
     (let num 1)
     (assert 11 ((num + 10) +=),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) increases the value of num by inc and returns the new value." (=> ()
+  (should "(num += values ...) increases the value of num by values and returns the new value." (=> ()
     (assert 10 (0 += 10),
     (assert 21 (1 += 10 10),
     (assert 29 (-1 += 10 10 10),
@@ -218,8 +219,9 @@
 
     (let num 1)
     (assert 21 ((num + 10) += 10),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) sets the new value back to num if num is a symbol." (=> ()
+  (should "(num += values ...) sets the new value back to num if num is a symbol." (=> ()
     (var num 1)
     (assert 11 (num += 10),
     (assert 11 num)
@@ -239,130 +241,178 @@
 ),
 
 (define "(num -= ...)" (=> ()
-  (should "(num +=) returns the orginal value of num." (=> ()
-    (assert 0 (0 +=),
-    (assert 1 (1 +=),
-    (assert -1 (-1 +=),
+  (should "(num -=) returns the orginal value of num." (=> ()
+    (assert 0 (0 -=),
+    (assert 1 (1 -=),
+    (assert -1 (-1 -=),
 
     (var num 1)
-    (assert 1 (num +=),
+    (assert 1 (num -=),
 
     (let num 1)
-    (assert 11 ((num + 10) +=),
+    (assert -9 ((num - 10) -=),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) increases the value of num by inc and returns the new value." (=> ()
-    (assert 10 (0 += 10),
-    (assert 21 (1 += 10 10),
-    (assert 29 (-1 += 10 10 10),
+  (should "(num -= values ...) decreases the value of num by values and returns the new value." (=> ()
+    (assert -10 (0 -= 10),
+    (assert -19 (1 -= 10 10),
+    (assert -31 (-1 -= 10 10 10),
 
     (var num 1)
-    (assert 11 (num += 10),
+    (assert -9 (num -= 10),
 
     (let num 1)
-    (assert 21 ((num + 10) += 10),
+    (assert -89 ((num + 10) -= 100),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) sets the new value back to num if num is a symbol." (=> ()
+  (should "(num -= values ...) sets the new value back to num if num is a symbol." (=> ()
     (var num 1)
-    (assert 11 (num += 10),
-    (assert 11 num)
+    (assert -9 (num -= 10),
+    (assert -9 num)
 
     (let num 0)
-    (assert 20 (num += 10 10),
-    (assert 20 num)
+    (assert -20 (num -= 10 10),
+    (assert -20 num)
 
     (let num -1)
-    (assert 29 (num += 10 10 10),
-    (assert 29 num)
+    (assert -31 (num -= 10 10 10),
+    (assert -31 num)
 
     (let num (number invalid),
-    (assert (number invalid) (num += 10),
+    (assert (number invalid) (num -= 10),
     (assert (number invalid) num)
   ),
 ),
 
 (define "(num *= ...)" (=> ()
-  (should "(num +=) returns the orginal value of num." (=> ()
-    (assert 0 (0 +=),
-    (assert 1 (1 +=),
-    (assert -1 (-1 +=),
+  (should "(num *=) returns the orginal value of num." (=> ()
+    (assert 0 (0 *=),
+    (assert 1 (1 *=),
+    (assert -1 (-1 *=),
 
     (var num 1)
-    (assert 1 (num +=),
+    (assert 1 (num *=),
 
     (let num 1)
-    (assert 11 ((num + 10) +=),
+    (assert 11 ((num + 10) *=),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) increases the value of num by inc and returns the new value." (=> ()
-    (assert 10 (0 += 10),
-    (assert 21 (1 += 10 10),
-    (assert 29 (-1 += 10 10 10),
+  (should "(num *= values ...) multiplies the value of num by values and returns the new value." (=> ()
+    (assert 0 (0 *= 10),
+    (assert 100 (1 *= 10 10),
+    (assert -1000 (-1 *= 10 10 10),
 
     (var num 1)
-    (assert 11 (num += 10),
+    (assert 10 (num *= 10),
 
     (let num 1)
-    (assert 21 ((num + 10) += 10),
+    (assert 110 ((num + 10) *= 10),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) sets the new value back to num if num is a symbol." (=> ()
+  (should "(num *= values ...) sets the new value back to num if num is a symbol." (=> ()
     (var num 1)
-    (assert 11 (num += 10),
-    (assert 11 num)
+    (assert 10 (num *= 10),
+    (assert 10 num)
 
     (let num 0)
-    (assert 20 (num += 10 10),
-    (assert 20 num)
+    (assert 0 (num *= 10 10),
+    (assert 0 num)
 
     (let num -1)
-    (assert 29 (num += 10 10 10),
-    (assert 29 num)
+    (assert -1000 (num *= 10 10 10),
+    (assert -1000 num)
 
     (let num (number invalid),
-    (assert (number invalid) (num += 10),
+    (assert (number invalid) (num *= 10),
     (assert (number invalid) num)
   ),
 ),
 
 (define "(num /= ...)" (=> ()
-  (should "(num +=) returns the orginal value of num." (=> ()
-    (assert 0 (0 +=),
-    (assert 1 (1 +=),
-    (assert -1 (-1 +=),
+  (should "(num /=) returns the orginal value of num." (=> ()
+    (assert 0 (0 /=),
+    (assert 1 (1 /=),
+    (assert -1 (-1 /=),
 
     (var num 1)
-    (assert 1 (num +=),
+    (assert 1 (num /=),
 
     (let num 1)
-    (assert 11 ((num + 10) +=),
+    (assert 11 ((num + 10) /=),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) increases the value of num by inc and returns the new value." (=> ()
-    (assert 10 (0 += 10),
-    (assert 21 (1 += 10 10),
-    (assert 29 (-1 += 10 10 10),
+  (should "(num /= values ...) divides the value of num by values and returns the new value." (=> ()
+    (assert 0 (0 /= 10),
+    (assert 0.01 (1 /= 10 10),
+    (assert -0.001 (-1 /= 10 10 10),
 
     (var num 1)
-    (assert 11 (num += 10),
+    (assert 0.1 (num /= 10),
 
     (let num 1)
-    (assert 21 ((num + 10) += 10),
+    (assert 1.1 ((num + 10) /= 10),
+    (assert 1 num)
   ),
-  (should "(num += inc ...) sets the new value back to num if num is a symbol." (=> ()
+  (should "(num /= values ...) sets the new value back to num if num is a symbol." (=> ()
     (var num 1)
-    (assert 11 (num += 10),
-    (assert 11 num)
+    (assert 0.1 (num /= 10),
+    (assert 0.1 num)
 
     (let num 0)
-    (assert 20 (num += 10 10),
-    (assert 20 num)
+    (assert 0 (num /= 10 10),
+    (assert 0 num)
 
     (let num -1)
-    (assert 29 (num += 10 10 10),
-    (assert 29 num)
+    (assert -0.001 (num /= 10 10 10),
+    (assert -0.001 num)
 
     (let num (number invalid),
-    (assert (number invalid) (num += 10),
+    (assert (number invalid) (num /= 10),
     (assert (number invalid) num)
   ),
 ),
 
 (define "(num %= ...)" (=> ()
+  (should "(num %=) returns the orginal value of num." (=> ()
+    (assert 0 (0 %=),
+    (assert 1 (1 %=),
+    (assert -1 (-1 %=),
+
+    (var num 1)
+    (assert 1 (num %=),
+
+    (let num 1)
+    (assert 11 ((num + 10) %=),
+    (assert 1 num)
+  ),
+  (should "(num %= base) computes the reminder of num to base." (=> ()
+    (assert 0 (0 %= 10),
+    (assert 1 (1 %= 10),
+    (assert 2 (12 %= 10),
+    (assert 2 (102 %= 10),
+
+    (var num 1)
+    (assert 1 (num %= 10),
+
+    (let num 1)
+    (assert 4 ((num + 3) %= 10),
+    (assert 1 num)
+  ),
+  (should "(num %= base) sets the reminder value back to num if num is a symbol." (=> ()
+    (var num 1)
+    (assert 1 (num %= 10),
+    (assert 1 num)
+
+    (let num 0)
+    (assert 0 (num %= 10),
+    (assert 0 num)
+
+    (let num -1)
+    (assert -1 (num %= 10),
+    (assert -1 num)
+
+    (let num (number invalid),
+    (assert (number invalid) (num %= 10),
+    (assert (number invalid) num)
+  ),
 ),
