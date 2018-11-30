@@ -81,17 +81,17 @@ module.exports = function evaluate ($void) {
         if (predicate.key === ':') {
           predicate = indexerOf(subject) // explicitly calling the indexer
         } else { // implicitly call the indexer
-          predicate = indexerOf(subject).call(subject, predicate.key)
+          var indexer = indexerOf(subject)
+          predicate = indexer.get
+            ? indexer.get.call(subject, predicate.key)
+            : indexer.call(subject, predicate.key)
           if (typeof predicate !== 'function') {
             return predicate // interpret to getter if the result is not a function.
           }
         }
-      } else if (typeof predicate === 'string' || typeof predicate === 'number') {
-        // implicitly calling the indexer with index value(s)
+      } else if (typeof predicate !== 'function') {
         args.push(predicate)
         predicate = indexerOf(subject)
-      } else if (typeof predicate !== 'function') {
-        return subject // do nothing with the subject.
       }
     }
 

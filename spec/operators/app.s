@@ -1,4 +1,4 @@
-(define "app resolving: $" (= ()
+(define "app/global resolving: $" (= ()
   (should "$ is a pure symbol." (= ()
     (assert $ (symbol of "$"),
   ),

@@ -9,17 +9,17 @@ module.exports = function iterate ($void) {
   var Iterator$ = $void.Iterator
   var numberOf = $.number.of
   var link = $void.link
-  var $export = $void.export
   var thisCall = $void.thisCall
   var boolValueOf = $void.boolValueOf
   var isApplicable = $void.isApplicable
+  var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // try to get an iterator function for an entity
-  var iterateOf = $export($void, 'iterateOf', function (source) {
+  var iterateOf = $void.iterateOf = function (source) {
     return isApplicable(source) ? source
       : isApplicable(source = thisCall(source, 'iterate')) ? source : null
-  })
+  }
 
   // create an empty iterator.
   var empty = link(Type, 'empty', new Iterator$(null))
@@ -31,7 +31,7 @@ module.exports = function iterate ($void) {
     }
     var next = iterateOf(iterable)
     return next ? new Iterator$(next) : empty
-  })
+  }, true)
 
   // create an iterator object for an unsafe iterable entity.
   var unsafe = function (next) {
@@ -52,7 +52,7 @@ module.exports = function iterate ($void) {
   link(Type, 'of-unsafe', function (iterable) {
     var next = iterateOf(iterable)
     return next ? new Iterator$(unsafe(next)) : empty
-  })
+  }, true)
 
   var proto = Type.proto
   // an iterator objecct is also iterable.
@@ -334,9 +334,12 @@ module.exports = function iterate ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? proto[index.key] : null
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

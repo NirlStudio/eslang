@@ -401,6 +401,47 @@
       (assert "cat is Tom, Mew! ..." (kitty to-string "Mew!" "..."),
     ),
   ),
+
+  (define "Indexer" (= ()
+    (var cat (@:class x: 100 y: 200 type: (@
+      indexer: (= i ((i == 1) ? x y),
+    ),
+    (var kitty1 (cat default),
+    (var kitty2 (@:cat x: 1000 y: 2000),
+    (should "a class cannot customize its indexer logic for symbol index." (=> ()
+      (assert 100 (kitty1 x),
+      (assert null (kitty1 xx),
+      (assert 1000 (kitty2 x),
+      (assert null (kitty2 xx),
+    ),
+    (should "a class cannot customize its indexer logic for string index." (=> ()
+      (assert 100 (kitty1 "x"),
+      (assert null (kitty1 "xx"),
+      (assert 1000 (kitty2 "x"),
+      (assert null (kitty2 "xx"),
+    ),
+    (should "a class can customized its indexer logic for other index values." (=> ()
+      (assert 200 (kitty1 0),
+      (assert 100 (kitty1 1),
+      (assert 200 (kitty1 2),
+      (assert 200 (kitty1 3),
+      (assert 200 (kitty1 (number invalid),
+
+      (assert 2000 (kitty2 true),
+      (assert 1000 (kitty2 (`x),
+      (assert 1000 (kitty2 ("x"),
+      (assert 2000 (kitty2 (@),
+      (assert 2000 (kitty2 (@:),
+
+      (assert null (kitty2 (=),
+      (assert null (kitty2 (=>),
+      (assert null (kitty2 (=?),
+
+      (assert 2000 (kitty2: (=),
+      (assert 2000 (kitty2: (=>),
+      (assert 2000 (kitty2: (=?),
+    ),
+  ),
 ),
 
 (define "Class Design Patterns" (=> ()

@@ -3,9 +3,13 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.symbol
-  var link = $void.link
+  var $String = $.string
   var Symbol$ = $void.Symbol
+  var link = $void.link
+  var isSafeSymbol = $void.isSafeSymbol
+  var protoValueOf = $void.protoValueOf
   var strCompare = $.string.proto.compare
+  var strToString = $.string.proto['to-string']
 
   // common symbol repository
   var sharedSymbols = $void.sharedSymbols
@@ -33,10 +37,6 @@ module.exports = function ($void) {
   link(Type, 'let', sharedSymbolOf('let'))
   link(Type, 'var', sharedSymbolOf('var'))
   link(Type, 'local', sharedSymbolOf('local'))
-  link(Type, 'export', sharedSymbolOf('export'))
-  link(Type, 'import', sharedSymbolOf('import'))
-  link(Type, 'include', sharedSymbolOf('include'))
-  link(Type, 'load', sharedSymbolOf('load'))
 
   // symbols for common punctuations
   link(Type, 'begin', sharedSymbolOf('('))
@@ -48,10 +48,6 @@ module.exports = function ($void) {
   link(Type, 'pairing', sharedSymbolOf(':'))
   link(Type, 'comment', sharedSymbolOf('#'))
 
-  // symbols for special punctuations
-  link(Type, 'in', sharedSymbolOf('in'))
-  link(Type, 'else', sharedSymbolOf('else'))
-
   // create a symbol from a key.
   link(Type, 'of', function (key) {
     return typeof key !== 'string'
@@ -59,14 +55,19 @@ module.exports = function ($void) {
         : typeof key === 'undefined' || key === null ? empty : invalid
       : /\s/g.test(key) ? /\S/g.test(key) ? invalid : empty
         : sharedSymbols[key] || new Symbol$(key)
-  })
+  }, true)
 
   // create a shared symbol from a key.
   link(Type, 'of-shared', function (key) {
     return typeof key !== 'string' ? invalid
       : /\s/g.test(key) || !key ? invalid
         : sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
-  })
+  }, true)
+
+  // to test if a string is a valid symbol key.
+  link(Type, 'is-valid', function (key) {
+    return typeof key === 'string' && key !== '\t'
+  }, true)
 
   var proto = Type.proto
 
@@ -108,16 +109,24 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function (format) {
-    return format !== Type ? this.key
+    return format !== Type
+      ? format !== $String ? this.key
+        : isSafeSymbol(this.key) ? this.key
+          : strToString.call(this.key)
       : this.key === '\t' ? '(symbol invalid)'
-        : this.key ? '(`' + this.key + ')' : '(`)'
+        : !this.key ? '(`)'
+          : isSafeSymbol(this.key) ? '(`' + this.key + ')'
+            : '(symbol of ' + strToString.call(this.key) + ')'
   })
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? this[index]
-      : index instanceof Symbol$ ? this[index.key] : null
+    return typeof index === 'string' ? protoValueOf(this, this, index)
+      : index instanceof Symbol$ ? protoValueOf(this, this, index.key) : null
   })
+  indexer.get = function (key) {
+    return this[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

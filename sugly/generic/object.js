@@ -12,6 +12,8 @@ module.exports = function ($void) {
   var thisCall = $void.thisCall
   var ClassType$ = $void.ClassType
   var ownsProperty = $void.ownsProperty
+  var protoValueOf = $void.protoValueOf
+  var encodeFieldName = $void.encodeFieldName
   var EncodingContext$ = $void.EncodingContext
   var defineTypeProperty = $void.defineTypeProperty
 
@@ -28,7 +30,7 @@ module.exports = function ($void) {
       }
     }
     return obj
-  })
+  }, true)
 
   // copy fields from source objects to the target object
   link(Type, 'assign', function (target) {
@@ -42,7 +44,7 @@ module.exports = function ($void) {
       return target
     }
     return null
-  })
+  }, true)
 
   // get the value of a field.
   link(Type, 'get', function (obj, name, value) {
@@ -51,9 +53,13 @@ module.exports = function ($void) {
     } else if (typeof name !== 'string') {
       return value
     }
+    var pValue
     return !isObject(obj) ? value
-      : typeof obj[name] === 'undefined' ? value : obj[name]
-  })
+      : ownsProperty(obj, name)
+        ? typeof obj[name] === 'undefined' ? value : obj[name]
+        : typeof (pValue = protoValueOf(obj, obj, name)) === 'undefined'
+          ? value : pValue
+  }, true)
   // set the value of a field.
   link(Type, 'set', function (obj, name, value) {
     if (name instanceof Symbol$) {
@@ -63,7 +69,7 @@ module.exports = function ($void) {
     }
     return !isObject(obj) ? null
       : (obj[name] = (typeof value !== 'undefined' ? value : null))
-  })
+  }, true)
   // remove a field.
   link(Type, 'reset', function (obj, name, more) {
     if (!isObject(obj)) {
@@ -87,7 +93,7 @@ module.exports = function ($void) {
       name = arguments[++i]
     } while (i < arguments.length)
     return counter
-  })
+  }, true)
 
   // make a copy with selected or all fields.
   link(Type, 'copy', function (src, fields) {
@@ -112,7 +118,7 @@ module.exports = function ($void) {
       activator.call(obj, obj)
     }
     return obj
-  })
+  }, true)
   // remove given or all fields.
   link(Type, 'clear', function (obj, fields) {
     if (!isObject(obj)) {
@@ -130,7 +136,7 @@ module.exports = function ($void) {
       }
     }
     return obj
-  })
+  }, true)
   // remove one or more values to create a new array.
   link(Type, 'remove', function (src, fields) {
     // TODO: fields can be another object
@@ -153,7 +159,7 @@ module.exports = function ($void) {
       activator.call(obj, obj)
     }
     return obj
-  })
+  }, true)
 
   // check the existence of a property
   link(Type, 'has', function (obj, name) {
@@ -165,7 +171,7 @@ module.exports = function ($void) {
       }
     }
     return isObject(obj) && typeof obj[name] !== 'undefined'
-  })
+  }, true)
   // check the existence of a field
   link(Type, 'owns', function (obj, name) {
     if (typeof name !== 'string') {
@@ -176,11 +182,11 @@ module.exports = function ($void) {
       }
     }
     return isObject(obj) && ownsProperty(obj, name)
-  })
+  }, true)
   // retrieve field names.
   link(Type, 'fields-of', function (obj) {
     return isObject(obj) ? Object.getOwnPropertyNames(obj) : []
-  })
+  }, true)
 
   var proto = Type.proto
   // generate an iterator function to traverse all fields as [name, value].
@@ -227,7 +233,7 @@ module.exports = function ($void) {
     var code = [$Symbol.object]
     for (var i = 0; i < props.length; i++) {
       var name = props[i]
-      code.push($Symbol.of(name), $Symbol.pairing, ctx.encode(this[name]))
+      code.push(encodeFieldName(name), $Symbol.pairing, ctx.encode(this[name]))
     }
     if (code.length < 2) {
       code.push($Symbol.pairing) // (@:) for empty object
@@ -252,9 +258,13 @@ module.exports = function ($void) {
     }
     return typeof value === 'undefined'
       ? typeof proto[index] === 'undefined' || index === 'type'
-        ? this[index] : proto[index] // getting
+        ? this[index] : protoValueOf(this, proto, index) // getting
       : (this[index] = value) // setting
   })
+  indexer.get = function (key) {
+    return typeof proto[key] === 'undefined' || key === 'type'
+      ? this[key] : proto[key] // getting
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

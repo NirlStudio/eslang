@@ -4,6 +4,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
   var $Lambda = $.lambda
+  var $Function = $.function
   var $Object = $.object
   var Null = $void.null
   var Tuple$ = $void.Tuple
@@ -27,6 +28,30 @@ module.exports = function ($void) {
     return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
   }
 
+  $void.regexNumber = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d+)/
+  $void.regexDecimal = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d\b|[1-9]\d*)/
+  $void.regexSpecialSymbol = /[(`@:$"#)',;\\\s]/
+
+  $void.regexConstants = /^(null|true|false)$/
+  $void.constantValues = Object.assign(Object.create(null), {
+    'null': null,
+    'true': true,
+    'false': false
+  })
+
+  var regexNumber = $void.regexNumber
+  var regexConstants = $void.regexConstants
+  var regexSpecialSymbol = $void.regexSpecialSymbol
+
+  var isSafeSymbol = $void.isSafeSymbol = function (key) {
+    return !regexSpecialSymbol.test(key) &&
+      !regexConstants.test(key) && !regexNumber.test(key)
+  }
+  $void.encodeFieldName = function (name) {
+    return isSafeSymbol(name) ? (sharedSymbols[name] || new Symbol$(name))
+      : name // use the raw string in the place of symbol.
+  }
+
   // to check if an value is a compatible object.
   $void.isObject = function (obj) {
     return obj instanceof Object$ || (!!obj && obj.type === $Object)
@@ -36,6 +61,15 @@ module.exports = function ($void) {
   var indexerOf = $void.indexerOf = function (entity) {
     var type = $Type.of(entity)
     return (type && type.indexer) || Null[':']
+  }
+
+  // retrieve a field value from prototype; it will be bound to its subject
+  // if it's a function.
+  var protoValueOf = $void.protoValueOf = function (subject, proto, key) {
+    var value = proto[key]
+    return typeof value === 'function' && (
+      value.type === $Lambda || value.type === $Function
+    ) ? bind(subject, value) : value
   }
 
   function thisCall (subject, methodName) {
@@ -66,12 +100,38 @@ module.exports = function ($void) {
     return tryToUpdateName(entity, name)
   }
 
+  // create a bound function from the orginal function or lambda.
+  function bind ($this, func) {
+    if (typeof func.bound === 'function') {
+      return func // binding can only happen once.
+    }
+    var bound = func.bind($this)
+    func.$name && (
+      bound.$name = func.$name
+    )
+    bound.type !== func.type && (
+      bound.type = func.type
+    )
+    typeof func.code !== 'undefined' && (
+      bound.code = func.code
+    )
+    bound.this = $this
+    bound.bound = func
+    return bound
+  }
+  $void.bind = bind
+
   // to link an entity to its owner.
-  function link (owner, names, entity) {
-    if (typeof entity === 'function' && !ownsProperty(entity, 'type')) {
-      entity.type = $Lambda
+  function link (owner, names, entity, autoBind) {
+    if (typeof entity === 'function') {
+      if (!ownsProperty(entity, 'type')) {
+        entity.type = $Lambda
+      }
       if (!entity.$name) {
         entity.$name = typeof names === 'string' ? names : names[0]
+      }
+      if (autoBind && (entity.type === $Lambda || entity.type === $Function)) {
+        entity = bind(owner, entity)
       }
     }
     if (typeof names === 'string') {
@@ -106,10 +166,10 @@ module.exports = function ($void) {
     noop.$name = 'noop'
     var empty = link(type, 'empty', function () {
       return noop
-    })
+    }, true)
 
     // a placeholder of function
-    link(type, 'of', empty)
+    link(type, 'of', empty, true)
 
     var proto = type.proto
     // return operation's name
@@ -157,9 +217,12 @@ module.exports = function ($void) {
 
     // Indexer
     var indexer = link(proto, ':', function (index) {
-      return typeof index === 'string' ? proto[index]
-        : index instanceof Symbol$ ? proto[index.key] : null
+      return typeof index === 'string' ? protoValueOf(this, proto, index)
+        : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
     })
+    indexer.get = function (key) {
+      return proto[key]
+    }
 
     // export type indexer.
     link(type, 'indexer', indexer)
@@ -170,15 +233,15 @@ module.exports = function ($void) {
 
     // test if the lambda/function has been bound to a subject.
     link(proto, 'is-bound', function () {
-      return this.bound === true
+      return typeof this.bound === 'function'
     })
     link(proto, 'not-bound', function () {
-      return this.bound !== true
+      return typeof this.bound !== 'function'
     })
 
     // return operation's parameters
     link(proto, 'this', function () {
-      return this.bound === true ? this.this : null
+      return typeof this.bound === 'function' ? this.this : null
     })
 
     // apply a function and expand arguments from an array.
@@ -192,15 +255,41 @@ module.exports = function ($void) {
 
     // bind a function to a fixed subject.
     link(proto, 'bind', function ($this) {
-      if (typeof $this === 'undefined' || this.bound === true) {
-        return this // binding can only happen once.
-      }
-      var bound = this.bind($this)
-      bound.type = type
-      bound.code = this.code || emptyCode
-      bound.bound = true
-      bound.this = $this
-      return bound
+      return typeof $this === 'undefined' ? this : bind($this, this)
+    })
+
+    link(proto, ['is', '==='], function (another) {
+      return typeof another === 'function' && (this === another || (
+        typeof this.this !== 'undefined' && (
+          this.this === another.this || Object.is(this.this, another.this)
+        ) && typeof this.bound !== 'undefined' && this.bound === another.bound
+      ))
+    })
+    link(proto, ['is-not', '!=='], function (another) {
+      return typeof another !== 'function' || (this !== another && (
+        typeof this.this === 'undefined' || (
+          this.this !== another.this && !Object.is(this.this, another.this)
+        ) || typeof this.bound === 'undefined' || this.bound !== another.bound
+      ))
+    })
+
+    link(proto, ['equals', '=='], function (another) {
+      return typeof another === 'function' && (
+        this === another || this === another.bound || (
+          typeof this.bound !== 'undefined' && (
+            this.bound === another || this.bound === another.bound
+          )
+        )
+      )
+    })
+    link(proto, ['not-equals', '!='], function (another) {
+      return typeof another !== 'function' || (
+        this !== another && this !== another.bound && (
+          typeof this.bound === 'undefined' || (
+            this.bound !== another && this.bound !== another.bound
+          )
+        )
+      )
     })
   }
 }

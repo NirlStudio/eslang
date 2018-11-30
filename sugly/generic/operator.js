@@ -11,7 +11,7 @@ module.exports = function ($void) {
   // the noop operator
   var noop = link(Type, 'noop', $void.operator(function () {
     return null
-  }, $Tuple.operator))
+  }, $Tuple.operator), true)
 
   // implement common operation features.
   prepareOperation(Type, noop, $Tuple.operator)

@@ -7,11 +7,8 @@
 (let all-specs (@
   # bootstrap
   "tokenizer" "compiler"
-
-  "generic"
-  "runtime"
-  "operators"
-  "lib"
+  # core
+  "generic" "runtime" "operators" "lib"
 ).
 
 # run given specs or all.

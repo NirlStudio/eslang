@@ -12,7 +12,7 @@ module.exports = function ($void) {
   // the noop lambda
   var noop = link(Type, 'noop', $void.lambda(function () {
     return null
-  }, $Tuple.lambda))
+  }, $Tuple.lambda), true)
 
   // implement common operation features.
   prepareOperation(Type, noop, $Tuple.lambda)

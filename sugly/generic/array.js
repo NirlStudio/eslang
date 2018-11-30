@@ -39,6 +39,7 @@ module.exports = function ($void) {
   var iterateOf = $void.iterateOf
   var boolValueOf = $void.boolValueOf
   var isApplicable = $void.isApplicable
+  var protoValueOf = $void.protoValueOf
   var EncodingContext$ = $void.EncodingContext
   var defineProperty = $void.defineProperty
   var defineTypeProperty = $void.defineTypeProperty
@@ -46,7 +47,7 @@ module.exports = function ($void) {
   // create an empty array.
   link(Type, 'empty', function () {
     return []
-  })
+  }, true)
 
   // create an array of the arguments
   link(Type, 'of', function (x, y, z) {
@@ -57,7 +58,7 @@ module.exports = function ($void) {
       case 3: return [x, y, z]
       default: return Array.prototype.slice.call(arguments)
     }
-  })
+  }, true)
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
@@ -85,7 +86,7 @@ module.exports = function ($void) {
     }
     isSparse && asSparse.call(list)
     return list
-  })
+  }, true)
 
   var proto = Type.proto
   // return the length of this array.
@@ -818,10 +819,13 @@ module.exports = function ($void) {
     return typeof index === 'number'
       ? typeof value === 'undefined' ? getter.call(this, index)
         : setter.call(this, index, value)
-      : typeof index === 'string' ? proto[index]
-        : index instanceof Symbol$ ? proto[index.key]
+      : typeof index === 'string' ? protoValueOf(this, proto, index)
+        : index instanceof Symbol$ ? protoValueOf(this, proto, index.key)
           : indexOf.call(this, index)
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

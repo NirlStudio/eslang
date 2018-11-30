@@ -19,11 +19,14 @@
 
   (define "Equivalence" (=> ()
     (should "string equivalence is the same of identity." (=> ()
-      (assert (:("" "is") is ("s" "equals")),
-      (assert (:("s" "is") is ("" "equals")),
+      (assert (:("" "is") is ("" "equals")),
+      (assert (:("s" "is") is ("s" "equals")),
 
-      (assert (:("" "equals") is ("s" "is")),
-      (assert (:("s" "equals") is ("" "is")),
+      (assert (:("" "is") equals ("s" "equals")),
+      (assert (:("s" "is") equals ("" "equals")),
+
+      (assert (:("" "equals") equals ("s" "is")),
+      (assert (:("s" "equals") equals ("" "is")),
     ),
   ),
 
@@ -755,8 +758,8 @@
     (assert (:("" "+") is ("" "concat"),
     (assert (:("" "concat") is ("" "+"),
 
-    (assert (:("A" "+") is ("A" "concat"),
-    (assert (:("A" "concat") is ("A" "+"),
+    (assert (:("" "+") equals ("s" "concat"),
+    (assert (:("s" "concat") equals ("" "+"),
   ),
 ).
 

@@ -35,11 +35,30 @@
   ),
 
   (define "Equivalence" (= ()
-    (should "a function's equivalence is defined as its identity." (= ()
-      (var f (=> x x),
+    (should "al bound functions are equivalent with the orginal bound target and each others." (= ()
+      (var f (=> () this),
+      (var f1 (:f bind 1),
+      (var f2 (:f bind 2),
+
+      (assert null (f),
+      (assert 1 (f1),
+      (assert 2 (f2),
+
       (assert (:f is-a function),
-      (assert (:(:f "is") is (:f "equals"),
-      (assert (:(:f "is-not") is (:f "not-equals"),
+      (assert (:f1 is-a function),
+      (assert (:f2 is-a function),
+
+      (assert (:f equals f),
+      (assert false (:f not-equals f),
+
+      (assert (:f equals f1),
+      (assert false (:f not-equals f1),
+
+      (assert (:f1 equals f),
+      (assert false (:f1 not-equals f),
+
+      (assert (:f1 equals f2),
+      (assert false (:f1 not-equals f2),
     ),
   ),
 
@@ -263,13 +282,11 @@
 
 (define "(:a-func is-bound)" (= ()
   (should "(:a-func is-bound) returns false if the function has not been bound with a subject." (= ()
-    (assert false (:(function empty) is-bound),
     (assert false (:(=> () null) is-bound),
     (assert false (:(=> x (x ++)) is-bound),
   ),
   (should "(:a-func is-bound) returns true if the function is bound with a subject." (= ()
     (var s (@ y: 1),
-    (assert (:(:(function empty) bind s) is-bound),
     (assert (:(:(=> () null) bind s) is-bound),
     (assert (:(:(=> x (x ++)) bind s) is-bound),
   ),
@@ -277,13 +294,11 @@
 
 (define "(:a-func not-bound)" (= ()
   (should "(:a-func not-bound) returns true for a free function." (= ()
-    (assert (:(function empty) not-bound),
     (assert (:(=> () null) not-bound),
     (assert (:(=> x (x ++)) not-bound),
   ),
   (should "(:a-func not-bound) returns false for a bound function." (= ()
     (var s (@ y: 1),
-    (assert false (:(:(function empty) bind s) not-bound),
     (assert false (:(:(=> () null) bind s) not-bound),
     (assert false (:(:(=> x (x ++)) bind s) not-bound),
   ),
@@ -291,16 +306,11 @@
 
 (define "(:a-func this)" (= ()
   (should "(:a-func this) returns null for a free function." (= ()
-    (assert null (:(function empty) this),
     (assert null (:(=> () null) this),
     (assert null (:(=> x (x ++)) this),
   ),
   (should "(:a-func this) returns null if it's bound to null." (= ()
-    (var l (:(function empty) bind null),
-    (assert (:l is-bound),
-    (assert null (:l this),
-
-    (let l (:(=> () null) bind null),
+    (var l (:(=> () null) bind null),
     (assert (:l is-bound),
     (assert null (:l this),
 
@@ -310,11 +320,7 @@
   ),
   (should "(:a-func this) returns the bound subject if it's bound." (= ()
     (var s (@ x: 1),
-    (var l (:(function empty) bind s),
-    (assert (:l is-bound),
-    (assert s (:l this),
-
-    (let l (:(=> () null) bind s),
+    (var l (:(=> () null) bind s),
     (assert (:l is-bound),
     (assert s (:l this),
 

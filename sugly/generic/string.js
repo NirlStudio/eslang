@@ -6,6 +6,7 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var thisCall = $void.thisCall
+  var protoValueOf = $void.protoValueOf
   var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value
@@ -32,12 +33,12 @@ module.exports = function ($void) {
       }
     }
     return result.join('')
-  })
+  }, true)
 
   // generate a string from a series of unicode values
   link(Type, 'of-chars', function () {
     return String.fromCharCode.apply(String, arguments)
-  })
+  }, true)
 
   var proto = Type.proto
   // return the length of this string.
@@ -226,13 +227,16 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? [proto.key]
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key)
         : typeof index !== 'number' ? null
           : arguments.length > 1
             ? slice.apply(this, arguments) // chars in a range.
             : copy.apply(this, [index, 1])
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

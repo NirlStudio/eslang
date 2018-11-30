@@ -214,7 +214,7 @@
   (define "Indexer" (=> ()
     (should "the indexer is a lambda." (=> ()
       (assert (:(the-type ":") is-a lambda),
-      (assert (:(the-type ":") is (type ":"),
+      (assert (:(the-type ":") equals (type ":"),
     ),
     (should "the indexer is a readonly accessor." (=> ()
       (assert null (the-type :"__new_prop" 1),
@@ -294,7 +294,6 @@
   (define "Evaluation" (=> ()
     (should "a type is evaluated to itself." (=> ()
       (assert the-type (the-type),
-      (assert the-type (the-type null),
     ),
   ),
 
@@ -456,13 +455,31 @@
         (assert (:(the-type "indexer") is-not (type "indexer"),
     ),
     (should "a common type's objectify function inherits type's." (=> ()
-      (assert (:(the-type "objectify") is (type "objectify"),
+      (assert (:(the-type "objectify") equals (type "objectify"),
     ),
     (should "a common type's typify function inherits type's." (=> ()
-      (assert (:(the-type "typify") is (type "typify"),
+      (assert (:(the-type "typify") equals (type "typify"),
     ),
   ),
-).
+),
+
+(define "Type Reflection" (=> ()
+  (should "(type objectify) returns the object representation of type." (=> ()
+    (var t (the-type objectify),
+    (assert (t is-a object),
+    (assert ((type of t) is object),
+    (for (k v) in t
+      (if (:v is-a lambda) (assert (:v is-bound),
+      (if (:v is-a function) (assert (:v is-bound),
+    ),
+    
+    (assert ((t type) is-a object),
+    (for (k v) in (t type)
+      (if (:v is-a lambda) (assert (:v is-bound),
+      (if (:v is-a function) (assert (:v is-bound),
+    ),
+  ),
+),
 
 # verify general logic for sample values.
 (var all-values (the-values concat (the-type empty).
@@ -473,4 +490,4 @@
     (define (+ "value: " the-value) (=> ()
       (include "share/value")
   ),
-).
+),

@@ -1,6 +1,16 @@
 (for spec in (@
-    "app" "arithmetic" "assignment" "bitwise" "control" "function" "general"
-    "import" "include" "load" "logical" "object" "operator" "quote"
-  )
-  (load ("operators/" + spec)
-),
+    "quote"
+    "app"
+    "assignment"
+    "control"
+    "general"
+    "logical"
+    "bitwise"
+    "arithmetic"
+    "object"
+    "function"
+    "operator"
+    "load"
+    "import"
+    "include"
+  ) (load ("operators/" + spec).

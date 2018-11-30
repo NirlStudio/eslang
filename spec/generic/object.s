@@ -972,6 +972,42 @@
     (assert 10 (code length),
     (assert "(@ x: 1 y: 2 z: 3)" (code to-string),
   ),
+  (should "(obj to-code) represent field name as string if it's any constant value." (= ()
+    (for sym in (@ "null" "true" "false")
+      (let obj (@:object (sym): 1),
+      (let code (obj to-code),
+      (assert (code is-a tuple),
+      (assert 4 (code length),
+      (assert ((code 1) is-a string),
+      (assert sym (code 1),
+    ),
+  ),
+  (should "(obj to-code) represent field name as string if it's any special symbol." (= ()
+    (var symbols (@
+      "(" "`" "@" ":" "$" "\"" "#" ")" "'" "," ";" "\\" " " "\t" "\n" "\r"
+    ),
+    (for sym in symbols
+      (let obj (@:object (sym): 1),
+      (let code (obj to-code),
+      (assert (code is-a tuple),
+      (assert 4 (code length),
+      (assert ((code 1) is-a string),
+      (assert sym (code 1),
+    ),
+  ),
+  (should "(obj to-code) represent field name as string if it represents any number." (= ()
+    (var symbols (@
+      "0" "-1" ".1" "-.1" "0." ".0" "08" "0x1" "0b10" "12e-12" "12.0e12"
+    ),
+    (for sym in symbols
+      (let obj (@:object (sym): 1),
+      (let code (obj to-code),
+      (assert (code is-a tuple),
+      (assert 4 (code length),
+      (assert ((code 1) is-a string),
+      (assert sym (code 1),
+    ),
+  ),
   (should "(obj to-code) returns the code of a lambda if it contains itself." (= ()
     (var obj (@ x: 1 y: 2),
     (obj "obj" obj),
@@ -1094,7 +1130,8 @@
       (assert 1 (object set obj field 1),
       (assert (object has obj field),
       (assert (object owns obj field),
-      (assert (:(obj: field) is (ref: field),
+      (assert (:(obj: field) is-bound),
+      (assert (:(obj: field) equals (ref: field),
     ),
   ),
 ),

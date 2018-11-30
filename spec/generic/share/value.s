@@ -44,10 +44,10 @@
 ).
 
 (define "Identity Operators" (=> ()
-  (should "'===' is 'is'." (=> ()
+  (should "'===' equals 'is'." (=> ()
     (assert (:(:the-value "===") is (:the-value "is"),
   ),
-  (should "'!==' is 'is-not'." (=> ()
+  (should "'!==' equals 'is-not'." (=> ()
     (assert (:(:the-value "!==") is (:the-value "is-not"),
   ),
 ).
@@ -157,14 +157,13 @@
 (define "Indexer" (=> ()
   (should "A value's indexer is a lambda." (=> ()
     (assert (:(:the-value ":") is-a lambda),
-    (assert (:(:the-value ":") is (:the-empty ":"),
+    (assert (:(:the-value ":") equals (:the-empty ":"),
   ),
 ).
 
 (define "Evaluation" (=> ()
   (should "a value may be evaluated to itself." (=> ()
     (assert the-value (:the-value),
-    (assert the-value (:the-value null),
   ),
 ).
 

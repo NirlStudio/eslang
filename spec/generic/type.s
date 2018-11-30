@@ -164,7 +164,6 @@
 (define "Evaluation" (=> ()
   (should "type is evaluated to type." (=> ()
     (assert type (type),
-    (assert type (type null),
   ),
 ).
 
@@ -318,9 +317,11 @@
   (should "(type \"indexer\") returns the indexer for all types." (=> ()
     (var indexer (type "indexer"),
     (assert (:indexer is-a lambda),
+    (assert (:indexer is-bound),
     (for t in types
       (if ((t the-type) is-not-a class)
-        (assert (:indexer is ((t the-type) ":"),
+        (assert (:((t the-type) ":") is-bound),
+        (assert (:indexer equals ((t the-type) ":"),
       )
     ),
   ),
@@ -330,6 +331,15 @@
     (assert ((t type) is-a object),
     (assert ((type of t) is object),
     (assert 1 ((object fields-of t) length),
+
+    (for (k v) in t
+      (if (:v is-a lambda) (assert (:v is-bound),
+      (if (:v is-a function) (assert (:v is-bound),
+    ),
+    (for (k v) in (t type)
+      (if (:v is-a lambda) (assert (:v is-bound),
+      (if (:v is-a function) (assert (:v is-bound),
+    ),
 
     (var s (object get t "type"),
     (assert (s is-a object),
@@ -345,15 +355,18 @@
     (assert (:(s "objectify") is-a lambda),
     (assert (:(s "typify") is-a lambda),
   ),
-  (should "((type \"objectify\") ) returns all universal operations defined on null." (= ()
-    (var t ((type "objectify") ),
+  (should "(type objectify null) returns all common operations defined on null." (= ()
+    (var t (type objectify null),
     (assert (t is-a object),
+    (assert null (t type),
+    (assert ((type of t) is object),
+    (assert 21 ((object fields-of t) length),
 
-    (var fields (object fields-of t),
-    (assert 20 (fields length),
-
-    (for field in fields
-      (assert (null :field) (object get t field),
+    (for (_ v) in t
+      (if (:v is-a lambda)
+        (assert (:v is-bound),
+        (assert null (:v this),
+      ),
     ),
   ),
   (should "(type typify ...) extends type with type descriptor(s)." (=> ()

@@ -35,11 +35,30 @@
   ),
 
   (define "Equivalence" (= ()
-    (should "a lambda's equivalence is defined as its identity." (= ()
-      (var l (= x x),
+    (should "all bound lambda are equivalent with their orginal bound target and each others." (= ()
+      (var l (=() this),
+      (var l1 (:l bind 1),
+      (var l2 (:l bind 2),
+
+      (assert null (l),
+      (assert 1 (l1),
+      (assert 2 (l2),
+
       (assert (:l is-a lambda),
-      (assert (:(:l "is") is (:l "equals"),
-      (assert (:(:l "is-not") is (:l "not-equals"),
+      (assert (:l1 is-a lambda),
+      (assert (:l2 is-a lambda),
+
+      (assert (:l equals l),
+      (assert false (:l not-equals l),
+
+      (assert (:l equals l1),
+      (assert false (:l not-equals l1),
+
+      (assert (:l1 equals l),
+      (assert false (:l1 not-equals l),
+
+      (assert (:l1 equals l2),
+      (assert false (:l1 not-equals l2),
     ),
   ),
 
@@ -265,13 +284,11 @@
 
 (define "(:a-lambda is-bound)" (= ()
   (should "(:a-lambda is-bound) returns false if the lambda has not been bound with a subject." (= ()
-    (assert false (:(lambda empty) is-bound),
     (assert false (:(= () null) is-bound),
     (assert false (:(= x (x ++)) is-bound),
   ),
   (should "(:a-lambda is-bound) returns true if the lambda is bound with a subject." (= ()
     (var s (@ y: 1),
-    (assert (:(:(lambda empty) bind s) is-bound),
     (assert (:(:(= () null) bind s) is-bound),
     (assert (:(:(= x (x ++)) bind s) is-bound),
   ),
@@ -279,13 +296,11 @@
 
 (define "(:a-lambda not-bound)" (= ()
   (should "(:a-lambda not-bound) returns true for a free lambda." (= ()
-    (assert (:(lambda empty) not-bound),
     (assert (:(= () null) not-bound),
     (assert (:(= x (x ++)) not-bound),
   ),
   (should "(:a-lambda not-bound) returns false for a bound lambda." (= ()
     (var s (@ y: 1),
-    (assert false (:(:(lambda empty) bind s) not-bound),
     (assert false (:(:(= () null) bind s) not-bound),
     (assert false (:(:(= x (x ++)) bind s) not-bound),
   ),
@@ -293,16 +308,11 @@
 
 (define "(:a-lambda this)" (= ()
   (should "(:a-lambda this) returns null for a free lambda." (= ()
-    (assert null (:(lambda empty) this),
     (assert null (:(= () null) this),
     (assert null (:(= x (x ++)) this),
   ),
   (should "(:a-lambda this) returns null if it's bound to null." (= ()
-    (var l (:(lambda empty) bind null),
-    (assert (:l is-bound),
-    (assert null (:l this),
-
-    (let l (:(= () null) bind null),
+    (var l (:(= () null) bind null),
     (assert (:l is-bound),
     (assert null (:l this),
 
@@ -312,11 +322,7 @@
   ),
   (should "(:a-lambda this) returns the bound subject if it's bound." (= ()
     (var s (@ x: 1),
-    (var l (:(lambda empty) bind s),
-    (assert (:l is-bound),
-    (assert s (:l this),
-
-    (let l (:(= () null) bind s),
+    (var l (:(= () null) bind s),
     (assert (:l is-bound),
     (assert s (:l this),
 

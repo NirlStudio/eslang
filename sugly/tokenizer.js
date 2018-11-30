@@ -1,19 +1,14 @@
 'use strict'
 
-var RegexNumber = /^[-+]?\d+\.?\d*$/
-var RegexSpecialSymbol = /[(`@:$"#)',;\\\s]/
-
-var Constants = Object.assign(Object.create(null), {
-  'null': null,
-  'true': true,
-  'false': false
-})
-
 module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['of-int']
   var $export = $void.export
+
+  var Constants = $void.constantValues
+  var RegexDecimal = $void.regexDecimal
+  var RegexSpecialSymbol = $void.regexSpecialSymbol
 
   var tokenizer = $export($, 'tokenizer', function (compiler) {
     var raiseToken = compiler || printToken
@@ -279,7 +274,7 @@ module.exports = function ($void) {
     }
 
     function finalizeSymbol () {
-      if (RegexNumber.test(pendingText)) {
+      if (RegexDecimal.test(pendingText)) {
         // try float number
         raiseToken('value', parseFloat(pendingText),
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])

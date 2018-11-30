@@ -5,6 +5,7 @@ module.exports = function ($void) {
   var Type = $.bool
   var link = $void.link
   var Symbol$ = $void.Symbol
+  var protoValueOf = $void.protoValueOf
   var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value of bool is the false.
@@ -13,7 +14,7 @@ module.exports = function ($void) {
   // booleanize
   $void.boolValueOf = link(Type, 'of', function (value) {
     return value !== null && value !== 0 && value !== false && typeof value !== 'undefined'
-  })
+  }, true)
 
   var proto = Type.proto
   // Emptiness
@@ -31,9 +32,12 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? proto[index.key] : null
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

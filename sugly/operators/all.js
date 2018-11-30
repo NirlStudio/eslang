@@ -22,9 +22,9 @@ module.exports = function all ($void) {
   require('./control')($void)
 
   require('./general')($void)
-  require('./arithmetic')($void)
   require('./logical')($void)
   require('./bitwise')($void)
+  require('./arithmetic')($void)
 
   require('./object')($void)
   require('./function')($void)

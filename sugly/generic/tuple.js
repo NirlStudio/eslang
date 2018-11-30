@@ -10,6 +10,7 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var link = $void.link
   var thisCall = $void.thisCall
+  var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // the empty value
@@ -42,7 +43,7 @@ module.exports = function ($void) {
       value instanceof Date ||
       value === null ||
       typeof value === 'undefined'
-  })
+  }, true)
 
   var atomOf = link(Type, 'atom-of', function (value) {
     return value instanceof Symbol$ ||
@@ -53,7 +54,7 @@ module.exports = function ($void) {
       value instanceof Range$ ||
       value instanceof Date ||
       value === null ? value : typeof value === 'undefined' ? null : unknown
-  })
+  }, true)
 
   var append = function () {
     var i = this.length
@@ -67,22 +68,22 @@ module.exports = function ($void) {
   // create a common tuple (statement) of the argument values.
   link(Type, 'of', function () {
     return arguments.length ? new Tuple$(append.apply([], arguments)) : empty
-  })
+  }, true)
 
   // create a plain tuple (code block or list of statements) of the argument values
   link(Type, 'of-plain', function () {
     return arguments.length
       ? new Tuple$(append.apply([], arguments), true) : blank
-  })
+  }, true)
 
   // create a tuple by elements from the iterable arguments or the argument
   // values itself if it's not iterable.
   link(Type, 'from', function () {
     return merge.apply(empty, arguments)
-  })
+  }, true)
   link(Type, 'from-plain', function () {
     return merge.apply(blank, arguments)
-  })
+  }, true)
 
   var proto = Type.proto
   // the length of this tuple.
@@ -292,12 +293,15 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index, end) {
-    return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? proto[index.key]
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key)
         : typeof index !== 'number' ? null
           : typeof end === 'undefined' ? this.$[index]
             : new Tuple$(array.slice.apply(this.$, arguments), this.plain)
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

@@ -119,6 +119,7 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var copyType = $void.copyType
+  var protoValueOf = $void.protoValueOf
   var defineTypeProperty = $void.defineTypeProperty
 
   // the value range and constant values.
@@ -160,21 +161,23 @@ module.exports = function ($void) {
       default:
         return parseFloat(value)
     }
-  })
+  }, true)
 
   // parse a string as an integer value.
-  var parseInteger = link(Type, 'parse-int', createIntParser($void))
+  var parseInteger = link(Type, 'parse-int', createIntParser($void), true)
 
   // get a number value from the input
-  var valueOf = link(Type, 'of', createValueOf($void, parse, parseInteger))
+  var valueOf = link(
+    Type, 'of', createValueOf($void, parse, parseInteger), true
+  )
 
   // get an integer value from the input
-  var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger))
+  var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger), true)
 
   // get an signed integer value which is stable with bitwise operation.
   link(Type, 'of-bits', function (input) {
     return intOf(input) >> 0
-  })
+  }, true)
 
   var proto = Type.proto
   // test for special values
@@ -354,10 +357,13 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index, value) {
-    return typeof index === 'string' ? proto[index]
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
       : typeof index === 'number' ? $Range.of(this, index, value)
-        : index instanceof Symbol$ ? proto[index.key] : null
+        : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

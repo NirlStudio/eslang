@@ -21,15 +21,15 @@
   (define "Equivalence" (=> ()
     (should "bool equivalence is the same of identity." (=> ()
       (assert (:(true "is") is (true "equals")),
-      (assert (:(true "is") is (false "equals")),
+      (assert (:(true "is") equals (false "equals")),
 
-      (assert (:(false "is") is (true "equals")),
+      (assert (:(false "is") equals (true "equals")),
       (assert (:(false "is") is (false "equals")),
 
       (assert (:(true "equals") is (true "is")),
-      (assert (:(true "equals") is (false "is")),
+      (assert (:(true "equals") equals (false "is")),
 
-      (assert (:(false "equals") is (true "is")),
+      (assert (:(false "equals") equals (true "is")),
       (assert (:(false "equals") is (false "is")),
     ),
   ),

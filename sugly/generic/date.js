@@ -22,6 +22,7 @@ module.exports = function ($void) {
   var $Object = $.object
   var link = $void.link
   var Symbol$ = $void.Symbol
+  var protoValueOf = $void.protoValueOf
   var numberCompare = $.number.proto.compare
   var numberToString = $.number.proto['to-string']
   var defineTypeProperty = $void.defineTypeProperty
@@ -35,7 +36,7 @@ module.exports = function ($void) {
   // parse a date/time string representation to a date object.
   link(Type, 'parse', function (str) {
     return typeof str !== 'string' ? invalid : new Date(str)
-  })
+  }, true)
 
   // get current time or the time as a string, a timestamp or data fields.
   link(Type, 'of', function (a, b, c, d, e, f, g) {
@@ -57,7 +58,7 @@ module.exports = function ($void) {
       default: // field values
         return new Date(a, b - 1, c, d, e, f, g)
     }
-  })
+  }, true)
 
   // compose a date object with utc values of its fields
   link(Type, 'of-utc', function (a, b, c, d, e, f, g) {
@@ -79,26 +80,26 @@ module.exports = function ($void) {
       default: // field values
         return new Date(Date.UTC(a, b - 1, c, d, e, f, g))
     }
-  })
+  }, true)
 
   // get current time as a date object.
   link(Type, 'now', function () {
     return new Date()
-  })
+  }, true)
 
   // get current time as its timestamp value.
   link(Type, 'timestamp', Date.now ? function () {
     return Date.now()
   } : function () {
     return (new Date()).getTime()
-  })
+  }, true)
 
   link(Type, 'timezone', function () {
     return $Object.of({
       name: getTimezoneName(),
       offset: (new Date()).getTimezoneOffset()
     })
-  })
+  }, true)
 
   var proto = Type.proto
 
@@ -220,9 +221,12 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? proto[index]
-      : index instanceof Symbol$ ? proto[index.key] : null
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
+  indexer.get = function (key) {
+    return proto[key]
+  }
 
   // export type indexer.
   link(Type, 'indexer', indexer)

@@ -274,62 +274,6 @@
       (assert false ((symbol local) is-invalid),
     ),
   ),
-  (define "(symbol export)" (= ()
-    (should "its key value is \"export\"." (= ()
-      (assert "export" ((symbol export) key),
-      (assert "export" ((symbol export) to-string),
-      (assert ((symbol of "export") is (symbol export),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol export)) is (symbol export),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol export) is-valid),
-      (assert false ((symbol export) is-invalid),
-    ),
-  ),
-  (define "(symbol import)" (= ()
-    (should "its key value is \"import\"." (= ()
-      (assert "import" ((symbol import) key),
-      (assert "import" ((symbol import) to-string),
-      (assert ((symbol of "import") is (symbol import),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol import)) is (symbol import),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol import) is-valid),
-      (assert false ((symbol import) is-invalid),
-    ),
-  ),
-  (define "(symbol include)" (= ()
-    (should "its key value is \"include\"." (= ()
-      (assert "include" ((symbol include) key),
-      (assert "include" ((symbol include) to-string),
-      (assert ((symbol of "include") is (symbol include),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol include)) is (symbol include),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol include) is-valid),
-      (assert false ((symbol include) is-invalid),
-    ),
-  ),
-  (define "(symbol load)" (= ()
-    (should "its key value is \"load\"." (= ()
-      (assert "load" ((symbol load) key),
-      (assert "load" ((symbol load) to-string),
-      (assert ((symbol of "load") is (symbol load),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol load)) is (symbol load),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol load) is-valid),
-      (assert false ((symbol load) is-invalid),
-    ),
-  ),
   (define "(symbol begin)" (= ()
     (should "its key value is \"(\"." (= ()
       (assert "(" ((symbol begin) key),
@@ -440,34 +384,6 @@
     (should "it is taken as an valid symbol." (= ()
       (assert ((symbol comment) is-valid),
       (assert false ((symbol comment) is-invalid),
-    ),
-  ),
-  (define "(symbol in)" (= ()
-    (should "its key value is \"in\"." (= ()
-      (assert "in" ((symbol in) key),
-      (assert "in" ((symbol in) to-string),
-      (assert ((symbol of "in") is (symbol in),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol in)) is (symbol in),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol in) is-valid),
-      (assert false ((symbol in) is-invalid),
-    ),
-  ),
-  (define "(symbol else)" (= ()
-    (should "its key value is \"else\"." (= ()
-      (assert "else" ((symbol else) key),
-      (assert "else" ((symbol else) to-string),
-      (assert ((symbol of "else") is (symbol else),
-    ),
-    (should "it is evaluated to itself." (= ()
-      (assert (((symbol else)) is (symbol else),
-    ),
-    (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol else) is-valid),
-      (assert false ((symbol else) is-invalid),
     ),
   ),
 ),

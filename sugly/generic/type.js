@@ -8,10 +8,11 @@ module.exports = function ($void) {
   var Null = $void.null
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
+  var bind = $void.bind
   var link = $void.link
-  var thisCall = $void.thisCall
   var isApplicable = $void.isApplicable
   var ownsProperty = $void.ownsProperty
+  var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
 
   /* The Supreme Prototype */
@@ -40,8 +41,16 @@ module.exports = function ($void) {
   var indexer = link(proto, ':', function (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? index.key : ''
-    return name === 'proto' ? this.objectify() : this[name]
+    return name === 'proto' ? this.objectify()
+      : name !== 'indexer' ? protoValueOf(this, this, name)
+        : bind(isApplicable(this.empty) ? this.empty() : this.empty,
+          this.indexer
+        )
   })
+  indexer.get = function (key) {
+    return key === 'proto' ? this.objectify()
+      : key === 'indexer' ? null : this[key]
+  }
 
   // the type is its own empty value.
   link(Type, 'empty', Type)
@@ -54,25 +63,32 @@ module.exports = function ($void) {
         ? (proto = Object.getPrototypeOf(entity)) !== null
           ? proto.type : $Object
         : entity.type
-  })
+  }, true)
 
   // Retrieve the indexer for this type's instances.
   link(Type, 'indexer', indexer)
 
   // Type Reflection: Convert this type to a type descriptor object.
-  link(Type, 'objectify', function () {
+  link(Type, 'objectify', function (null_) {
     var typeDef = $Object.empty()
-    if (typeof this === 'undefined' || this === null) {
-      return Object.assign(typeDef, Null)
+    var name
+    if (null_ === null) {
+      for (name in Null) {
+        typeDef[name] = bind(null, Null[name])
+      }
+      typeDef.type = null
+      return typeDef
     }
-    var name, value, thisEmpty
-    for (name in this.proto) {
+
+    var proto_ = this.proto
+    var value, thisEmpty
+    for (name in proto_) {
       if (name !== 'type' && typeof proto[name] === 'undefined') {
-        value = this.proto[name]
+        value = proto_[name]
         typeDef[name] = !isApplicable(value) ? value
-          : thisCall(value, 'bind', typeof thisEmpty !== 'undefined' ? thisEmpty
+          : bind(typeof thisEmpty !== 'undefined' ? thisEmpty
             : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
-          )
+          , value)
       }
     }
     var typeStatic = typeDef.type = $Object.empty()
@@ -80,10 +96,10 @@ module.exports = function ($void) {
       if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
         value = this[name]
         typeStatic[name] = !isApplicable(value) ? value
-          : thisCall(value, 'bind', name !== 'indexer' ? this
+          : bind(name !== 'indexer' ? this
             : typeof thisEmpty !== 'undefined' ? thisEmpty
               : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
-          )
+          , value)
       }
     }
     return typeDef
@@ -118,10 +134,10 @@ module.exports = function ($void) {
   // Type Verification: Any type is a type.
   link(Type, 'is-a', function (type) {
     return Type === type
-  })
+  }, true)
   link(Type, 'is-not-a', function (type) {
     return Type !== type
-  })
+  }, true)
 
   // Emptiness for types:
   //  The primal type is taken as an empty entity.
