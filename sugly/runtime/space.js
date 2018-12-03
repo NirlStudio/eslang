@@ -4,7 +4,6 @@ module.exports = function space ($void) {
   var $ = $void.$
   var $Object = $.object
   var ClassInst$ = $void.ClassInst
-  var $export = $void.export
   var isObject = $void.isObject
   var indexerOf = $void.indexerOf
   var ownsProperty = $void.ownsProperty
@@ -33,7 +32,7 @@ module.exports = function space ($void) {
     var: function (key, value) {
       return (this.local[key] = value)
     },
-    cvar: function (key, value) {
+    lvar: function (key, value) {
       return (this.context[key] = value)
     },
     let: function (key, value) {
@@ -58,8 +57,9 @@ module.exports = function space ($void) {
       return (this.local[key] = value)
     },
     export: function (key, value) {
-      return this.exporting && typeof this.exporting[key] === 'undefined'
-        ? $export(this.exporting, key, (this.local[key] = value)) : null
+      this.exporting && typeof this.exporting[key] === 'undefined' &&
+        (this.exporting[key] = value)
+      return this.var(key, value)
     }
   })
 

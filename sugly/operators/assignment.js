@@ -11,86 +11,37 @@ module.exports = function assignment ($void) {
   var staticOperator = $void.staticOperator
   var tryToUpdateName = $void.tryToUpdateName
 
-  // 'export' exports a value when called in module context.
-  // (export symbol value)
-  staticOperator('export', function (space, clause) {
-    var clist = clause.$
-    if (clist.length < 3) {
-      return null
-    }
-    var sym
-    if (space.inop) { // in operator context, export works like a function
-      sym = evaluate(clist[1], space)
-      var key = typeof sym === 'string' ? sym
-        : sym instanceof Symbol$ ? sym.key : null
-      return key ? space.export(key,
-        space.var(key, tryToUpdateName(evaluate(clist[2], space), key))) : null
-    }
-    // in normal context, the symbol part can only be a symbol
-    sym = clist[1]
-    var values = evaluate(clist[2], space)
-    var i, names, name, value
-    // (export (names ...) obj)
-    if (sym instanceof Tuple$) {
-      if (values instanceof Object$) {
-        names = sym.$
-        for (i = 0; i < names.length; i++) {
-          name = names[i]
-          if (name instanceof Symbol$) {
-            name = name.key
-            value = values[name]
-            space.export(name, space.var(name,
-              typeof value === 'undefined' ? null : value
-            ))
-          }
-        }
-        return values
-      }
-      return null
-    }
-    if (!(sym instanceof Symbol$)) {
-      return null
-    }
-    // (export name value)
-    if (sym !== symbolAll) {
-      return space.export(sym.key,
-        space.var(sym.key, tryToUpdateName(values, sym.key)))
-    }
-    // (export * obj)
-    if (values instanceof Object$) {
-      names = Object.getOwnPropertyNames(values)
-      for (i = 0; i < names.length; i++) {
-        name = names[i]
-        value = values[name]
-        space.export(name, space.var(name,
-          typeof value === 'undefined' ? null : value
-        ))
-      }
-      return values
-    }
-    return null
-  })
-
-  // 'let' update the variable in most recent context.
-  // in function: (let var-name value)), or
-  //              (let (var-name ...) values), or
-  //              (let (field-name ...) object)
-  // in operator: (let name-expr value-expr)
-  staticOperator('let', createOperatorFor('let'))
+  // 'export' update the variable in most recent context.
+  // in function: (export var-name value)), or
+  //              (export * object), or
+  //              (export (field-name ...) object), or
+  //              (export (var-name ...) values)
+  // in operator: (export name-expr value-expr)
+  staticOperator('export', createOperatorFor('export'))
 
   // 'var' explicitly declares a local variable in current function's context.
-  // in function: (var var-name value), or
-  //              (var (var-name ...) values), or
-  //              (var (field-name ...) object)
+  // in function: (var var-name value)), or
+  //              (var * object), or
+  //              (var (field-name ...) object), or
+  //              (var (var-name ...) values)
   // in operator: (var name-expr value-expr)
   staticOperator('var', createOperatorFor('var'))
 
+  // 'let' update the variable in most recent context.
+  // in function: (let var-name value)), or
+  //              (let * object), or
+  //              (let (field-name ...) object), or
+  //              (let (var-name ...) values)
+  // in operator: (let name-expr value-expr)
+  staticOperator('let', createOperatorFor('let'))
+
   // 'local' explicitly declares a context variable in and only in current function's context.
-  // in function: (local var-name value), or
-  //              (local (var-name ...) values), or
-  //              (local (field-name ...) object)
+  // in function: (local var-name value)), or
+  //              (local * object), or
+  //              (local (field-name ...) object), or
+  //              (local (var-name ...) values)
   // in operator: (local name-expr value-expr)
-  staticOperator('local', createOperatorFor('cvar'))
+  staticOperator('local', createOperatorFor('lvar'))
 
   function createOperatorFor (method) {
     return function (space, clause) {
