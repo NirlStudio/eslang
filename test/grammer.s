@@ -513,9 +513,14 @@ emit((e emit) emit)
 
 # numbers
 00 01 07 08 09 0a
+00i 01i 07i 08i 09i 0ai
+0i 1i 11i 12i 18i 19i 1a
 0x1234567890abcdef 0xg
+0x1234567890abcdefi 0xgi
 0x1234567890ABCDEF 0xG
+0x1234567890ABCDEFi 0xGi
 0b0011 0b0022
+0b0011i 0b0022i
 -0 0
 -1 1
 -1.03 1.03

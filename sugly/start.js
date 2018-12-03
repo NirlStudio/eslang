@@ -54,6 +54,26 @@ function initializeRuntime ($void) {
   require('./runtime/interpreter')($void)
 }
 
+function initializeOperators ($void) {
+  require('./operators/quote')($void)
+  require('./operators/app')($void)
+  require('./operators/assignment')($void)
+  require('./operators/control')($void)
+
+  require('./operators/general')($void)
+  require('./operators/logical')($void)
+  require('./operators/bitwise')($void)
+  require('./operators/arithmetic')($void)
+
+  require('./operators/object')($void)
+  require('./operators/function')($void)
+  require('./operators/operator')($void)
+
+  require('./operators/load')($void)
+  require('./operators/import')($void)
+  require('./operators/include')($void)
+}
+
 module.exports = function start () {
   // Hello, world.
   var $void = require('./generic/genesis')()
@@ -68,6 +88,8 @@ module.exports = function start () {
   // prepare runtime functions
   initializeRuntime($void)
 
-  require('./operators/all')($void)
+  // publish operators
+  initializeOperators($void)
+
   return $void
 }

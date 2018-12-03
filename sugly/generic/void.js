@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
+  var $Tuple = $.tuple
   var $Lambda = $.lambda
   var $Function = $.function
   var $Object = $.object
@@ -10,6 +11,7 @@ module.exports = function ($void) {
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var Symbol$ = $void.Symbol
+  var operator = $void.operator
   var ClassType$ = $void.ClassType
 
   // a static version of isPrototypeOf.
@@ -24,9 +26,26 @@ module.exports = function ($void) {
 
   // to retrieve or create a shared symbol.
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
-  $void.sharedSymbolOf = function (key) {
+  function sharedSymbolOf (key) {
     return sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
   }
+  $void.sharedSymbolOf = sharedSymbolOf
+
+  // generic operators cannot be overridden in program. They are interpreted
+  // directly in core evaluation function.
+  function staticOperator (name, impl) {
+    // make the symbol a pure symbol.
+    $[name] = sharedSymbolOf(name)
+    // export the implementation.
+    $void.staticOperators[name] = operator(impl, $Tuple.operator)
+    return impl
+  }
+  $void.staticOperator = staticOperator
+
+  // pseudo operater ':' is implemented in evaluation function.
+  staticOperator(':', function () {
+    return null
+  })
 
   $void.regexNumber = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d+)/
   $void.regexDecimal = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d\b|[1-9]\d*)/

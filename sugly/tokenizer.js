@@ -3,7 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
-  var intValueOf = $.number['of-int']
+  var intValueOf = $.number['parse-int']
   var $export = $void.export
 
   var Constants = $void.constantValues
@@ -276,7 +276,10 @@ module.exports = function ($void) {
     function finalizeSymbol () {
       if (RegexDecimal.test(pendingText)) {
         // try float number
-        raiseToken('value', parseFloat(pendingText),
+        raiseToken('value',
+          /(\.|e|E|^-0$)/.test(pendingText)
+            ? parseFloat(pendingText)
+            : intValueOf(pendingText),
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
       } else if (pendingText.startsWith('0')) {
         // try integer number

@@ -651,6 +651,9 @@
     (assert 17 (number of-int "0x11"),
     (assert 3 (number of-int "0b11"),
 
+    (assert -1 (number of-int "0xFFFFFFFFi"),
+    (assert -1 (number of-int "0b11111111111111111111111111111111i"),
+
     (assert 0 (number of-int "(number invalid)"),
     (assert 0 (number of-int "(number infinite)"),
     (assert 0 (number of-int "(number -infinite)"),

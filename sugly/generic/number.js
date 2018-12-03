@@ -60,7 +60,8 @@ function createIntParser ($void) {
     }
     value = parseInt(input, radix)
     return value === 0 ? 0
-      : Number.isSafeInteger(value) ? value : NaN
+      : input.endsWith('i') ? value >> 0
+        : Number.isSafeInteger(value) ? value : NaN
   }
 }
 
