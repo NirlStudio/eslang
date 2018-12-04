@@ -99,10 +99,24 @@
     (assert 10 (while (i < 10) (count ++) (i += 2),
     (assert 5 count)
   ),
-  (should "(while cond statements ...) can be broken by (break )." (=> ()
+  (should "(continue ) skips all statements after." (=> ()
     (var i 0)
-    (assert null (while (i < 10) (++ i) (? (i > 5) (break),
-    (assert 6 i)
+    (assert null (while (i < 10) (++ i) (continue) (i ++),
+    (assert 10 i)
+  ),
+  (should "(continue value) applies value as the result of while loop." (=> ()
+    (var i 0)
+    (assert 100 (while (i < 10) (++ i) (continue 100) (i ++),
+    (assert 10 i)
+  ),
+  (should "(continue values ...) applies the array of values as the result of while loop." (=> ()
+    (var i 0)
+    (var result (while (i < 10) (++ i) (continue 10 100) (i ++),
+    (assert 10 i)
+
+    (assert (result is-a array),
+    (assert 10 (result 0),
+    (assert 100 (result 1),
   ),
   (should "(break value) applies value as the result of while loop." (=> ()
     (var i 0)
