@@ -178,6 +178,9 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 ==(== (a == b)== c)
 !=(!= (a != b)!= c)
 
+===(=== (a === b)=== c)
+!==(!== (a !== b)!== c)
+
 >(> (a > b)> c)
 >=(>= (a >= b)>= c)
 

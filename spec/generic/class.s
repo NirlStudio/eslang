@@ -504,7 +504,7 @@
     (var cls (class empty),
     (assert cls (cls as),
   ),
-  (should "(a-class as def-obj) applys def-obj on the class and returns it." (= ()
+  (should "(a-class as def-obj) applies def-obj on the class and returns it." (= ()
     (var cls (class empty),
     (assert cls (cls as (@ x: 1 type: (@ y: 2),
     (assert 2 (cls y),
@@ -516,7 +516,7 @@
     (assert 1 (inst x),
     (assert null (inst y),
   ),
-  (should "(a-class as another-class) applys the other class on this class and returns it." (= ()
+  (should "(a-class as another-class) applies the other class on this class and returns it." (= ()
     (var cls (class empty),
     (assert cls (cls as (@:class x: 1 type: (@ y: 2),
     (assert 2 (cls y),
@@ -528,7 +528,7 @@
     (assert 1 (inst x),
     (assert null (inst y),
   ),
-  (should "(a-class as extensions ...) applys all extensions on this class and returns it." (= ()
+  (should "(a-class as extensions ...) applies all extensions on this class and returns it." (= ()
     (var cls (@:class y: 1 type: (@ q: 1),
     (assert cls (cls as
       (@ x: 1 y: 2 type: (@ p: 3 q: 4),

@@ -325,7 +325,7 @@
     (assert iter (iter select (=?),
     (assert next (iter iterate),
   ),
-  (should "(iter select filter) returns this iterator and applys the filter function." (= ()
+  (should "(iter select filter) returns this iterator and applies the filter function." (= ()
     (var next (= () 1),
     (var iter (iterator of next),
     (assert next (iter iterate),
@@ -398,7 +398,7 @@
     (assert true (((iter iterate)) 0),
     (assert null ((iter iterate),
   ),
-  (should "(iter map converter) returns this iterator and applys the converter function." (= ()
+  (should "(iter map converter) returns this iterator and applies the converter function." (= ()
     (var next (= () 1),
     (var iter (iterator of next),
     (assert next (iter iterate),
