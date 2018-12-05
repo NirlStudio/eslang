@@ -35,7 +35,7 @@
   ),
 
   (define "Equivalence" (= ()
-    (should "al bound functions are equivalent with the orginal bound target and each others." (= ()
+    (should "al bound functions are equivalent with the original bound target and each others." (= ()
       (var f (=> () this),
       (var f1 (:f bind 1),
       (var f2 (:f bind 2),
@@ -377,7 +377,7 @@
 ),
 
 (define "(:a-func bind ...)" (= ()
-  (should "(:a-func bind) returns the orginal function." (= ()
+  (should "(:a-func bind) returns the original function." (= ()
     (var l (=> x (+ 1 x),
     (assert l (:l bind),
   ),
@@ -415,7 +415,7 @@
     (var s2 (@ y: 10),
     (assert s1 (s2 (:b),
   ),
-  (should "(:a-bound-func bind new-subject) returns the orginal bound function." (= ()
+  (should "(:a-bound-func bind new-subject) returns the original bound function." (= ()
     (var s1 (@ y: 100),
     (var l (=> x this),
     (let l (:l bind s1),

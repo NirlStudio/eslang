@@ -287,7 +287,7 @@
     (assert null (((range of 10 0 1) iterate),
     (assert null (((range of 0 -10 1) iterate),
   ),
-  (should "(a-non-empty-iterator) returns all values in its orginal range sequentially, then returns null after the last value." (= ()
+  (should "(a-non-empty-iterator) returns all values in its original range sequentially, then returns null after the last value." (= ()
     (var iter ((range of 0 3) iterate),
     (assert 0 (iter),
     (assert 1 (iter),

@@ -722,7 +722,7 @@
 ).
 
 (define "(a-string concat ...)" (=> ()
-  (should "(str concat) returns the orginal str" (= ()
+  (should "(str concat) returns the original str" (= ()
     (assert "" ("" concat),
     (assert "A" ("A" concat),
     (assert "ABC" ("ABC" concat),
@@ -765,7 +765,7 @@
 
 
 (define "(a-string - ...)" (=> ()
-  (should "(str -) returns the orginal str." (= ()
+  (should "(str -) returns the original str." (= ()
     (assert "" ("" -),
     (assert "A" ("A" -),
     (assert "ABC" ("ABC" -),
@@ -855,7 +855,7 @@
 ).
 
 (define "(a-string split)" (= ()
-  (should "(str split) returns an array with single element of the orginal string" (= ()
+  (should "(str split) returns an array with single element of the original string" (= ()
     (assert (("" split) is-a array),
     (assert ((("" split) length) is 1),
     (assert ((("" split) 0) is ""),
@@ -864,7 +864,7 @@
     (assert ((("ABC" split) length) is 1),
     (assert ((("ABC" split) 0) is "ABC"),
   ),
-  (should "(str split \"\") returns an array with single element of the orginal string" (= ()
+  (should "(str split \"\") returns an array with single element of the original string" (= ()
     (assert (("" split "") is-a array),
     (assert ((("" split "") length) is 1),
     (assert ((("" split "") 0) is ""),

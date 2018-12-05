@@ -500,7 +500,7 @@
 ),
 
 (define "(a-class as ...)" (= ()
-  (should "(a-class as) returns the orginal class without modification." (= ()
+  (should "(a-class as) returns the original class without modification." (= ()
     (var cls (class empty),
     (assert cls (cls as),
   ),

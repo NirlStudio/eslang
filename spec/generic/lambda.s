@@ -35,7 +35,7 @@
   ),
 
   (define "Equivalence" (= ()
-    (should "all bound lambda are equivalent with their orginal bound target and each others." (= ()
+    (should "all bound lambda are equivalent with their original bound target and each others." (= ()
       (var l (=() this),
       (var l1 (:l bind 1),
       (var l2 (:l bind 2),
@@ -375,7 +375,7 @@
 ),
 
 (define "(:a-lambda bind ...)" (= ()
-  (should "(:a-lambda bind) returns the orginal lambda." (= ()
+  (should "(:a-lambda bind) returns the original lambda." (= ()
     (var l (= x (+ 1 x),
     (assert l (:l bind),
   ),
@@ -413,7 +413,7 @@
     (var s2 (@ y: 10),
     (assert s1 (s2 (:b),
   ),
-  (should "(:a-bound-lambda bind new-subject) returns the orginal bound lambda." (= ()
+  (should "(:a-bound-lambda bind new-subject) returns the original bound lambda." (= ()
     (var s1 (@ y: 100),
     (var l (= x this),
     (let l (:l bind s1),

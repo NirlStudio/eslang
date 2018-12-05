@@ -1204,7 +1204,7 @@
 ).
 
 (define "(a-number ++)" (= ()
-  (should "(num ++) increments the value of num by 1 but returns the orginal value." (= ()
+  (should "(num ++) increments the value of num by 1 but returns the original value." (= ()
     (assert 0 (0 ++),
     (assert ((-0 ++) is -0),
 
@@ -1243,7 +1243,7 @@
 ).
 
 (define "(a-number --)" (= ()
-  (should "(num --) decrements the value of num by 1 but returns the orginal value." (= ()
+  (should "(num --) decrements the value of num by 1 but returns the original value." (= ()
     (assert 0 (0 --),
     (assert ((-0 --) is -0),
 

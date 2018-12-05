@@ -100,7 +100,7 @@
 ),
 
 (define "(num |= ...)" (=> ()
-  (should "(num |=) returns the orginal value." (=> ()
+  (should "(num |=) returns the original value." (=> ()
     (assert 0 (0 |=),
     (assert 1 (1 |=),
     (assert -1 (-1 |=),
@@ -129,7 +129,7 @@
 ),
 
 (define "(num ^= ...)" (=> ()
-  (should "(num ^=) returns the orginal value." (=> ()
+  (should "(num ^=) returns the original value." (=> ()
     (assert 0 (0 ^=),
     (assert 1 (1 ^=),
     (assert -1 (-1 ^=),
@@ -158,7 +158,7 @@
 ),
 
 (define "(num <<= ...)" (=> ()
-  (should "(num <<=) returns the orginal value." (=> ()
+  (should "(num <<=) returns the original value." (=> ()
     (assert 0 (0 <<=),
     (assert 1 (1 <<=),
     (assert -1 (-1 <<=),
@@ -187,7 +187,7 @@
 ),
 
 (define "(num >>= ...)" (=> ()
-  (should "(num >>=) returns the orginal value." (=> ()
+  (should "(num >>=) returns the original value." (=> ()
     (assert 0 (0 >>=),
     (assert 1 (1 >>=),
     (assert -1 (-1 >>=),
@@ -216,7 +216,7 @@
 ),
 
 (define "(num >>>= ...)" (=> ()
-  (should "(num >>>=) returns the orginal value." (=> ()
+  (should "(num >>>=) returns the original value." (=> ()
     (assert 0 (0 >>>=),
     (assert 1 (1 >>>=),
     (assert 0xFFFFFFFF (-1 >>>=),

@@ -493,7 +493,7 @@
     ),
     (assert 100 (opr2 100),
   ),
-  (should "operator arguments are resolved to their orginal atomic values, symbols and tuples." (= ()
+  (should "operator arguments are resolved to their original atomic values, symbols and tuples." (= ()
     (var opr1 (=? X X),
     (assert 10 (opr1 10),
     (assert true (opr1 true),

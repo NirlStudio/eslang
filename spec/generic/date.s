@@ -441,7 +441,7 @@
     (assert (date invalid) ((date invalid) + 1),
     (assert (date invalid) ((date invalid) + -1),
   ),
-  (should "(a-date + not-a-number) returns the orginal date." (= ()
+  (should "(a-date + not-a-number) returns the original date." (= ()
     (var non-num-values (@
       null type
       bool true false
@@ -497,7 +497,7 @@
     (assert (date invalid) ((date invalid) - 1),
     (assert (date invalid) ((date invalid) - -1),
   ),
-  (should "(a-date - not-a-number-or-date) returns the orginal date." (= ()
+  (should "(a-date - not-a-number-or-date) returns the original date." (= ()
     (var non-num-values (@
       null type
       bool true false

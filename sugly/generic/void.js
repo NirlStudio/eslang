@@ -119,7 +119,7 @@ module.exports = function ($void) {
     return tryToUpdateName(entity, name)
   }
 
-  // create a bound function from the orginal function or lambda.
+  // create a bound function from the original function or lambda.
   function bind ($this, func) {
     if (typeof func.bound === 'function') {
       return func // binding can only happen once.

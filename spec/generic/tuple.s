@@ -1143,7 +1143,7 @@
 ),
 
 (define "(a-tuple to-array)" (= ()
-  (should "(a-tuple to-array) returns an array which has same elements in the orginal tuple." (= ()
+  (should "(a-tuple to-array) returns an array which has same elements in the original tuple." (= ()
     (var t (` (x y),
     (var a (t to-array),
     (a push (`z),

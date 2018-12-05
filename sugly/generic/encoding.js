@@ -144,7 +144,7 @@ module.exports = function ($void) {
         ref = record[0] = this._createRef(offset)
         var code = record[2]
         var newCode = new Tuple$(code.$) // copy code of value.
-        code.$ = ref.$ // update orginal code from value to ref.
+        code.$ = ref.$ // update original code from value to ref.
         record[2] = newCode // save the new code of value.
       }
       return ref

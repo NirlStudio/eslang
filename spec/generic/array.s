@@ -1273,7 +1273,7 @@ f
 ),
 
 (define "(an-array concat ...)" (= ()
-  (should "(an-array concat) returns a shallow copy of the orginal array." (= ()
+  (should "(an-array concat) returns a shallow copy of the original array." (= ()
     (var a (@ 1 2),
     (var b (a concat),
     (assert (b is-not a),
@@ -1350,7 +1350,7 @@ f
     (assert 101 (a length),
     (assert 4 (a count),
   ),
-  (should "(an-array append value ...) returns the orginal array with the value(s) appended to the end." (= ()
+  (should "(an-array append value ...) returns the original array with the value(s) appended to the end." (= ()
     (var a (@ 1 2),
     (assert ((a append 3) is a),
     (assert 3 (a length),
@@ -1371,7 +1371,7 @@ f
     (assert 103 (a length),
     (assert 8 (a count),
   ),
-  (should "(an-array append an-array ...) returns the orginal array appending other array's elements." (= ()
+  (should "(an-array append an-array ...) returns the original array appending other array's elements." (= ()
     (var a (@ 1 2),
     (var b (@ 3 4),
     (assert ((a append b) is a),
@@ -1404,7 +1404,7 @@ f
     (assert 101 (a 103),
     (assert 102 (a 104),
   ),
-  (should "(an-array append an-iterable ...) returns the orginal array appending iterable source's elements." (= ()
+  (should "(an-array append an-iterable ...) returns the original array appending iterable source's elements." (= ()
     (var a (@ 1 2),
     (assert ((a append (3 5)) is a),
     (assert 4 (a length),
@@ -2411,7 +2411,7 @@ f
 ),
 
 (define "(an-array replace ...)" (= ()
-  (should "(an-array replace) returns the orginal array." (= ()
+  (should "(an-array replace) returns the original array." (= ()
     (var a (@),
     (assert a (a replace),
     (assert 0 (a length),
@@ -3262,7 +3262,7 @@ f
 ),
 
 (define "(an-array insert ...)" (= ()
-  (should "(an-array insert) inserts an empty as the first element and returns the orginal array." (= ()
+  (should "(an-array insert) inserts an empty as the first element and returns the original array." (= ()
     (var a (@),
     (assert ((a insert) is a),
     (assert 1 (a length),
@@ -3299,7 +3299,7 @@ f
     (assert null (a 0),
     (assert false (a has 0),
   ),
-  (should "(an-array insert index) inserts an empty at index and returns the orginal array." (= ()
+  (should "(an-array insert index) inserts an empty at index and returns the original array." (= ()
     (var a (@),
     (assert ((a insert 0) is a),
     (assert 1 (a length),
@@ -3408,7 +3408,7 @@ f
     (assert false (a has 100),
     (assert 100 (a 101),
   ),
-  (should "(an-array insert index value) inserts value at index and returns the orginal array." (= ()
+  (should "(an-array insert index value) inserts value at index and returns the original array." (= ()
     (var a (@),
     (assert ((a insert 0 100) is a),
     (assert 1 (a length),
@@ -3568,7 +3568,7 @@ f
 ),
 
 (define "(an-array delete ...)" (= ()
-  (should "(an-array delete) deletes the first element and returns the orginal array." (= ()
+  (should "(an-array delete) deletes the first element and returns the original array." (= ()
     (var a (@),
     (assert ((a delete) is a),
     (assert 0 (a length),
@@ -3606,7 +3606,7 @@ f
     (assert 2 (a 0),
     (assert 100 (a 99),
   ),
-  (should "(an-array delete index) deletes the element at index and returns the orginal array." (= ()
+  (should "(an-array delete index) deletes the element at index and returns the original array." (= ()
     (var a (@),
     (assert ((a delete 0) is a),
     (assert 0 (a length),
@@ -3813,7 +3813,7 @@ f
     (assert 0 (b length),
     (assert 0 (b count),
   ),
-  (should "(an-array splice index) returns a new array with element(s) deleted from the orginal one." (= ()
+  (should "(an-array splice index) returns a new array with element(s) deleted from the original one." (= ()
     (var a (@),
     (var b (a splice 1),
     (assert (b is-not a),
@@ -3872,7 +3872,7 @@ f
     (assert 100 (b length),
     (assert 2 (b count),
   ),
-  (should "(an-array splice index count) returns a new array with no more than (count) element(s) deleted from the orginal one." (= ()
+  (should "(an-array splice index count) returns a new array with no more than (count) element(s) deleted from the original one." (= ()
     (var a (@),
     (var b (a splice 1 1),
     (assert (b is-not a),
@@ -4095,7 +4095,7 @@ f
 ),
 
 (define "(an-array push ...)" (= ()
-  (should "(an-array push) returns the unmodified orginal array." (= ()
+  (should "(an-array push) returns the unmodified original array." (= ()
     (var a (@),
     (assert ((a push) is a),
     (assert 0 (a length),
@@ -4122,7 +4122,7 @@ f
     (assert 101 (a length),
     (assert 3 (a count),
   ),
-  (should "(an-array push value ...) returns the orginal array with value(s) inserted into the end." (= ()
+  (should "(an-array push value ...) returns the original array with value(s) inserted into the end." (= ()
     (var a (@),
     (assert ((a push 100) is a),
     (assert 1 (a length),
@@ -4311,7 +4311,7 @@ f
 ),
 
 (define "(an-array enqueue ...)" (= ()
-  (should "(an-array enqueue) returns the unmodified orginal array." (= ()
+  (should "(an-array enqueue) returns the unmodified original array." (= ()
     (var a (@),
     (assert ((a enqueue) is a),
     (assert 0 (a length),
@@ -4393,7 +4393,7 @@ f
 ),
 
 (define "(an-array reverse)" (= ()
-  (should "(an-array reverse) returns the unmodified orginal array if it is empty or has only one element." (= ()
+  (should "(an-array reverse) returns the unmodified original array if it is empty or has only one element." (= ()
     (var a (@),
     (assert ((a reverse) is a),
     (assert 0 (a length),
@@ -4403,7 +4403,7 @@ f
     (assert 1 (a length),
     (assert 1 (a 0),
   ),
-  (should "(an-array reverse) returns orginal array and reverses the order of all elements." (= ()
+  (should "(an-array reverse) returns original array and reverses the order of all elements." (= ()
     (var a (@ 1 2),
     (assert ((a reverse) is a),
     (assert 2 (a length),
@@ -4444,7 +4444,7 @@ f
 ),
 
 (define "(an-array sort)" (= ()
-  (should "(an-array sort) returns the orginal array by re-arranging its elements of ascending order." (= ()
+  (should "(an-array sort) returns the original array by re-arranging its elements of ascending order." (= ()
     (var a (@),
     (assert ((a sort) is a),
     (assert 0 (a length),
@@ -4497,7 +4497,7 @@ f
     (assert null (a 100),
     (assert false (a has 100),
   ),
-  (should "(an-array sort ascending) returns the orginal array by re-arranging its elements of ascending order." (= ()
+  (should "(an-array sort ascending) returns the original array by re-arranging its elements of ascending order." (= ()
     (var a (@),
     (assert ((a sort ascending) is a),
     (assert 0 (a length),
@@ -4550,7 +4550,7 @@ f
     (assert null (a 100),
     (assert false (a has 100),
   ),
-  (should "(an-array sort descending) returns the orginal array by re-arranging its elements of descending order." (= ()
+  (should "(an-array sort descending) returns the original array by re-arranging its elements of descending order." (= ()
     (var a (@),
     (assert ((a sort descending) is a),
     (assert 0 (a length),
@@ -4603,7 +4603,7 @@ f
     (assert null (a 100),
     (assert false (a has 100),
   ),
-  (should "(an-array sort comparer) returns the orginal array by re-arranging its elements by comparer of ascending order." (= ()
+  (should "(an-array sort comparer) returns the original array by re-arranging its elements by comparer of ascending order." (= ()
     (var cmp (= (a b) ((a % 10) - (b % 10),
     (var a (@ 12 3 101),
     (assert ((a sort cmp) is a),
@@ -4644,7 +4644,7 @@ f
     (assert null (a 3),
     (assert false (a has 3),
   ),
-  (should "(an-array sort ascending comparer) returns the orginal array by re-arranging its elements by comparer of ascending order." (= ()
+  (should "(an-array sort ascending comparer) returns the original array by re-arranging its elements by comparer of ascending order." (= ()
     (var cmp (= (a b) ((a % 10) - (b % 10),
     (var a (@ 12 3 101),
     (assert ((a sort ascending cmp) is a),
@@ -4685,7 +4685,7 @@ f
     (assert null (a 3),
     (assert false (a has 3),
   ),
-  (should "(an-array sort descending comparer) returns the orginal array by re-arranging its elements by comparer of descending order." (= ()
+  (should "(an-array sort descending comparer) returns the original array by re-arranging its elements by comparer of descending order." (= ()
     (var cmp (= (a b) ((a % 10) - (b % 10),
     (var a (@ 12 3 101),
     (assert ((a sort descending cmp) is a),

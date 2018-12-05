@@ -9,7 +9,7 @@
     (assert null (? true),
     (assert null (? false),
   ),
-  (should "(? cond x) returns x if cond is evaluated to true." (=> ()
+  (should "(? cond x) returns x if condition is evaluated to true." (=> ()
     (assert 10 (? true 10),
     (assert 10 (? (1 === 1) 10),
     (assert 10 (? 1 10),
@@ -17,14 +17,14 @@
     (assert 10 (? "" 10),
     (assert 10 (? ("x" + "y") 10),
   ),
-  (should "(? cond x) returns null if cond is evaluated to false." (=> ()
+  (should "(? cond x) returns null if condition is evaluated to false." (=> ()
     (assert null (? null 10),
     (assert null (? false 10),
     (assert null (? (1 == 0) 10),
     (assert null (? 0 10),
     (assert null (? (1 - 1) 10),
   ),
-  (should "(? cond x y) returns y if cond is evaluated to false." (=> ()
+  (should "(? cond x y) returns y if condition is evaluated to false." (=> ()
     (assert 100 (? null 10 100),
     (assert 100 (? false 10 100),
     (assert 100 (? (1 == 0) 10 100),
@@ -44,7 +44,7 @@
     (assert null (if true),
     (assert null (if false),
   ),
-  (should "(if cond x) returns x if cond is evaluated to true." (=> ()
+  (should "(if cond x) returns x if condition is evaluated to true." (=> ()
     (assert 10 (if true 10),
     (assert 10 (if (1 === 1) 100 10),
 
@@ -54,7 +54,7 @@
     (assert 10 (if "" 10),
     (assert 10 (if ("x" + "y") 100 10),
   ),
-  (should "(if cond x) returns null if cond is evaluated to false." (=> ()
+  (should "(if cond x) returns null if condition is evaluated to false." (=> ()
     (assert null (if null 10),
     (assert null (if null 100 10),
 
@@ -64,7 +64,7 @@
     (assert null (if 0 10),
     (assert null (if (1 - 1) 100 10),
   ),
-  (should "(if cond x else y) returns y if cond is evaluated to false." (=> ()
+  (should "(if cond x else y) returns y if condition is evaluated to false." (=> ()
     (assert 10 (if null else 10),
     (assert 10 (if null else 100 10),
 
@@ -80,7 +80,7 @@
   (should "(while) returns null." (=> ()
     (assert null (while),
   ),
-  (should "(while cond) returns if cond is evaluated to false." (=> ()
+  (should "(while cond) returns if condition is evaluated to false." (=> ()
     (assert null (while null),
     (assert null (while xxx),
 
@@ -90,7 +90,7 @@
     (assert null (while false),
     (assert null (while (1 == 0),
   ),
-  (should "(while cond statements ...) repeatedly evaluates statements until cond is evaluated to false." (=> ()
+  (should "(while cond statements ...) repeatedly evaluates statements until condition is evaluated to false." (=> ()
     (var i 0)
     (assert 10 (while (i < 10) (++ i),
 
