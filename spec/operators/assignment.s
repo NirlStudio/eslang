@@ -85,6 +85,19 @@
     (=>:() (let x 100),
     (assert 100 x),
   ),
+  (should "(export (names ...) value) returns value and exports the same value to all names." (= ()
+    (var x)
+    (var exported (export (x y z a) 10),
+    (assert 10 exported),
+    (assert 10 x)
+    (assert 10 y)
+    (assert 10 z)
+    (assert 10 a)
+
+    (=>:() (let x 100) (let a 200),
+    (assert 100 x),
+    (assert 200 a),
+  ),
   (should "(export (names ...) values) returns values and exports each value by its corresponding name." (= ()
     (var x)
     (var a 100)
@@ -188,6 +201,19 @@
 
     (=>:() (let x 100),
     (assert 100 x),
+  ),
+  (should "(var (names ...) value) returns value and declares all variables with the same value." (= ()
+    (var x)
+    (var value (var (x y z a) 10),
+    (assert 10 value),
+    (assert 10 x)
+    (assert 10 y)
+    (assert 10 z)
+    (assert 10 a)
+
+    (=>:() (let x 100) (let a 200),
+    (assert 100 x),
+    (assert 200 a),
   ),
   (should "(var (names ...) values) returns values and declares each value by its corresponding name as variable." (= ()
     (var x)
@@ -310,6 +336,19 @@
 
     (=>:() (let x 100),
     (assert 100 x),
+  ),
+  (should "(let (names ...) value) returns value and declares all variables with the same value." (= ()
+    (var x)
+    (var value (let (x y z a) 10),
+    (assert 10 value),
+    (assert 10 x)
+    (assert 10 y)
+    (assert 10 z)
+    (assert 10 a)
+
+    (=>:() (let x 100) (let a 200),
+    (assert 100 x),
+    (assert 200 a),
   ),
   (should "(let (names ...) values) returns values and declares each value by its corresponding name as variable." (= ()
     (var x)
@@ -435,6 +474,19 @@
 
     (=>:() (let x 100),
     (assert null x),
+  ),
+  (should "(local (names ...) value) returns value and declares all variables with the same value." (= ()
+    (var x)
+    (var value (local (x y z a) 10),
+    (assert 10 value),
+    (assert 10 x)
+    (assert 10 y)
+    (assert 10 z)
+    (assert 10 a)
+
+    (=>:() (let x 100) (let a 200),
+    (assert 10 x),
+    (assert 10 a),
   ),
   (should "(local (names ...) values) returns values and declares each value by its corresponding name as variable in current scope." (= ()
     (local x)
