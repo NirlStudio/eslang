@@ -1,9 +1,8 @@
-(var the-type class)
-(include "share/type")
+(var * (load "share/type" (@ the-type: class),
 
 (define "Class (Type) Common Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "an empty class is identitied by its instance." (= ()
+    (should "an empty class is identified by its instance." (= ()
       (assert ((@:class) is-not (@:class),
       (assert false ((@:class) is (@:class),
 

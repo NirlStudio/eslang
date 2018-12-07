@@ -1,5 +1,4 @@
-(var the-type symbol)
-(include "share/type")
+(var * (load "share/type" (@ the-type: symbol),
 
 (define "Symbol Common Behaviours" (=> ()
   (define "Identity" (= ()

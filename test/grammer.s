@@ -21,7 +21,6 @@ var(var -var var var- var)var
 local(local -local local local- local)local
 export(export -export export export- export)export
 import(import -import import import- import)import
-include(include -include include include- include)include
 load(load -load load load- load)load
 
 # keyword.control.flow.sugly

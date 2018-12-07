@@ -3,7 +3,7 @@
 (:the-value ?? (warn "the-value is missing.").
 ((:the-value is-a the-type) ? (warn "the-value does not match with the-type.").
 ((:other-values is-a array) ? (warn "other-values should be an array").
-((:other-types is-a array) ? (warn "other-values should be an array").
+((:other-types is-a array) ? (warn "other-types should be an array").
 ################################################################################
 (define "Identity" (=> ()
   (should "A value is always itself." (=> ()
@@ -201,9 +201,8 @@
 ).
 
 (define "Logical Operators" (=> ()
-  (include (
-    ((:the-value is false) || (:the-value equals 0)) ? "share/false" "share/true")
-  ),
+  (var mod (((:the-value is false) || (:the-value equals 0)) ? "false" "true"),
+  (load mod (@:object the-value),
 ).
 
 (define "Global Operators" (=> ()

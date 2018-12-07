@@ -1,5 +1,4 @@
-(var the-type date)
-(include "share/type")
+(var * (load "share/type" (@ the-type: date),
 
 (define "Date Common Behaviours" (=> ()
   (define "Identity" (=> ()

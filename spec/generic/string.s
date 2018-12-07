@@ -1,5 +1,4 @@
-(var the-type string)
-(include "share/type")
+(var * (load "share/type" (@ the-type: string),
 
 (define "String Common Behaviours" (= ()
   (define "Identity" (=> ()

@@ -1,9 +1,8 @@
-(var the-type array)
-(include "share/type")
+(var * (load "share/type" (@ the-type: array),
 
 (define "Array Common Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "an empty array is also identitied by its instance." (= ()
+    (should "an empty array is also identified by its instance." (= ()
       (assert ((@) is-not (@),
       (assert false ((@) is (@),
 

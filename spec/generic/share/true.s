@@ -48,7 +48,7 @@
 ).
 
 (define "Boolean Test: (the-value ? ...)" (=> ()
-  (should "Booeanize: (the-value ?) returns true." (=> ()
+  (should "Booleanize: (the-value ?) returns true." (=> ()
     (assert true (:the-value ?),
     (var x the-value)
     (assert true (:x ?),

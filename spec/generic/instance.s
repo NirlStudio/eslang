@@ -6,37 +6,37 @@
   roar: (=() ("..." + age),
   hop: (=>() ("hopping" + age),
 ),
-(var the-type (var cat (@:class type: mammal
-  name: "kitty"
-  revived: false
-  constructor: (= (a h w n)
-    (if (a > 0) (let age a),
-    (if (h > 0) (let height h),
-    (if (w > 0) (let weight w),
-    (if (n not-empty) (let name n),
+(var * (load "share/type" (@
+  the-type: (var cat (@:class type: mammal
+    name: "kitty"
+    revived: false
+    constructor: (= (a h w n)
+      (if (a > 0) (let age a),
+      (if (h > 0) (let height h),
+      (if (w > 0) (let weight w),
+      (if (n not-empty) (let name n),
+    ),
+    activator: (=()
+      (let revived true)
+    ),
+    roar: (=() (mew),
+    mew: (=() "Mew!"),
   ),
-  activator: (=()
-    (let revived true)
+  the-values: (@
+    (var kitty (@:cat),
+    (var harry (@:cat name: "Harry"),
+    (var thomas (@:cat age: 10 name: "Old Thomas"),
+    (var kitty1 (cat of),
+    (var kitty2 (cat of 2),
+    (var kitty3 (cat of 3 20),
+    (var kitty4 (cat of 4 10 1),
+    (var tom (cat of 5 10 1 "Big Tom"),
   ),
-  roar: (=() (mew),
-  mew: (=() "Mew!"),
 ),
-(var the-values (@
-  (var kitty (@:cat),
-  (var harry (@:cat name: "Harry"),
-  (var thomas (@:cat age: 10 name: "Old Thomas"),
-  (var kitty1 (cat of),
-  (var kitty2 (cat of 2),
-  (var kitty3 (cat of 3 20),
-  (var kitty4 (cat of 4 10 1),
-  (var tom (cat of 5 10 1 "Big Tom"),
-),
-(include "share/type")
-
 
 (define "Class Instance Default Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "an empty instance is also identitied by itself." (=> ()
+    (should "an empty instance is also identified by itself." (=> ()
       (assert ((@:cat) is-not (@:cat),
       (assert false ((@:cat) is (@:cat),
 

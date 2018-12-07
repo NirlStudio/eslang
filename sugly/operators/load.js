@@ -24,7 +24,7 @@ module.exports = function load ($void) {
   // expose to be called by native code
   $void.loadData = loadData
 
-  function loadData (space, moduleUri, source) {
+  function loadData (space, moduleUri, source, args) {
     if (typeof source !== 'string') {
       console.warn('load > invalid source:', source)
       return null
@@ -35,20 +35,13 @@ module.exports = function load ($void) {
     // space uri > app uri.
     var loader = $void.loader
     var baseUri = loader.dir(moduleUri)
-    var dirs = baseUri ? [baseUri] : [] // under the same directory
+    var dirs = baseUri && !moduleUri.endsWith('/' + source)
+      ? [baseUri] : [] // under the same directory
     if ($.env('home-uri') !== baseUri) {
       dirs.push($.env('home-uri')) // the app directory
     }
     // try to locate the sourcevar uri
-    var uri
-    for (var i = 0; i < dirs.length; i++) {
-      uri = loader.resolve(source, [dirs[i]])
-      if (uri === moduleUri) {
-        uri = ['400', 'A module cannot import itself.', [source, [dirs[i]]]]
-      } else if (typeof uri === 'string') {
-        break
-      }
-    }
+    var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       console.warn('load > failed to resolve for', uri)
       return null
@@ -65,8 +58,9 @@ module.exports = function load ($void) {
       console.warn('load > compiler warnings:', code)
       return null
     }
+
     try { // to load data
-      return execute(space, code, uri)[0]
+      return execute(space, code, uri, args)[0]
     } catch (signal) {
       console.warn('load > invalid call to', signal.id,
         'in', code, 'from', uri, 'on', moduleUri)

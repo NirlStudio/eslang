@@ -1,5 +1,4 @@
-(var the-type operator)
-(include "share/type")
+(var * (load "share/type" (@ the-type: operator),
 
 (define "Operator Common Behaviours" (=> ()
   (define "Identity" (= ()

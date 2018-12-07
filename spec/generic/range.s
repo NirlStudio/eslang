@@ -1,5 +1,4 @@
-(var the-type range)
-(include "share/type")
+(var * (load "share/type" (@ the-type: range),
 
 (define "Range Common Behaviours" (=> ()
   (define "Identity" (= ()

@@ -78,10 +78,13 @@ module.exports = function import_ ($void) {
     // space uri > app uri > runtime uri
     var loader = $void.loader
     var baseUri = moduleUri ? loader.dir(moduleUri) : null
-    var dirs = baseUri ? [
-      baseUri, // under the same directory
-      baseUri + '/modules' // local modules directory
-    ] : []
+    var dirs = baseUri
+      ? moduleUri.endsWith('/' + source) ? [
+        baseUri + '/modules' // local modules directory
+      ] : [
+        baseUri, // under the same directory
+        baseUri + '/modules' // local modules directory
+      ] : []
     if ($.env('home-uri') !== baseUri) {
       dirs.push($.env('home-uri') + '/modules') // app shared modules
     }
@@ -89,15 +92,7 @@ module.exports = function import_ ($void) {
       dirs.push($void.runtime('uri') + '/modules') // runtime shared modules
     }
     // try to locate the source in dirs.
-    var uri
-    for (var i = 0; i < dirs.length; i++) {
-      uri = loader.resolve(source, [dirs[i]])
-      if (uri === moduleUri) {
-        uri = ['400', 'A module cannot import itself.', [source, [dirs[i]]]]
-      } else if (typeof uri === 'string') {
-        break
-      }
-    }
+    var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       console.warn('import > failed to resolve source for', uri)
       return null
@@ -133,7 +128,7 @@ module.exports = function import_ ($void) {
     }
 
     try { // to load module
-      var scope = execute(null, code, uri)[1]
+      var scope = execute(space, code, uri)[1]
       if (scope) { // try to cache it.
         modules[uri] = scope
         modules[uri].importStatus = 200

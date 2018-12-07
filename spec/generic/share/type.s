@@ -1,8 +1,8 @@
 ################################################################################
 # the shared test code for all types
 (the-type ?? (warn "the type to be tested is not defined.").
-(var (the-values the-empty other-types) (=> :()
-  (var (choose) (import "samples/types"),
+(var (the-values the-empty other-types) (=>:()
+  (var (choose) (import "../samples/types"),
   (var (target others) (choose the-type the-values),
   (@ (target values) (target "empty") others)
 ).
@@ -472,7 +472,7 @@
       (if (:v is-a lambda) (assert (:v is-bound),
       (if (:v is-a function) (assert (:v is-bound),
     ),
-    
+
     (assert ((t type) is-a object),
     (for (k v) in (t type)
       (if (:v is-a lambda) (assert (:v is-bound),
@@ -486,8 +486,13 @@
 (for i in (0 (all-values length))
   (var the-value (all-values:i))
   (var other-values ((all-values copy) delete i),
-  (=> (the-value other-values) : (the-value other-values)
-    (define (+ "value: " the-value) (=> ()
-      (include "share/value")
+  (define (+ "value: " the-value) (=> ()
+    (load "value" (@:object
+      the-type the-values the-empty other-types
+      the-value other-values
+    ),
   ),
 ),
+
+# export results
+(@:object the-type the-values the-empty other-types).

@@ -1,9 +1,8 @@
-(var the-type object)
-(include "share/type")
+(var * (load "share/type" (@ the-type: object),
 
 (define "Object Common Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "an empty object is also identitied by its instance." (= ()
+    (should "an empty object is also identified by its instance." (= ()
       (assert ((@:) is-not (@:),
       (assert false ((@:) is (@:),
 

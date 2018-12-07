@@ -1,9 +1,8 @@
-(var the-type tuple)
-(include "share/type")
+(var * (load "share/type" (@ the-type: tuple),
 
 (define "Tuple Common Behaviours" (=> ()
   (define "Identity" (=> ()
-    (should "a tuple is identitied by its instance." (= ()
+    (should "a tuple is identified by its instance." (= ()
       (assert ((` (x y)) is-not (` (x y),
       (assert false ((` (x y)) is (` (x y),
 

@@ -1,5 +1,4 @@
-(var the-type lambda)
-(include "share/type")
+(var * (load "share/type" (@ the-type: lambda),
 
 (define "Lambda Common Behaviours" (=> ()
   (define "Identity" (= ()

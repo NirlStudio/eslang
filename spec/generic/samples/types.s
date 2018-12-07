@@ -1,5 +1,5 @@
 ################################################################################
-# Common sample data of priamry types.
+# Common sample data of primary types.
 ################################################################################
 (export samples (@).
 (let e.g. (=> (a-type value ...)

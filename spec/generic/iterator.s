@@ -1,5 +1,4 @@
-(var the-type iterator)
-(include "share/type")
+(var * (load "share/type" (@ the-type: iterator),
 
 (define "Iterator Common Behaviours" (=> ()
   (define "Identity" (= ()

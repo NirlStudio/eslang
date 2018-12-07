@@ -92,11 +92,11 @@ module.exports = function ($void) {
     ])
 
     checkStaticOperators('[void / operators] ', [
-      '`', 'export', 'let', 'var',
+      '`', 'export', 'let', 'var', 'local',
       '?', 'if', 'while', 'for', 'break', 'continue',
       '+', '++', '--', '!', 'not', '~',
       '@', '=?', '=', '=>', 'redo', 'return', 'exit',
-      'load', 'import', 'include'
+      'load', 'import'
     ])
 
     checkObjects($, '[Sugly / types] ', [

@@ -57,7 +57,7 @@ module.exports = function () {
     // a new type should have a new nature.
     type.proto = Object.create(Type.proto)
     // a proto always intrinsically knows its container type.
-    type.proto.type = type
+    defineTypeProperty(type.proto, type)
     // give a name to the new type.
     naming(type, name)
     return type

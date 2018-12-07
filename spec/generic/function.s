@@ -1,5 +1,4 @@
-(var the-type function)
-(include "share/type")
+(var * (load "share/type" (@ the-type: function),
 
 (define "Function Common Behaviours" (=> ()
   (define "Identity" (= ()
