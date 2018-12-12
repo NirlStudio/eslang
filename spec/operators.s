@@ -12,4 +12,4 @@
     "operator"
     "load"
     "import"
-  ) (load ("operators/" + spec).
+  ) (load ("./operators/" + spec).

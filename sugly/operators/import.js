@@ -132,10 +132,10 @@ module.exports = function import_ ($void) {
     var loader = $void.loader
     var isAbsolute = loader.isAbsolute(source)
     if (!moduleUri && isAbsolute) {
-      warn("import > It's forbidden to load a module", 'from a absolute uri.')
+      warn("import > It's forbidden to import a module", 'from a absolute uri.')
       return null
     }
-    var dirs = isAbsolute ? [ source ] : dirsOf(
+    var dirs = isAbsolute ? [] : dirsOf(
       source,
       moduleUri && loader.dir(moduleUri),
       $.env('home-uri') + '/modules',

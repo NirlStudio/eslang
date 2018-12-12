@@ -29,10 +29,13 @@ module.exports = function execute ($void) {
 
   // export to be used for interpreter.
   function populateArguments (scope, args, mainApp) {
-    if (typeof args === 'undefined' || args === null) {
-      return // no arguments (module mode)
-    } // otherwise, in application mode(w/ mainApp) or isolated mode.
     var context = scope.context
+    if (typeof args === 'undefined' || args === null) {
+      context.this = null
+      context.arguments = []
+      return
+    }
+
     if (Array.isArray(args)) {
       args = parseArguments(args)
     } else if (typeof args !== 'object') {

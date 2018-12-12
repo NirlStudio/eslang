@@ -4,4 +4,4 @@
     "print"
     "timer"
     "uri"
-  ) (load ("lib/" + spec).
+  ) (load ("./lib/" + spec).

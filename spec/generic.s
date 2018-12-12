@@ -17,4 +17,4 @@
     "class"
     "instance"
     "global"
-  ) (load ("generic/" + spec).
+  ) (load ("./generic/" + spec).

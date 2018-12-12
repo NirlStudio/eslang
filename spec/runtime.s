@@ -6,4 +6,4 @@
     "runtime"
     "signal"
     "space"
-  ) (load ("runtime/" + spec).
+  ) (load ("./runtime/" + spec).
