@@ -10,43 +10,56 @@ module.exports = function import_ ($void) {
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
   var symbolFrom = $void.sharedSymbolOf('from')
+  var warn = (console.warn || console.log).bind(console)
+
+  // const values
+  var RefreshInterval = 60 * 1000 // milliseconds
 
   // import: a module from source.
   //   (import src), or
-  //   (import field from src), or
-  //   (import (fields ...) from src)
+  //   (import field from module), or
+  //   (import (fields ...) from module)
   staticOperator('import', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return null
     }
+    var src
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      return importModule(space, space.local['-module'],
+      src = importModule(space, space.local['-module'],
         evaluate(clist[1], space),
         clist.length > 2 ? evaluate(clist[2], space) : null
       )
+      // clone to protect inner exports object.
+      return Object.assign(new Object$(), src)
     }
     // (import field-or-fields from src)
-    var src = evaluate(clist[3], space)
-    var imported = src instanceof Object$ ? src // importing from an object
-      : importModule(space, space.local['-module'], src,
-        clist.length > 4 ? evaluate(clist[4], space) : null)
-    if (!imported) {
+    src = evaluate(clist[3], space)
+    var imported = src instanceof Object$ ? src
+      : typeof src !== 'string' ? null
+        : importModule(space, space.local['-module'], src,
+          clist.length > 4 ? evaluate(clist[4], space) : null
+        )
+    if (typeof imported !== 'object') {
       return null // importing failed.
     }
+
     // find out fields
-    var i
     var fields = clist[1]
     if (fields instanceof Symbol$) {
-      fields = [fields.key]
-    } else if (fields instanceof Tuple$) {
-      var flist = fields.$
-      fields = []
-      for (i = 0; i < flist.length; i++) {
-        if (flist[i] instanceof Symbol$) {
-          fields.push(flist[i].key)
-        }
+      return imported[fields.key] // import only a single field.
+    }
+    if (!(fields instanceof Tuple$)) {
+      return null // invalid field descriptor
+    }
+
+    var i
+    var flist = fields.$
+    fields = []
+    for (i = 0; i < flist.length; i++) {
+      if (flist[i] instanceof Symbol$) {
+        fields.push(flist[i].key)
       }
     }
     // import fields into an array.
@@ -66,128 +79,156 @@ module.exports = function import_ ($void) {
 
   function importModule (space, moduleUri, source, type) {
     if (typeof source !== 'string') {
-      console.warn('import > invalid source:', source)
-      return null
-    }
-    if (type === 'js') {
-      return importJSModule(space, source)
-    }
-    if (!source.endsWith('.s')) {
-      source += '.s'
-    }
-    // space uri > app uri > runtime uri
-    var loader = $void.loader
-    var baseUri = moduleUri ? loader.dir(moduleUri) : null
-    var dirs = baseUri
-      ? moduleUri.endsWith('/' + source) ? [
-        baseUri + '/modules' // local modules directory
-      ] : [
-        baseUri, // under the same directory
-        baseUri + '/modules' // local modules directory
-      ] : []
-    if ($.env('home-uri') !== baseUri) {
-      dirs.push($.env('home-uri') + '/modules') // app shared modules
-    }
-    if ($void.runtime('uri') !== baseUri) {
-      dirs.push($void.runtime('uri') + '/modules') // runtime shared modules
+      if (source instanceof Symbol$) {
+        source = source.key
+      } else {
+        warn('import > invalid module source:', source)
+        return null
+      }
     }
     // try to locate the source in dirs.
-    var uri = loader.resolve(source, dirs)
-    if (typeof uri !== 'string') {
-      console.warn('import > failed to resolve source for', uri)
+    var check = function (ext) {
+      return source.endsWith(ext) ? source : source + ext
+    }
+    var uri = resolve(moduleUri, check(type === 'js' ? '.js' : '.s'))
+    if (!uri) {
       return null
     }
     // look up it in cache.
-    if (modules[uri]) {
-      if (modules[uri] === 100) {
-        console.warn('import > loop dependency detected at', uri, 'from', moduleUri)
-        return modules[uri].exporting
-      }
-      if ((Date.now() - modules[uri].importTime) < 3000) {
-        return modules[uri].exporting
-      } // else try to reload
-    } else {
-      // generate a fake module to prevent loop dependency, either on purpose or not.
-      modules[uri] = Object.assign(Object.create(null), {
-        importStatus: 100,
-        importTime: Date.now(),
-        exporting: Object.create(null)
-      })
-    }
-    // try to load file
-    var text = loader.read(uri)
-    if (typeof text !== 'string') {
-      console.warn('import > failed to read source', source, 'for', text)
-      return modules[uri].exporting
-    }
-    // compile text
-    var code = compile(text)
-    if (!(code instanceof Tuple$)) {
-      console.warn('import > compiler warnings:', code)
-      return modules[uri].exporting
+    var module_ = lookupInCache(uri, moduleUri)
+    var reloading
+    switch (module_.status) {
+      case 0:
+        module_.status = 100
+        break // continue to load
+      case 205:
+        reloading = true
+        break // try to reload
+      default:
+        return module_.exports
     }
 
-    try { // to load module
-      var scope = execute(space, code, uri)[1]
-      if (scope) { // try to cache it.
-        modules[uri] = scope
-        modules[uri].importStatus = 200
-        modules[uri].importTime = Date.now()
-      } else {
-        modules[uri].importStatus = 500
-        console.warn('import > failed when executing', code)
-      }
-    } catch (signal) {
-      modules[uri].importStatus = 400
-      console.warn('import > invalid call to', signal.id,
-        'in', code, 'at', uri, 'from', moduleUri)
+    var exporting = (type === 'js' ? loadJsModule : loadModule)(
+      space, uri, module_, source, moduleUri
+    )
+    if (!exporting || exporting === module_.exporting) {
+      return module_.exports
     }
-    return modules[uri].exporting
+    module_.exporting = exporting
+    if (reloading) {
+      module_.exports = new Object$()
+    }
+    var keys = Object.getOwnPropertyNames(exporting)
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]
+      if (!key.startsWith('-')) { // only expose public fields
+        module_.exports[key] = exporting[key]
+      }
+    }
+    return module_.exports
   }
 
-  function importJSModule (space, source) {
+  function resolve (moduleUri, source) {
     var loader = $void.loader
-    if (loader.isAbsolute(source)) {
-      console.warn("import > It's forbidden to load a native module",
-        'from a absolute uri.')
+    var isAbsolute = loader.isAbsolute(source)
+    if (!moduleUri && isAbsolute) {
+      warn("import > It's forbidden to load a module", 'from a absolute uri.')
       return null
     }
-    if (!source.endsWith('.js')) {
-      source += '.js'
-    }
-    var dirs = [
-      $.env('home-uri') + '/modules', // app shared modules
-      $void.runtime('uri') + '/modules' // runtime shared modules
-    ]
+    var dirs = isAbsolute ? [ source ] : dirsOf(
+      source,
+      moduleUri && loader.dir(moduleUri),
+      $.env('home-uri') + '/modules',
+      $void.runtime('uri') + '/modules'
+    )
     var uri = loader.resolve(source, dirs)
-    if (typeof uri !== 'string') {
-      console.warn('import > failed to resolve source for', source, 'in', dirs)
-      return null
+    if (typeof uri === 'string') {
+      return uri
     }
-    // look up it in cache.
-    if (modules[uri]) {
-      return modules[uri].exporting
+    warn('import > failed to resolve module ', source, 'in', dirs)
+    return null
+  }
+
+  function dirsOf (source, baseUri, appDir, runtimeDir) {
+    return baseUri
+      ? source.startsWith('.')
+        ? [ baseUri ]
+        : [ appDir, runtimeDir, baseUri ]
+      : [ runtimeDir ]
+  }
+
+  function lookupInCache (uri, moduleUri) {
+    var module = modules[uri]
+    if (!module) {
+      module = modules[uri] = Object.assign(Object.create(null), {
+        status: 0, // loading
+        exports: new Object$(),
+        timestamp: Date.now()
+      })
+    } else if (module.status === 100) {
+      warn('import > loop dependency when loading', uri, 'from', moduleUri)
+    } else if ((Date.now() - modules[uri].timestamp) > RefreshInterval) {
+      module.status = 205
     }
+    return module
+  }
+
+  function loadModule (space, uri, module_, source, moduleUri) {
+    try {
+      // try to load file
+      var text = $void.loader.read(uri)
+      if (typeof text !== 'string') {
+        module_.status = 415 // unspported media type
+        warn('import > failed to read source', source, 'for', text)
+        return null
+      }
+      // compile text
+      var code = compile(text)
+      if (!(code instanceof Tuple$)) {
+        module_.status = 400 //
+        warn('import > failed to compile source', source, 'for', code)
+        return null
+      }
+      // to load module
+      var scope = execute(space, code, uri, { this: module_.exporting })[1]
+      if (scope) {
+        module_.status = 200
+        return scope.exporting
+      }
+      module_.status = 500
+      warn('import > failed when executing', code)
+    } catch (signal) {
+      module_.status = 503
+      warn('import > invalid call to', signal.id,
+        'in', code, 'at', uri, 'from', moduleUri)
+    }
+    return null
+  }
+
+  function loadJsModule (space, uri, module_, source, moduleUri) {
     try {
       var importing = require(uri) // the JS module must export a loader function.
       if (typeof importing !== 'function') {
-        console.warn('import > invalid JS module', source, 'at', uri)
+        module_.status = 400
+        warn('import > invalid JS module', source, 'at', uri)
         return null
       }
-      var scope = $void.createModuleSpace(uri, null)
-      var status = importing(scope.exporting, scope.context)
-      if (status !== true) { // the loader can report error details
-        console.warn('import > failed to import JS module of', source,
-          'for', status, 'at', uri)
-        return null
+      var scope = $void.createModuleSpace(uri, space)
+      var status = importing.call(
+        module_.exporting, scope.exporting, scope.context
+      )
+      if (status === true) { // the loader can report error details
+        module_.status = 200
+        return scope.exporting
       }
-      scope.time = new Date()
-      modules[uri] = scope
-      return scope.exporting
+      module_.status = 500 // internal error
+      warn('import > failed to import JS module of', source,
+        'for', status, 'at', uri)
     } catch (err) {
-      console.warn('import > failed to import JS module of', source,
-        'for', err, 'from', uri)
-      return null
+      module_.status = 503 // service unavailable
+      warn('import > failed to import JS module of', source,
+        'for', err, 'at', uri, 'from', moduleUri)
     }
+    return null
   }
 }

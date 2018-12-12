@@ -60,8 +60,8 @@ module.exports = function ($void) {
       sourceStack = [[]]
       waiter = null
       lastToken = null
-      raiseExpression(null, 'reseting',
-        'reseting tokenizer and compiler context.')
+      raiseExpression(null, 'resetting',
+        'resetting tokenizer and compiler context.')
     }
 
     function tryToRaise () {
@@ -192,7 +192,7 @@ module.exports = function ($void) {
     var warnings = null
     var compiling = compiler(function collector (expr, status) {
       if (status) {
-        if (status !== 'reseting') { // restting is ignored for sync compiling.
+        if (status !== 'resetting') { // restting is ignored for sync compiling.
           if (!warnings) {
             warnings = [list]
           }

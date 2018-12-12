@@ -32,23 +32,27 @@ module.exports = function execute ($void) {
     if (typeof args === 'undefined' || args === null) {
       return // no arguments (module mode)
     } // otherwise, in application mode(w/ mainApp) or isolated mode.
+    var context = scope.context
     if (Array.isArray(args)) {
       args = parseArguments(args)
     } else if (typeof args !== 'object') {
-      scope.context.arguments = [args] // a native argument value
+      context.this = null
+      context.arguments = [args] // a native argument value
       return
-    } else if (!args.arguments) {
-      args.arguments = [] // ensure the existence of arguments.
     }
+
+    context.this = typeof args.this !== 'undefined' ? args.this : null
+    context.arguments = Array.isArray(args.arguments) ? args.arguments : []
+
     var keys = Object.getOwnPropertyNames(args)
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
-      if (key === 'arguments') {
-        scope.context.arguments = args.arguments
-      } else if (mainApp && key === 'env') {
-        populateEnv(args.env)
-      } else {
-        scope.local[key] = args[key]
+      if (key !== 'arguments' && key !== 'this') {
+        if (mainApp && key === 'env') {
+          populateEnv(args.env)
+        } else {
+          scope.local[key] = args[key]
+        }
       }
     }
   }

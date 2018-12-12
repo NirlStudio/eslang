@@ -30,25 +30,25 @@ module.exports = function ($void) {
     var singleQuoteWaiter = createStringWaiter("'")
     var doubleQuoteWaiter = createStringWaiter('"')
 
-    var reseting = false
+    var resetting = false
     return function tokenizing (text) {
       if (typeof text !== 'string') { // stopping
-        if (!reseting && waiter) {
+        if (!resetting && waiter) {
           waiter() // finalize pending action
         }
-        if (!reseting) {
-          reseting = true // update state
+        if (!resetting) {
+          resetting = true // update state
         }
-        // reseting: wating next piece of source code to continue
+        // resetting: waiting next piece of source code to continue
         return false
       }
-      if (reseting) { // resume parsing
+      if (resetting) { // resume parsing
         resumeParsing() // clear parsing context
       }
       // start parsing
       for (var i = 0; i < text.length; i++) {
         if (pushChar(text[i])) {
-          return false // reseting
+          return false // resetting
         }
       }
       return true // keep waiting more code
@@ -67,13 +67,13 @@ module.exports = function ($void) {
       pendingLine = 0
       pendingOffset = 0
       pendingText = ''
-      reseting = false
+      resetting = false
     }
 
     function pushChar (c) {
       if (waiter && waiter(c)) {
         nextChar(c)
-        return reseting
+        return resetting
       }
       switch (c) {
         case '(':
@@ -110,7 +110,7 @@ module.exports = function ($void) {
           if (indenting >= 0) {
             raiseToken('error', c, [indenting, lineNo, lineOffset],
               'tab-indent', 'TAB cannot be used as indent character.')
-            reseting = true
+            resetting = true
             return true // ending
           } else {
             raiseSpace(c)
@@ -124,7 +124,7 @@ module.exports = function ($void) {
           break
       }
       nextChar(c)
-      return reseting
+      return resetting
     }
 
     function nextChar (c) {
@@ -155,11 +155,11 @@ module.exports = function ($void) {
 
     function createStringWaiter (quote) {
       return function (c) {
-        if (!c) { // unexpecting ending
+        if (!c) { // unexpected ending
           raiseToken('error', pendingText,
             [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
             'missing-quote: ' + quote, 'the format of string is invalid.')
-          reseting = true
+          resetting = true
           return true
         }
         if (c === '\r') { // skip '\r' anyway
@@ -199,7 +199,7 @@ module.exports = function ($void) {
           }
           return true
         }
-        // string reseting
+        // string resetting
         pendingText += quote
         var value = JSON.parse(pendingText)
         if (typeof value === 'string') {
@@ -212,7 +212,7 @@ module.exports = function ($void) {
         raiseToken('error', pendingText,
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
           'invalid-string:' + quote, 'the format of string is invalid.')
-        reseting = true
+        resetting = true
         return true
       }
     }
