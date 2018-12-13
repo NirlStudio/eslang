@@ -1,8 +1,7 @@
 'use strict'
 
-module.exports = function object ($void) {
+module.exports = function literal ($void) {
   var $ = $void.$
-  var $Array = $.array
   var $Class = $.class
   var $Object = $.object
   var $Symbol = $.symbol
@@ -13,6 +12,13 @@ module.exports = function object ($void) {
   var arraySet = $.array.proto.set
   var staticOperator = $void.staticOperator
 
+  var symbolPairing = $Symbol.pairing
+  var symbolAll = $Symbol.all
+  var symbolLiteral = $Symbol.literal
+  var symbolArray = $Symbol.of('array')
+  var symbolObject = $Symbol.of('object')
+  var symbolClass = $Symbol.of('class')
+
   // (@ value ...)
   function arrayCreate (space, clist, offset) {
     var result = []
@@ -20,7 +26,7 @@ module.exports = function object ($void) {
     while (offset < clist.length) {
       value = evaluate(clist[offset], space)
       offset += 1
-      if (offset < clist.length && clist[offset] === $Symbol.pairing) {
+      if (offset < clist.length && clist[offset] === symbolPairing) {
         index = value >> 0; offset += 1
         arraySet.call(result, index, offset >= clist.length ? null
           : evaluate(clist[offset++], space)
@@ -39,14 +45,14 @@ module.exports = function object ($void) {
     while (offset < length) {
       var name = clist[offset++]
       if (name instanceof Symbol$) {
-        if (name === $Symbol.pairing) {
+        if (name === symbolPairing) {
           continue
         }
         name = name.key
       } else if (typeof name !== 'string') {
         name = evaluate(name, space)
         if (name instanceof Symbol$) {
-          if (name === $Symbol.pairing) {
+          if (name === symbolPairing) {
             continue
           }
           name = name.key
@@ -54,7 +60,7 @@ module.exports = function object ($void) {
           continue
         }
       }
-      if (clist[offset] === $Symbol.pairing) {
+      if (clist[offset] === symbolPairing) {
         obj[name] = ++offset < length ? evaluate(clist[offset++], space) : null
       } else {
         obj[name] = evaluate(symbolOf(name), space)
@@ -75,25 +81,28 @@ module.exports = function object ($void) {
       return []
     }
     var indicator = clist[1]
-    if (indicator === $Symbol.pairing) {
-      if (length < 3) { // (@:)
-        return Object.create($Object.proto)
-      }
-      var type = evaluate(clist[2], space) // (@:type-or-factory )
-      return type === $Class
-        ? $Class.of(objectCreate(space, clist, $Object, 3))
-        : type instanceof ClassType$
-          ? objectCreate(space, clist, type, 3)
-          : type === $Array
-            ? arrayCreate(space, clist, 3)
-            : objectCreate(space, clist, $Object, 3)
+    if (indicator !== symbolPairing) {
+      return length > 2 && clist[2] === symbolPairing &&
+          (typeof indicator === 'string' || indicator instanceof Symbol$)
+        ? objectCreate(space, clist, $Object, 1) // (@ name: ...) or (@ "name": ...)
+        : arrayCreate(space, clist, 1) // (@ ...) or (@ offset: value ...)
     }
-    if (length > 2 && clist[2] === $Symbol.pairing &&
-        (typeof indicator === 'string' || indicator instanceof Symbol$)
-    ) { // (@ ? :)
-      return objectCreate(space, clist, $Object, 1)
-    } else { // as array
-      return arrayCreate(space, clist, 1)
+    // (@: ...)
+    if (length < 3) { // (@:)
+      return Object.create($Object.proto)
     }
+    // (@:a-type ...)
+    var type = clist[2]
+    return type === symbolClass
+      ? $Class.of(objectCreate(space, clist, $Object, 3)) // (@:class ...)
+      : type === symbolLiteral || type === symbolObject
+        ? objectCreate(space, clist, $Object, 3) // (@:@ ...) (@:object ...)
+        : type === symbolAll || type === symbolArray
+          ? arrayCreate(space, clist, 3) // (@:* ...) (@:array ...)
+          : objectCreate(space, clist,
+            (type = evaluate(type, space)) instanceof ClassType$
+              ? type // (@:a-class ...)
+              : $Object, // ingore type and treat it as a common object.
+            3)
   })
 }

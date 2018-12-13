@@ -314,14 +314,14 @@
   (define "(tuple array)" (= ()
     (should "(tuple array) is a piece of code to generate an empty array." (= ()
       (assert 1 ((tuple array) length),
-      (assert (symbol object) ((tuple array) 0),
+      (assert (symbol literal) ((tuple array) 0),
       (assert (((tuple array)) is-a array),
     ),
   ),
   (define "(tuple object)" (= ()
     (should "(tuple object) is a piece of code to generate an empty object." (= ()
       (assert 2 ((tuple object) length),
-      (assert (symbol object) ((tuple object) 0),
+      (assert (symbol literal) ((tuple object) 0),
       (assert (symbol pairing) ((tuple object) 1),
       (assert (((tuple object)) is-a object),
     ),
@@ -329,7 +329,7 @@
   (define "(tuple class)" (= ()
     (should "(tuple class) is a piece of code to generate an empty class." (= ()
       (assert 3 ((tuple class) length),
-      (assert (symbol object) ((tuple class) 0),
+      (assert (symbol literal) ((tuple class) 0),
       (assert (symbol pairing) ((tuple class) 1),
       (assert (symbol of "class") ((tuple class) 2),
       (assert (((tuple class)) is-a type),

@@ -26,10 +26,10 @@ module.exports = function ($void) {
   link(Type, 'operator', new Tuple$([$Symbol.operator, empty, blank]))
 
   // empty objects
-  link(Type, 'array', new Tuple$([$Symbol.object]))
-  link(Type, 'object', new Tuple$([$Symbol.object, $Symbol.pairing]))
+  link(Type, 'array', new Tuple$([$Symbol.literal]))
+  link(Type, 'object', new Tuple$([$Symbol.literal, $Symbol.pairing]))
   link(Type, 'class', new Tuple$([
-    $Symbol.object, $Symbol.pairing, sharedSymbolOf('class')
+    $Symbol.literal, $Symbol.pairing, sharedSymbolOf('class')
   ]))
 
   // check if the value can be accepted as an element of a tuple.

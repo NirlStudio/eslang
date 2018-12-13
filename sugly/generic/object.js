@@ -230,7 +230,7 @@ module.exports = function ($void) {
       ctx = new EncodingContext$(this)
     }
     var props = Object.getOwnPropertyNames(this)
-    var code = [$Symbol.object]
+    var code = [$Symbol.literal]
     for (var i = 0; i < props.length; i++) {
       var name = props[i]
       code.push(encodeFieldName(name), $Symbol.pairing, ctx.encode(this[name]))

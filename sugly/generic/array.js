@@ -799,7 +799,7 @@ module.exports = function ($void) {
     } else {
       ctx = new EncodingContext$(this)
     }
-    var code = [$Symbol.object]
+    var code = [$Symbol.literal]
     var last = -1
     trace.call(this, function (v, i) {
       v = ctx.encode(v);

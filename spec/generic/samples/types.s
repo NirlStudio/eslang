@@ -122,7 +122,7 @@
 
 (e.g. object
   (@ x: 1) (@ x: 1)
-  (@:object x ) (@:object x)
+  (@:@ x ) (@:@ x)
   (@ x: 1 y: 2) (@ x: 1 y: 2)
   (@:object x y) (@:object x y)
 ).

@@ -209,7 +209,7 @@ module.exports = function ($void) {
       return thisCall(code, 'to-string')
     }
     code = objectToCode.call(toObject.call(this))
-    if (code.$[0] === $Symbol.object) {
+    if (code.$[0] === $Symbol.literal) {
       code.$[1] === $Symbol.pairing ? code.$.splice(2, 0, symbolClass)
         : code.$.splice(1, 0, $Symbol.pairing, symbolClass)
     } else {

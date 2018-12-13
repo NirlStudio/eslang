@@ -343,18 +343,18 @@
       (assert false ((symbol period) is-invalid),
     ),
   ),
-  (define "(symbol object)" (= ()
+  (define "(symbol literal)" (= ()
     (should "its key value is \"@\"." (= ()
-      (assert "@" ((symbol object) key),
-      (assert "@" ((symbol object) to-string),
-      (assert ((symbol of "@") is (symbol object),
+      (assert "@" ((symbol literal) key),
+      (assert "@" ((symbol literal) to-string),
+      (assert ((symbol of "@") is (symbol literal),
     ),
     (should "it is evaluated to itself." (= ()
-      (assert (((symbol object)) is (symbol object),
+      (assert (((symbol literal)) is (symbol literal),
     ),
     (should "it is taken as an valid symbol." (= ()
-      (assert ((symbol object) is-valid),
-      (assert false ((symbol object) is-invalid),
+      (assert ((symbol literal) is-valid),
+      (assert false ((symbol literal) is-invalid),
     ),
   ),
   (define "(symbol pairing)" (= ()

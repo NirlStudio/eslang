@@ -15,7 +15,7 @@
   (iterator of (@),
   (iterator of (@ null),
   (iterator of (@ 1 2),
-  object (object empty) (@:) (@ x: null) (@:object x ) (@ x: 1 y: 2)
+  object (object empty) (@:) (@ x: null) (@:@ x ) (@ x: 1 y: 2)
   class (class empty)
   ((class empty) empty),
 ),

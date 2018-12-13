@@ -38,4 +38,16 @@ module.exports = function ($void) {
   $export($, sharedSymbolOf('descending').key, 1)
   $export($, sharedSymbolOf('equivalent').key, 0)
   $export($, sharedSymbolOf('ascending').key, -1)
+
+  // TODO: ensure common symbols are shared.
+  var commonSymbols = [
+    'null', 'true', 'false',
+    'type', 'bool', 'string', 'number', 'date', 'range',
+    'symbol', 'tuple',
+    'operator', 'lambda', 'function',
+    'array', 'iterator', 'object', 'class'
+  ]
+  for (var i = 0; i < commonSymbols.length; i++) {
+    sharedSymbolOf(commonSymbols[i])
+  }
 }

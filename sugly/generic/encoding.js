@@ -93,12 +93,12 @@ module.exports = function ($void) {
     return type === $Array ? $Tuple.array
       : type === $Object || (type = normalize(type)) === symbolObject
         ? $Tuple.object
-        : new Tuple$([$Symbol.object, $Symbol.pairing, type])
+        : new Tuple$([$Symbol.literal, $Symbol.pairing, type])
   }
   var updateInst = function (ref, type, code) {
     // remove unnecessary activation for data entity.
     var items = code.$
-    if (items.length > 2 && items[0] === $Symbol.object &&
+    if (items.length > 2 && items[0] === $Symbol.literal &&
       items[1] === $Symbol.pairing && (items[2] instanceof Symbol$)
     ) {
       var cls = items[2].key
@@ -185,7 +185,7 @@ module.exports = function ($void) {
         // no circular or shared array/object.
         return this.clist[rootOffset][2]
       }
-      var args = [$Symbol.object] // (@ ...)
+      var args = [$Symbol.literal] // (@ ...)
       var body = [new Tuple$([ // (local _ args) ...
         $Symbol.local, symbolLocals, new Tuple$(args)
       ])]

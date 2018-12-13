@@ -65,7 +65,7 @@ function initializeOperators ($void) {
   require('./operators/bitwise')($void)
   require('./operators/arithmetic')($void)
 
-  require('./operators/object')($void)
+  require('./operators/literal')($void)
   require('./operators/function')($void)
   require('./operators/operator')($void)
 

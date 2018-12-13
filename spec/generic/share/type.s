@@ -487,7 +487,7 @@
   (var the-value (all-values:i))
   (var other-values ((all-values copy) delete i),
   (define (+ "value: " the-value) (=> ()
-    (load "value" (@:object
+    (load "value" (@:@
       the-type the-values the-empty other-types
       the-value other-values
     ),
@@ -495,4 +495,4 @@
 ),
 
 # export results
-(@:object the-type the-values the-empty other-types).
+(@:@ the-type the-values the-empty other-types).

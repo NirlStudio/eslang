@@ -6,6 +6,9 @@
       (assert ((@:) is-not (@:),
       (assert false ((@:) is (@:),
 
+      (assert ((@:@) is-not (@:@),
+      (assert false ((@:@) is (@:@),
+
       (assert ((@:object) is-not (@:object),
       (assert false ((@:object) is (@:object),
 
@@ -973,7 +976,7 @@
   ),
   (should "(obj to-code) represent field name as string if it's any constant value." (= ()
     (for sym in (@ "null" "true" "false")
-      (let obj (@:object (sym): 1),
+      (let obj (@:@ (sym): 1),
       (let code (obj to-code),
       (assert (code is-a tuple),
       (assert 4 (code length),
@@ -986,7 +989,7 @@
       "(" "`" "@" ":" "$" "\"" "#" ")" "'" "," ";" "\\" " " "\t" "\n" "\r"
     ),
     (for sym in symbols
-      (let obj (@:object (sym): 1),
+      (let obj (@:@ (sym): 1),
       (let code (obj to-code),
       (assert (code is-a tuple),
       (assert 4 (code length),
@@ -999,7 +1002,7 @@
       "0" "-1" ".1" "-.1" "0." ".0" "08" "0x1" "0b10" "12e-12" "12.0e12"
     ),
     (for sym in symbols
-      (let obj (@:object (sym): 1),
+      (let obj (@:@ (sym): 1),
       (let code (obj to-code),
       (assert (code is-a tuple),
       (assert 4 (code length),

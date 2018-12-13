@@ -7,7 +7,7 @@
     "logical"
     "bitwise"
     "arithmetic"
-    "object"
+    "literal"
     "function"
     "operator"
     "load"

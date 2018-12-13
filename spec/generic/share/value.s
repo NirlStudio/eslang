@@ -202,7 +202,7 @@
 
 (define "Logical Operators" (=> ()
   (var mod (((:the-value is false) || (:the-value equals 0)) ? "false" "true"),
-  (load mod (@:object the-value),
+  (load mod (@:@ the-value),
 ).
 
 (define "Global Operators" (=> ()

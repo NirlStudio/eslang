@@ -44,7 +44,7 @@ module.exports = function ($void) {
   link(Type, 'comma', sharedSymbolOf(','))
   link(Type, 'semicolon', sharedSymbolOf(';'))
   link(Type, 'period', sharedSymbolOf('.'))
-  link(Type, 'object', sharedSymbolOf('@'))
+  link(Type, 'literal', sharedSymbolOf('@'))
   link(Type, 'pairing', sharedSymbolOf(':'))
   link(Type, 'comment', sharedSymbolOf('#'))
 
