@@ -141,9 +141,9 @@
     ),
   ),
   (define "NOT: not / !" (= ()
-    (should "the empty not operator is defined as true" (= ()
-      (assert (not),
-      (assert (!),
+    (should "the empty not operator is defined as false" (= ()
+      (assert ((not) is false),
+      (assert ((!) is false),
     ),
     (should "the not value of true is false" (= ()
       (assert false (not true),

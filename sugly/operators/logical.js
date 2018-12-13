@@ -12,11 +12,11 @@ module.exports = function logical ($void) {
   var staticOperator = $void.staticOperator
 
   var not = staticOperator('!', function (space, clause) {
-    if (clause.$.length > 1) {
-      var value = evaluate(clause.$[1], space)
-      return value === false || value === null || value === 0 || typeof value === 'undefined'
+    if (clause.$.length < 2) {
+      return false
     }
-    return true
+    var value = evaluate(clause.$[1], space)
+    return value === false || value === null || value === 0
   })
 
   staticOperator('not', not)

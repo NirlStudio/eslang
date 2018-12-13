@@ -174,14 +174,12 @@
 (define "Logical Operators" (=> ()
   (define "Logical NOT: (! null)" (=> ()
     (should "(! null) returns true." (=> ()
-      (assert true (!),
       (assert true (! null),
 
       (var n null)
       (assert true (! n),
     ),
     (should "(not null) returns true." (=> ()
-      (assert true (not),
       (assert true (not null),
 
       (var n null)
