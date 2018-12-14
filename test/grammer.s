@@ -525,5 +525,9 @@ emit((e emit) emit)
 -1.03e+12
 -1.03E-12
 
-# string
-"123$bcd\"''$\t xyz"
+# single line comment
+#( block comment )# 123
+#(multiple lines comment
+  multiple lines comment
+)# 123
+"123$bcd\"''$\t xyz" 123

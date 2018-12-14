@@ -3,18 +3,21 @@
     (var f (=),
     (assert (:f is-a lambda),
     (assert (:f is-empty),
+
+    (assert (:f is (lambda empty),
+    (assert (:(=()) is (lambda empty),
   ),
-  (should "(= param) returns the empty lambda." (=> ()
+  (should "(= param) returns an empty lambda." (=> ()
     (var f (= x),
     (assert (:f is-a lambda),
     (assert (:f is-empty),
   ),
-  (should "(=(params ...)) returns the empty lambda." (=> ()
-    (var f (= (x y)),
+  (should "(= (params ...)) returns an empty lambda." (=> ()
+    (var f (= (x y),
     (assert (:f is-a lambda),
     (assert (:f is-empty),
   ),
-  (should "(=() body ...) returns a new lambda which has no explicit argument." (=> ()
+  (should "(= () body ...) returns a new lambda which has no explicit parameter." (=> ()
     (var f (=() 10),
     (assert (:f is-a lambda),
     (assert (:f not-empty),
@@ -23,7 +26,7 @@
     (assert 0 ((:f parameters) length),
     (assert 10 ((:f body) 0),
   ),
-  (should "(= param body ...) returns a new lambda having an explicit argument." (=> ()
+  (should "(= param body ...) returns a new lambda having an explicit parameter." (=> ()
     (var f (= x 10 x),
     (assert (:f is-a lambda),
     (assert (:f not-empty),
@@ -36,7 +39,7 @@
     (assert 10 ((:f body) 0),
     (assert (`x) ((:f body) 1),
   ),
-  (should "(=(params ...) body ...) returns a new lambda." (=> ()
+  (should "(= (params ...) body ...) returns a new lambda." (=> ()
     (var f (= (x y) 10 (x + y),
     (assert (:f is-a lambda),
     (assert (:f not-empty),
@@ -51,25 +54,21 @@
     (assert 10 ((:f body) 0),
     (assert (`(x + y)) ((:f body) 1),
   ),
-  (should "(=:() body ...) returns a new lambda." (=> ()
-    (var f (= (x y) 10 (x + y),
-    (assert (:f is-a lambda),
-    (assert (:f not-empty),
+  (should "(= :() body ...) calls the new lambda immediately and returns the result." (= ()
+    (var r (=: () 100),
+    (assert 100 r),
   ),
-  (should "(=():() body ...) returns a new lambda." (=> ()
-    (var f (= (x y) 10 (x + y),
-    (assert (:f is-a lambda),
-    (assert (:f not-empty),
+  (should "(= ():() body ...) calls the new lambda immediately and returns the result." (= ()
+    (var r (= ():() 100),
+    (assert 100 r),
   ),
-  (should "(= arg:param body ...) returns a new lambda." (=> ()
-    (var f (= (x y) 10 (x + y),
-    (assert (:f is-a lambda),
-    (assert (:f not-empty),
+  (should "(= arg:param body ...) calls the new lambda immediately with an argument and returns the result." (= ()
+    (var r (= 10:x (100 + x),
+    (assert 110 r),
   ),
-  (should "(=(args ...):(params ...) body ...) returns a new lambda." (=> ()
-    (var f (= (x y) 10 (x + y),
-    (assert (:f is-a lambda),
-    (assert (:f not-empty),
+  (should "(= (args ...):(params ...) body ...) calls the new lambda immediately with arguments and returns the result." (= ()
+    (var r (= (1 10):(x y) (100 + x y),
+    (assert 111 r),
   ),
 ),
 
@@ -78,18 +77,21 @@
     (var f (=>),
     (assert (:f is-a function),
     (assert (:f is-empty),
+
+    (assert (:f is (function empty),
+    (assert (:(=>()) is (function empty),
   ),
-  (should "(=> param) returns the empty function." (=> ()
+  (should "(=> param) returns an empty function." (=> ()
     (var f (=> x),
     (assert (:f is-a function),
     (assert (:f is-empty),
   ),
-  (should "(=>(params ...)) returns the empty function." (=> ()
-    (var f (=> (x y)),
+  (should "(=> (params ...)) returns an empty function." (=> ()
+    (var f (=> (x y),
     (assert (:f is-a function),
     (assert (:f is-empty),
   ),
-  (should "(=>() body ...) returns a new function which has no explicit argument." (=> ()
+  (should "(=> () body ...) returns a new function which has no explicit parameter." (=> ()
     (var f (=>() 10),
     (assert (:f is-a function),
     (assert (:f not-empty),
@@ -98,7 +100,7 @@
     (assert 0 ((:f parameters) length),
     (assert 10 ((:f body) 0),
   ),
-  (should "(=> param body ...) returns a new function having an explicit argument." (=> ()
+  (should "(=> param body ...) returns a new function having an explicit parameter." (=> ()
     (var f (=> x 10 x),
     (assert (:f is-a function),
     (assert (:f not-empty),
@@ -111,7 +113,7 @@
     (assert 10 ((:f body) 0),
     (assert (`x) ((:f body) 1),
   ),
-  (should "(=>(params ...) body ...) returns a new function." (=> ()
+  (should "(=> (params ...) body ...) returns a new function." (=> ()
     (var f (=> (x y) 10 (x + y),
     (assert (:f is-a function),
     (assert (:f not-empty),
@@ -126,25 +128,25 @@
     (assert 10 ((:f body) 0),
     (assert (`(x + y)) ((:f body) 1),
   ),
-  (should "(=>:() body ...) returns a new function." (=> ()
-    (var f (=> (x y) 10 (x + y),
-    (assert (:f is-a function),
-    (assert (:f not-empty),
+  (should "(=> :() body ...) calls the new function immediately and returns the result." (= ()
+    (var base 100)
+    (var r (=>:() base),
+    (assert 100 r),
   ),
-  (should "(=>():() body ...) returns a new function." (=> ()
-    (var f (=> (x y) 10 (x + y),
-    (assert (:f is-a function),
-    (assert (:f not-empty),
+  (should "(=> ():() body ...) calls the new function immediately and returns the result." (= ()
+    (var base 100)
+    (var r (=>():() base),
+    (assert 100 r),
   ),
-  (should "(=> arg:param body ...) returns a new function." (=> ()
-    (var f (=> (x y) 10 (x + y),
-    (assert (:f is-a function),
-    (assert (:f not-empty),
+  (should "(=> arg:param body ...) calls the new function immediately with an argument and returns the result." (= ()
+    (var base 100)
+    (var r (=> 10:x (base + x),
+    (assert 110 r),
   ),
-  (should "(=>(args ...):(params ...) body ...) returns a new function." (=> ()
-    (var f (=> (x y) 10 (x + y),
-    (assert (:f is-a function),
-    (assert (:f not-empty),
+  (should "(=> (args ...):(params ...) body ...) calls the new function immediately with arguments and returns the result." (= ()
+    (var base 100)
+    (var r (=> (1 10):(x y) (base + x y),
+    (assert 111 r),
   ),
 ),
 
