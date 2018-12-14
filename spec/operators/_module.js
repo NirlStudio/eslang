@@ -8,5 +8,8 @@ module.exports = function (exporting) {
 
   exporting.a = 101
   exporting.b = 102
+
+  exporting['-a'] = 201
+  exporting._b = 202
   return true
 }

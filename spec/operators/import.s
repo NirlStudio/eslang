@@ -17,6 +17,9 @@
     (assert 101 (mod a),
     (assert 102 (mod b),
     (assert null (mod c),
+
+    (assert null (mod -a),
+    (assert null (mod _b),
   ),
   (should "(import field from \"module\") returns the value of field." (=> ()
     (var y (import y from "_module"),
@@ -45,5 +48,8 @@
 
     (assert 101 (mod a),
     (assert 102 (mod b),
+
+    (assert null (mod -a),
+    (assert null (mod _b),
   ),
 ),

@@ -121,7 +121,7 @@ module.exports = function import_ ($void) {
     var keys = Object.getOwnPropertyNames(exporting)
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
-      if (!key.startsWith('-')) { // only expose public fields
+      if (!/^[-_]/.test(key)) { // only expose public fields
         module_.exports[key] = exporting[key]
       }
     }

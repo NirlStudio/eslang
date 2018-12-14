@@ -6,8 +6,10 @@ module.exports = function literal ($void) {
   var $Object = $.object
   var $Symbol = $.symbol
   var symbolOf = $Symbol.of
+  var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var ClassType$ = $void.ClassType
+  var thisCall = $void.thisCall
   var evaluate = $void.evaluate
   var arraySet = $.array.proto.set
   var staticOperator = $void.staticOperator
@@ -24,10 +26,10 @@ module.exports = function literal ($void) {
     var result = []
     var index, value
     while (offset < clist.length) {
-      value = evaluate(clist[offset], space)
-      offset += 1
+      value = evaluate(clist[offset++], space)
       if (offset < clist.length && clist[offset] === symbolPairing) {
-        index = value >> 0; offset += 1
+        offset += 1
+        index = typeof value === 'number' ? value >> 0 : result.length
         arraySet.call(result, index, offset >= clist.length ? null
           : evaluate(clist[offset++], space)
         )
@@ -45,19 +47,15 @@ module.exports = function literal ($void) {
     while (offset < length) {
       var name = clist[offset++]
       if (name instanceof Symbol$) {
-        if (name === symbolPairing) {
-          continue
-        }
         name = name.key
       } else if (typeof name !== 'string') {
-        name = evaluate(name, space)
+        if (name instanceof Tuple$) {
+          name = evaluate(name, space)
+        }
         if (name instanceof Symbol$) {
-          if (name === symbolPairing) {
-            continue
-          }
           name = name.key
         } else if (typeof name !== 'string') {
-          continue
+          name = thisCall(name, 'to-string')
         }
       }
       if (clist[offset] === symbolPairing) {
