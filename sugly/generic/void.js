@@ -115,6 +115,8 @@ module.exports = function ($void) {
 
   // to export an entity to a space.
   $void.export = function (space, name, entity) {
+    // ensure exported names are shared.
+    sharedSymbolOf(name)
     space[name] = entity
     return tryToUpdateName(entity, name)
   }
@@ -154,9 +156,11 @@ module.exports = function ($void) {
       }
     }
     if (typeof names === 'string') {
+      sharedSymbolOf(names)
       owner[names] = entity
     } else {
       for (var i = 0; i < names.length; i++) {
+        sharedSymbolOf(names[i])
         owner[names[i]] = entity
       }
     }

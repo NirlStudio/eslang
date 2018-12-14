@@ -331,8 +331,8 @@
       (assert 12 (kitty age),
     ),
   ),
-  (define "(@:? ...) - invalid types" (= ()
-    (should "(@:? ...) always returns a common object." (= ()
+  (define "general behaviours" (= ()
+    (should "(@:? ...) always returns a common object if the type cannot be recognised as any above type." (= ()
       (var invalid-types (@
         null type bool string number date range symbol tuple
         operator lambda function
@@ -359,6 +359,47 @@
         (assert 2 (obj y),
         (assert null (obj z),
       ),
+    ),
+    (should "constant values and type names can be used as field name." (= ()
+      (var obj (@
+        *:* ...
+        null true false
+        type bool string number date range symbol tuple
+        operator lambda function
+        array iterator object class
+        in else
+      ),
+      (assert null (obj "*"),
+      (assert (object owns obj "*"),
+
+      (assert null (obj "..."),
+      (assert (object owns obj "..."),
+
+      (assert null (obj "null"),
+      (assert (object owns obj "null"),
+
+      (assert true (obj "true"),
+      (assert false (obj "false"),
+
+      (assert type (obj "type"),
+      (assert bool (obj "bool"),
+      (assert string (obj "string"),
+      (assert number (obj "number"),
+      (assert date (obj "date"),
+      (assert range (obj "range"),
+      (assert symbol (obj "symbol"),
+      (assert tuple (obj "tuple"),
+
+      (assert operator (obj "operator"),
+      (assert lambda (obj "lambda"),
+      (assert function (obj "function"),
+      (assert array (obj "array"),
+      (assert iterator (obj "iterator"),
+      (assert object (obj "object"),
+      (assert class (obj "class"),
+
+      (assert in (obj "in"),
+      (assert else (obj "else"),
     ),
   ),
 ),

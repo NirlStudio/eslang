@@ -80,10 +80,10 @@ module.exports = function literal ($void) {
     }
     var indicator = clist[1]
     if (indicator !== symbolPairing) {
-      return length > 2 && clist[2] === symbolPairing &&
-          (typeof indicator === 'string' || indicator instanceof Symbol$)
-        ? objectCreate(space, clist, $Object, 1) // (@ name: ...) or (@ "name": ...)
-        : arrayCreate(space, clist, 1) // (@ ...) or (@ offset: value ...)
+      return length <= 2 || clist[2] !== symbolPairing ||
+          typeof indicator === 'number' || indicator instanceof Tuple$
+        ? arrayCreate(space, clist, 1) // (@ ...) or (@ offset: value ...)
+        : objectCreate(space, clist, $Object, 1) // (@ name: ...) or (@ "name": ...)
     }
     // (@: ...)
     if (length < 3) { // (@:)
