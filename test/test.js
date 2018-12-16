@@ -12,12 +12,14 @@ var signFailed = '    ' + colors.passed + red('[FAILED]')
 
 module.exports = function ($void) {
   var $ = $void.$
+  var print = $void.print
+
   var passing = 0
   var failing = []
 
   return function () {
     // check native environment
-    console.log('\n  Checking JavaScript environment')
+    print('\n  Checking JavaScript environment')
     checkJavascript()
     checkPolyfill()
 
@@ -25,30 +27,30 @@ module.exports = function ($void) {
     checkSuglyRuntime()
 
     // start to report result
-    console.log(green('\n  passing: ', passing))
+    print(green('\n  passing: ', passing))
     if (failing.length < 1) {
-      console.log(green('\n  Sugly is ready to run.\n'))
+      print(green('\n  Sugly is ready to run.\n'))
       return true
     }
 
     // print failures
-    console.log(red('  failing: ', failing.length))
-    console.log('\n  There might be some issues to prevent running sugly')
+    print(red('  failing: ', failing.length))
+    print('\n  There might be some issues to prevent running sugly')
     for (var i = 0; i < failing.length; i++) {
-      console.log(red('  - ' + failing[i]))
+      print(red('  - ' + failing[i]))
     }
-    console.log()
+    print()
     return false
   }
 
   function passed (feature) {
     passing += 1
-    console.log(signPassed, gray(feature))
+    print(signPassed, gray(feature))
   }
 
   function failed (feature) {
     failing.push(feature)
-    console.log(signFailed, red(feature))
+    print(signFailed, red(feature))
   }
 
   function checkJavascript () {
@@ -60,14 +62,14 @@ module.exports = function ($void) {
     if (polyfill.length > 0) {
       passed('Sugly is using some polyfill functions:')
       var padding = '      - '
-      console.log(gray(padding, polyfill.join('\n' + padding)))
+      print(gray(padding, polyfill.join('\n' + padding)))
     } else {
       passed('Congratulations! Sugly does not need any polyfill.')
     }
   }
 
   function checkSuglyRuntime () {
-    console.log('\n  Checking Sugly Runtime ...')
+    print('\n  Checking Sugly Runtime ...')
     checkObjects($void, '[Void / Null] ', [
       'null'
     ])
@@ -139,7 +141,7 @@ module.exports = function ($void) {
   }
 
   function checkObjects ($, group, names) {
-    console.log('\n  -', group)
+    print('\n  -', group)
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
       if (typeof $[name] === 'object') {
@@ -151,7 +153,7 @@ module.exports = function ($void) {
   }
 
   function checkFunctions ($, group, names) {
-    console.log('\n  -', group)
+    print('\n  -', group)
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
       if (typeof $[name] === 'function') {
@@ -163,7 +165,7 @@ module.exports = function ($void) {
   }
 
   function checkStaticOperators (group, names) {
-    console.log('\n  -', group)
+    print('\n  -', group)
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
       if (typeof $void.staticOperators[name] === 'function') {
@@ -179,7 +181,7 @@ module.exports = function ($void) {
   }
 
   function checkTypeOf () {
-    console.log('\n  - Static type-of')
+    print('\n  - Static type-of')
     var typeOf = $.type.of
 
     check('[undefined]', typeOf() === null)
@@ -208,7 +210,7 @@ module.exports = function ($void) {
   }
 
   function checkIndexerOf () {
-    console.log('\n  - Static indexer-of')
+    print('\n  - Static indexer-of')
     var indexerOf = $void.indexerOf
 
     check('[undefined]', indexerOf() === $void.null[':'])
@@ -261,7 +263,7 @@ module.exports = function ($void) {
   }
 
   function checkTypes () {
-    console.log('\n  - Primary Types')
+    print('\n  - Primary Types')
     seval(null, '', '<empty>')
     seval(null, '()')
     seval(null, 'null')
@@ -358,7 +360,7 @@ module.exports = function ($void) {
   }
 
   function checkAssignment () {
-    console.log('\n  - Assignment')
+    print('\n  - Assignment')
     seval(1, '(let x 1)')
     seval(2, '(let x 1) (let y 2)')
     seval(2, '(let (x y) (@ 1 2). y')
@@ -378,7 +380,7 @@ module.exports = function ($void) {
   }
 
   function checkOperators () {
-    console.log('\n  - Operators')
+    print('\n  - Operators')
     seval(1, '(? true 1 0)')
     seval(0, '(? false 1 0)')
 
@@ -417,7 +419,7 @@ module.exports = function ($void) {
   }
 
   function checkControl () {
-    console.log('\n  - Control')
+    print('\n  - Control')
     seval(0, '(if true 1 0)')
     seval(null, '(if false 1 0)')
     seval(1, '(if true 1 else 0)')
@@ -432,7 +434,7 @@ module.exports = function ($void) {
   }
 
   function checkOperations () {
-    console.log('\n  - Operations')
+    print('\n  - Operations')
     seval(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b), (add x y)')
 
     seval(21, '(let z 100) (let add (= (x y) (x + y z), (add 1 20)')

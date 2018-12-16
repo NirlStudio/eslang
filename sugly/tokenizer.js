@@ -4,6 +4,8 @@ module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']
+  var warn = $void.warn
+  var print = $void.print
   var $export = $void.export
 
   var Constants = $void.constantValues
@@ -307,12 +309,12 @@ module.exports = function ($void) {
     tokenizing() // notify the end of stream.
     return tokens
   })
-}
 
-function printToken (type, value, source, errCode, errMessage) {
-  if (type === 'error') {
-    console.warn('tokenizing >', type, value, source, errCode, errMessage)
-  } else {
-    console.log('tokenizing > token:', type, value, source, errCode, errMessage)
+  function printToken (type, value, source, errCode, errMessage) {
+    if (type === 'error') {
+      warn('tokenizing >', type, value, source, errCode, errMessage)
+    } else {
+      print('tokenizing > token:', type, value, source, errCode, errMessage)
+    }
   }
 }

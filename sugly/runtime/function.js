@@ -7,6 +7,7 @@ module.exports = function function_ ($void) {
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
+  var warn = $void.warn
   var lambda = $void.lambda
   var evaluate = $void.evaluate
   var function_ = $void.function
@@ -62,7 +63,7 @@ module.exports = function function_ ($void) {
             }
             throw signal
           }
-          console.warn('lambda > unexpected error:', signal)
+          warn('lambda > unexpected error:', signal)
           return null
         }
       }
@@ -125,7 +126,7 @@ module.exports = function function_ ($void) {
             }
             throw signal
           } // for unexpected errors
-          console.warn('function > unexpected error:', signal)
+          warn('function > unexpected error:', signal)
           return null
         }
       }

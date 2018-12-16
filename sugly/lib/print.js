@@ -2,20 +2,22 @@
 
 module.exports = function ($void, JS) {
   var $ = $void.$
+  var warn = $void.warn
+  var print = $void.print
   var $export = $void.export
   var thisCall = $void.thisCall
 
   // standard output.
   $export($, 'print', function () {
     var text = toStrings.apply(null, arguments)
-    console.log(text)
+    print(text)
     return text
   })
 
   // standard error, but no error in sugly.
   $export($, 'warn', function () {
     var text = toStrings.apply(null, arguments)
-    console.warn(text)
+    warn(text)
     return text
   })
 

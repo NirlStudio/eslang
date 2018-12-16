@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Tuple$ = $void.Tuple
+  var print = $void.print
   var $export = $void.export
   var tokenizer = $.tokenizer
 
@@ -209,12 +210,12 @@ module.exports = function ($void) {
     compiling() // notify the end of stream.
     return warnings || new Tuple$(list, true, src)
   })
-}
 
-function printExpression (expr, status, message, info) {
-  if (status) {
-    console.log('compiling >', status, ':', message, expr || '', info || '')
-  } else {
-    console.log('compiling > expression:', expr[0], expr[1])
+  function printExpression (expr, status, message, info) {
+    if (status) {
+      print('compiling >', status, ':', message, expr || '', info || '')
+    } else {
+      print('compiling > expression:', expr[0], expr[1])
+    }
   }
 }
