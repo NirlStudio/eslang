@@ -14,6 +14,8 @@ $($ a$ $ $b $)$
 # keyword.operator.quote.sugly
 quote
 quote(quote -quote quote quote- quote)quote
+unquote
+unquote(unquote -unquote unquote unquote- unquote)unquote
 
 # keyword.operator.assignment.sugly
 let(let -let let let- let)let

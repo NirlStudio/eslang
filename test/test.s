@@ -5,10 +5,12 @@
 
 # define the full feature set.
 (let all-specs (@
+  # core
+  "generic" "operators" "runtime"
   # bootstrap
   "tokenizer" "compiler"
-  # core
-  "generic" "runtime" "operators" "lib"
+  # extra
+   "lib"
 ).
 
 # run given specs or all.

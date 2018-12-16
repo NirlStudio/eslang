@@ -57,12 +57,12 @@
   (` (x null 1),
   (` (x null 1 true),
   (` (x null 1 true "abc"),
-  (tuple of-plain null)
-  (tuple of-plain (` x),
-  (tuple of-plain (` x) null)
-  (tuple of-plain (` x) null 1)
-  (tuple of-plain (` x) null 1 true)
-  (tuple of-plain (` x) null 1 true "abc")
+  (unquote null)
+  (unquote (` x),
+  (unquote (` x) null)
+  (unquote (` x) null 1)
+  (unquote (` x) null 1 true)
+  (unquote (` x) null 1 true "abc")
 ).
 
 (e.g. operator
