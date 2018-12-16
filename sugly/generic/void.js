@@ -24,6 +24,13 @@ module.exports = function ($void) {
   )
   $void.ownsProperty = ownsProperty
 
+  // default native output methods
+  $void.print = console.log.bind(console)
+  $void.warn = console.warn ? console.log.bind(console) : function () {
+    var args = Array.prototype.slice.call(arguments)
+    args.unshift('[warn]')
+  }
+
   // to retrieve or create a shared symbol.
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
   function sharedSymbolOf (key) {

@@ -5,17 +5,18 @@ module.exports = function run ($void) {
   var compile = $.compile
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
+  var warn = $void.warn
   var $export = $void.export
   var execute = $void.execute
 
   // evaluate: a string, a symbol or a tuple in a separate space.
-  $export($, 'eval', function (expr, args) {
+  $export($, 'eval', function (expr) {
     var code
     if (typeof expr === 'string') {
       // try to compile & evaluate
       code = compile(expr)
       if (!(code instanceof Tuple$)) {
-        console.warn('eval > compiler: ', code)
+        warn('eval > compiler: ', code)
         return null
       }
     } else if (expr instanceof Tuple$) {
@@ -29,12 +30,12 @@ module.exports = function run ($void) {
       return expr
     }
     try {
-      return args ? execute(null, code, null, args)[0] : execute(null, code)[0]
+      return execute(null, code)[0]
     } catch (signal) { // any unexpected signal
       if (code === expr) {
-        console.warn('eval > invalid call to', signal.id, 'for', code)
+        warn('eval > invalid call to', signal.id, 'for', code)
       } else {
-        console.warn('eval > invalid call to', signal.id, 'for', code, 'of', expr)
+        warn('eval > invalid call to', signal.id, 'for', code, 'of', expr)
       }
       return null
     }

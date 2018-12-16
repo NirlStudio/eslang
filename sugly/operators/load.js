@@ -4,10 +4,10 @@ module.exports = function load ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
+  var warn = $void.warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
-  var warn = (console.warn || console.log).bind(console)
 
   // load: a module from source.
   staticOperator('load', function (space, clause) {

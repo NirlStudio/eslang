@@ -6,11 +6,11 @@ module.exports = function import_ ($void) {
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
+  var warn = $void.warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
   var symbolFrom = $void.sharedSymbolOf('from')
-  var warn = (console.warn || console.log).bind(console)
 
   // const values
   var RefreshInterval = 60 * 1000 // milliseconds
