@@ -6,4 +6,5 @@
     "runtime"
     "signal"
     "space"
-  ) (load ("./runtime/" + spec).
+  ) (define spec (=> ()
+    (load ("./runtime/" + spec).

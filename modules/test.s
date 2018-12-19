@@ -24,11 +24,16 @@
   ),
 ).
 
+# assertion counter
+(var assertions 0)
+(export ++assertions (=>() (++ assertions),
+
 (export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
   (if (expr is-empty)
     (local "expr" expected)
     (local "expected" true)
   ),
+  (++assertions )
   (++ asserting-step)
   (local "expected" (expected),
   (local "value" (expr),
@@ -127,6 +132,7 @@
   (let path (@).
   (let indent "  ")
   # counters
+  (let assertions 0)
   (let passing 0)
   (let failing 0)
 ).
@@ -145,7 +151,10 @@
 
   (print
     (green "\n  passing: " passing),
-    (gray " (" ((ts > 1000)? (ts / 1000) ts) ((ts > 1000)? "s)" "ms)"),
+    (gray " ("
+      ((ts > 1000) ? (ts / 1000) ts),
+      ((ts > 1000)? "s, " "ms, "),
+      assertions " assertions)"
   ),
   (if failing
     (print (red "  failing: " failing "\n"),

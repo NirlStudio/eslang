@@ -81,8 +81,10 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return function_(createFunction(params, tbody, space.local, space.locals, space.app),
-        new Tuple$(code))
+      return function_(
+        createFunction(params, tbody, space.local, space.locals, space.app),
+        new Tuple$(code)
+      )
     } else {
       code.push($Tuple.blank) // empty body
       return params.length < 1 ? $.function.noop : function_(function () {

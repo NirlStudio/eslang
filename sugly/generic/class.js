@@ -351,6 +351,7 @@ module.exports = function ($void) {
       : overriding.apply(this, arguments)
   })
 
+  var typeOf = $.type.of
   var indexer = link(instance, ':', function (index, value) {
     var overriding
     if (typeof index === 'string') {
@@ -371,7 +372,7 @@ module.exports = function ($void) {
     if (typeof index !== 'string') {
       return overriding === indexer ? null : overriding.call(this, index)
     }
-    value = protoValueOf(this, instance, index)
+    value = protoValueOf(this, typeOf(this).proto || instance, index)
     return typeof value === 'function' ? value : this[index]
   })
   indexer.get = function (key) {

@@ -12,4 +12,5 @@
     "logical"
     "operator"
     "quote"
-  ) (load ("./operators/" + spec).
+  ) (define spec (=> ()
+    (load ("./operators/" + spec).

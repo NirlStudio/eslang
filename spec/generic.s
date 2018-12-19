@@ -17,4 +17,5 @@
     "class"
     "instance"
     "global"
-  ) (load ("./generic/" + spec).
+  ) (define spec (=> ()
+    (load ("./generic/" + spec).

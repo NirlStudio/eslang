@@ -4,4 +4,5 @@
     "print"
     "timer"
     "uri"
-  ) (load ("./lib/" + spec).
+  ) (define spec (=> ()
+    (load ("./lib/" + spec).
