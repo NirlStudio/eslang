@@ -47,9 +47,9 @@ module.exports = function operators$operator ($void) {
         var j = i + offset
         scope.context[params[i]] = j < clist.length ? clist[j] : null
       }
-      scope.context['operation'] = clause
-      scope.context['operand'] = offset
-      scope.context['that'] = typeof that !== 'undefined' ? that : null
+      scope.context.operation = clause
+      scope.context.operand = offset
+      scope.context.that = typeof that !== 'undefined' ? that : null
       // execution
       return evaluate(tbody, scope)
     }

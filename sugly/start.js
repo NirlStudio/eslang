@@ -48,9 +48,9 @@ function initializeRuntime ($void) {
   require('./runtime/operator')($void)
 
   require('./runtime/execute')($void)
+  require('./runtime/eval')($void)
 
   require('./runtime/run')($void)
-  require('./runtime/eval')($void)
   require('./runtime/interpreter')($void)
 }
 

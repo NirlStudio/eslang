@@ -41,9 +41,7 @@ module.exports = function function_ ($void) {
         var param = params[i]
         scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
       }
-      scope.context.do = $lambda
-      scope.context.this = typeof this === 'undefined' ? null : this
-      scope.context.arguments = Array.prototype.slice.call(arguments)
+      scope.prepare($lambda, this, Array.prototype.slice.call(arguments))
       // execution
       while (true) { // redo
         try {
@@ -106,9 +104,7 @@ module.exports = function function_ ($void) {
         var param = params[i]
         scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
       }
-      scope.context.do = $func
-      scope.context.this = typeof this === 'undefined' ? null : this
-      scope.context.arguments = Array.prototype.slice.call(arguments)
+      scope.prepare($func, this, Array.prototype.slice.call(arguments))
       // execution
       while (true) { // redo
         try {

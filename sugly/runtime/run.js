@@ -8,7 +8,7 @@ module.exports = function run ($void) {
   var $export = $void.export
   var execute = $void.execute
 
-  // run: a module from source as an application.
+  // run a module from source as an application.
   $export($, 'run', function (source, args, baseUri) {
     if (typeof source !== 'string') {
       return null

@@ -60,6 +60,37 @@ module.exports = function space ($void) {
       this.exporting && typeof this.exporting[key] === 'undefined' &&
         (this.exporting[key] = value)
       return this.var(key, value)
+    },
+    populate: function (ctx) {
+      if (Array.isArray(ctx)) {
+        this.context.arguments = ctx
+        return
+      }
+      if (ctx === null || typeof ctx !== 'object') {
+        return
+      }
+
+      var keys = Object.getOwnPropertyNames(ctx)
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i]
+        switch (key) {
+          case 'this':
+            this.context.this = ctx.this
+            break
+          case 'arguments':
+            if (Array.isArray(ctx.arguments)) {
+              this.context.arguments = ctx.arguments
+            }
+            break
+          default:
+            this.local[key] = ctx[key]
+        }
+      }
+    },
+    prepare: function (do_, this_, args) {
+      this.context.do = do_
+      this.context.this = typeof this_ === 'undefined' ? null : this_
+      this.context.arguments = args
     }
   })
 

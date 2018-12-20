@@ -7,10 +7,12 @@ module.exports = function interpreter ($void) {
   var $export = $void.export
   var evaluate = $void.evaluate
   var createAppSpace = $void.createAppSpace
-  var populateArguments = $void.populateArguments
 
   // interactively feed & evaluate
   $export($, 'interpreter', function (shell, args, baseUri) {
+    if (typeof shell !== 'function') {
+      return null
+    }
     // save the base uri of whole application.
     if (typeof baseUri !== 'string') {
       baseUri = null
@@ -19,7 +21,7 @@ module.exports = function interpreter ($void) {
     $void.env('home-uri', baseUri)
     // create a module space.
     var scope = createAppSpace(baseUri)
-    populateArguments(scope, args, true)
+    scope.populate(args)
     // create compiler.
     var compile = compiler(function (expr, status) {
       if (status) {

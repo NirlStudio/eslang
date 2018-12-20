@@ -9,8 +9,16 @@
     (assert 3 (data z),
 
     (assert null (data this),
+    (assert null (data arguments),
+
+    (let data (load "_data" (@),
+    (assert 1 (data x),
+    (assert 2 (data y),
+    (assert 3 (data z),
+
+    (assert null (data this),
     (assert ((data arguments) is-a array),
-    (assert ((data arguments) is-empty)
+    (assert ((data arguments) is-empty),
   ),
   (should "(load \"module\" args) returns the evaluation result with arguments." (=> ()
     (var data (load "_data" (@
