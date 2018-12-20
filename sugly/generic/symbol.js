@@ -70,6 +70,9 @@ module.exports = function ($void) {
   }, true)
 
   var proto = Type.proto
+  link(proto, 'key', function () {
+    return this.key
+  })
 
   // test if this is a valid symbol.
   link(proto, 'is-valid', function () {
@@ -121,11 +124,11 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index) {
-    return typeof index === 'string' ? protoValueOf(this, this, index)
-      : index instanceof Symbol$ ? protoValueOf(this, this, index.key) : null
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
   indexer.get = function (key) {
-    return this[key]
+    return proto[key]
   }
 
   // export type indexer.

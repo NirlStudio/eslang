@@ -32,6 +32,17 @@ module.exports = function ($void) {
   }, true)
 
   var proto = Type.proto
+
+  link(proto, 'begin', function () {
+    return this.begin
+  })
+  link(proto, 'end', function () {
+    return this.end
+  })
+  link(proto, 'step', function () {
+    return this.step
+  })
+
   link(proto, 'count', function () {
     var diff = this.end - this.begin
     var count = Math.trunc(diff / this.step)
@@ -108,11 +119,11 @@ module.exports = function ($void) {
 
   // Indexer
   var indexer = link(proto, ':', function (index, value) {
-    return typeof index === 'string' ? protoValueOf(this, this, index)
-      : index instanceof Symbol$ ? protoValueOf(this, this, index.key) : null
+    return typeof index === 'string' ? protoValueOf(this, proto, index)
+      : index instanceof Symbol$ ? protoValueOf(this, proto, index.key) : null
   })
   indexer.get = function (key) {
-    return this[key]
+    return proto[key]
   }
 
   // export type indexer.

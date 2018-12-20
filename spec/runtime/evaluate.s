@@ -97,10 +97,12 @@
     (assert 6 (sum 1 2 3),
   ),
   (define "(a-value a-string)" (=> ()
-    (should "(a-value field) returns the value of field or null." (= ()
-      (assert 1 ((1 10) "begin"),
-      (assert 10 ((1 10) "end"),
-      (assert 1 ((1 10) "step"),
+    (should "(a-value field) returns the value of field or null." (=> ()
+      (var obj (@ z: 10),
+      (assert 10 (:obj "z"),
+
+      (let obj (cat default),
+      (assert 10 (:obj "z"),
     ),
     (should "(a-value method) returns the bound method if it's an instance method." (=> ()
       (var length ("123" "length"),
@@ -156,13 +158,12 @@
     ),
   ),
   (define "(a-value a-symbol)" (=> ()
-    (should "(a-value member-field ...) returns the value of the field." (= ()
-      (assert 1 ((1 10) begin),
-      (assert 1 ((1 10) begin 10),
-      (assert 10 ((1 10) end),
-      (assert 10 ((1 10) end 100),
-      (assert 1 ((1 10) step),
-      (assert 1 ((1 10) step 1000),
+    (should "(a-value member-field ...) returns the value of the field." (=> ()
+      (var obj (@ z: 10),
+      (assert 10 (:obj z),
+
+      (let obj (cat default),
+      (assert 10 (:obj z),
     ),
     (should "(a-value member-operator ...) calls the member operator with all arguments." (=> ()
       (var obj (@ z: 10
@@ -286,13 +287,6 @@
 (define "(:? ? ...) - explicit subject" (=> ()
   (define "(:an-entity a-string)" (=> ()
     (should "(:an-entity field) returns the value of field or null." (=> ()
-      (assert 1 (:(1 10) "begin"),
-      (assert 1 (:(1 10) "begin" 10),
-      (assert 10 (:(1 10) "end"),
-      (assert 10 (:(1 10) "end" 1),
-      (assert 1 (:(1 10) "step"),
-      (assert 1 (:(1 10) "step" 10),
-
       (var obj (@ z: 10),
       (assert 10 (:obj "z"),
 
@@ -378,13 +372,12 @@
     ),
   ),
   (define "(:an-entity a-symbol)" (=> ()
-    (should "(:an-entity member-field ...) returns the value of the field." (= ()
-      (assert 1 (:(1 10) begin),
-      (assert 1 (:(1 10) begin 10),
-      (assert 10 (:(1 10) end),
-      (assert 10 (:(1 10) end 100),
-      (assert 1 (:(1 10) step),
-      (assert 1 (:(1 10) step 1000),
+    (should "(:an-entity member-field ...) returns the value of the field." (=> ()
+      (var obj (@ z: 10),
+      (assert 10 (:obj z),
+
+      (let obj (cat default),
+      (assert 10 (:obj z),
     ),
     (should "(:an-entity member-operator ...) calls the member operator with all arguments." (=> ()
       (var obj (@ z: 10
