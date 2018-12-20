@@ -11,6 +11,7 @@ module.exports = function operators$operator ($void) {
   var operator = $void.operator
   var symbolPairing = $Symbol.pairing
   var createOperatorSpace = $void.createOperatorSpace
+  var createEmptyOperation = $void.createEmptyOperation
 
   $void.operatorOf = function operatorOf (space, clause) {
     // compile code
@@ -25,9 +26,8 @@ module.exports = function operators$operator ($void) {
       return operator(createOperator(params, tbody), new Tuple$(code))
     } else {
       code.push($Tuple.blank) // empty body
-      return params.length < 1 ? $.operator.noop : operator(function () {
-        return null
-      }, new Tuple$(code))
+      return params.length < 1 ? $.operator.noop
+        : operator(createEmptyOperation(), new Tuple$(code))
     }
   }
 
@@ -36,21 +36,18 @@ module.exports = function operators$operator ($void) {
       if (!(space instanceof Space$)) {
         return null // invalid call.
       }
-      var scope = createOperatorSpace(space)
       // populate operands
       var clist = clause.$
       var offset = typeof that !== 'undefined' ? 2 : 1
       if (clist[0] === symbolPairing) {
         offset += 1
       }
+      var scope = createOperatorSpace(space)
       for (var i = 0; i < params.length; i++) {
         var j = i + offset
         scope.context[params[i]] = j < clist.length ? clist[j] : null
       }
-      scope.context.operation = clause
-      scope.context.operand = offset
-      scope.context.that = typeof that !== 'undefined' ? that : null
-      // execution
+      scope.prepareOp(clause, offset, that)
       return evaluate(tbody, scope)
     }
   }

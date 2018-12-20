@@ -13,6 +13,7 @@ module.exports = function function_ ($void) {
   var function_ = $void.function
   var createLambdaSpace = $void.createLambdaSpace
   var createFunctionSpace = $void.createFunctionSpace
+  var createEmptyOperation = $void.createEmptyOperation
 
   $void.lambdaOf = function lambdaOf (space, clause, offset) {
     // compile code
@@ -27,9 +28,8 @@ module.exports = function function_ ($void) {
       return lambda(createLambda(params, tbody, space.app), new Tuple$(code))
     } else {
       code.push($Tuple.blank) // empty body
-      return params.length < 1 ? $.lambda.noop : lambda(function () {
-        return null
-      }, new Tuple$(code))
+      return params.length < 1 ? $.lambda.noop
+        : lambda(createEmptyOperation(), new Tuple$(code))
     }
   }
 
@@ -45,11 +45,8 @@ module.exports = function function_ ($void) {
       // execution
       while (true) { // redo
         try {
-          var result = evaluate(tbody, scope)
-          clearContext(scope)
-          return result
+          return evaluate(tbody, scope)
         } catch (signal) {
-          clearContext(scope)
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createLambdaSpace(app),
@@ -80,23 +77,17 @@ module.exports = function function_ ($void) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
       return function_(
-        createFunction(params, tbody, space.local, space.locals, space.app),
+        createFunction(params, tbody, space.reserve()),
         new Tuple$(code)
       )
     } else {
       code.push($Tuple.blank) // empty body
-      return params.length < 1 ? $.function.noop : function_(function () {
-        return null
-      }, new Tuple$(code))
+      return params.length < 1 ? $.function.noop
+        : function_(createEmptyOperation(), new Tuple$(code))
     }
   }
 
-  function createFunction (params, tbody, local, locals, app) {
-    var parent = {
-      local: local,
-      locals: locals,
-      app: app
-    }
+  function createFunction (params, tbody, parent) {
     var $func = function () {
       var scope = createFunctionSpace(parent)
       // populate arguments
@@ -108,11 +99,8 @@ module.exports = function function_ ($void) {
       // execution
       while (true) { // redo
         try {
-          var result = evaluate(tbody, scope)
-          clearContext(scope)
-          return result
+          return evaluate(tbody, scope)
         } catch (signal) {
-          clearContext(scope)
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
               scope = prepareToRedo(createFunctionSpace(parent),
@@ -134,10 +122,8 @@ module.exports = function function_ ($void) {
 
   // to prepare a new context for redo
   function prepareToRedo (scope, me, t, params, value, count) {
-    scope.context.do = me
-    scope.context.this = typeof t === 'undefined' ? null : t
-    var args = scope.context['arguments'] = count === 0 ? []
-      : count === 1 ? [value] : value
+    var args = count === 0 ? [] : count === 1 ? [value] : value
+    scope.prepare(me, t, args)
     for (var i = 0; i < params.length; i++) {
       var param = params[i]
       scope.local[param[0]] = i < args.length ? args[i] : param[1]
@@ -199,10 +185,4 @@ module.exports = function function_ ($void) {
     }
     return [args, new Tuple$(list)]
   }
-}
-
-function clearContext (scope) {
-  delete scope.context.do
-  delete scope.context.this
-  delete scope.context.arguments
 }

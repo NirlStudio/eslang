@@ -8,6 +8,9 @@ module.exports = function space ($void) {
   var indexerOf = $void.indexerOf
   var ownsProperty = $void.ownsProperty
 
+  // shared empty array
+  var EmptyArray = Object.freeze && Object.freeze([])
+
   $void.Space = Space$
   function Space$ (local, locals, context, export_) {
     this.local = local
@@ -63,7 +66,7 @@ module.exports = function space ($void) {
     },
     populate: function (ctx) {
       if (Array.isArray(ctx)) {
-        this.context.arguments = ctx
+        this.context.arguments = ctx.length < 1 && EmptyArray ? EmptyArray : ctx
         return
       }
       if (ctx === null || typeof ctx !== 'object') {
@@ -79,7 +82,8 @@ module.exports = function space ($void) {
             break
           case 'arguments':
             if (Array.isArray(ctx.arguments)) {
-              this.context.arguments = ctx.arguments
+              this.context.arguments = ctx.arguments.length < 1 && EmptyArray
+                ? EmptyArray : ctx.arguments
             }
             break
           default:
@@ -90,7 +94,21 @@ module.exports = function space ($void) {
     prepare: function (do_, this_, args) {
       this.context.do = do_
       this.context.this = typeof this_ === 'undefined' ? null : this_
-      this.context.arguments = args
+      this.context.arguments = args.length < 1 && EmptyArray ? EmptyArray : args
+    },
+    prepareOp: function (operation, operand, that) {
+      this.context.operation = operation
+      this.context.operand = operand
+      this.context.that = typeof that !== 'undefined' ? that : null
+    },
+    reserve: function () {
+      return this.reserved || (
+        this.reserved = {
+          local: this.local,
+          locals: this.locals,
+          app: this.app
+        }
+      )
     }
   })
 

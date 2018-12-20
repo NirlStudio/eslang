@@ -113,10 +113,9 @@ module.exports = function evaluate ($void) {
     } catch (signal) {
       if (signal instanceof Signal$) {
         throw signal
-      } else {
-        warn('evaluating > unknow signal:', signal, 'when evaluating', clause)
-        return null
       }
+      warn('evaluating > unknow signal:', signal, 'when evaluating', clause)
+      return null
     }
   }
 }

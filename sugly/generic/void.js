@@ -1,5 +1,11 @@
 'use strict'
 
+function createEmptyOperation () {
+  return function () {
+    return null
+  }
+}
+
 module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
@@ -13,6 +19,9 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var operator = $void.operator
   var ClassType$ = $void.ClassType
+
+  // generate an empty function.
+  $void.createEmptyOperation = createEmptyOperation
 
   // a static version of isPrototypeOf.
   var isPrototypeOf = Function.prototype.call.bind(Object.prototype.isPrototypeOf)
