@@ -6,13 +6,17 @@ module.exports = function interpreter ($void) {
   var Signal$ = $void.Signal
   var $export = $void.export
   var evaluate = $void.evaluate
+  var isApplicable = $void.isApplicable
+  var atomicArrayOf = $void.atomicArrayOf
   var createAppSpace = $void.createAppSpace
 
   // interactively feed & evaluate
   $export($, 'interpreter', function (shell, args, baseUri) {
-    if (typeof shell !== 'function') {
+    if (!isApplicable(shell)) {
       return null
     }
+    // formalize arguments values to separate spaces.
+    args = Array.isArray(args) ? atomicArrayOf(args) : []
     // save the base uri of whole application.
     if (typeof baseUri !== 'string') {
       baseUri = null

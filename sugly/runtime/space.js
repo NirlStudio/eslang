@@ -11,6 +11,15 @@ module.exports = function space ($void) {
   // shared empty array
   var EmptyArray = Object.freeze && Object.freeze([])
 
+  var atomOf = $.tuple['atom-of']
+  $void.atomicArrayOf = function (src) {
+    var values = []
+    for (var i = 0; i < src.length; i++) {
+      values.push(atomOf(src[i]))
+    }
+    return values
+  }
+
   $void.Space = Space$
   function Space$ (local, locals, context, export_) {
     this.local = local
@@ -102,8 +111,8 @@ module.exports = function space ($void) {
       this.context.that = typeof that !== 'undefined' ? that : null
     },
     reserve: function () {
-      return this.reserved || (
-        this.reserved = {
+      return this._reserved || (
+        this._reserved = {
           local: this.local,
           locals: this.locals,
           app: this.app

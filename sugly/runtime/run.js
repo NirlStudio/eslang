@@ -7,12 +7,15 @@ module.exports = function run ($void) {
   var warn = $void.warn
   var $export = $void.export
   var execute = $void.execute
+  var atomicArrayOf = $void.atomicArrayOf
 
   // run a module from source as an application.
   $export($, 'run', function (source, args, baseUri) {
     if (typeof source !== 'string') {
       return null
     }
+    // formalize arguments values to separate spaces.
+    args = Array.isArray(args) ? atomicArrayOf(args) : []
     // try to resolve the base uri of the whole application
     if (typeof baseUri !== 'string') {
       baseUri = $.env('home-uri')
