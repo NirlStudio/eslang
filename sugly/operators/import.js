@@ -27,7 +27,7 @@ module.exports = function import_ ($void) {
     var src
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      src = importModule(space, space.local['-module'],
+      src = importModule(space, space.local['-app'], space.local['-module'],
         evaluate(clist[1], space),
         clist.length > 2 ? evaluate(clist[2], space) : null
       )
@@ -38,7 +38,7 @@ module.exports = function import_ ($void) {
     src = evaluate(clist[3], space)
     var imported = src instanceof Object$ ? src
       : typeof src !== 'string' ? null
-        : importModule(space, space.local['-module'], src,
+        : importModule(space, space.local['-app'], space.local['-module'], src,
           clist.length > 4 ? evaluate(clist[4], space) : null
         )
     if (typeof imported !== 'object') {
@@ -75,9 +75,10 @@ module.exports = function import_ ($void) {
   $void.importModule = importModule
 
   // the cached modules
+  // TODO: move into app space?
   var modules = $void.modules = Object.create(null)
 
-  function importModule (space, moduleUri, source, type) {
+  function importModule (space, appUri, moduleUri, source, type) {
     if (typeof source !== 'string') {
       if (source instanceof Symbol$) {
         source = source.key
@@ -90,7 +91,7 @@ module.exports = function import_ ($void) {
     var check = function (ext) {
       return source.endsWith(ext) ? source : source + ext
     }
-    var uri = resolve(moduleUri, check(type === 'js' ? '.js' : '.s'))
+    var uri = resolve(appUri, moduleUri, check(type === 'js' ? '.js' : '.s'))
     if (!uri) {
       return null
     }
@@ -128,7 +129,7 @@ module.exports = function import_ ($void) {
     return module_.exports
   }
 
-  function resolve (moduleUri, source) {
+  function resolve (appUri, moduleUri, source) {
     var loader = $void.loader
     var isAbsolute = loader.isAbsolute(source)
     if (!moduleUri && isAbsolute) {
@@ -138,7 +139,8 @@ module.exports = function import_ ($void) {
     var dirs = isAbsolute ? [] : dirsOf(
       source,
       moduleUri && loader.dir(moduleUri),
-      $.env('home-uri') + '/modules',
+      loader.dir(appUri) + '/modules',
+      $.env('home') + '/modules',
       $void.runtime('uri') + '/modules'
     )
     var uri = loader.resolve(source, dirs)
@@ -149,12 +151,12 @@ module.exports = function import_ ($void) {
     return null
   }
 
-  function dirsOf (source, baseUri, appDir, runtimeDir) {
-    return baseUri
+  function dirsOf (source, moduleDir, appDir, homeDir, runtimeDir) {
+    return moduleDir
       ? source.startsWith('.')
-        ? [ baseUri ]
-        : [ appDir, runtimeDir, baseUri ]
-      : [ runtimeDir ]
+        ? [ moduleDir ]
+        : [ appDir, homeDir, runtimeDir, moduleDir ]
+      : [ runtimeDir ] // for dynamic or unknown-source code.
   }
 
   function lookupInCache (uri, moduleUri) {

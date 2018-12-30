@@ -10,22 +10,22 @@ module.exports = function run ($void) {
   var atomicArrayOf = $void.atomicArrayOf
 
   // run a module from source as an application.
-  $export($, 'run', function (source, args, baseUri) {
-    if (typeof source !== 'string') {
+  $export($, 'run', function (appSource, args, appHome) {
+    if (typeof appSource !== 'string') {
       return null
     }
     // formalize arguments values to separate spaces.
     args = Array.isArray(args) ? atomicArrayOf(args) : []
     // try to resolve the base uri of the whole application
-    if (typeof baseUri !== 'string') {
-      baseUri = $.env('home-uri')
+    if (typeof appHome !== 'string' || appHome.length < 1) {
+      appHome = $.env('home')
     }
-    if (!source.endsWith('.s')) {
-      source += '.s'
+    if (!appSource.endsWith('.s')) {
+      appSource += '.s'
     }
     // try to resolve the uri for source
     var loader = $void.loader
-    var uri = loader.resolve(source, [baseUri])
+    var uri = loader.resolve(appSource, [appHome])
     if (typeof uri !== 'string') {
       warn('run > failed to resolve source for', uri)
       return null
@@ -33,7 +33,7 @@ module.exports = function run ($void) {
     // try to load file
     var text = loader.read(uri)
     if (typeof text !== 'string') {
-      warn('run > failed to read source', source, 'for', text)
+      warn('run > failed to read source', appSource, 'for', text)
       return null
     }
     // compile text

@@ -441,6 +441,7 @@ activator((i activator) activator)
 (interpreter)
 (eval)
 (run)
+(env)
 
 # meta.function.lib.sugly
 (encode) # to be removed.

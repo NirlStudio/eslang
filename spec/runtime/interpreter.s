@@ -104,27 +104,39 @@
   ),
 ),
 
-(define "(interpreter shell args home-uri)" (= ()
-  (should "pass home-uri to new space if it's a string." (= ()
-    (var feedback)
-    (var shell (=> (fb) (let feedback fb),
+(define "(interpreter shell args app-home)" (= ()
+  (should "pass app-home to new app space if it's a string." (= ()
+    (var app-home)
+    (var mod-home)
+    (var shell (=> (fb) (let (app-home mod-home) fb),
     (var interpret (interpreter shell (@ 1 10 100) "/var/tmp/sugly"),
-    (interpret "(env \"home-uri\")\n"),
-    (assert "/var/tmp/sugly" feedback)
+    (interpret "(@ -app -module)\n"),
+    (assert "/var/tmp/sugly/." app-home)
+    (assert "/var/tmp/sugly/." mod-home)
 
     (let interpret (interpreter shell (@ 1 10 100) ""),
-    (interpret "(env \"home-uri\")\n"),
-    (assert "" feedback)
+    (interpret "(@ -app -module)\n"),
+    (assert ((env "home") + "/.") app-home)
+    (assert ((env "home") + "/.") mod-home)
   ),
-  (should "pass null to new space as home-uri if it's missing or not a string." (= ()
-    (var feedback)
-    (var shell (=> (fb) (let feedback fb),
+  (should "pass (env \"home\") to new space as app-home if it's missing or not a string." (= ()
+    (var app-home)
+    (var mod-home)
+    (var home ((env "home") + "/."),
+    (var shell (=> (fb) (let (app-home mod-home) fb),
     (var interpret (interpreter shell (@ 1 10 100),
-    (interpret "(env \"home-uri\")\n"),
-    (assert null feedback)
+    (interpret "(@ -app -module)\n"),
+    (assert home app-home)
+    (assert home mod-home)
 
-    (let interpret (interpreter shell (@ 1 10 100) true),
-    (interpret "(env \"home-uri\")\n"),
-    (assert null feedback)
+    (var interpret (interpreter shell (@ 1 10 100) null),
+    (interpret "(@ -app -module)\n"),
+    (assert home app-home)
+    (assert home mod-home)
+
+    (var interpret (interpreter shell (@ 1 10 100) ""),
+    (interpret "(@ -app -module)\n"),
+    (assert home app-home)
+    (assert home mod-home)
   ),
 ),

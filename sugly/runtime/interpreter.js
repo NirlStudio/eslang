@@ -11,20 +11,17 @@ module.exports = function interpreter ($void) {
   var createAppSpace = $void.createAppSpace
 
   // interactively feed & evaluate
-  $export($, 'interpreter', function (shell, args, baseUri) {
+  $export($, 'interpreter', function (shell, args, appHome) {
     if (!isApplicable(shell)) {
       return null
     }
     // formalize arguments values to separate spaces.
     args = Array.isArray(args) ? atomicArrayOf(args) : []
-    // save the base uri of whole application.
-    if (typeof baseUri !== 'string') {
-      baseUri = null
+    if (typeof appHome !== 'string' || appHome.length < 1) {
+      appHome = $.env('home')
     }
-    // save the base uri into environment.
-    $void.env('home-uri', baseUri)
     // create a module space.
-    var scope = createAppSpace(baseUri)
+    var scope = createAppSpace(appHome + '/.') // to indicate a directory.
     scope.populate(args)
     // create compiler.
     var compile = compiler(function (expr, status) {

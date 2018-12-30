@@ -16,7 +16,7 @@ module.exports = function load ($void) {
       return null
     }
     // look into current space to have the base uri.
-    return loadData(space, space.local['-module'],
+    return loadData(space, space.local['-app'], space.local['-module'],
       evaluate(clist[1], space),
       clist.length > 2 ? evaluate(clist[2], space) : null
     )
@@ -25,7 +25,7 @@ module.exports = function load ($void) {
   // expose to be called by native code
   $void.loadData = loadData
 
-  function loadData (space, moduleUri, source, args) {
+  function loadData (space, appUri, moduleUri, source, args) {
     if (typeof source !== 'string') {
       warn('load > invalid source:', source)
       return null
@@ -34,7 +34,7 @@ module.exports = function load ($void) {
       source += '.s'
     }
     // try to locate the sourcevar uri
-    var uri = resolve(moduleUri, source)
+    var uri = resolve(appUri, moduleUri, source)
     if (typeof uri !== 'string') {
       return null
     }
@@ -63,14 +63,14 @@ module.exports = function load ($void) {
     }
   }
 
-  function resolve (moduleUri, source) {
+  function resolve (appUri, moduleUri, source) {
     if (!moduleUri) {
       warn("load > It's forbidden to load a module", 'from an anonymous module.')
       return null
     }
     var loader = $void.loader
     var dirs = loader.isAbsolute(source) ? []
-      : dirsOf(source, loader.dir(moduleUri), $.env('home-uri'))
+      : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $.env('home'))
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       warn('load > failed to resolve module ', source, 'in', dirs)
@@ -83,7 +83,8 @@ module.exports = function load ($void) {
     return null
   }
 
-  function dirsOf (source, baseUri, appDir) {
-    return source.startsWith('.') ? [ baseUri ] : [ baseUri, appDir ]
+  function dirsOf (source, moduleDir, appDir, homeDir) {
+    return source.startsWith('.') ? [ moduleDir ]
+      : [ moduleDir, appDir, homeDir ]
   }
 }
