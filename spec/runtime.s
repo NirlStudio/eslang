@@ -1,9 +1,9 @@
 (for spec in (@
+    "env"
     "eval"
     "evaluate"
     "interpreter"
     "run"
-    "runtime"
     "signal"
     "space"
   ) (define spec (=> ()

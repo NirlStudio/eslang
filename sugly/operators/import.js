@@ -141,7 +141,7 @@ module.exports = function import_ ($void) {
       moduleUri && loader.dir(moduleUri),
       loader.dir(appUri) + '/modules',
       $.env('home') + '/modules',
-      $void.runtime('uri') + '/modules'
+      $void.runtime('home') + '/modules'
     )
     var uri = loader.resolve(source, dirs)
     if (typeof uri === 'string') {

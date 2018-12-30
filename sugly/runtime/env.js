@@ -5,12 +5,10 @@ module.exports = function runtime ($void) {
   var $export = $void.export
   var emptyObject = $.object.empty
 
-  var runtime = Object.assign(Object.create(null), {
+  var environment = Object.assign(Object.create(null), {
     'runtime-core': 'js',
-    'runtime-version': '0.6.1'
-  })
-
-  var environment = Object.assign(Object.create(runtime), {
+    'runtime-host': typeof window === 'undefined' ? 'native' : 'browser',
+    'runtime-version': '0.6.1',
     'is-debugging': false
   })
 
@@ -24,13 +22,11 @@ module.exports = function runtime ($void) {
 
   $void.env = function (name, value) {
     return typeof value === 'undefined' ? environment[name]
-      : typeof runtime[name] !== 'undefined' ? runtime[name]
-        : (environment[name] = value)
+      : (environment[name] = value)
   }
 
   $void.runtime = function (name, value) {
     name = 'runtime-' + name
-    return typeof value === 'undefined'
-      ? runtime[name] : (runtime[name] = value)
+    return $void.env(name, value)
   }
 }

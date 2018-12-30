@@ -9,7 +9,7 @@ module.exports = function sugly (loader/*, more options */) {
   // create the source loader
   $void.loader = loader($void.$)
   // set the location of the runtime
-  $void.runtime('uri', __dirname)
+  $void.runtime('home', __dirname)
   // now we got a complete runtime.
   return $void
 }

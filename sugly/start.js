@@ -1,6 +1,10 @@
 'use strict'
 
-var JS = global || window
+var JS = (typeof window === 'undefined' ? function () {
+  return global
+} : function () {
+  return window
+})()
 
 function initializeSpace ($void) {
   require('./generic/void')($void)
@@ -39,7 +43,7 @@ function initializeSpace ($void) {
 }
 
 function initializeRuntime ($void) {
-  require('./runtime/runtime')($void)
+  require('./runtime/env')($void)
   require('./runtime/signal')($void)
   require('./runtime/space')($void)
   require('./runtime/evaluate')($void)
