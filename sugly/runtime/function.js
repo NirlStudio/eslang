@@ -25,7 +25,9 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return lambda(createLambda(params, tbody, space.app), new Tuple$(code))
+      return lambda(createLambda(
+        params, tbody, space.app, space.local['-module']
+      ), new Tuple$(code))
     } else {
       code.push($Tuple.blank) // empty body
       return params.length < 1 ? $.lambda.noop
@@ -33,9 +35,9 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createLambda (params, tbody, app) {
+  function createLambda (params, tbody, app, module_) {
     var $lambda = function () {
-      var scope = createLambdaSpace(app)
+      var scope = createLambdaSpace(app, module_)
       // populate arguments
       for (var i = 0; i < params.length; i++) {
         var param = params[i]
@@ -49,7 +51,7 @@ module.exports = function function_ ($void) {
         } catch (signal) {
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
-              scope = prepareToRedo(createLambdaSpace(app),
+              scope = prepareToRedo(createLambdaSpace(app, module_),
                 $lambda, this, params, signal.value, signal.count)
               continue
             } else if (signal.id !== 'exit') {

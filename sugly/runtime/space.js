@@ -12,6 +12,7 @@ module.exports = function space ($void) {
   var EmptyArray = Object.freeze && Object.freeze([])
 
   var atomOf = $.tuple['atom-of']
+  // to be used for safely separating spaces.
   $void.atomicArrayOf = function (src) {
     var values = []
     for (var i = 0; i < src.length; i++) {
@@ -143,14 +144,18 @@ module.exports = function space ($void) {
     return space
   }
 
-  $void.createLambdaSpace = function (app) {
+  $void.createLambdaSpace = function (app, module_) {
+    var space
     if (app) {
-      var space = new Space$(Object.create(app))
+      space = new Space$(Object.create(app))
       space.app = app
-      return space
     } else {
-      return new Space$(Object.create($))
+      space = new Space$(Object.create($))
     }
+    if (module_) {
+      space.local['-module'] = module_ || ''
+    }
+    return space
   }
 
   $void.createFunctionSpace = function (parent) {
