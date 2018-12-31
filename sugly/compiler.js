@@ -3,6 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Tuple$ = $void.Tuple
+  var warn = $void.warn
   var print = $void.print
   var $export = $void.export
   var tokenizer = $.tokenizer
@@ -22,16 +23,10 @@ module.exports = function ($void) {
       }
       // reset compiling context.
       resetContext()
-      return -1
+      return 0
     }
 
-    function compileToken (type, value, source, errCode, errMessage) {
-      if (type === 'error') {
-        raiseExpression([stack, sourceStack], 'tokenizer:' + errCode, errMessage,
-          [type, value, source])
-        resetContext()
-        return
-      }
+    function compileToken (type, value, source) {
       if (waiter && waiter(type, value, source)) {
         lastToken = [type, value, source]
         return
@@ -61,8 +56,6 @@ module.exports = function ($void) {
       sourceStack = [[]]
       waiter = null
       lastToken = null
-      raiseExpression(null, 'resetting',
-        'resetting tokenizer and compiler context.')
     }
 
     function tryToRaise () {
@@ -125,8 +118,8 @@ module.exports = function ($void) {
 
     function endClause () {
       if (stack.length < 2) {
-        raiseExpression(null, 'warning',
-          'extra enclosing parentheses is found and ignored.', [lastToken])
+        warn('parsing> extra enclosing parentheses is found and ignored.',
+          [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
       endTopWith(lastToken[2])
@@ -135,8 +128,7 @@ module.exports = function ($void) {
 
     function endMatched (value, source) {
       if (stack.length < 2) {
-        raiseExpression(null, 'warning',
-          'extra enclosing parentheses is found and ignored.',
+        warn('parsing> extra enclosing parentheses is found and ignored.',
           [lastToken, ['symbol', value, source]])
         return // allow & ignore extra enclosing parentheses
       }
@@ -190,32 +182,18 @@ module.exports = function ($void) {
   $export($, 'compile', function (text) {
     var list = []
     var src = [[0, 0, 0]]
-    var warnings = null
-    var compiling = compiler(function collector (expr, status) {
-      if (status) {
-        if (status !== 'resetting') { // restting is ignored for sync compiling.
-          if (!warnings) {
-            warnings = [list]
-          }
-          warnings.push(Array.prototype.slice.call(arguments))
-        }
-      } else {
-        list.push(expr[0])
-        src.push(expr[1])
-      }
+    var compiling = compiler(function collector (expr) {
+      list.push(expr[0])
+      src.push(expr[1])
     })
     if (compiling(text) > 1) {
-      compiling('\n') // end pending waiter.
+      compiling('\n') // end any pending waiter.
     }
     compiling() // notify the end of stream.
-    return warnings || new Tuple$(list, true, src)
+    return new Tuple$(list, true, src)
   })
 
-  function printExpression (expr, status, message, info) {
-    if (status) {
-      print('compiling >', status, ':', message, expr || '', info || '')
-    } else {
-      print('compiling > expression:', expr[0], expr[1])
-    }
+  function printExpression (expr) {
+    print('compiling> expression:', expr[0], expr[1])
   }
 }

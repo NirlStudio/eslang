@@ -16,8 +16,8 @@ module.exports = function ($void) {
     var raiseToken = compiler || printToken
 
     var lineNo, lineOffset, lastChar, spacing, indenting, clauseIndent
-    var waiter, pendingText, pendingLine, pendingOffset, pendingIndent, escaping
-    var stringPadding, resetting
+    var waiter, pendingText, pendingLine, pendingOffset, pendingIndent
+    var escaping, stringPadding
     resumeParsing() // initialize context
 
     function resumeParsing () {
@@ -35,38 +35,30 @@ module.exports = function ($void) {
       pendingOffset = 0
       pendingIndent = -1
       escaping = false
-      // TODO: to be removed
-      resetting = false
+      stringPadding = -1
     }
 
     var singleQuoteWaiter = createStringWaiter("'")
     var doubleQuoteWaiter = createStringWaiter('"')
 
     return function tokenizing (text) {
-      if (typeof text !== 'string') { // stopping
-        if (!resetting) {
-          waiter && waiter() // finalize pending action
-          resetting = true // update state
-        }
-        // resetting: waiting for next piece of source code to start.
-        return false
-      }
-      if (resetting) { // resume parsing
+      if (typeof text !== 'string') {
+        waiter && waiter() // finalize pending action
         resumeParsing() // clear parsing context
+        return false // indicate a reset happened.
       }
       // start parsing
       for (var i = 0; i < text.length; i++) {
-        if (pushChar(text[i])) {
-          return false // entered an abnormal state, resetting
+        var c = text[i]
+        if (!waiter || !waiter(c)) {
+          processChar(c)
         }
+        finalizeChar(c)
       }
       return true // keep waiting more code
     }
 
-    function pushChar (c) {
-      if (waiter && waiter(c)) {
-        return finalizePushing(c)
-      }
+    function processChar (c) {
       switch (c) {
         case '(':
           raiseToken('punctuation', c, [clauseIndent, lineNo, lineOffset])
@@ -105,10 +97,9 @@ module.exports = function ($void) {
           beginSymbol(c)
           break
       }
-      return finalizePushing(c)
     }
 
-    function finalizePushing (c) {
+    function finalizeChar (c) {
       lastChar = c
       spacing = /[\s]/.test(c)
       if (c !== ' ' && c !== '\t') {
@@ -120,7 +111,6 @@ module.exports = function ($void) {
       } else {
         lineOffset += 1
       }
-      return resetting
     }
 
     function beginWaiting (c, stateWaiter) {
@@ -143,15 +133,31 @@ module.exports = function ($void) {
     }
 
     function createStringWaiter (quote) {
+      function raiseValue () {
+        var value, error
+        try {
+          value = JSON.parse(pendingText + quote)
+        } catch (err) {
+          error = err
+        }
+        if (typeof value !== 'string') {
+          warn('tokenizing> invalid string input: [JSON] ',
+            (error && error.message) || 'unknow error.', '\n',
+            pendingText + quote, '\n',
+            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
+          value = pendingText.substring(1) // skip all escaping logic.
+        }
+        raiseToken('value', value,
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
+        waiter = null
+        return true
+      }
+
       return function (c) {
         if (typeof c === 'undefined') { // unexpected ending
-          warn('tokenizing> a string is not closed properly.',
+          warn('tokenizing> a string value is not closed properly.',
             [lineNo, lineOffset, pendingLine, pendingOffset])
-          raiseToken('error', pendingText,
-            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
-            'missing-quote: ' + quote, 'the format of string is invalid.')
-          resetting = true
-          return true
+          return raiseValue()
         }
         if (c === '\r') { // skip '\r' anyway
           return true
@@ -183,27 +189,13 @@ module.exports = function ($void) {
           escaping = false
           return true
         }
-        if (c !== quote) {
-          pendingText += c
-          if (c === '\\') {
-            escaping = true
-          }
-          return true
+        if (c === quote) {
+          return raiseValue()
         }
-        // string resetting
-        pendingText += quote
-        var value = JSON.parse(pendingText)
-        if (typeof value === 'string') {
-          raiseToken('value', value,
-            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
-          waiter = null
-          return true
+        pendingText += c
+        if (c === '\\') {
+          escaping = true
         }
-        // invalid string.
-        raiseToken('error', pendingText,
-          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
-          'invalid-string:' + quote, 'the format of string is invalid.')
-        resetting = true
         return true
       }
     }
@@ -299,11 +291,7 @@ module.exports = function ($void) {
     return tokens
   })
 
-  function printToken (type, value, source, errCode, errMessage) {
-    if (type === 'error') {
-      warn('tokenizing>', type, value, source, errCode, errMessage)
-    } else {
-      print('tokenizing> token:', type, value, source, errCode, errMessage)
-    }
+  function printToken (type, value, source) {
+    print('tokenizing> token:', type, value, source)
   }
 }
