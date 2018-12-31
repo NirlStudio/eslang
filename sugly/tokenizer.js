@@ -15,33 +15,40 @@ module.exports = function ($void) {
   var tokenizer = $export($, 'tokenizer', function (compiler) {
     var raiseToken = compiler || printToken
 
-    var lineNo = 0
-    var lineOffset = 0
-    var waiter = null
-    var spacing = false
-    var indenting = 0
-    var clauseIndent = 0
-    var lastChar = null
-    var escaping = false
-    var pendingIndent = -1
-    var pendingLine = 0
-    var pendingOffset = 0
-    var pendingText = ''
-    var stringPadding = -1
+    var lineNo, lineOffset, lastChar, spacing, indenting, clauseIndent
+    var waiter, pendingText, pendingLine, pendingOffset, pendingIndent, escaping
+    var stringPadding, resetting
+    resumeParsing() // initialize context
+
+    function resumeParsing () {
+      // general states
+      lineNo = 0
+      lineOffset = 0
+      lastChar = null
+      spacing = false
+      indenting = 0
+      clauseIndent = 0
+      // escaping states
+      waiter = null
+      pendingText = ''
+      pendingLine = 0
+      pendingOffset = 0
+      pendingIndent = -1
+      escaping = false
+      // TODO: to be removed
+      resetting = false
+    }
 
     var singleQuoteWaiter = createStringWaiter("'")
     var doubleQuoteWaiter = createStringWaiter('"')
 
-    var resetting = false
     return function tokenizing (text) {
       if (typeof text !== 'string') { // stopping
-        if (!resetting && waiter) {
-          waiter() // finalize pending action
-        }
         if (!resetting) {
+          waiter && waiter() // finalize pending action
           resetting = true // update state
         }
-        // resetting: waiting next piece of source code to continue
+        // resetting: waiting for next piece of source code to start.
         return false
       }
       if (resetting) { // resume parsing
@@ -50,32 +57,15 @@ module.exports = function ($void) {
       // start parsing
       for (var i = 0; i < text.length; i++) {
         if (pushChar(text[i])) {
-          return false // resetting
+          return false // entered an abnormal state, resetting
         }
       }
       return true // keep waiting more code
     }
 
-    function resumeParsing () {
-      lineNo = 0
-      lineOffset = 0
-      waiter = null
-      spacing = false
-      indenting = 0
-      clauseIndent = 0
-      lastChar = null
-      escaping = false
-      pendingIndent = -1
-      pendingLine = 0
-      pendingOffset = 0
-      pendingText = ''
-      resetting = false
-    }
-
     function pushChar (c) {
       if (waiter && waiter(c)) {
-        nextChar(c)
-        return resetting
+        return finalizePushing(c)
       }
       switch (c) {
         case '(':
@@ -89,75 +79,74 @@ module.exports = function ($void) {
         case '@':
         case ':':
         case '$':
+        case '[': // reserved as block punctuation
+        case ']': // reserved as block punctuation
+        case '{': // reserved as block punctuation
+        case '}': // reserved as block punctuation
           raiseToken('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
-        case "'": // TODO: static string?
+        case "'": // TODO: format string
           beginWaiting("'", singleQuoteWaiter)
           break
-        case '"': // TODO: format string?
+        case '"': // TODO: static string
           beginWaiting('"', doubleQuoteWaiter)
           break
         case '#':
           beginWaiting('', commentWaiter)
           break
         case ' ':
-          if (indenting >= 0) {
-            indenting += 1
-            clauseIndent = indenting
-          } else {
-            raiseSpace(c)
-          }
+        case '\t': // It may spoils well foramtted code.
+          processWhitespace(c)
           break
-        case '\t': // The world would be more peceaful now.
-          if (indenting >= 0) {
-            raiseToken('error', c, [indenting, lineNo, lineOffset],
-              'tab-indent', 'TAB cannot be used as indent character.')
-            resetting = true
-            return true // ending
-          } else {
-            raiseSpace(c)
-          }
-          break
-        case ',': // reserved as punctuation
-        case ';': // reserved as punctuation
-        case '\\': // reserved as punctuation
+        case ',': // inline-closing, indent-closing
+        case ';': // line-closing
+        case '\\': // reserved as control punctuation
         default:
           beginSymbol(c)
           break
       }
-      nextChar(c)
-      return resetting
+      return finalizePushing(c)
     }
 
-    function nextChar (c) {
-      if (!/[\s]/.test(c)) {
-        spacing = false // continuous spacing will be ignored.
-      }
+    function finalizePushing (c) {
       lastChar = c
-      if (c !== ' ') {
+      spacing = /[\s]/.test(c)
+      if (c !== ' ' && c !== '\t') {
         indenting = -1
       }
       if (c === '\n') {
         lineNo += 1
-        lineOffset = 0
-        indenting = 0
-        clauseIndent = 0
+        lineOffset = indenting = clauseIndent = 0
       } else {
         lineOffset += 1
       }
+      return resetting
     }
 
     function beginWaiting (c, stateWaiter) {
+      waiter = stateWaiter
       pendingText = c
       pendingLine = lineNo
       pendingOffset = lineOffset
       pendingIndent = indenting
-      waiter = stateWaiter
+    }
+
+    function processWhitespace (c) {
+      if (indenting < 0) {
+        return raiseSpace(c)
+      }
+      if (c === '\t') {
+        warn('tokenizing> TAB-space is not suggested in indention.',
+          [lineNo, lineOffset, indenting])
+      }
+      clauseIndent = ++indenting
     }
 
     function createStringWaiter (quote) {
       return function (c) {
-        if (!c) { // unexpected ending
+        if (typeof c === 'undefined') { // unexpected ending
+          warn('tokenizing> a string is not closed properly.',
+            [lineNo, lineOffset, pendingLine, pendingOffset])
           raiseToken('error', pendingText,
             [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset],
             'missing-quote: ' + quote, 'the format of string is invalid.')
@@ -220,8 +209,8 @@ module.exports = function ($void) {
     }
 
     function raiseSpace (c) {
-      if (!spacing) {
-        spacing = true
+      if (!spacing || c === '\n') { // only raise once for common spaces, but
+        // raise every new-line in case parser giving it special meanings.
         raiseToken('space', c, [indenting, lineNo, lineOffset])
       }
     }
@@ -312,9 +301,9 @@ module.exports = function ($void) {
 
   function printToken (type, value, source, errCode, errMessage) {
     if (type === 'error') {
-      warn('tokenizing >', type, value, source, errCode, errMessage)
+      warn('tokenizing>', type, value, source, errCode, errMessage)
     } else {
-      print('tokenizing > token:', type, value, source, errCode, errMessage)
+      print('tokenizing> token:', type, value, source, errCode, errMessage)
     }
   }
 }

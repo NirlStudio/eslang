@@ -65,7 +65,7 @@ module.exports = function ($void) {
 
   $void.regexNumber = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d+)/
   $void.regexDecimal = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d\b|[1-9]\d*)/
-  $void.regexSpecialSymbol = /[(`@:$"#)',;\\\s]/
+  $void.regexSpecialSymbol = /[(`@:$"#)',;\\\s[\]{}]/
 
   $void.regexConstants = /^(null|true|false)$/
   $void.constantValues = Object.assign(Object.create(null), {
