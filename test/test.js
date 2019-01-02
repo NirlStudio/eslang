@@ -12,7 +12,7 @@ var signFailed = '    ' + colors.passed + red('[FAILED]')
 
 module.exports = function ($void) {
   var $ = $void.$
-  var print = $void.print
+  var print = $.print
 
   var passing = 0
   var failing = []

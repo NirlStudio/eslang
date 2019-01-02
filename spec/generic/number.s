@@ -422,7 +422,7 @@
     (assert 65537 (number parse-int 65537.5),
     (assert -65537 (number parse-int -65537.5),
   ),
-  (should "(number parse-int hex-str) parses the string a hex value." (= ()
+  (should "(number parse-int hex-str) parses a hex string to its integer value." (= ()
     (assert 0 (number parse-int "0x0"),
     (assert 1 (number parse-int "0x1"),
     (assert 1 (number parse-int "0x01"),
@@ -431,6 +431,14 @@
     (assert 1 (number parse-int "0x00000001"),
     (assert 65535 (number parse-int "0x000FFFF"),
     (assert 65535 (number parse-int "0x000ffff"),
+  ),
+  (should "(number parse-int bit-str) parses a octal string to its integer value" (= ()
+    (assert 0 (number parse-int "00"),
+    (assert 1 (number parse-int "01"),
+    (assert 7 (number parse-int "07"),
+    (assert 9 (number parse-int "011"),
+    (assert 15 (number parse-int "017"),
+    (assert 16 (number parse-int "020"),
   ),
   (should "(number parse-int bit-str) parses a bit string to its integer value" (= ()
     (assert 0 (number parse-int "0b0"),
@@ -459,10 +467,9 @@
     (assert (number invalid) (number parse-int "\r"),
     (assert (number invalid) (number parse-int "\n"),
 
-    (assert 0 (number parse-int "0B1"),
-    (assert 0 (number parse-int "0X1"),
-    (assert 7 (number parse-int "07"),
-    (assert 8 (number parse-int "08"),
+    (assert (number invalid) (number parse-int "0B1"),
+    (assert (number invalid) (number parse-int "0X1"),
+    (assert (number invalid) (number parse-int "08"),
 
     (assert (number invalid) (number parse-int "0xG"),
     (assert (number invalid) (number parse-int "0b2"),

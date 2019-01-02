@@ -528,9 +528,22 @@ emit((e emit) emit)
 -1.03e+12
 -1.03E-12
 
-# single line comment
-#( block comment )# 123
-#(multiple lines comment
-  multiple lines comment
-)# 123
+# string.quoted.double.sugly
 "123$bcd\"''$\t xyz" 123
+
+# string.format.single.sugly
+'" 123 $() xyz'
+
+# comment.line.hash.sugly
+# single line comment
+123 # single line comment
+
+# comment.block.hash.sugly
+#( block comment )#
+123 true#( block comment )#123
+#( multiple lines comment
+  multiple lines comment
+)#
+123 null#( multiple lines comment
+  multiple lines comment
+)#123

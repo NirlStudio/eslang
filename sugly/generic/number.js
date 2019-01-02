@@ -51,6 +51,9 @@ function createIntParser ($void) {
     } else if (input.startsWith('0b')) {
       radix = 2
       input = input.substring(2)
+    } else if (input.length > 1 && input.startsWith('0')) {
+      radix = 8
+      input = input.substring(1)
     } else {
       radix = 10
       var offset = input.indexOf('.')

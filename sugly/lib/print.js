@@ -5,32 +5,24 @@ module.exports = function ($void, JS) {
   var warn = $void.warn
   var print = $void.print
   var $export = $void.export
-  var thisCall = $void.thisCall
 
   // standard output.
-  $export($, 'print', function () {
-    var text = toStrings.apply(null, arguments)
-    print(text)
-    return text
-  })
-
-  // standard error, but no error in sugly.
-  $export($, 'warn', function () {
-    var text = toStrings.apply(null, arguments)
-    warn(text)
-    return text
-  })
-
-  function toStrings () {
-    var strings = []
-    for (var i = 0; i < arguments.length; i++) {
-      var value = arguments[i]
-      if (typeof value === 'string') {
-        strings.push(value)
-      } else {
-        strings.push(thisCall(value, 'to-string'))
-      }
+  var lastPrinting = null // save to make it testable.
+  $export($, 'print', function (value) {
+    if (typeof value === 'undefined') {
+      return lastPrinting
     }
-    return strings.join(' ')
-  }
+    lastPrinting = Array.prototype.slice.call(arguments)
+    return print.apply(null, arguments)
+  })
+
+  // standard error, but only warning exists in sugly space.
+  var lastWarning = null // save to make it testable.
+  $export($, 'warn', function (category) {
+    if (typeof category === 'undefined') {
+      return lastWarning
+    }
+    lastWarning = Array.prototype.slice.call(arguments)
+    return warn.apply(null, arguments)
+  })
 }

@@ -4,7 +4,7 @@ module.exports = function load ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
-  var warn = $void.warn
+  var warn = $.warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
@@ -27,7 +27,7 @@ module.exports = function load ($void) {
 
   function loadData (space, appUri, moduleUri, source, args) {
     if (typeof source !== 'string') {
-      warn('load > invalid source:', source)
+      warn('load', 'invalid source:', source)
       return null
     }
     if (!source.endsWith('.s')) {
@@ -41,13 +41,13 @@ module.exports = function load ($void) {
     // try to load file
     var text = $void.loader.read(uri)
     if (typeof text !== 'string') {
-      warn('load > failed to load source', source, 'for', text)
+      warn('load', 'failed to load source', source, 'for', text)
       return null
     }
     // compile text
     var code = compile(text)
     if (!(code instanceof Tuple$)) {
-      warn('load > compiler warnings:', code)
+      warn('load', 'compiler warnings:', code)
       return null
     }
 
@@ -57,7 +57,7 @@ module.exports = function load ($void) {
       return scope && Object.getOwnPropertyNames(scope.exporting).length > 0
         ? scope.exporting : result[0]
     } catch (signal) {
-      warn('load > invalid call to', signal.id,
+      warn('load', 'invalid call to', signal.id,
         'in', code, 'from', uri, 'on', moduleUri)
       return null
     }
@@ -65,7 +65,7 @@ module.exports = function load ($void) {
 
   function resolve (appUri, moduleUri, source) {
     if (!moduleUri) {
-      warn("load > It's forbidden to load a module", 'from an anonymous module.')
+      warn('load', "It's forbidden to load a module", 'from an anonymous module.')
       return null
     }
     var loader = $void.loader
@@ -73,13 +73,13 @@ module.exports = function load ($void) {
       : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $.env('home'))
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
-      warn('load > failed to resolve module ', source, 'in', dirs)
+      warn('load', 'failed to resolve module ', source, 'in', dirs)
       return null
     }
     if (uri !== moduleUri) {
       return uri
     }
-    warn('load > a module,', moduleUri, ',cannot load itself by resolving', source, 'in', dirs)
+    warn('load', 'a module,', moduleUri, ',cannot load itself by resolving', source, 'in', dirs)
     return null
   }
 

@@ -4,16 +4,18 @@ module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']
-  var warn = $void.warn
-  var print = $void.print
+  var warn = $.warn
   var $export = $void.export
+  var isApplicable = $void.isApplicable
 
   var Constants = $void.constantValues
   var RegexDecimal = $void.regexDecimal
   var RegexSpecialSymbol = $void.regexSpecialSymbol
 
-  var tokenizer = $export($, 'tokenizer', function (compiler) {
-    var raiseToken = compiler || printToken
+  var tokenizer = $export($, 'tokenizer', function (parse) {
+    if (!isApplicable(parse)) {
+      return $.tokenize
+    }
 
     var lineNo, lineOffset, lastChar, spacing, indenting, clauseIndent
     var waiter, pendingText, pendingLine, pendingOffset, pendingIndent
@@ -38,7 +40,7 @@ module.exports = function ($void) {
       stringPadding = -1
     }
 
-    var singleQuoteWaiter = createStringWaiter("'")
+    var singleQuoteWaiter = createStringWaiter("'", 'format')
     var doubleQuoteWaiter = createStringWaiter('"')
 
     return function tokenizing (text) {
@@ -61,11 +63,11 @@ module.exports = function ($void) {
     function processChar (c) {
       switch (c) {
         case '(':
-          raiseToken('punctuation', c, [clauseIndent, lineNo, lineOffset])
+          parse('punctuation', c, [clauseIndent, lineNo, lineOffset])
           clauseIndent = -1 // clear begining indent
           break
         case ')':
-          raiseToken('punctuation', c, [indenting, lineNo, lineOffset])
+          parse('punctuation', c, [indenting, lineNo, lineOffset])
           break
         case '`':
         case '@':
@@ -75,19 +77,20 @@ module.exports = function ($void) {
         case ']': // reserved as block punctuation
         case '{': // reserved as block punctuation
         case '}': // reserved as block punctuation
-          raiseToken('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
+          parse('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
-        case "'": // TODO: format string
-          beginWaiting("'", singleQuoteWaiter)
+        case "'": // reserved for format string
+          // JSON.parse requires double-quote
+          beginWaiting('"', singleQuoteWaiter)
           break
-        case '"': // TODO: static string
+        case '"':
           beginWaiting('"', doubleQuoteWaiter)
           break
         case '#':
           beginWaiting('', commentWaiter)
           break
         case ' ':
-        case '\t': // It may spoils well foramtted code.
+        case '\t': // It may spoil well foramtted code.
           processWhitespace(c)
           break
         case ',': // inline-closing, indent-closing
@@ -126,28 +129,29 @@ module.exports = function ($void) {
         return raiseSpace(c)
       }
       if (c === '\t') {
-        warn('tokenizing> TAB-space is not suggested in indention.',
+        warn('tokenizing', 'TAB-space is not suggested in indention.',
           [lineNo, lineOffset, indenting])
       }
       clauseIndent = ++indenting
     }
 
-    function createStringWaiter (quote) {
+    function createStringWaiter (quote, tokenType) {
       function raiseValue () {
         var value, error
         try {
-          value = JSON.parse(pendingText + quote)
+          // TODO: to be replaced to native escape processor?
+          value = JSON.parse(pendingText + '"')
         } catch (err) {
           error = err
         }
         if (typeof value !== 'string') {
-          warn('tokenizing> invalid string input: [JSON] ',
+          warn('tokenizing', 'invalid string input: [JSON] ',
             (error && error.message) || 'unknow error.', '\n',
             pendingText + quote, '\n',
             [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
           value = pendingText.substring(1) // skip all escaping logic.
         }
-        raiseToken('value', value,
+        parse(tokenType || 'value', value,
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
         waiter = null
         return true
@@ -155,7 +159,7 @@ module.exports = function ($void) {
 
       return function (c) {
         if (typeof c === 'undefined') { // unexpected ending
-          warn('tokenizing> a string value is not closed properly.',
+          warn('tokenizing', 'a string value is not properly closed.',
             [lineNo, lineOffset, pendingLine, pendingOffset])
           return raiseValue()
         }
@@ -175,7 +179,7 @@ module.exports = function ($void) {
         if (/[\s]/.test(c)) {
           if (stringPadding >= 0) { // padding or padded
             if (stringPadding === 0) { // pading
-              pendingText += c // keeps the first space character.
+              pendingText += ' ' // keeps the first space character.
               stringPadding = 1
             }
             return true
@@ -203,24 +207,21 @@ module.exports = function ($void) {
     function raiseSpace (c) {
       if (!spacing || c === '\n') { // only raise once for common spaces, but
         // raise every new-line in case parser giving it special meanings.
-        raiseToken('space', c, [indenting, lineNo, lineOffset])
+        parse('space', c, [indenting, lineNo, lineOffset])
       }
     }
 
     function commentWaiter (c) {
-      if (c !== '\n') {
-        if (pendingText.length < 1 && c === '(') {
-          waiter = blockCommentWaiter
-          return true
-        } else if (c) {
-          pendingText += c
-          return true
-        }
+      if (typeof c === 'undefined' || c === '\n') {
+        parse('comment', pendingText,
+          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
+        waiter = null
+      } else if (pendingText.length < 1 && c === '(') {
+        pendingText = '('
+        waiter = blockCommentWaiter // upgrade to block comment
+      } else {
+        pendingText += c
       }
-      raiseToken('comment', pendingText,
-        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset]
-      )
-      waiter = null
       return true
     }
 
@@ -229,21 +230,21 @@ module.exports = function ($void) {
         if (lastChar !== ')' || c !== '#') {
           pendingText += c
           return true
-        }
+        } // else, normal ending
+      } else {
+        pendingText += ')'
+        warn('tokenizing', 'a block comment is not properly closed.',
+          [lineNo, lineOffset, pendingLine, pendingOffset])
       }
-      raiseToken('comment', pendingText,
-        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset]
-      )
+      parse('comment', pendingText,
+        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
       waiter = null
       return true
     }
 
     function beginSymbol (c) {
-      if (/[\s]/.test(c)) {
-        raiseSpace(c) // report space once.
-      } else {
-        beginWaiting(c, symbolWaiter)
-      }
+      /[\s]/.test(c) ? raiseSpace(c) // report space once.
+        : beginWaiting(c, symbolWaiter)
     }
 
     function symbolWaiter (c) {
@@ -251,32 +252,26 @@ module.exports = function ($void) {
         pendingText += c
         return true
       }
-      finalizeSymbol()
+      raiseSymbol()
       waiter = null
-      return false
+      return false // return the char to tokenizer.
     }
 
-    function finalizeSymbol () {
-      if (RegexDecimal.test(pendingText)) {
-        // try float number
-        raiseToken('value',
-          /(\.|e|E|^-0$)/.test(pendingText)
-            ? parseFloat(pendingText)
-            : intValueOf(pendingText),
-          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
-      } else if (pendingText.startsWith('0')) {
-        // try integer number
-        raiseToken('value', intValueOf(pendingText),
-          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
-      } else if (typeof Constants[pendingText] !== 'undefined') {
-        // check if a constant value
-        raiseToken('value', Constants[pendingText],
-          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
-      } else {
-        // as a common symbol
-        raiseToken('symbol', symbolOf(pendingText),
-          [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
+    function raiseSymbol () {
+      var type, value
+      if (typeof Constants[pendingText] !== 'undefined') { // a constant value
+        value = Constants[pendingText]
+      } else if (RegexDecimal.test(pendingText)) { // a decimal number
+        value = /(\.|e|E|^-0$)/.test(pendingText)
+          ? parseFloat(pendingText) : intValueOf(pendingText)
+      } else if (pendingText.startsWith('0')) { // a special integer number
+        value = intValueOf(pendingText)
+      } else { // a common symbol
+        type = 'symbol'
+        value = symbolOf(pendingText)
       }
+      parse(type || 'value', value,
+        [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset - 1])
     }
   })
 
@@ -290,8 +285,4 @@ module.exports = function ($void) {
     tokenizing() // notify the end of stream.
     return tokens
   })
-
-  function printToken (type, value, source) {
-    print('tokenizing> token:', type, value, source)
-  }
 }

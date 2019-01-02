@@ -4,7 +4,7 @@ module.exports = function run ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
-  var warn = $void.warn
+  var warn = $.warn
   var $export = $void.export
   var execute = $void.execute
   var atomicArrayOf = $void.atomicArrayOf
@@ -27,25 +27,25 @@ module.exports = function run ($void) {
     var loader = $void.loader
     var uri = loader.resolve(appSource, [appHome])
     if (typeof uri !== 'string') {
-      warn('run > failed to resolve source for', uri)
+      warn('run', 'failed to resolve source for', uri)
       return null
     }
     // try to load file
     var text = loader.read(uri)
     if (typeof text !== 'string') {
-      warn('run > failed to read source', appSource, 'for', text)
+      warn('run', 'failed to read source', appSource, 'for', text)
       return null
     }
     // compile text
     var code = compile(text)
     if (!(code instanceof Tuple$)) {
-      warn('run > compiler warnings:', code)
+      warn('run', 'compiler warnings:', code)
       return null
     }
     try {
       return execute(null, code, uri, args, true)[0]
     } catch (signal) {
-      warn('run > invalid call to', signal.id,
+      warn('run', 'invalid call to', signal.id,
         'in', text, 'from', uri, 'with', args)
       return null
     }

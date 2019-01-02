@@ -6,7 +6,7 @@ module.exports = function evaluate ($void) {
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
-  var warn = $void.warn
+  var warn = $.warn
   var indexerOf = $void.indexerOf
   var staticOperators = $void.staticOperators
 
@@ -114,7 +114,7 @@ module.exports = function evaluate ($void) {
       if (signal instanceof Signal$) {
         throw signal
       }
-      warn('evaluating > unknow signal:', signal, 'when evaluating', clause)
+      warn('evaluate', 'unknown signal:', signal, 'when evaluating', clause)
       return null
     }
   }

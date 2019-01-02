@@ -5,7 +5,7 @@ module.exports = function run ($void) {
   var compile = $.compile
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var warn = $void.warn
+  var warn = $.warn
   var $export = $void.export
   var execute = $void.execute
 
@@ -16,7 +16,7 @@ module.exports = function run ($void) {
       // try to compile & evaluate
       code = compile(expr)
       if (!(code instanceof Tuple$)) {
-        warn('eval > compiler: ', code)
+        warn('eval', 'invalid code', code)
         return null
       }
     } else if (expr instanceof Tuple$) {
@@ -33,9 +33,9 @@ module.exports = function run ($void) {
       return execute(null, code)[0]
     } catch (signal) { // any unexpected signal
       if (code === expr) {
-        warn('eval > invalid call to', signal.id, 'for', code)
+        warn('eval', 'invalid call to', signal.id, 'for', code)
       } else {
-        warn('eval > invalid call to', signal.id, 'for', code, 'of', expr)
+        warn('eval', 'invalid call to', signal.id, 'for', code, 'of', expr)
       }
       return null
     }

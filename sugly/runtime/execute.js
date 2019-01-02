@@ -2,7 +2,7 @@
 
 module.exports = function execute ($void) {
   var Signal$ = $void.Signal
-  var warn = $void.warn
+  var warn = $void.$.warn
   var evaluate = $void.evaluate
   var createAppSpace = $void.createAppSpace
   var createModuleSpace = $void.createModuleSpace
@@ -19,7 +19,7 @@ module.exports = function execute ($void) {
         }
         throw signal
       }
-      warn('execute > unknown error:', signal,
+      warn('execute', 'unknown error:', signal,
         'with', args, 'for', code, 'from', uri
       )
       return [null, null]

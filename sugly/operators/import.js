@@ -6,7 +6,7 @@ module.exports = function import_ ($void) {
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
-  var warn = $void.warn
+  var warn = $.warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
@@ -83,7 +83,7 @@ module.exports = function import_ ($void) {
       if (source instanceof Symbol$) {
         source = source.key
       } else {
-        warn('import > invalid module source:', source)
+        warn('import', 'invalid module source:', source)
         return null
       }
     }
@@ -133,7 +133,7 @@ module.exports = function import_ ($void) {
     var loader = $void.loader
     var isAbsolute = loader.isAbsolute(source)
     if (!moduleUri && isAbsolute) {
-      warn("import > It's forbidden to import a module", 'from a absolute uri.')
+      warn('import', "It's forbidden to import a module", 'from a absolute uri.')
       return null
     }
     var dirs = isAbsolute ? [] : dirsOf(
@@ -147,7 +147,7 @@ module.exports = function import_ ($void) {
     if (typeof uri === 'string') {
       return uri
     }
-    warn('import > failed to resolve module ', source, 'in', dirs)
+    warn('import', 'failed to resolve module ', source, 'in', dirs)
     return null
   }
 
@@ -168,7 +168,7 @@ module.exports = function import_ ($void) {
         timestamp: Date.now()
       })
     } else if (module.status === 100) {
-      warn('import > loop dependency when loading', uri, 'from', moduleUri)
+      warn('import', 'loop dependency when loading', uri, 'from', moduleUri)
     } else if ((Date.now() - modules[uri].timestamp) > RefreshInterval) {
       module.status = 205
     }
@@ -181,14 +181,14 @@ module.exports = function import_ ($void) {
       var text = $void.loader.read(uri)
       if (typeof text !== 'string') {
         module_.status = 415 // unspported media type
-        warn('import > failed to read source', source, 'for', text)
+        warn('import', 'failed to read source', source, 'for', text)
         return null
       }
       // compile text
       var code = compile(text)
       if (!(code instanceof Tuple$)) {
         module_.status = 400 //
-        warn('import > failed to compile source', source, 'for', code)
+        warn('import', 'failed to compile source', source, 'for', code)
         return null
       }
       // to load module
@@ -198,10 +198,10 @@ module.exports = function import_ ($void) {
         return scope.exporting
       }
       module_.status = 500
-      warn('import > failed when executing', code)
+      warn('import', 'failed when executing', code)
     } catch (signal) {
       module_.status = 503
-      warn('import > invalid call to', signal.id,
+      warn('import', 'invalid call to', signal.id,
         'in', code, 'at', uri, 'from', moduleUri)
     }
     return null
@@ -212,7 +212,7 @@ module.exports = function import_ ($void) {
       var importing = require(uri) // the JS module must export a loader function.
       if (typeof importing !== 'function') {
         module_.status = 400
-        warn('import > invalid JS module', source, 'at', uri)
+        warn('import', 'invalid JS module', source, 'at', uri)
         return null
       }
       var scope = $void.createModuleSpace(uri, space)
@@ -224,11 +224,11 @@ module.exports = function import_ ($void) {
         return scope.exporting
       }
       module_.status = 500 // internal error
-      warn('import > failed to import JS module of', source,
+      warn('import', 'failed to import JS module of', source,
         'for', status, 'at', uri)
     } catch (err) {
       module_.status = 503 // service unavailable
-      warn('import > failed to import JS module of', source,
+      warn('import', 'failed to import JS module of', source,
         'for', err, 'at', uri, 'from', moduleUri)
     }
     return null

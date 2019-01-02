@@ -3,13 +3,15 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Tuple$ = $void.Tuple
-  var warn = $void.warn
-  var print = $void.print
+  var warn = $.warn
   var $export = $void.export
   var tokenizer = $.tokenizer
+  var isApplicable = $void.isApplicable
 
-  var compiler = $export($, 'compiler', function (evaluater) {
-    var raiseExpression = evaluater || printExpression
+  var compiler = $export($, 'compiler', function (evaluate) {
+    if (!isApplicable(evaluate)) {
+      return $.compile
+    }
 
     var stack = [[]]
     var sourceStack = [[]]
@@ -60,7 +62,7 @@ module.exports = function ($void) {
 
     function tryToRaise () {
       while (stack[0].length > 0) {
-        raiseExpression([stack[0].shift(), sourceStack[0].shift()])
+        evaluate([stack[0].shift(), sourceStack[0].shift()])
       }
     }
 
@@ -118,7 +120,7 @@ module.exports = function ($void) {
 
     function endClause () {
       if (stack.length < 2) {
-        warn('parsing> extra enclosing parentheses is found and ignored.',
+        warn('parsing', 'extra enclosing parentheses is found and ignored.',
           [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
@@ -128,7 +130,7 @@ module.exports = function ($void) {
 
     function endMatched (value, source) {
       if (stack.length < 2) {
-        warn('parsing> extra enclosing parentheses is found and ignored.',
+        warn('parsing', 'extra enclosing parentheses is found and ignored.',
           [lastToken, ['symbol', value, source]])
         return // allow & ignore extra enclosing parentheses
       }
@@ -192,8 +194,4 @@ module.exports = function ($void) {
     compiling() // notify the end of stream.
     return new Tuple$(list, true, src)
   })
-
-  function printExpression (expr) {
-    print('compiling> expression:', expr[0], expr[1])
-  }
 }

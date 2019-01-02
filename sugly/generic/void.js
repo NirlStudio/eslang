@@ -11,6 +11,7 @@ module.exports = function ($void) {
   var $Type = $.type
   var $Tuple = $.tuple
   var $Lambda = $.lambda
+  var $String = $.string
   var $Function = $.function
   var $Object = $.object
   var Null = $void.null
@@ -19,6 +20,7 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var operator = $void.operator
   var ClassType$ = $void.ClassType
+  var isApplicable = $void.isApplicable
 
   // generate an empty function.
   $void.createEmptyOperation = createEmptyOperation
@@ -33,11 +35,35 @@ module.exports = function ($void) {
   )
   $void.ownsProperty = ownsProperty
 
-  // default native output methods
-  $void.print = console.log.bind(console)
-  $void.warn = console.warn ? console.log.bind(console) : function () {
+  // default native output methods - TODO: move to $/lib/io.js
+  function formatArgs () {
+    var strings = []
+    for (var i = 0; i < arguments.length; i++) {
+      strings.push($String.of(arguments[i]))
+    }
+    return strings.join(' ')
+  }
+  $void.print = function () {
+    var text = formatArgs.apply(null, arguments)
+    console.log(text) // keep orginal types in browser
+    return text
+  }
+  function formatWarning () {
     var args = Array.prototype.slice.call(arguments)
-    args.unshift('[warn]')
+    args.splice(1, 0, '>')
+    return args
+  }
+  $void.warn = console.warn ? function () {
+    var args = formatWarning.apply(null, arguments)
+    var text = formatArgs.apply(null, args)
+    console.warn(text) // keep orginal types in browser
+    return text
+  } : function () {
+    var args = formatWarning.apply(null, arguments)
+    args.unshift('[WARN]')
+    var text = formatArgs.apply(null, args)
+    console.log(text) // keep orginal types in browser
+    return text
   }
 
   // to retrieve or create a shared symbol.
@@ -133,7 +159,8 @@ module.exports = function ($void) {
   $void.export = function (space, name, entity) {
     // ensure exported names are shared.
     sharedSymbolOf(name)
-    space[name] = entity
+    // automatically bind null for static methods
+    space[name] = isApplicable(entity) ? bind(null, entity) : entity
     return tryToUpdateName(entity, name)
   }
 
@@ -167,7 +194,7 @@ module.exports = function ($void) {
       if (!entity.$name) {
         entity.$name = typeof names === 'string' ? names : names[0]
       }
-      if (autoBind && (entity.type === $Lambda || entity.type === $Function)) {
+      if (autoBind && isApplicable(entity)) {
         entity = bind(owner, entity)
       }
     }
