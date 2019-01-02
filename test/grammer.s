@@ -444,7 +444,6 @@ activator((i activator) activator)
 (env)
 
 # meta.function.lib.sugly
-(encode) # to be removed.
 (print)
 (warn)
 

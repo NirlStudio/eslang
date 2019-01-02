@@ -40,6 +40,12 @@ module.exports = function ($void) {
     return String.fromCharCode.apply(String, arguments)
   }, true)
 
+  // generate the source code string for a value
+  link(Type, 'of-code', function (value) {
+    return typeof value === 'undefined' ? ''
+      : thisCall(thisCall(value, 'to-code'), 'to-string')
+  }, true)
+
   var proto = Type.proto
   // return the length of this string.
   link(proto, 'length', function () {

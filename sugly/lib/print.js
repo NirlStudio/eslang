@@ -1,9 +1,9 @@
 'use strict'
 
-module.exports = function ($void, JS) {
+module.exports = function ($void, JS, printer) {
   var $ = $void.$
-  var warn = $void.warn
-  var print = $void.print
+  var warn = printer.warn
+  var print = printer.print
   var $export = $void.export
 
   // standard output.
@@ -13,7 +13,7 @@ module.exports = function ($void, JS) {
       return lastPrinting
     }
     lastPrinting = Array.prototype.slice.call(arguments)
-    return print.apply(null, arguments)
+    return print.apply(printer, arguments)
   })
 
   // standard error, but only warning exists in sugly space.
@@ -23,6 +23,6 @@ module.exports = function ($void, JS) {
       return lastWarning
     }
     lastWarning = Array.prototype.slice.call(arguments)
-    return warn.apply(null, arguments)
+    return warn.apply(printer, arguments)
   })
 }

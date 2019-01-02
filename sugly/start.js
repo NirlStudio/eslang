@@ -32,9 +32,10 @@ function initializeSpace ($void) {
   require('./generic/class')($void)
 
   require('./generic/global')($void)
+}
 
-  require('./lib/encode')($void, JS)
-  require('./lib/print')($void, JS)
+function initializeLib ($void, printer) {
+  require('./lib/print')($void, JS, printer)
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
   require('./lib/json')($void, JS)
@@ -77,21 +78,24 @@ function initializeOperators ($void) {
   require('./operators/import')($void)
 }
 
-module.exports = function start () {
+module.exports = function start (printer) {
   // Hello, world.
   var $void = require('./generic/genesis')()
 
   // create generic type system
   initializeSpace($void)
 
+  // prepare primary lib
+  initializeLib($void, printer($void.$))
+
   // prepare tokenizer & compiler
   require('./tokenizer')($void)
   require('./compiler')($void)
 
-  // prepare runtime functions
+  // assemble runtime functions
   initializeRuntime($void)
 
-  // publish operators
+  // assemble & publish operators
   initializeOperators($void)
 
   return $void

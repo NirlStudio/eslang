@@ -183,6 +183,20 @@
   ),
 ).
 
+(define "(string of-code ...)" (= ()
+  (should "(string of-code) returns (string empty)." (= ()
+    (assert "" (string of-code),
+  ),
+  (should "(string of-code value) returns ((value to-code) to-string)." (= ()
+    (assert (("abc" to-code) to-string) (string of-code "abc"),
+    (assert ((true to-code) to-string) (string of-code true),
+    (assert ((1 to-code) to-string) (string of-code 1),
+    (assert (((@ 1 2  3) to-code) to-string) (string of-code (@ 1 2 3)),
+    (assert (((@ 1 2  10:3) to-code) to-string) (string of-code (@ 1 2 10:3)),
+    (assert (((@ x:1 y:2  z:3) to-code) to-string) (string of-code (@ x:1 y:2 z:3)),
+  ),
+).
+
 (define "(a-string length)" (= ()
   (should "(str \"length\") is a function." (= ()
     (assert (:("" "length") is-a lambda),

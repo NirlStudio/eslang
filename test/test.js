@@ -112,13 +112,12 @@ module.exports = function ($void) {
     checkFunctions($, '[Sugly / functions] ', [
       // runtime
       'env', 'eval', 'run', 'interpreter',
-      // startup
+      // bootstrap
       'tokenizer', 'tokenize', 'compiler', 'compile'
     ])
 
     checkFunctions($, '[Sugly / lib / functions] ', [
-      // lib
-      'encode', 'print', 'warn'
+      'print', 'warn'
     ])
 
     checkObjects($, '[Sugly / lib / objects] ', [

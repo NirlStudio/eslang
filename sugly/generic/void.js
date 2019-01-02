@@ -11,7 +11,6 @@ module.exports = function ($void) {
   var $Type = $.type
   var $Tuple = $.tuple
   var $Lambda = $.lambda
-  var $String = $.string
   var $Function = $.function
   var $Object = $.object
   var Null = $void.null
@@ -34,37 +33,6 @@ module.exports = function ($void) {
     Object.prototype.hasOwnProperty
   )
   $void.ownsProperty = ownsProperty
-
-  // default native output methods - TODO: move to $/lib/io.js
-  function formatArgs () {
-    var strings = []
-    for (var i = 0; i < arguments.length; i++) {
-      strings.push($String.of(arguments[i]))
-    }
-    return strings.join(' ')
-  }
-  $void.print = function () {
-    var text = formatArgs.apply(null, arguments)
-    console.log(text) // keep orginal types in browser
-    return text
-  }
-  function formatWarning () {
-    var args = Array.prototype.slice.call(arguments)
-    args.splice(1, 0, '>')
-    return args
-  }
-  $void.warn = console.warn ? function () {
-    var args = formatWarning.apply(null, arguments)
-    var text = formatArgs.apply(null, args)
-    console.warn(text) // keep orginal types in browser
-    return text
-  } : function () {
-    var args = formatWarning.apply(null, arguments)
-    args.unshift('[WARN]')
-    var text = formatArgs.apply(null, args)
-    console.log(text) // keep orginal types in browser
-    return text
-  }
 
   // to retrieve or create a shared symbol.
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
