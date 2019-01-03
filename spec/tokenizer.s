@@ -22,6 +22,53 @@
     (tokenizing "(x)"),
     (assert 3 (tokens length),
   ),
+  (should "(tokenizing ) and (tokenizing non-string) resets its inner states to begin a new tokenizing session." (= ()
+    (var tokens (@),
+    (var parser (=>() (tokens push arguments),
+    (var tokenizing (tokenizer parser),
+    (assert (:tokenizing is-a function),
+
+    (tokenizing "\"xyz"),
+    (assert 0 (tokens length),
+
+    (tokenizing)
+    (assert 1 (tokens length),
+
+    (tokens clear)
+    (tokenizing "(y)"),
+    (assert 3 (tokens length),
+
+    (var non-str-values (@
+      null type
+      bool true false
+      number -1 -0 0 1 1.1
+      string
+      date (date empty)
+      range (range empty)
+      date (date empty)
+      symbol (symbol empty)
+      tuple (tuple empty)
+      operator (=?)
+      lambda (=)
+      lambda (=>)
+      iterator (iterator empty)
+      array (array empty)
+      object (object empty)
+      class (class empty) ((class empty) default)
+    ),
+    (for non-str in non-str-values
+      (tokens clear)
+      (tokenizing "\"xyz"),
+      (assert 0 (tokens length),
+
+      (tokenizing non-str)
+      (assert 1 (tokens length),
+
+      (tokens clear)
+      (tokenizing "(y)"),
+      (assert 3 (tokens length),
+    ),
+  ),
   (should "(tokenizer non-applicable) returns the global function tokenize." (= ()
     (var non-applicables (@
       null type
@@ -287,10 +334,10 @@
   ),
   (define "format values - reserved" (=> ()
     (should "(tokenize code) feeds a single-quoted format value to parser function." (=> ()
-      (var tokens (tokenize "'abc'"),
+      (var tokens (tokenize "'abc\"cde'"),
       (assert (tokens is-a array),
       (assert 1 (tokens length),
-      (assert-format "abc" (tokens 0),
+      (assert-format "abc\"cde" (tokens 0),
     ),
   ),
   (var assert-comment (=? (C T)

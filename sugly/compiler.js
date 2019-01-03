@@ -2,6 +2,7 @@
 
 module.exports = function ($void) {
   var $ = $void.$
+  var $Tuple = $.tuple
   var Tuple$ = $void.Tuple
   var warn = $.warn
   var $export = $void.export
@@ -13,10 +14,17 @@ module.exports = function ($void) {
       return $.compile
     }
 
-    var stack = [[]]
-    var sourceStack = [[]]
-    var waiter = null
-    var lastToken = null
+    var stack, sourceStack, waiter, lastToken, openningLine, openningOffset
+    resetContext()
+
+    function resetContext () {
+      stack = [[]]
+      sourceStack = [[]]
+      waiter = null
+      lastToken = null
+      openningLine = -1
+      openningOffset = 0
+    }
 
     var tokenizing = tokenizer(compileToken)
     return function compiling (text) {
@@ -24,40 +32,54 @@ module.exports = function ($void) {
         return stack.length
       }
       // reset compiling context.
+      waiter && waiter()
+      if (stack.length > 1) {
+        warn('compiling', 'open statements are not properly closed.',
+          [lastToken])
+        endAll(null, lastToken ? lastToken[2] : [0, 0, 0])
+      }
+      tryToRaise()
       resetContext()
       return 0
     }
 
     function compileToken (type, value, source) {
-      if (waiter && waiter(type, value, source)) {
-        lastToken = [type, value, source]
-        return
+      var endingLine = source[source.length - 2]
+      if (endingLine !== openningLine) {
+        openningLine = endingLine
+        openningOffset = stack[stack.length - 1].length
       }
+      if (!waiter || !waiter(type, value, source)) {
+        parseToken(type, value, source)
+      }
+      lastToken = [type, value, source]
+    }
+
+    function parseToken (type, value, source) {
       switch (type) {
         case 'value':
           pushValue(value, source)
           break
         case 'symbol':
-          pushValue(value, source)
-          break
-        case 'comment':
-          // TODO: comment as embedded code, e.g. document, html, js.
-          // pushValue(new Tuple$([$Symbol.comment, null/* render */, value], true), source)
+          pushSymbol(value, source)
           break
         case 'punctuation':
           pushPunctuation(value, source)
           break
+        case 'format': // TODO: as a format string.
+          pushValue(value, source) // treat it as a common string now.
+          break
+        case 'space':
+          if (value === '\n') {
+            tryToRaise()
+          }
+          break
+        case 'comment':
+          // TODO: special comment can works as annotation.
+          break
         default: // do nothing for free space.
           break
       }
-      lastToken = [type, value, source]
-    }
-
-    function resetContext () {
-      stack = [[]]
-      sourceStack = [[]]
-      waiter = null
-      lastToken = null
     }
 
     function tryToRaise () {
@@ -69,7 +91,26 @@ module.exports = function ($void) {
     function pushValue (value, source) {
       stack[stack.length - 1].push(value)
       sourceStack[stack.length - 1].push(source)
-      tryToRaise()
+    }
+
+    function pushSymbol (value, source) {
+      switch (value.key) {
+        case ',':
+          // a free comma functions only as a stronger visual indicator like
+          // a whitespace, so it will be just skipped in building AST.
+          if (lastToken && lastToken[0] === 'symbol' && lastToken[1].key === ',') {
+            pushValue(null, source)
+          }
+          break
+        case ';':
+          endLine(value, source)
+          if (!crossingLines()) {
+            closeLine(value, source)
+          } // else, do nothing if a single expression crossing multiple lines.
+          break
+        default:
+          pushValue(value, source)
+      }
     }
 
     function pushPunctuation (value, source) {
@@ -98,7 +139,12 @@ module.exports = function ($void) {
           endMatched(value, source)
           return true
         case '.':
-          endAll(value, source)
+          if (stack.length > 1) {
+            endAll(value, source)
+          } else {
+            warn('compiling', 'extra enclosing ")." is found and ignored.',
+              [lastToken, ['symbol', value, source]])
+          }
           return true
         default:
           endClause()
@@ -111,7 +157,9 @@ module.exports = function ($void) {
       // append ending token(s)' source info.
       Array.prototype.push.apply(srcTop[0], arguments)
       // create a tuple for the top clause, and
-      var top = new Tuple$(stack.pop(), false, srcTop)
+      var statement = stack.pop()
+      var top = statement.length > 0
+        ? new Tuple$(statement, false, srcTop) : $Tuple.empty
       // push it to the end of container clause.
       stack[stack.length - 1].push(top)
       // since the source has been saved into the tuple, only left a placeholder here
@@ -120,23 +168,22 @@ module.exports = function ($void) {
 
     function endClause () {
       if (stack.length < 2) {
-        warn('parsing', 'extra enclosing parentheses is found and ignored.',
+        warn('compiling', 'extra enclosing parentheses is found and ignored.',
           [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
-      endTopWith(lastToken[2])
-      tryToRaise()
+      var lastSource = lastToken[2]
+      endTopWith(lastSource, lastSource)
     }
 
     function endMatched (value, source) {
       if (stack.length < 2) {
-        warn('parsing', 'extra enclosing parentheses is found and ignored.',
+        warn('compiling', 'extra ")," is found and ignored.',
           [lastToken, ['symbol', value, source]])
         return // allow & ignore extra enclosing parentheses
       }
       lastToken[2][0] >= 0 // the indent value of ')'
         ? endIndent(value, source) : endLine(value, source)
-      tryToRaise()
     }
 
     function endLine (value, source) {
@@ -149,6 +196,26 @@ module.exports = function ($void) {
         endTopWith(lastToken[2], source)
         depth = stack.length - 1
       }
+    }
+
+    function crossingLines () {
+      var depth = sourceStack.length - 1
+      var topSource = sourceStack[depth]
+      return topSource.length > openningOffset &&
+        openningLine > topSource[openningOffset][1]
+    }
+
+    function closeLine (value, source) {
+      var depth = stack.length - 1
+      var statement = stack[depth].splice(openningOffset)
+      var statementSrc = sourceStack[depth].splice(openningOffset)
+      stack[depth].push(statement.length > 0
+        ? new Tuple$(statement, false, statementSrc) : $Tuple.empty
+      )
+      statementSrc.push(lastToken
+        ? lastToken[lastToken.length - 2] : source, source)
+      sourceStack[depth].push(statementSrc)
+      openningOffset = stack[depth].length
     }
 
     function endIndent (value, source) {
@@ -176,7 +243,6 @@ module.exports = function ($void) {
       while (stack.length > 1) {
         endTopWith(lastToken[2], source)
       }
-      tryToRaise()
     }
   })
 
@@ -192,6 +258,6 @@ module.exports = function ($void) {
       compiling('\n') // end any pending waiter.
     }
     compiling() // notify the end of stream.
-    return new Tuple$(list, true, src)
+    return list.length > 0 ? new Tuple$(list, true, src) : $Tuple.blank
   })
 }

@@ -23,6 +23,8 @@ module.exports = function ($void, JS, printer) {
       return lastWarning
     }
     lastWarning = Array.prototype.slice.call(arguments)
-    return warn.apply(printer, arguments)
+    return typeof category !== 'string' || !category
+      ? '' // taken as clearing last warning.
+      : warn.apply(printer, arguments)
   })
 }

@@ -4,6 +4,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']
+  var strReplace = $.string.proto.replace
   var warn = $.warn
   var $export = $void.export
   var isApplicable = $void.isApplicable
@@ -73,6 +74,9 @@ module.exports = function ($void) {
         case '@':
         case ':':
         case '$':
+        case ',': // inline-closing, indent-closing
+        case ';': // line-closing
+        case '\\': // reserved as control punctuation
         case '[': // reserved as block punctuation
         case ']': // reserved as block punctuation
         case '{': // reserved as block punctuation
@@ -93,9 +97,6 @@ module.exports = function ($void) {
         case '\t': // It may spoil well foramtted code.
           processWhitespace(c)
           break
-        case ',': // inline-closing, indent-closing
-        case ';': // line-closing
-        case '\\': // reserved as control punctuation
         default:
           beginSymbol(c)
           break
@@ -140,7 +141,9 @@ module.exports = function ($void) {
         var value, error
         try {
           // TODO: to be replaced to native escape processor?
-          value = JSON.parse(pendingText + '"')
+          value = JSON.parse((quote === '"' ? pendingText
+            : strReplace.call(pendingText, '"', '\\"')
+          ) + '"')
         } catch (err) {
           error = err
         }
