@@ -34,7 +34,7 @@ module.exports = function evaluate ($void) {
     var implicitMode = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
       var key = subject.key
-      if (key === ':') { // switching to explicit mode.
+      if (key === ':' || key === '$') { // switching to explicit mode.
         if (length < 2) {
           return null // no subject.
         }

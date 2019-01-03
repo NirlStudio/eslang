@@ -37,7 +37,7 @@
   (++ asserting-step)
   (local "expected" (expected),
   (local "value" (expr),
-  (if (:value != expected)
+  (if ($value != expected)
     (return (@
       failed: true
       step: asserting-step
@@ -112,8 +112,8 @@
   (let assertion (failure assertion),
   (print (+
     (red "     step-" (assertion step) " is expecting "),
-    (green (underline (:(assertion "expected") to-string),
-    (red " instead of " (underline (:(assertion "real") to-string),
+    (green (underline ($(assertion "expected") to-string),
+    (red " instead of " (underline ($(assertion "real") to-string),
   ),
   (print (gray "     when asserting "
     (underline ((assertion expr) to-string),

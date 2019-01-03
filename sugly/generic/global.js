@@ -28,6 +28,7 @@ module.exports = function ($void) {
   $export($, '.', sharedSymbolOf('.'))
   $export($, '@', sharedSymbolOf('@'))
   $export($, ':', sharedSymbolOf(':'))
+  $export($, '$', sharedSymbolOf('$'))
   $export($, '#', sharedSymbolOf('#'))
 
   // other pure symbols

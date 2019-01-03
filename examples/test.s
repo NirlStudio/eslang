@@ -1,4 +1,4 @@
-(if (:define is null)
+(if ($define is null)
   (let direct-testing true)
   (print "---- loading testing framework ----"),
   (let * (import "test"),

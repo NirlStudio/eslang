@@ -1,11 +1,11 @@
 # simple importing
 (let colors (import "colors" "js").
-(print "(colors green) is-a function?" (:(colors "green") is-a function).
+(print "(colors green) is-a function?" ($(colors "green") is-a function).
 
 # populate fields from an object into current context.
 (let (green gray) colors).
-(print "green is-a function?" (:green is-a function).
-(print "gray is-a function?" (:gray is-a function).
+(print "green is-a function?" ($green is-a function).
+(print "gray is-a function?" ($gray is-a function).
 (print (gray "- gray is gray").
 (print (green "- green is green").
 
@@ -29,3 +29,4 @@
   (import (green gray) from "colors" "js").
 (print (not-gray "- green is not gray").
 (print (not-green "- gray is not green").
+;

@@ -1,5 +1,4 @@
 (for spec in (@
-    "app"
     "arithmetic"
     "assignment"
     "bitwise"

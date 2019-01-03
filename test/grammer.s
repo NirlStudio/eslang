@@ -8,8 +8,9 @@
 $ : @ `
 @(@ a@ @ @b @)@
 :(: a: : :b :):
-`(` a` ` `b `)`
 $($ a$ $ $b $)$
+`(` a` ` `b `)`
+;(; a; ; ;b ;);
 
 # keyword.operator.quote.sugly
 quote

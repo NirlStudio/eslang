@@ -1,5 +1,5 @@
 # check the existence of testing framework
-(if (:test is null) # running as an app.
+(if ($test is null) # running as an app.
   (let direct-testing true)
   (export * (import "test").
 

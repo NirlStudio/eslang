@@ -61,7 +61,6 @@ function initializeRuntime ($void) {
 
 function initializeOperators ($void) {
   require('./operators/quote')($void)
-  require('./operators/app')($void)
   require('./operators/assignment')($void)
   require('./operators/control')($void)
 
