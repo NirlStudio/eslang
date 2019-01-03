@@ -18,14 +18,14 @@
 
   (define "Equivalence" (=> ()
     (should "string equivalence is the same of identity." (=> ()
-      (assert (:("" "is") is ("" "equals")),
-      (assert (:("s" "is") is ("s" "equals")),
+      (assert ($("" "is") is ("" "equals")),
+      (assert ($("s" "is") is ("s" "equals")),
 
-      (assert (:("" "is") equals ("s" "equals")),
-      (assert (:("s" "is") equals ("" "equals")),
+      (assert ($("" "is") equals ("s" "equals")),
+      (assert ($("s" "is") equals ("" "equals")),
 
-      (assert (:("" "equals") equals ("s" "is")),
-      (assert (:("s" "equals") equals ("" "is")),
+      (assert ($("" "equals") equals ("s" "is")),
+      (assert ($("s" "equals") equals ("" "is")),
     ),
   ),
 
@@ -199,8 +199,8 @@
 
 (define "(a-string length)" (= ()
   (should "(str \"length\") is a function." (= ()
-    (assert (:("" "length") is-a lambda),
-    (assert (:("A" "length") is-a lambda),
+    (assert ($("" "length") is-a lambda),
+    (assert ($("A" "length") is-a lambda),
   ),
   (should "(str length) returns the count of characters." (= ()
     (assert 0 ("" length),
@@ -763,16 +763,16 @@
     (for t in other-types
       (assert ((t the-type) to-string) ("" concat (t the-type),
       (for v in (t values)
-        (assert (:v to-string) ("" concat v),
+        (assert ($v to-string) ("" concat v),
       ),
     ),
   ),
   (should "(str +) is the same of (str concat)." (= ()
-    (assert (:("" "+") is ("" "concat"),
-    (assert (:("" "concat") is ("" "+"),
+    (assert ($("" "+") is ("" "concat"),
+    (assert ($("" "concat") is ("" "+"),
 
-    (assert (:("" "+") equals ("s" "concat"),
-    (assert (:("s" "concat") equals ("" "+"),
+    (assert ($("" "+") equals ("s" "concat"),
+    (assert ($("s" "concat") equals ("" "+"),
   ),
 ).
 
@@ -809,7 +809,7 @@
     (for t in other-types
       (assert "" (((t the-type) to-string) - (t the-type),
       (if ((t the-type) is-not number) (for v in (t values)
-        (assert "" ((:v to-string) - v),
+        (assert "" (($v to-string) - v),
       ),
     ),
   ),

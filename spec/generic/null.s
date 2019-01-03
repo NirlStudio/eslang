@@ -25,26 +25,26 @@
 
 (define "Identity Operators" (= ()
   (should "'===' is 'is'." (= ()
-    (assert (:(null "===") is (null "is"),
+    (assert ($(null "===") is (null "is"),
   ),
   (should "'!==' is 'is-not'." (= ()
-    (assert (:(null "!==") is (null "is-not"),
+    (assert ($(null "!==") is (null "is-not"),
   ),
 ).
 
 (define "Equivalence" (= ()
   (should "null's equivalence is identical with its identity." (= ()
-    (assert (:(null "equals") is (null "is"),
-    (assert (:(null "not-equals") is (null "is-not"),
+    (assert ($(null "equals") is (null "is"),
+    (assert ($(null "not-equals") is (null "is-not"),
   ),
 ).
 
 (define "Equivalence Operators" (= ()
   (should "'==' is 'equals'." (= ()
-    (assert (:(null "==") is (null "equals"),
+    (assert ($(null "==") is (null "equals"),
   ),
   (should "'!=' is 'not-equals'." (= ()
-    (assert (:(null "!=") is (null "not-equals"),
+    (assert ($(null "!=") is (null "not-equals"),
   ),
 ).
 
@@ -97,7 +97,7 @@
 
 (define "Indexer" (= ()
   (should "the indexer is a lambda." (= ()
-    (assert (:(null ":") is-a lambda),
+    (assert ($(null ":") is-a lambda),
   ),
   (should "null's type is null." (= ()
     (assert null (null type),

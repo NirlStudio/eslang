@@ -11,8 +11,8 @@
     (assert 10 (mod p),
     (assert 10 (mod q),
 
-    (assert (:(mod "l") is-a lambda),
-    (assert (:(mod "f") is-a function),
+    (assert ($(mod "l") is-a lambda),
+    (assert ($(mod "f") is-a function),
 
     (assert 101 (mod a),
     (assert 102 (mod b),

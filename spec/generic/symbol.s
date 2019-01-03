@@ -20,8 +20,8 @@
   (define "Equivalence" (= ()
     (should "a symbol's equivalence is defined as the same of its identity." (= ()
       (var s (symbol of "xyz"),
-      (assert (:(s "is") is (s "equals"),
-      (assert (:(s "is-not") is (s "not-equals"),
+      (assert ($(s "is") is (s "equals"),
+      (assert ($(s "is-not") is (s "not-equals"),
     ),
   ),
 
@@ -369,6 +369,20 @@
     (should "it is taken as an valid symbol." (= ()
       (assert ((symbol pairing) is-valid),
       (assert false ((symbol pairing) is-invalid),
+    ),
+  ),
+  (define "(symbol subject)" (= ()
+    (should "its key value is \"$\"." (= ()
+      (assert "$" ((symbol subject) key),
+      (assert "$" ((symbol subject) to-string),
+      (assert ((symbol of "$") is (symbol subject),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol subject)) is (symbol subject),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol subject) is-valid),
+      (assert false ((symbol subject) is-invalid),
     ),
   ),
   (define "(symbol comment)" (= ()

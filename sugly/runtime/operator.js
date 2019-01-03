@@ -10,6 +10,7 @@ module.exports = function operators$operator ($void) {
   var evaluate = $void.evaluate
   var operator = $void.operator
   var symbolPairing = $Symbol.pairing
+  var symbolSubject = $Symbol.subject
   var createOperatorSpace = $void.createOperatorSpace
   var createEmptyOperation = $void.createEmptyOperation
 
@@ -38,10 +39,9 @@ module.exports = function operators$operator ($void) {
       }
       // populate operands
       var clist = clause.$
-      var offset = typeof that !== 'undefined' ? 2 : 1
-      if (clist[0] === symbolPairing) {
-        offset += 1
-      }
+      var offset = typeof that !== 'undefined'
+        ? clist[0] === symbolSubject ? 3 : 2
+        : clist[0] === symbolPairing ? 2 : 1
       var scope = createOperatorSpace(space)
       for (var i = 0; i < params.length; i++) {
         var j = i + offset

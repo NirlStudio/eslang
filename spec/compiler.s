@@ -1,14 +1,14 @@
 (define "compiler" (= ()
   (should "(compiler) returns the global function compile." (= ()
     (var compiling (compiler ),
-    (assert (:compiling is-a function),
-    (assert (:compiling is compile),
+    (assert ($compiling is-a function),
+    (assert ($compiling is compile),
   ),
   (should "(compiler a-lambda) returns a function to feed all statements to the evaluator lambda." (= ()
     (var statements (@),
     (var evaluator (=() (this push arguments),
-    (var compiling (compiler (:evaluator bind statements),
-    (assert (:compiling is-a function),
+    (var compiling (compiler ($evaluator bind statements),
+    (assert ($compiling is-a function),
 
     (compiling "(x)\n"),
     (assert 1 (statements length),
@@ -17,7 +17,7 @@
     (var statements (@),
     (var evaluator (=>() (statements push arguments),
     (var compiling (compiler evaluator),
-    (assert (:compiling is-a function),
+    (assert ($compiling is-a function),
 
     (compiling "(x)\n"),
     (assert 1 (statements length),
@@ -26,7 +26,7 @@
     (var statements (@),
     (var evaluator (=>() (statements push arguments),
     (var compiling (compiler evaluator),
-    (assert (:compiling is-a function),
+    (assert ($compiling is-a function),
 
     (compiling "(((x)"),
     (assert 0 (statements length),
@@ -88,8 +88,8 @@
     ),
     (for nona in non-applicables
       (var compiling (compiler nona),
-      (assert (:compiling is-a function),
-      (assert (:compiling is compile),
+      (assert ($compiling is-a function),
+      (assert ($compiling is compile),
     ),
   ),
 ),
@@ -217,7 +217,7 @@
     (assert 1 (value length),
     (assert ((value 0) is-a object),
     (assert 1 ((value 0) x),
-    (assert (:((value 0) "m") is-a lambda),
+    (assert ($((value 0) "m") is-a lambda),
 
     (assert 'compiling' (warning 0),
   ),

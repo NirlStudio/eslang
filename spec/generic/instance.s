@@ -644,22 +644,22 @@
       (assert 0 (m height),
       (assert 0 (m weight),
 
-      (assert (:(m "roar") is-a lambda),
-      (assert (:(m "roar") is-bound),
-      (assert kitty (:(m "roar") this),
+      (assert ($(m "roar") is-a lambda),
+      (assert ($(m "roar") is-bound),
+      (assert kitty ($(m "roar") this),
 
-      (assert (:(m "hop") is-a function),
-      (assert (:(m "hop") is-bound),
-      (assert kitty (:(m "hop") this),
+      (assert ($(m "hop") is-a function),
+      (assert ($(m "hop") is-bound),
+      (assert kitty ($(m "hop") this),
 
       (assert "...2" (m roar),
       (assert "hopping2" (m hop),
     ),
     (should "an instance can call another type's method on itself." (=> ()
       (var roar (kitty as mammal "roar"),
-      (assert (:roar is-a lambda),
-      (assert (:roar is-bound),
-      (assert kitty (:roar this),
+      (assert ($roar is-a lambda),
+      (assert ($roar is-bound),
+      (assert kitty ($roar this),
 
       (kitty "age" 10)
       (assert "...10" (roar ),

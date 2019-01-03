@@ -25,25 +25,25 @@
 
 (define "Identity Operators" (= ()
   (should "'===' is 'is'." (= ()
-    (assert (:(type "===") is (type "is"),
+    (assert ($(type "===") is (type "is"),
   ),
   (should "'!==' is 'is-not'." (= ()
-    (assert (:(type "!==") is (type "is-not"),
+    (assert ($(type "!==") is (type "is-not"),
   ),
 ).
 
 (define "Equivalence" (= ()
   (should "null's equivalence is identical with its identity." (= ()
-    (assert (:(type "equals") is (type "is"),
-    (assert (:(type "not-equals") is (type "is-not"),
+    (assert ($(type "equals") is (type "is"),
+    (assert ($(type "not-equals") is (type "is-not"),
 ).
 
 (define "Equivalence Operators" (= ()
   (should "'==' is 'equals'." (= ()
-    (assert (:(type "==") is (type "equals"),
+    (assert ($(type "==") is (type "equals"),
   ),
   (should "'!=' is 'not-equals'." (= ()
-    (assert (:(type "!=") is (type "not-equals"),
+    (assert ($(type "!=") is (type "not-equals"),
   ),
 ).
 
@@ -64,7 +64,7 @@
 
       (for v in (t values)
         (assert null (type compare v),
-        (assert null (:v compare type),
+        (assert null ($v compare type),
       ),
 ).
 
@@ -105,14 +105,14 @@
 
 (define "Indexer" (= ()
   (should "the indexer is a lambda." (= ()
-    (assert (:(type ":") is-a lambda),
+    (assert ($(type ":") is-a lambda),
   ),
   (should "the indexer is a readonly accessor." (= ()
     (assert null (type :"__new_prop" 1),
     (assert ((type "__new_prop") is null),
 
     (assert null (type :"__new_method" (= x x),
-    (assert (:(type "__new_method") is null),
+    (assert ($(type "__new_method") is null),
   ),
   (should "type's type is type." (= ()
     (assert type (type type),
@@ -154,10 +154,10 @@
     (assert 6 ((object fields-of s) length),
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
-    (assert (:(s "of") is-a lambda),
-    (assert (:(s "indexer") is-a lambda),
-    (assert (:(s "objectify") is-a lambda),
-    (assert (:(s "typify") is-a lambda),
+    (assert ($(s "of") is-a lambda),
+    (assert ($(s "indexer") is-a lambda),
+    (assert ($(s "objectify") is-a lambda),
+    (assert ($(s "typify") is-a lambda),
   ),
 ).
 
@@ -316,12 +316,12 @@
   ),
   (should "(type \"indexer\") returns the indexer for all types." (=> ()
     (var indexer (type "indexer"),
-    (assert (:indexer is-a lambda),
-    (assert (:indexer is-bound),
+    (assert ($indexer is-a lambda),
+    (assert ($indexer is-bound),
     (for t in types
       (if ((t the-type) is-not-a class)
-        (assert (:((t the-type) ":") is-bound),
-        (assert (:indexer equals ((t the-type) ":"),
+        (assert ($((t the-type) ":") is-bound),
+        (assert ($indexer equals ((t the-type) ":"),
       )
     ),
   ),
@@ -333,12 +333,12 @@
     (assert 1 ((object fields-of t) length),
 
     (for (k v) in t
-      (if (:v is-a lambda) (assert (:v is-bound),
-      (if (:v is-a function) (assert (:v is-bound),
+      (if ($v is-a lambda) (assert ($v is-bound),
+      (if ($v is-a function) (assert ($v is-bound),
     ),
     (for (k v) in (t type)
-      (if (:v is-a lambda) (assert (:v is-bound),
-      (if (:v is-a function) (assert (:v is-bound),
+      (if ($v is-a lambda) (assert ($v is-bound),
+      (if ($v is-a function) (assert ($v is-bound),
     ),
 
     (var s (object get t "type"),
@@ -350,10 +350,10 @@
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
 
-    (assert (:(s "of") is-a lambda),
-    (assert (:(s "indexer") is-a lambda),
-    (assert (:(s "objectify") is-a lambda),
-    (assert (:(s "typify") is-a lambda),
+    (assert ($(s "of") is-a lambda),
+    (assert ($(s "indexer") is-a lambda),
+    (assert ($(s "objectify") is-a lambda),
+    (assert ($(s "typify") is-a lambda),
   ),
   (should "(type objectify null) returns all common operations defined on null." (= ()
     (var t (type objectify null),
@@ -363,9 +363,9 @@
     (assert 21 ((object fields-of t) length),
 
     (for (_ v) in t
-      (if (:v is-a lambda)
-        (assert (:v is-bound),
-        (assert null (:v this),
+      (if ($v is-a lambda)
+        (assert ($v is-bound),
+        (assert null ($v this),
       ),
     ),
   ),
@@ -378,47 +378,47 @@
 
     (type typify (@
       __inst_prop: 1
-      __inst_method: (= x (+ x (:this __inst_prop),
+      __inst_method: (= x (+ x ($this __inst_prop),
       type: (@
         __type_prop: 10
         __type_method: (=> y (+ y (this __type_prop),
     ),
 
     (assert 1 (type "__inst_prop"),
-    (assert (:(type "__inst_method") is-a lambda),
+    (assert ($(type "__inst_method") is-a lambda),
     (assert 11 (type __inst_method 10),
 
     (assert 10 (type "__type_prop"),
-    (assert (:(type "__type_method") is-a function),
+    (assert ($(type "__type_method") is-a function),
     (assert 110 (type __type_method 100),
 
     (for t in types
       (var tt (t the-type))
       (assert 1 (tt "__inst_prop"),
-      (assert (:(tt "__inst_method") is-a lambda),
+      (assert ($(tt "__inst_method") is-a lambda),
       (assert 11 (tt __inst_method 10),
 
       (assert 10 (tt "__type_prop"),
-      (assert (:(tt "__type_method") is-a function),
+      (assert ($(tt "__type_method") is-a function),
       (assert 110 (tt __type_method 100),
 
       (var te (t "empty"))
-      (assert 1 (:te "__inst_prop"),
-      (assert (:(:te "__inst_method") is-a lambda),
-      (assert 11 (:te __inst_method 10),
+      (assert 1 ($te "__inst_prop"),
+      (assert ($($te "__inst_method") is-a lambda),
+      (assert 11 ($te __inst_method 10),
 
-      (assert (? (tt is class) 10) (:te "__type_prop"),
-      (assert (:(:te "__type_method") is-a (? (tt is class) function),
-      (assert (? (tt is class) 110) (:te __type_method 100),
+      (assert (? (tt is class) 10) ($te "__type_prop"),
+      (assert ($($te "__type_method") is-a (? (tt is class) function),
+      (assert (? (tt is class) 110) ($te __type_method 100),
 
       (for v in (t values)
-        (assert 1 (:v "__inst_prop"),
-        (assert (:(:v "__inst_method") is-a lambda),
-        (assert 11 (:v __inst_method 10),
+        (assert 1 ($v "__inst_prop"),
+        (assert ($($v "__inst_method") is-a lambda),
+        (assert 11 ($v __inst_method 10),
 
-        (assert (? (tt is class) 10)  (:v "__type_prop"),
-        (assert (:(:v "__type_method") is-a (? (tt is class) function),
-        (assert (? (tt is class) 110)  (:v __type_method 100),
+        (assert (? (tt is class) 10)  ($v "__type_prop"),
+        (assert ($($v "__type_method") is-a (? (tt is class) function),
+        (assert (? (tt is class) 110)  ($v __type_method 100),
       ),
     ),
 ).

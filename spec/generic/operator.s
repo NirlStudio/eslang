@@ -7,85 +7,85 @@
       (var op2 (=? (),
       (var op3 (=? X),
       (var op4 (=? (X),
-      (assert (:op1 is-a operator),
-      (assert (:op2 is-a operator),
-      (assert (:op3 is-a operator),
-      (assert (:op4 is-a operator),
-      (assert (:op1 is op2),
-      (assert false (:op1 is-not op2),
+      (assert ($op1 is-a operator),
+      (assert ($op2 is-a operator),
+      (assert ($op3 is-a operator),
+      (assert ($op4 is-a operator),
+      (assert ($op1 is op2),
+      (assert false ($op1 is-not op2),
 
-      (assert (:op1 is-not op3),
-      (assert (:op2 is-not op3),
-      (assert (:op1 is-not op4),
-      (assert (:op2 is-not op4),
+      (assert ($op1 is-not op3),
+      (assert ($op2 is-not op3),
+      (assert ($op1 is-not op4),
+      (assert ($op2 is-not op4),
 
-      (assert (:op3 is-not op4),
-      (assert (:op4 is-not op3),
+      (assert ($op3 is-not op4),
+      (assert ($op4 is-not op3),
     ),
     (should "non-empty operator code generates different operators in each evaluation." (= ()
       (var code (` (=? X X),
       (var op1 (code),
       (var op2 (code),
-      (assert (:op1 is-a operator),
-      (assert (:op2 is-a operator),
-      (assert (:op1 is-not op2),
-      (assert false (:op1 is op2),
+      (assert ($op1 is-a operator),
+      (assert ($op2 is-a operator),
+      (assert ($op1 is-not op2),
+      (assert false ($op1 is op2),
     ),
   ),
 
   (define "Equivalence" (= ()
     (should "an operator's equivalence is defined as its identity." (= ()
       (var op (=? X X),
-      (assert (:op is-a operator),
-      (assert (:(:op "is") is (:op "equals"),
-      (assert (:(:op "is-not") is (:op "not-equals"),
+      (assert ($op is-a operator),
+      (assert ($($op "is") is ($op "equals"),
+      (assert ($($op "is-not") is ($op "not-equals"),
     ),
   ),
 
   (define "Ordering" (= ()
     (should "comparing a operator with itself returns 0." (= ()
       (var op (=? X X),
-      (assert (:op is-a operator),
-      (assert 0 (:op compare op),
-      (assert 0 (:(operator empty) compare (operator empty),
+      (assert ($op is-a operator),
+      (assert 0 ($op compare op),
+      (assert 0 ($(operator empty) compare (operator empty),
     ),
     (should "comparison of two operators returns null." (=> ()
       (var op1 (=? () null),
       (var op2 (=? () null),
-      (assert (:op1 is-a operator),
-      (assert (:op2 is-a operator),
-      (assert null (:op1 compare op2),
+      (assert ($op1 is-a operator),
+      (assert ($op2 is-a operator),
+      (assert null ($op1 compare op2),
 
       (let op1 (=? X X),
       (let op2 (=? X X),
-      (assert (:op1 is-a operator),
-      (assert (:op2 is-a operator),
-      (assert null (:op1 compare op2),
+      (assert ($op1 is-a operator),
+      (assert ($op2 is-a operator),
+      (assert null ($op1 compare op2),
     ),
   ),
 
   (define "Emptiness" (= ()
     (should "an operator is defined as empty when its body is empty." (= ()
-      (assert (:(=?) is-empty),
-      (assert false (:(=?) not-empty),
+      (assert ($(=?) is-empty),
+      (assert false ($(=?) not-empty),
 
-      (assert (:(=? X) is-empty),
-      (assert false (:(=? X) not-empty),
+      (assert ($(=? X) is-empty),
+      (assert false ($(=? X) not-empty),
 
-      (assert (:(=? (X Y)) is-empty),
-      (assert false (:(=? (X Y)) not-empty),
+      (assert ($(=? (X Y)) is-empty),
+      (assert false ($(=? (X Y)) not-empty),
 
-      (assert false (:(=? () null) is-empty),
-      (assert (:(=? () null) not-empty),
+      (assert false ($(=? () null) is-empty),
+      (assert ($(=? () null) not-empty),
 
-      (assert false (:(=? () 0) is-empty),
-      (assert (:(=? () 0) not-empty),
+      (assert false ($(=? () 0) is-empty),
+      (assert ($(=? () 0) not-empty),
 
-      (assert false (:(=? X X) is-empty),
-      (assert (:(=? X X) not-empty),
+      (assert false ($(=? X X) is-empty),
+      (assert ($(=? X X) not-empty),
 
-      (assert false (:(=? (X Y) (+ (X) (Y))) is-empty),
-      (assert (:(=? (X Y) (+ X Y)) not-empty),
+      (assert false ($(=? (X Y) (+ (X) (Y))) is-empty),
+      (assert ($(=? (X Y) (+ X Y)) not-empty),
     )
   ),
 
@@ -93,7 +93,7 @@
     (should "an operator is encoded to its code." (=> ()
       (for value
           in (the-values concat (operator empty),
-        (var code (:value to-code),
+        (var code ($value to-code),
         (assert (code is-a tuple),
         (assert 3 (code length),
         (assert (symbol operator) (code 0),
@@ -109,14 +109,14 @@
 
   (define "Representation" (=> ()
     (should "(operator empty) is represented as (=? ())." (= ()
-      (assert "(=? ())" (:(operator empty) to-string),
+      (assert "(=? ())" ($(operator empty) to-string),
     ),
     (should "an operator is represented as its string value of its code." (=> ()
       (for value
           in (the-values concat (operator empty),
-        (assert (:value is-a operator),
-        (var code (:value to-code),
-        (assert (code to-string) (:value to-string),
+        (assert ($value is-a operator),
+        (var code ($value to-code),
+        (assert (code to-string) ($value to-string),
       ),
     ),
   ),
@@ -125,16 +125,16 @@
 (define "Constant Value" (= ()
   (define "(operator noop)" (= ()
     (should "(operator \"noop\") is an operator with empty parameters and an empty body." (= ()
-      (assert (:(operator "noop") is-a operator),
-      (assert "noop" (:(operator "noop") name),
+      (assert ($(operator "noop") is-a operator),
+      (assert "noop" ($(operator "noop") name),
 
-      (assert ((:(operator "noop") parameters) is-a tuple),
-      (assert ((:(operator "noop") parameters) not-plain),
-      (assert 0 ((:(operator "noop") parameters) length),
+      (assert (($(operator "noop") parameters) is-a tuple),
+      (assert (($(operator "noop") parameters) not-plain),
+      (assert 0 (($(operator "noop") parameters) length),
 
-      (assert ((:(operator "noop") body) is-a tuple),
-      (assert ((:(operator "noop") body) is-plain),
-      (assert 0 ((:(operator "noop") parameters) length),
+      (assert (($(operator "noop") body) is-a tuple),
+      (assert (($(operator "noop") body) is-plain),
+      (assert 0 (($(operator "noop") parameters) length),
     ),
     (should "(operator noop) always return null." (= ()
       (assert null (operator noop),
@@ -142,30 +142,30 @@
       (assert null (noop),
     ),
     (should "(operator noop) is encoded to (tuple operator)." (= ()
-      (assert ((:(operator "noop") to-code) is (tuple operator),
+      (assert (($(operator "noop") to-code) is (tuple operator),
     ),
   ),
 ),
 
 (define "(operator empty)" (= ()
   (should "(operator \"empty\") is a generic operator." (= ()
-    (assert (:(operator "empty") is-a lambda),
-    (assert "empty" (:(operator "empty") name),
+    (assert ($(operator "empty") is-a lambda),
+    (assert "empty" ($(operator "empty") name),
 
-    (assert (:(operator "empty") is-generic),
-    (assert false (:(operator "empty") not-generic),
+    (assert ($(operator "empty") is-generic),
+    (assert false ($(operator "empty") not-generic),
   ),
   (should "(operator empty) returns (operator \"noop\")." (= ()
-    (assert (:(operator empty) is (operator "noop"),
+    (assert ($(operator empty) is (operator "noop"),
 
     (var empty (operator "empty"),
-    (assert (:(empty) is (operator "noop"),
+    (assert ($(empty) is (operator "noop"),
   ),
 ),
 
 (define "(operator of)" (= ()
   (should "(operator of) is only a placeholder generator and actually an alias of (operator empty)." (= ()
-    (assert (:(operator of) is (operator empty),
+    (assert ($(operator of) is (operator empty),
   ),
   (should "an operator can be dynamically generated by evaluating a tuple." (= ()
     (var c "value: ")
@@ -175,7 +175,7 @@
       (`(c + value),
     ),
     (var op (t),
-    (assert (:op is-a operator),
+    (assert ($op is-a operator),
     (assert "value: null" (op),
     (assert "value: true" (op true),
     (assert "value: 100" (op 100),
@@ -191,7 +191,7 @@
       (`(c + value),
     ),
     (var op (eval t),
-    (assert (:op is-a operator),
+    (assert ($op is-a operator),
     (assert "value: null" (op),
     (assert "value: true" (op true),
     (assert "value: 100" (op 100),
@@ -201,76 +201,76 @@
   ),
 ),
 
-(define "(:an-operator name)" (= ()
-  (should "(:an-operator name) returns (string empty) for an anonymous operator." (= ()
-    (assert "" (:(=? x) name),
+(define "($an-operator name)" (= ()
+  (should "($an-operator name) returns (string empty) for an anonymous operator." (= ()
+    (assert "" ($(=? x) name),
   ),
-  (should "(:an-operator name) returns the operator's name." (= ()
+  (should "($an-operator name) returns the operator's name." (= ()
     (var op (=? x),
     (var opp op),
-    (assert "op" (:op name),
-    (assert "op" (:opp name),
+    (assert "op" ($op name),
+    (assert "op" ($opp name),
   ),
 ),
 
-(define "(:an-operator parameters)" (= ()
-  (should "(:an-operator parameters) returns (tuple empty) for a function without any parameter." (= ()
-    (assert ((:(=? () null) parameters) is (tuple empty),
+(define "($an-operator parameters)" (= ()
+  (should "($an-operator parameters) returns (tuple empty) for a function without any parameter." (= ()
+    (assert (($(=? () null) parameters) is (tuple empty),
   ),
-  (should "(:an-operator parameters) returns a symbol when the operator has only one parameter." (= ()
-    (assert ((:(=? X) parameters) is (`X),
-    (assert ((:(=? X (X)) parameters) is (`X),
-    (assert ((:(=? (X)) parameters) is (`X),
-    (assert ((:(=? (X) (X)) parameters) is (`X),
+  (should "($an-operator parameters) returns a symbol when the operator has only one parameter." (= ()
+    (assert (($(=? X) parameters) is (`X),
+    (assert (($(=? X (X)) parameters) is (`X),
+    (assert (($(=? (X)) parameters) is (`X),
+    (assert (($(=? (X) (X)) parameters) is (`X),
   ),
-  (should "(:an-operator parameters) returns a tuple when the operator has multiple parameters." (= ()
-    (assert (`(X Y)) (:(=> (X Y)) parameters),
-    (assert (`(X Y)) (:(=> (X Y) (+ X Y)) parameters),
-  ),
-),
-
-(define "(:an-operator body)" (= ()
-  (should "(:an-operator body) returns (tuple blank) for an empty operator." (= ()
-    (assert ((:(=?) body) is (tuple blank),
-    (assert ((:(=? ()) body) is (tuple blank),
-    (assert ((:(=? X) body) is (tuple blank),
-  ),
-  (should "(:an-operator body) returns a plain tuple when the operator is not empty." (= ()
-    (assert ((`(null)) as-plain) (:(=? () null) body),
-    (assert ((`((+ x y))) as-plain) (:(=? (x  y) (+ x y)) body),
-    (assert ((`((var z 100 )(+ x y  z))) as-plain) (:(=? (x  y) (var z 100) (+ x y z)) body),
+  (should "($an-operator parameters) returns a tuple when the operator has multiple parameters." (= ()
+    (assert (`(X Y)) ($(=> (X Y)) parameters),
+    (assert (`(X Y)) ($(=> (X Y) (+ X Y)) parameters),
   ),
 ),
 
-(define "(:an-operator is-generic)" (= ()
-  (should "(:a-func is-generic) returns true for most runtime operators." (= ()
-    (assert (:(0 "+=") is-a operator),
-    (assert (:(0 "+=") is-generic),
-    (assert (:(0 "++") is-a operator),
-    (assert (:(0 "++") is-generic),
+(define "($an-operator body)" (= ()
+  (should "($an-operator body) returns (tuple blank) for an empty operator." (= ()
+    (assert (($(=?) body) is (tuple blank),
+    (assert (($(=? ()) body) is (tuple blank),
+    (assert (($(=? X) body) is (tuple blank),
   ),
-  (should "(:an-operator is-generic) returns false for operators generated by code." (= ()
-    (assert false (:(=? () null) is-generic),
-    (assert false (:(=? x) is-generic),
-    (assert false (:(=? x x) is-generic),
-    (assert false (:(=? (x y)) is-generic),
-    (assert false (:(=? (x y) (+ x y)) is-generic),
+  (should "($an-operator body) returns a plain tuple when the operator is not empty." (= ()
+    (assert ((`(null)) as-plain) ($(=? () null) body),
+    (assert ((`((+ x y))) as-plain) ($(=? (x  y) (+ x y)) body),
+    (assert ((`((var z 100 )(+ x y  z))) as-plain) ($(=? (x  y) (var z 100) (+ x y z)) body),
   ),
 ),
 
-(define "(:an-operator not-generic)" (= ()
-  (should "(:an-operator not-generic) returns false for most runtime operators." (= ()
-    (assert (:(0 "+=") is-a operator),
-    (assert false (:(0 "+=") not-generic),
-    (assert (:(0 "++") is-a operator),
-    (assert false (:(0 "++") not-generic),
+(define "($an-operator is-generic)" (= ()
+  (should "($a-func is-generic) returns true for most runtime operators." (= ()
+    (assert ($(0 "+=") is-a operator),
+    (assert ($(0 "+=") is-generic),
+    (assert ($(0 "++") is-a operator),
+    (assert ($(0 "++") is-generic),
   ),
-  (should "(:an-operator is-generic) returns true for operators generated by code." (= ()
-    (assert (:(=? () null) not-generic),
-    (assert (:(=? x) not-generic),
-    (assert (:(=? x x) not-generic),
-    (assert (:(=? (x y)) not-generic),
-    (assert (:(=? (x y) (+ x y)) not-generic),
+  (should "($an-operator is-generic) returns false for operators generated by code." (= ()
+    (assert false ($(=? () null) is-generic),
+    (assert false ($(=? x) is-generic),
+    (assert false ($(=? x x) is-generic),
+    (assert false ($(=? (x y)) is-generic),
+    (assert false ($(=? (x y) (+ x y)) is-generic),
+  ),
+),
+
+(define "($an-operator not-generic)" (= ()
+  (should "($an-operator not-generic) returns false for most runtime operators." (= ()
+    (assert ($(0 "+=") is-a operator),
+    (assert false ($(0 "+=") not-generic),
+    (assert ($(0 "++") is-a operator),
+    (assert false ($(0 "++") not-generic),
+  ),
+  (should "($an-operator is-generic) returns true for operators generated by code." (= ()
+    (assert ($(=? () null) not-generic),
+    (assert ($(=? x) not-generic),
+    (assert ($(=? x x) not-generic),
+    (assert ($(=? (x y)) not-generic),
+    (assert ($(=? (x y) (+ x y)) not-generic),
   ),
 ),
 
@@ -307,7 +307,7 @@
     (var z 100),
     (op true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z),
   ),
-  (should "(s (:an-operator) value ...) evaluates the operator with s as subject and all argument symbols." (= ()
+  (should "(s ($an-operator) value ...) evaluates the operator with s as subject and all argument symbols." (= ()
     (var obj (@ x: 1),
     (var z 100),
     (var op (=? X
@@ -322,7 +322,7 @@
 
       (assert true (X))
       (assert (`obj) (-operation 0),
-      (assert (`(:op)) (-operation 1),
+      (assert (`($op)) (-operation 1),
 
       (var "oprds" (=(operation operand) :(c o)
         (=> i (c: (o + i),
@@ -339,7 +339,7 @@
       (assert (function empty) ((oprds 9),
       (assert 100 ((oprds 10),
     ),
-    (obj (:op) true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z),
+    (obj ($op) true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z),
   ),
   (should "(s (= ...) value ...) evaluates the anonymous operator with s as subject and all argument symbols." (= ()
     (var obj (@ x: 1),
@@ -385,16 +385,16 @@
     (var opr (=? () (+ 10 that),
     (assert 10 (opr),
     (assert 10 (opr 1),
-    (assert 11 (1 (:opr),
+    (assert 11 (1 ($opr),
   ),
   (should "'operand' in an operator is resolved to the offset of first operand in the whole operation." (= ()
     (var opr (=? () (+ 10 operand),
     (assert 11 (opr),
     (assert 11 (opr 1),
-    (assert 12 (1 (:opr),
-    (assert 12 (1 (:opr) 1),
-    (assert 13 (:1 (:opr),
-    (assert 13 (:1 (:opr) 1),
+    (assert 12 (1 ($opr),
+    (assert 12 (1 ($opr) 1),
+    (assert 13 ($1 ($opr),
+    (assert 13 ($1 ($opr) 1),
   ),
   (should "'operation' in an operator is resolved to the whole expression being evaluated." (= ()
     (var opr (=? () operation),
@@ -408,17 +408,17 @@
     (assert (`x) (t2 1),
     (assert (`y) (t2 2),
 
-    (var t3 (x (:opr) y),
+    (var t3 (x ($opr) y),
     (assert 3 (t3 length),
     (assert (`x) (t3 0),
-    (assert (`(:opr)) (t3 1),
+    (assert (`($opr)) (t3 1),
     (assert (`y) (t3 2),
 
-    (var t3 (:x (:opr) y),
+    (var t3 ($x ($opr) y),
     (assert 4 (t3 length),
-    (assert (symbol pairing) (t3 0),
+    (assert (symbol subject) (t3 0),
     (assert (`x) (t3 1),
-    (assert (`(:opr)) (t3 2),
+    (assert (`($opr)) (t3 2),
     (assert (`y) (t3 3),
   ),
 ),
@@ -430,14 +430,14 @@
       (opr)
     ),
     (assert null (l),
-    (assert 1 (1 (:l),
-    (assert "x" ("x" (:l),
+    (assert 1 (1 ($l),
+    (assert "x" ("x" ($l),
 
     (var opr (=? () this),
     (var f (=> () (opr),
     (assert null (f),
-    (assert 1 (1 (:f),
-    (assert "x" ("x" (:f),
+    (assert 1 (1 ($f),
+    (assert "x" ("x" ($f),
   ),
   (should "'arguments' in an operator is resolved according to the lambda or function calling it." (= ()
     (var l (= ()
@@ -471,11 +471,11 @@
       (var opr (=? () do),
       (opr)
     ),
-    (assert (:(l) is l),
+    (assert ($(l) is l),
 
     (var opr (=? () do),
     (var f (=> () (opr),
-    (assert (:(f) is f),
+    (assert ($(f) is f),
   ),
 ),
 

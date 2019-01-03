@@ -290,7 +290,7 @@
       (assert (symbol lambda) ((tuple lambda) 0),
       (assert (tuple empty) ((tuple lambda) 1),
       (assert (tuple blank) ((tuple lambda) 2),
-      (assert (:((tuple lambda)) is-a lambda),
+      (assert ($((tuple lambda)) is-a lambda),
     ),
   ),
   (define "(tuple function)" (= ()
@@ -299,7 +299,7 @@
       (assert (symbol function) ((tuple function) 0),
       (assert (tuple empty) ((tuple function) 1),
       (assert (tuple blank) ((tuple function) 2),
-      (assert (:((tuple function)) is-a function),
+      (assert ($((tuple function)) is-a function),
     ),
   ),
   (define "(tuple operator)" (= ()
@@ -308,7 +308,7 @@
       (assert (symbol operator) ((tuple operator) 0),
       (assert (tuple empty) ((tuple operator) 1),
       (assert (tuple blank) ((tuple operator) 2),
-      (assert (:((tuple operator)) is-a operator),
+      (assert ($((tuple operator)) is-a operator),
     ),
   ),
   (define "(tuple array)" (= ()
@@ -691,7 +691,7 @@
   (should "(a-tuple iterate) returns an interator function to traverse all its items." (= ()
     (var t (tuple of null true 1),
     (var iter (t iterate),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
     (assert ((iter) is-a array),
     (assert null ((iter true) 0),
     (assert ((iter) is-a array),
@@ -1137,7 +1137,7 @@
 (define "(a-tuple + ...)" (= ()
   (should "(a-tuple + ...) is just an alias of (a-tuple merge ...)." (= ()
     (var t (` (x y),
-    (assert (:(t "+") is (t "merge"),
+    (assert ($(t "+") is (t "merge"),
   ),
 ),
 

@@ -17,8 +17,8 @@
   (define "Equivalence" (= ()
     (should "a class's equivalence is defined as the same of its identity." (= ()
       (var c (@:class x:1 y:10),
-      (assert (:(c "is") is (c "equals"),
-      (assert (:(c "is-not") is (c "not-equals"),
+      (assert ($(c "is") is (c "equals"),
+      (assert ($(c "is-not") is (c "not-equals"),
     ),
   ),
 

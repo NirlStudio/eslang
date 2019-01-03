@@ -56,6 +56,9 @@ module.exports = function ($void) {
   staticOperator(':', function () {
     return null
   })
+  staticOperator('$', function () {
+    return null
+  })
 
   $void.regexNumber = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d+)/
   $void.regexDecimal = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d\b|[1-9]\d*)/

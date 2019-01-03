@@ -11,9 +11,9 @@
   (should "(interpreter a-lambda) returns an interpret interface function." (= ()
     (var feedback)
     (var save (=> (fb) (let feedback fb),
-    (var shell (:(= () (this (arguments 0))) bind save),
+    (var shell ($(= () (this (arguments 0))) bind save),
     (var interpret (interpreter shell),
-    (assert (:interpret is-a function),
+    (assert ($interpret is-a function),
 
     (var depth (interpret "1"),
     (assert null feedback)
@@ -31,7 +31,7 @@
     (var feedback)
     (var shell (=> () (let feedback (arguments 0),
     (var interpret (interpreter shell),
-    (assert (:interpret is-a function),
+    (assert ($interpret is-a function),
 
     (var depth (interpret "1"),
     (assert null feedback)

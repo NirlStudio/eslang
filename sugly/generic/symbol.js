@@ -46,6 +46,7 @@ module.exports = function ($void) {
   link(Type, 'period', sharedSymbolOf('.'))
   link(Type, 'literal', sharedSymbolOf('@'))
   link(Type, 'pairing', sharedSymbolOf(':'))
+  link(Type, 'subject', sharedSymbolOf('$'))
   link(Type, 'comment', sharedSymbolOf('#'))
 
   // create a symbol from a key.

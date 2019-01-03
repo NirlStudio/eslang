@@ -225,7 +225,7 @@
   ),
   (should "(date of year month ...) returns a date by fields." (=> ()
     (for args in fields-set
-      (var fields ((:(date "of") apply date args) all-fields),
+      (var fields (($(date "of") apply date args) all-fields),
       (for (v i) in fields
         (assert ((args : i) ?? ((i == 2) ? 1 0)) v),
       ),
@@ -243,7 +243,7 @@
   ),
   (should "(date of-utc year month ...) returns a date by fields with utc values." (=> ()
     (for args in fields-set
-      (var fields ((:(date "of-utc") apply date args) all-fields "utc"),
+      (var fields (($(date "of-utc") apply date args) all-fields "utc"),
       (for (v i) in fields
         (assert ((args : i) ?? ((i == 2) ? 1 0)) v),
       ),

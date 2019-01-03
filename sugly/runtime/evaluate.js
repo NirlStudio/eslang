@@ -8,6 +8,8 @@ module.exports = function evaluate ($void) {
   var Symbol$ = $void.Symbol
   var warn = $.warn
   var indexerOf = $void.indexerOf
+  var symbolPairing = $.symbol.pairing
+  var symbolSubject = $.symbol.subject
   var staticOperators = $void.staticOperators
 
   $void.evaluate = function evaluate (clause, space) {
@@ -33,8 +35,7 @@ module.exports = function evaluate ($void) {
     var offset = 1
     var implicitMode = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
-      var key = subject.key
-      if (key === ':' || key === '$') { // switching to explicit mode.
+      if (subject === symbolSubject) { // switching to explicit mode.
         if (length < 2) {
           return null // no subject.
         }
@@ -45,10 +46,19 @@ module.exports = function evaluate ($void) {
         }
         offset = 2
         implicitMode = false // explicit mode
+      } else if (subject === symbolPairing) { // switching to explicit mode.
+        if (length < 2) {
+          return null // no predicate.
+        }
+        subject = evaluate(clist[1], space)
+        if (typeof subject !== 'function') {
+          return null // invalid operation
+        }
+        offset = 2
       } else if (staticOperators[subject.key]) { // static operators
         return staticOperators[subject.key](space, clause)
       } else { // a common symbol
-        subject = space.resolve(key)
+        subject = space.resolve(subject.key)
       }
     } else if (subject instanceof Tuple$) { // a statment
       subject = evaluate(subject, space)

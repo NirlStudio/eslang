@@ -8,7 +8,7 @@ module.exports = function logical ($void) {
   var Space$ = $void.Space
   var operator = $void.operator
   var evaluate = $void.evaluate
-  var symbolPairing = $.symbol.pairing
+  var symbolSubject = $.symbol.subject
   var staticOperator = $void.staticOperator
 
   var not = staticOperator('!', function (space, clause) {
@@ -34,7 +34,7 @@ module.exports = function logical ($void) {
       return that
     }
     var value = that
-    var i = clist[0] === symbolPairing ? 3 : 2
+    var i = clist[0] === symbolSubject ? 3 : 2
     for (; i < clist.length; i++) {
       value = evaluate(clist[i], space)
       if (value === false || value === null || value === 0) {
@@ -57,7 +57,7 @@ module.exports = function logical ($void) {
       return null
     }
     var value = that
-    var i = clist[0] === symbolPairing ? 3 : 2
+    var i = clist[0] === symbolSubject ? 3 : 2
     for (; i < clist.length; i++) {
       value = evaluate(clist[i], space)
       if (value !== false && value !== null && value !== 0) {
@@ -76,7 +76,7 @@ module.exports = function logical ($void) {
     if (!clist || !clist.length || clist.length < 2) {
       return null // invalid call
     }
-    var base = clist[0] === symbolPairing ? 3 : 2
+    var base = clist[0] === symbolSubject ? 3 : 2
     if (typeof that !== 'undefined' && that !== false && that !== null && that !== 0) {
       switch (clist.length - base) { // true logic
         case 0:
@@ -104,7 +104,7 @@ module.exports = function logical ($void) {
       return null
     }
     var clist = clause.$
-    var i = clist[0] === symbolPairing ? 3 : 2
+    var i = clist[0] === symbolSubject ? 3 : 2
     for (; i < clist.length; i++) {
       var value = evaluate(clist[i], space)
       if (value !== null) {

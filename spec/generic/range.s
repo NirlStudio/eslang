@@ -14,8 +14,8 @@
   (define "Equivalence" (= ()
     (should "a range's equivalence is defined as the same of its identity." (= ()
       (var r (range of 1 10),
-      (assert (:(r "is") is (r "equals"),
-      (assert (:(r "is-not") is (r "not-equals"),
+      (assert ($(r "is") is (r "equals"),
+      (assert ($(r "is-not") is (r "not-equals"),
     ),
   ),
 
@@ -261,20 +261,20 @@
 
 (define "(a-range iterate)" (= ()
   (should "(a-range iterate) always returns an iterator function for a range." (= ()
-    (assert (:((range empty) iterate) is-a function),
+    (assert ($((range empty) iterate) is-a function),
 
-    (assert (:((range of 0 0) iterate) is-a function),
-    (assert (:((range of 1 1) iterate) is-a function),
-    (assert (:((range of -1 -1) iterate) is-a function),
+    (assert ($((range of 0 0) iterate) is-a function),
+    (assert ($((range of 1 1) iterate) is-a function),
+    (assert ($((range of -1 -1) iterate) is-a function),
 
-    (assert (:((range of 10 0 1) iterate) is-a function),
-    (assert (:((range of 0 -10 1) iterate) is-a function),
+    (assert ($((range of 10 0 1) iterate) is-a function),
+    (assert ($((range of 0 -10 1) iterate) is-a function),
 
-    (assert (:((range of 0 10) iterate) is-a function),
-    (assert (:((range of 10 0 -1) iterate) is-a function),
+    (assert ($((range of 0 10) iterate) is-a function),
+    (assert ($((range of 10 0 -1) iterate) is-a function),
 
-    (assert (:((range of -10 0 1) iterate) is-a function),
-    (assert (:((range of 0 -10 -1) iterate) is-a function),
+    (assert ($((range of -10 0 1) iterate) is-a function),
+    (assert ($((range of 0 -10 -1) iterate) is-a function),
   ),
   (should "(an-empty-iterator) always returns null." (= ()
     (assert null (((range empty) iterate),

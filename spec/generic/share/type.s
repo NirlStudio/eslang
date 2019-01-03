@@ -40,10 +40,10 @@
 
   (define "Identity Operators" (= ()
     (should "'===' is 'is'." (= ()
-      (assert (:(the-type "===") is (the-type "is"),
+      (assert ($(the-type "===") is (the-type "is"),
     ),
     (should "'!==' is 'is-not'." (= ()
-      (assert (:(the-type "!==") is (the-type "is-not"),
+      (assert ($(the-type "!==") is (the-type "is-not"),
     ),
   ),
 
@@ -79,10 +79,10 @@
 
   (define "Equivalence Operators" (=> ()
     (should "'==' is 'equals'." (= ()
-      (assert (:(the-type "==") is (the-type "equals"),
+      (assert ($(the-type "==") is (the-type "equals"),
     ),
     (should "'!=' is 'not-equals'." (= ()
-      (assert (:(the-type "!=") is (the-type "not-equals"),
+      (assert ($(the-type "!=") is (the-type "not-equals"),
     ),
   ),
 
@@ -147,42 +147,42 @@
     ),
     (should "the type of the value is the type." (=> ()
       (for v in the-values
-        (assert (:v is-a the-type),
-        (assert false (:v is-not-a the-type),
+        (assert ($v is-a the-type),
+        (assert false ($v is-not-a the-type),
 
-        (assert ((:v type) is the-type),
-        (assert false ((:v type) is-not the-type),
+        (assert (($v type) is the-type),
+        (assert false (($v type) is-not the-type),
       ),
     ),
     (should "any other type's value's type is not the type." (=> ()
       (for t in other-types
         (if ((the-type is-not object) || ((t the-type) is-not-a class))
           (for v in (t values)
-            (assert false (:v is-a the-type),
-            (assert (:v is-not-a the-type),
+            (assert false ($v is-a the-type),
+            (assert ($v is-not-a the-type),
 
-            (assert false ((:v type) is the-type),
-            (assert ((:v type) is-not the-type),
+            (assert false (($v type) is the-type),
+            (assert (($v type) is-not the-type),
           ),
         ),
       ),
     ),
     (should "the type of the empty value is the type." (=> ()
-      (assert (:the-empty is-a the-type),
-      (assert false (:the-empty is-not-a the-type),
+      (assert ($the-empty is-a the-type),
+      (assert false ($the-empty is-not-a the-type),
 
-      (assert ((:the-empty type) is the-type),
-      (assert false ((:the-empty type) is-not the-type),
+      (assert (($the-empty type) is the-type),
+      (assert false (($the-empty type) is-not the-type),
     ),
     (should "any other type's empty value's type is not the type." (=> ()
       (for t in other-types
         (if ((the-type is-not object) || ((t the-type) is-not-a class))
           (var e (t "empty"),
-          (assert false (:e is-a the-type),
-          (assert (:e is-not-a the-type),
+          (assert false ($e is-a the-type),
+          (assert ($e is-not-a the-type),
 
-          (assert false ((:e type) is the-type),
-          (assert ((:e type) is-not the-type),
+          (assert false (($e type) is the-type),
+          (assert (($e type) is-not the-type),
         ),
       ),
     ),
@@ -194,8 +194,8 @@
       (assert (the-type not-empty),
     ),
     (should "a common type's empty value must be an empty value." (=> ()
-      (assert (:the-empty is-empty),
-      (assert false (:the-empty not-empty),
+      (assert ($the-empty is-empty),
+      (assert false ($the-empty not-empty),
     )
   ),
 
@@ -213,15 +213,15 @@
 
   (define "Indexer" (=> ()
     (should "the indexer is a lambda." (=> ()
-      (assert (:(the-type ":") is-a lambda),
-      (assert (:(the-type ":") equals (type ":"),
+      (assert ($(the-type ":") is-a lambda),
+      (assert ($(the-type ":") equals (type ":"),
     ),
     (should "the indexer is a readonly accessor." (=> ()
       (assert null (the-type :"__new_prop" 1),
       (assert ((the-type "__new_prop") is null),
 
       (assert null (the-type :"__new_method" (= x x),
-      (assert (:(the-type "__new_method") is null),
+      (assert ($(the-type "__new_method") is null),
     ),
     ((the-type is-a class) ?
       (should "a class's type is class." (=> ()
@@ -277,17 +277,17 @@
       (assert ((s proto) is null),
 
       (assert ((s name) is-a string),
-      (assert (:(s empty) is-a the-type),
-      (assert (:(s "of") is-a lambda),
-      (assert (:(s "indexer") is-a lambda),
-      (assert (:(s "objectify") is-a lambda),
-      (assert (:(s "typify") is-a lambda),
+      (assert ($(s empty) is-a the-type),
+      (assert ($(s "of") is-a lambda),
+      (assert ($(s "indexer") is-a lambda),
+      (assert ($(s "objectify") is-a lambda),
+      (assert ($(s "typify") is-a lambda),
     ),
   ),
 
   (define "Proto Indexer" (=> ()
     (should "(a-type \"indexer\") is a lambda." (=> ()
-      (assert (:(the-type "indexer") is-a lambda),
+      (assert ($(the-type "indexer") is-a lambda),
     ),
   ),
 
@@ -434,31 +434,31 @@
 
   (define "General Behaviours" (=> ()
     (should "(a-type empty) returns an empty value." (=> ()
-      (assert (:(the-type empty) is-not null),
-      (assert false (:(the-type empty) is null),
+      (assert ($(the-type empty) is-not null),
+      (assert false ($(the-type empty) is null),
 
-      (assert (:(the-type empty) is-a the-type),
-      (assert false (:(the-type empty) is-not-a the-type),
+      (assert ($(the-type empty) is-a the-type),
+      (assert false ($(the-type empty) is-not-a the-type),
 
-      (assert (:(the-type empty) is-empty),
-      (assert false(:(the-type empty) not-empty),
+      (assert ($(the-type empty) is-empty),
+      (assert false($(the-type empty) not-empty),
     ),
     (should "(a-type of) function returns an empty value." (=> ()
-      (assert (:(the-type of) is-empty),
-      (assert false (:(the-type of) not-empty),
+      (assert ($(the-type of) is-empty),
+      (assert false ($(the-type of) not-empty),
 
-      (assert (:(the-type of) is-a the-type),
-      (assert false (:(the-type of) is-not-a the-type),
+      (assert ($(the-type of) is-a the-type),
+      (assert false ($(the-type of) is-not-a the-type),
     ),
     (if (the-type is-not class)
       (should "each primary type has its own instance indexer." (=> ()
-        (assert (:(the-type "indexer") is-not (type "indexer"),
+        (assert ($(the-type "indexer") is-not (type "indexer"),
     ),
     (should "a common type's objectify function inherits type's." (=> ()
-      (assert (:(the-type "objectify") equals (type "objectify"),
+      (assert ($(the-type "objectify") equals (type "objectify"),
     ),
     (should "a common type's typify function inherits type's." (=> ()
-      (assert (:(the-type "typify") equals (type "typify"),
+      (assert ($(the-type "typify") equals (type "typify"),
     ),
   ),
 ),
@@ -469,14 +469,14 @@
     (assert (t is-a object),
     (assert ((type of t) is object),
     (for (k v) in t
-      (if (:v is-a lambda) (assert (:v is-bound),
-      (if (:v is-a function) (assert (:v is-bound),
+      (if ($v is-a lambda) (assert ($v is-bound),
+      (if ($v is-a function) (assert ($v is-bound),
     ),
 
     (assert ((t type) is-a object),
     (for (k v) in (t type)
-      (if (:v is-a lambda) (assert (:v is-bound),
-      (if (:v is-a function) (assert (:v is-bound),
+      (if ($v is-a lambda) (assert ($v is-bound),
+      (if ($v is-a function) (assert ($v is-bound),
     ),
   ),
 ),

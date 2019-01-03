@@ -23,8 +23,8 @@
   (define "Equivalence" (= ()
     (should "an object's equivalence is defined as the same of its identity." (= ()
       (var a (@ x:1 y:10),
-      (assert (:(a "is") is (a "equals"),
-      (assert (:(a "is-not") is (a "not-equals"),
+      (assert ($(a "is") is (a "equals"),
+      (assert ($(a "is-not") is (a "not-equals"),
     ),
   ),
 
@@ -926,12 +926,12 @@
 (define "(an-object iterate)" (= ()
   (should "(empty-obj iterate) returns an empty next function." (= ()
     (var next ((@:) iterate),
-    (assert (:next is-a function),
+    (assert ($next is-a function),
     (assert null (next ),
   ),
   (should "(obj iterate) returns a non-empty next function." (= ()
     (var next ((@ x:1 y) iterate),
-    (assert (:next is-a function),
+    (assert ($next is-a function),
     (var (k v) (next),
     (assert "x" k)
     (assert 1 v)
@@ -947,7 +947,7 @@
       ),
     ),
     (var next ((cat of 2) iterate),
-    (assert (:next is-a function),
+    (assert ($next is-a function),
     (var (k v) (next),
     (assert "y" k)
     (assert 2 v)
@@ -1132,8 +1132,8 @@
       (assert 1 (object set obj field 1),
       (assert (object has obj field),
       (assert (object owns obj field),
-      (assert (:(obj: field) is-bound),
-      (assert (:(obj: field) equals (ref: field),
+      (assert ($(obj: field) is-bound),
+      (assert ($(obj: field) equals (ref: field),
     ),
   ),
 ),

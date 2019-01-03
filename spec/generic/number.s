@@ -1498,22 +1498,22 @@
 
 (define "(a-number plus ...)" (= ()
   (should "(num \"plus\") is the same of (number \"+\")." (= ()
-    (assert (:(0 "plus") is (0 "+"),
-    (assert (:(-0 "plus") is (-0 "+"),
+    (assert ($(0 "plus") is (0 "+"),
+    (assert ($(-0 "plus") is (-0 "+"),
 
-    (assert (:(1 "plus") is (1 "+"),
-    (assert (:(-1 "plus") is (-1 "+"),
+    (assert ($(1 "plus") is (1 "+"),
+    (assert ($(-1 "plus") is (-1 "+"),
 
-    (assert (:(1.5 "plus") is (1.5 "+"),
-    (assert (:(-1.5 "plus") is (-1.5 "+"),
+    (assert ($(1.5 "plus") is (1.5 "+"),
+    (assert ($(-1.5 "plus") is (-1.5 "+"),
 
-    (assert (:((number max) "plus") is ((number max) "+"),
-    (assert (:((number min) "plus") is ((number min) "+"),
+    (assert ($((number max) "plus") is ((number max) "+"),
+    (assert ($((number min) "plus") is ((number min) "+"),
 
-    (assert (:((number infinite) "plus") is ((number infinite) "+"),
-    (assert (:((number -infinite) "plus") is ((number -infinite) "+"),
+    (assert ($((number infinite) "plus") is ((number infinite) "+"),
+    (assert ($((number -infinite) "plus") is ((number -infinite) "+"),
 
-    (assert (:((number invalid) "plus") is ((number invalid) "+"),
+    (assert ($((number invalid) "plus") is ((number invalid) "+"),
   ),
 ).
 
@@ -1694,22 +1694,22 @@
 
 (define "(a-number minus ...)" (= ()
   (should "(num \"minus\") is the same of (number \"-\")." (= ()
-    (assert (:(0 "minus") is (0 "-"),
-    (assert (:(-0 "minus") is (-0 "-"),
+    (assert ($(0 "minus") is (0 "-"),
+    (assert ($(-0 "minus") is (-0 "-"),
 
-    (assert (:(1 "minus") is (1 "-"),
-    (assert (:(-1 "minus") is (-1 "-"),
+    (assert ($(1 "minus") is (1 "-"),
+    (assert ($(-1 "minus") is (-1 "-"),
 
-    (assert (:(1.5 "minus") is (1.5 "-"),
-    (assert (:(-1.5 "minus") is (-1.5 "-"),
+    (assert ($(1.5 "minus") is (1.5 "-"),
+    (assert ($(-1.5 "minus") is (-1.5 "-"),
 
-    (assert (:((number max) "minus") is ((number max) "-"),
-    (assert (:((number min) "minus") is ((number min) "-"),
+    (assert ($((number max) "minus") is ((number max) "-"),
+    (assert ($((number min) "minus") is ((number min) "-"),
 
-    (assert (:((number infinite) "minus") is ((number infinite) "-"),
-    (assert (:((number -infinite) "minus") is ((number -infinite) "-"),
+    (assert ($((number infinite) "minus") is ((number infinite) "-"),
+    (assert ($((number -infinite) "minus") is ((number -infinite) "-"),
 
-    (assert (:((number invalid) "minus") is ((number invalid) "-"),
+    (assert ($((number invalid) "minus") is ((number invalid) "-"),
   ),
 ).
 
@@ -1958,22 +1958,22 @@
 
 (define "(a-number times ...)" (= ()
   (should "(num \"times\") is the same of (number \"*\")." (= ()
-    (assert (:(0 "times") is (0 "*"),
-    (assert (:(-0 "times") is (-0 "*"),
+    (assert ($(0 "times") is (0 "*"),
+    (assert ($(-0 "times") is (-0 "*"),
 
-    (assert (:(1 "times") is (1 "*"),
-    (assert (:(-1 "times") is (-1 "*"),
+    (assert ($(1 "times") is (1 "*"),
+    (assert ($(-1 "times") is (-1 "*"),
 
-    (assert (:(1.5 "times") is (1.5 "*"),
-    (assert (:(-1.5 "times") is (-1.5 "*"),
+    (assert ($(1.5 "times") is (1.5 "*"),
+    (assert ($(-1.5 "times") is (-1.5 "*"),
 
-    (assert (:((number max) "times") is ((number max) "*"),
-    (assert (:((number min) "times") is ((number min) "*"),
+    (assert ($((number max) "times") is ((number max) "*"),
+    (assert ($((number min) "times") is ((number min) "*"),
 
-    (assert (:((number infinite) "times") is ((number infinite) "*"),
-    (assert (:((number -infinite) "times") is ((number -infinite) "*"),
+    (assert ($((number infinite) "times") is ((number infinite) "*"),
+    (assert ($((number -infinite) "times") is ((number -infinite) "*"),
 
-    (assert (:((number invalid) "times") is ((number invalid) "*"),
+    (assert ($((number invalid) "times") is ((number invalid) "*"),
   ),
 ).
 
@@ -2207,22 +2207,22 @@
 
 (define "(a-number divided-by ...)" (= ()
   (should "(num \"divided-by\") is the same of (number \"/\")." (= ()
-    (assert (:(0 "divided-by") is (0 "/"),
-    (assert (:(-0 "divided-by") is (-0 "/"),
+    (assert ($(0 "divided-by") is (0 "/"),
+    (assert ($(-0 "divided-by") is (-0 "/"),
 
-    (assert (:(1 "divided-by") is (1 "/"),
-    (assert (:(-1 "divided-by") is (-1 "/"),
+    (assert ($(1 "divided-by") is (1 "/"),
+    (assert ($(-1 "divided-by") is (-1 "/"),
 
-    (assert (:(1.5 "divided-by") is (1.5 "/"),
-    (assert (:(-1.5 "divided-by") is (-1.5 "/"),
+    (assert ($(1.5 "divided-by") is (1.5 "/"),
+    (assert ($(-1.5 "divided-by") is (-1.5 "/"),
 
-    (assert (:((number max) "divided-by") is ((number max) "/"),
-    (assert (:((number min) "divided-by") is ((number min) "/"),
+    (assert ($((number max) "divided-by") is ((number max) "/"),
+    (assert ($((number min) "divided-by") is ((number min) "/"),
 
-    (assert (:((number infinite) "divided-by") is ((number infinite) "/"),
-    (assert (:((number -infinite) "divided-by") is ((number -infinite) "/"),
+    (assert ($((number infinite) "divided-by") is ((number infinite) "/"),
+    (assert ($((number -infinite) "divided-by") is ((number -infinite) "/"),
 
-    (assert (:((number invalid) "divided-by") is ((number invalid) "/"),
+    (assert ($((number invalid) "divided-by") is ((number invalid) "/"),
   ),
 ).
 

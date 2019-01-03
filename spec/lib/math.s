@@ -9,5 +9,5 @@
 
 (define "functions" (= ()
   (should "have function abs" (= ()
-    (assert (:(math "abs") is-a lambda),
+    (assert ($(math "abs") is-a lambda),
 ).

@@ -67,10 +67,10 @@
   (should "(value &&) returns the value." (=> ()
     (for value in falsy-values
       (assert ((value &&) is value),
-      (assert ((:value &&) is value),
+      (assert (($value &&) is value),
     ),
     (for value in truthy-values
-      (assert (:(:value &&) is value),
+      (assert ($($value &&) is value),
     ),
   ),
   (should "(falsy-value && values ...) returns the falsy-value." (=> ()
@@ -80,27 +80,27 @@
       (assert ((value && false) is value),
       (assert ((value && false true) is value),
 
-      (assert ((:value && true) is value),
-      (assert ((:value && true false) is value),
-      (assert ((:value && false) is value),
-      (assert ((:value && false true) is value),
+      (assert (($value && true) is value),
+      (assert (($value && true false) is value),
+      (assert (($value && false) is value),
+      (assert (($value && false true) is value),
     ),
   ),
   (should "(truthy-value && values ...) returns the first falsy-value." (=> ()
     (for value in truthy-values
       (for falsy-value in falsy-values
-        (assert ((:value && falsy-value) is falsy-value),
-        (assert ((:value && true falsy-value false) is falsy-value),
-        (assert ((:value && true false falsy-value) is false),
+        (assert (($value && falsy-value) is falsy-value),
+        (assert (($value && true falsy-value false) is falsy-value),
+        (assert (($value && true false falsy-value) is false),
       ),
     ),
   ),
   (should "(truthy-value && values ...) returns the last truthy-value if no falsy value exists in values." (=> ()
     (for value in truthy-values
       (for truthy-value in truthy-values
-        (assert (:(:value && truthy-value) is truthy-value),
-        (assert (:(:value && true truthy-value) is truthy-value),
-        (assert (:(:value && true true truthy-value) is truthy-value),
+        (assert ($($value && truthy-value) is truthy-value),
+        (assert ($($value && true truthy-value) is truthy-value),
+        (assert ($($value && true true truthy-value) is truthy-value),
       ),
     )
   ),
@@ -110,35 +110,35 @@
   (should "(value ||) returns the value." (=> ()
     (for value in falsy-values
       (assert ((value ||) is value),
-      (assert ((:value ||) is value),
+      (assert (($value ||) is value),
     ),
     (for value in truthy-values
-      (assert (:(:value ||) is value),
+      (assert ($($value ||) is value),
     ),
   ),
   (should "(truthy-value || values ...) returns the truthy-value." (=> ()
     (for value in truthy-value
-      (assert (:(:value && true) is value),
-      (assert (:(:value && true false) is value),
-      (assert (:(:value && false) is value),
-      (assert (:(:value && false true) is value),
+      (assert ($($value && true) is value),
+      (assert ($($value && true false) is value),
+      (assert ($($value && false) is value),
+      (assert ($($value && false true) is value),
     ),
   ),
   (should "(falsy-value || values ...) returns the first truthy-value." (=> ()
     (for value in falsy-values
       (for truthy-value in truthy-values
-        (assert (:(:value || truthy-value) is truthy-value),
-        (assert (:(:value || false truthy-value true) is truthy-value),
-        (assert (:(:value || false true truthy-value) is true),
+        (assert ($($value || truthy-value) is truthy-value),
+        (assert ($($value || false truthy-value true) is truthy-value),
+        (assert ($($value || false true truthy-value) is true),
       ),
     ),
   ),
   (should "(falsy-value || values ...) returns the last falsy-value if no truthy value exists in values." (=> ()
     (for value in falsy-values
       (for falsy-value in falsy-values
-        (assert (:(:value || falsy-value) is falsy-value),
-        (assert (:(:value || false falsy-value) is falsy-value),
-        (assert (:(:value || false false falsy-value) is falsy-value),
+        (assert ($($value || falsy-value) is falsy-value),
+        (assert ($($value || false falsy-value) is falsy-value),
+        (assert ($($value || false false falsy-value) is falsy-value),
       ),
     ),
   ),
@@ -153,7 +153,7 @@
     ),
     (should "(truthy-value ?) returns true." (=> ()
       (for value in truthy-values
-        (assert ((:value ?) is true),
+        (assert (($value ?) is true),
       ),
     ),
   ),
@@ -161,13 +161,13 @@
     (should "(falsy-value ? value) returns the value." (=> ()
       (for value in (falsy-values + truthy-values)
         (for falsy-value in falsy-values
-          (assert (:(falsy-value ? value) is value),
+          (assert ($(falsy-value ? value) is value),
       ),
     ),
     (should "(truthy-value ? value) returns the truthy-value." (=> ()
       (for value in (falsy-values + truthy-values)
         (for truthy-value in truthy-values
-          (assert (:(:truthy-value ? value) is truthy-value),
+          (assert ($($truthy-value ? value) is truthy-value),
       ),
     ),
   ),
@@ -175,13 +175,13 @@
     (should "(falsy-value ? b c) returns the value of c." (=> ()
       (for value in (falsy-values concat truthy-values)
         (for falsy-value in falsy-values
-          (assert (:(falsy-value ? 100 value) is value),
+          (assert ($(falsy-value ? 100 value) is value),
       ),
     ),
     (should "(truthy-value ? b c) returns the value of b." (=> ()
       (for value in (falsy-values + truthy-values)
         (for truthy-value in truthy-values
-          (assert (:(:truthy-value ? value 100) is value),
+          (assert ($($truthy-value ? value 100) is value),
       ),
     ),
   ),
@@ -196,16 +196,16 @@
     (assert ((null ?? null null) is null),
 
     (for value in (truthy-values concat 0 -0 false)
-      (assert (:(null ?? value) is value),
-      (assert (:(null ?? null value) is value),
-      (assert (:(null ?? null null value) is value),
+      (assert ($(null ?? value) is value),
+      (assert ($(null ?? null value) is value),
+      (assert ($(null ?? null null value) is value),
     ),
   ),
   (should "(value ?? ...) always returns the value if value is not null." (=> ()
     (for value in (truthy-values concat 0 -0 false)
-      (assert (:(:value ??) is value),
-      (assert (:(:value ?? true) is value),
-      (assert (:(:value ?? true false) is value),
+      (assert ($($value ??) is value),
+      (assert ($($value ?? true) is value),
+      (assert ($($value ?? true false) is value),
     ),
   ),
 ),

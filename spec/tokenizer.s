@@ -1,14 +1,14 @@
 (define "(tokenizer ...)" (= ()
   (should "(tokenizer) returns the global function tokenize." (= ()
     (var tokenizing (tokenizer ),
-    (assert (:tokenizing is-a function),
-    (assert (:tokenizing is tokenize),
+    (assert ($tokenizing is-a function),
+    (assert ($tokenizing is tokenize),
   ),
   (should "(tokenizer a-lambda) returns a function to feed all tokens to the parser lambda." (= ()
     (var tokens (@),
     (var parser (=() (this push arguments),
-    (var tokenizing (tokenizer (:parser bind tokens),
-    (assert (:tokenizing is-a function),
+    (var tokenizing (tokenizer ($parser bind tokens),
+    (assert ($tokenizing is-a function),
 
     (tokenizing "(x)"),
     (assert 3 (tokens length),
@@ -17,7 +17,7 @@
     (var tokens (@),
     (var parser (=>() (tokens push arguments),
     (var tokenizing (tokenizer parser),
-    (assert (:tokenizing is-a function),
+    (assert ($tokenizing is-a function),
 
     (tokenizing "(x)"),
     (assert 3 (tokens length),
@@ -26,7 +26,7 @@
     (var tokens (@),
     (var parser (=>() (tokens push arguments),
     (var tokenizing (tokenizer parser),
-    (assert (:tokenizing is-a function),
+    (assert ($tokenizing is-a function),
 
     (tokenizing "\"xyz"),
     (assert 0 (tokens length),
@@ -88,8 +88,8 @@
     ),
     (for nona in non-applicables
       (var tokenizing (tokenizer nona),
-      (assert (:tokenizing is-a function),
-      (assert (:tokenizing is tokenize),
+      (assert ($tokenizing is-a function),
+      (assert ($tokenizing is tokenize),
     ),
   ),
 ),

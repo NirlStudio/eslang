@@ -23,8 +23,8 @@
   (define "Equivalence" (= ()
     (should "an array's equivalence is defined as the same of its identity." (= ()
       (var a (array of 1 10),
-      (assert (:(a "is") is (a "equals"),
-      (assert (:(a "is-not") is (a "not-equals"),
+      (assert ($(a "is") is (a "equals"),
+      (assert ($(a "is-not") is (a "not-equals"),
     ),
   ),
 
@@ -428,7 +428,7 @@
   (should "(an-array iterate) returns an interator function to traverse all its items." (= ()
     (var a (array of null true 10),
     (var iter (a iterate),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -455,7 +455,7 @@
     (assert 11 (a 10),
 
     (var iter (a iterate),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -482,7 +482,7 @@
     (assert 101 (a 100),
 
     (var iter (a iterate),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -503,7 +503,7 @@
   (should "(an-array iterate begin) returns an interator function to traverse all items from the position of begin." (= ()
     (var a (array of null true 10),
     (var iter (a iterate 1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -517,7 +517,7 @@
     (assert null (iter),
 
     (let iter (a iterate -2),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -531,7 +531,7 @@
     (assert null (iter),
 
     (let iter (a iterate -4),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -575,7 +575,7 @@
     (assert 11 (a 10),
 
     (var iter (a iterate 1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -589,7 +589,7 @@
     (assert null (iter),
 
     (let iter (a iterate -10),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -603,7 +603,7 @@
     (assert null (iter),
 
     (let iter (a iterate -12),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -647,7 +647,7 @@
     (assert 101 (a 100),
 
     (var iter (a iterate 1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -661,7 +661,7 @@
     (assert null (iter),
 
     (var iter (a iterate -101),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -700,7 +700,7 @@
   (should "(an-array iterate begin end) returns an interator function to traverse all items between begin and end." (= ()
     (var a (array of null true 10),
     (var iter (a iterate 1 3),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -714,7 +714,7 @@
     (assert null (iter),
 
     (let iter (a iterate -2 4),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -728,7 +728,7 @@
     (assert null (iter),
 
     (let iter (a iterate -4 -1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -763,7 +763,7 @@
     (assert 11 (a 10),
 
     (var iter (a iterate 1 11),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -777,7 +777,7 @@
     (assert null (iter),
 
     (let iter (a iterate -10 -1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 f
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -786,7 +786,7 @@ f
     (assert null (iter),
 
     (let iter (a iterate -12 5),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -821,7 +821,7 @@ f
     (assert 101 (a 100),
 
     (var iter (a iterate 1 101),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -835,7 +835,7 @@ f
     (assert null (iter),
 
     (var iter (a iterate -101 -1),
-    (assert (:iter is-a function),
+    (assert ($iter is-a function),
 
     (assert ((iter) is-a array),
     (assert 2 ((iter true) length),
@@ -1442,7 +1442,7 @@ f
 (define "(an-array += ...)" (= ()
   (should "(an-array += ...) is just an alias of (an-array append ...)." (= ()
     (var a (@ 1 2),
-    (assert (:(a "+=") is (a "append"),
+    (assert ($(a "+=") is (a "append"),
   ),
 ),
 
@@ -1566,7 +1566,7 @@ f
 (define "(an-array + ...)" (= ()
   (should "(an-array + ...) is just an alias of (an-array merge ...)." (= ()
     (var a (@ 1 2),
-    (assert (:(a "+") is (a "merge"),
+    (assert ($(a "+") is (a "merge"),
   ),
 ),
 
@@ -4387,7 +4387,7 @@ f
 (define "(an-array dequeue ...)" (= ()
   (should "(an-array \"dequeue\") is only an alias of (an-array \"pop\")." (= ()
     (var a (@),
-    (assert (:(a "dequeue") is (a "pop")),
+    (assert ($(a "dequeue") is (a "pop")),
   ),
 ),
 
