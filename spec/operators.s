@@ -9,6 +9,7 @@
     "literal"
     "load"
     "logical"
+    "pattern"
     "operator"
     "quote"
   ) (define spec (=> ()

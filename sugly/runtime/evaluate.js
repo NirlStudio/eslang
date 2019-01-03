@@ -33,7 +33,7 @@ module.exports = function evaluate ($void) {
     //  explicit: the subject keeps as a subject even it's a function.
     var subject = clist[0]
     var offset = 1
-    var implicitMode = true // by default, use implicit mode.
+    var implicitSubject = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
       if (subject === symbolSubject) { // switching to explicit mode.
         if (length < 2) {
@@ -45,7 +45,7 @@ module.exports = function evaluate ($void) {
           return subject
         }
         offset = 2
-        implicitMode = false // explicit mode
+        implicitSubject = false // explicit mode
       } else if (subject === symbolPairing) { // switching to explicit mode.
         if (length < 2) {
           return null // no predicate.
@@ -66,7 +66,7 @@ module.exports = function evaluate ($void) {
 
     // switch subject to predicate if it's apppliable.
     var predicate
-    if (typeof subject === 'function' && implicitMode) {
+    if (typeof subject === 'function' && implicitSubject) {
       if (subject.type === $Operator) {
         return subject(space, clause)
       }

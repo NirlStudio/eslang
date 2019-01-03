@@ -44,7 +44,7 @@
       expected: expected
       real: value
       expr: expr
-      note: (note))
+      note: (note)
 ).
 
 # test results
@@ -126,10 +126,10 @@
   (let cases (@)
   (let current null)
   # result
-  (let summary (@).
-  (let failures (@).
+  (let summary (@),
+  (let failures (@),
   # progress
-  (let path (@).
+  (let path (@),
   (let indent "  ")
   # counters
   (let assertions 0)

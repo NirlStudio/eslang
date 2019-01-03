@@ -19,7 +19,7 @@ module.exports = function ($void) {
 
     function resetContext () {
       stack = [[]]
-      sourceStack = [[]]
+      sourceStack = [[[0, 0, 0]]]
       waiter = null
       lastToken = null
       openningLine = -1
@@ -84,13 +84,13 @@ module.exports = function ($void) {
 
     function tryToRaise () {
       while (stack[0].length > 0) {
-        evaluate([stack[0].shift(), sourceStack[0].shift()])
+        evaluate([stack[0].shift(), sourceStack[0].splice(0, 1)])
       }
     }
 
     function pushValue (value, source) {
       stack[stack.length - 1].push(value)
-      sourceStack[stack.length - 1].push(source)
+      sourceStack[sourceStack.length - 1].push(source)
     }
 
     function pushSymbol (value, source) {
@@ -106,7 +106,7 @@ module.exports = function ($void) {
           endLine(value, source)
           if (!crossingLines()) {
             closeLine(value, source)
-          } // else, do nothing if a single expression crossing multiple lines.
+          }
           break
         default:
           pushValue(value, source)
@@ -200,21 +200,26 @@ module.exports = function ($void) {
 
     function crossingLines () {
       var depth = sourceStack.length - 1
+      var srcOffset = openningOffset + 1
       var topSource = sourceStack[depth]
-      return topSource.length > openningOffset &&
-        openningLine > topSource[openningOffset][1]
+      return topSource.length > srcOffset &&
+        openningLine > topSource[srcOffset][1]
     }
 
     function closeLine (value, source) {
       var depth = stack.length - 1
-      var statement = stack[depth].splice(openningOffset)
-      var statementSrc = sourceStack[depth].splice(openningOffset)
-      stack[depth].push(statement.length > 0
-        ? new Tuple$(statement, false, statementSrc) : $Tuple.empty
-      )
-      statementSrc.push(lastToken
-        ? lastToken[lastToken.length - 2] : source, source)
-      sourceStack[depth].push(statementSrc)
+      stack.push(stack[depth].splice(openningOffset))
+      var src = sourceStack[depth].splice(openningOffset + 1)
+      var lastSource
+      if (src.length > 0) {
+        src.unshift(src[0])
+        lastSource = lastToken[2]
+      } else {
+        src.push(source)
+        lastSource = source
+      }
+      sourceStack.push(src)
+      endTopWith(lastSource, source)
       openningOffset = stack[depth].length
     }
 
@@ -228,10 +233,7 @@ module.exports = function ($void) {
         if (indent >= 0 && indent <= endingIndent) {
           if (indent === endingIndent) {
             endTopWith(lastSource, source)
-          } /*
-            otherwise, no matched indent found. It is still tolerable but
-            not a good practice.
-          */
+          }
           break
         }
         endTopWith(lastSource, source)

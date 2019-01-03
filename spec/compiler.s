@@ -277,10 +277,10 @@
     (let statements (compile "(let f (=> (x y)\n  + x (y * 2;\n),"),
     (assert (unquote (let f (=> (x y) (+ x (y * 2))))) statements),
 
-    (let statements (compile "\"abc\n   cde\";"),
-    (assert (unquote "abc cde") statements),
+    (let statements (compile "\"abc\n   cde1\";"),
+    (assert (unquote "abc cde1") statements),
 
-    (let statements (compile "\"abc\n   cde\" (let x 1;"),
-    (assert (unquote "abc cde" (let x 1)) statements),
+    (let statements (compile "\"abc\n   cde2\" (let x 1;"),
+    (assert (unquote "abc cde2" (let x 1)) statements),
   ),
 ),
