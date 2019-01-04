@@ -4337,7 +4337,7 @@ f
     (assert 101 (a length),
     (assert 3 (a count),
   ),
-  (should "(an-array enqueue value ...) insert value(s) into the begining of the array." (= ()
+  (should "(an-array enqueue value ...) insert value(s) into the beginning of the array." (= ()
     (var a (@),
     (assert ((a enqueue 100) is a),
     (assert 1 (a length),

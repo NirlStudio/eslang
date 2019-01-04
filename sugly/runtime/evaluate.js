@@ -60,7 +60,7 @@ module.exports = function evaluate ($void) {
       } else { // a common symbol
         subject = space.resolve(subject.key)
       }
-    } else if (subject instanceof Tuple$) { // a statment
+    } else if (subject instanceof Tuple$) { // a statement
       subject = evaluate(subject, space)
     } // else, the subject is a common value.
 

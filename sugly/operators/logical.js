@@ -8,6 +8,7 @@ module.exports = function logical ($void) {
   var Space$ = $void.Space
   var operator = $void.operator
   var evaluate = $void.evaluate
+  var thisCall = $void.thisCall
   var symbolSubject = $.symbol.subject
   var staticOperator = $void.staticOperator
 
@@ -67,10 +68,10 @@ module.exports = function logical ($void) {
     return value
   }))
 
-  // Boolean Test: only for null.
-  // - (x ?) returns true or false.
-  // - (x ? y) returns x itself or returns y if x is equivalent to false.
-  // - (x ? y z) returns y if x is equivalent to true, returns z otherwise.
+  // Boolean Test.
+  // (x ?) - booleanize, returns true or false.
+  // (x ? y) - boolean fallback, returns x itself or returns y if x is equivalent to false.
+  // (x ? y z) - boolean switch, returns y if x is equivalent to true, returns z otherwise.
   link(Null, '?', operator(function (space, clause, that) {
     var clist = clause && clause.$
     if (!clist || !clist.length || clist.length < 2) {
@@ -78,6 +79,36 @@ module.exports = function logical ($void) {
     }
     var base = clist[0] === symbolSubject ? 3 : 2
     if (typeof that !== 'undefined' && that !== false && that !== null && that !== 0) {
+      switch (clist.length - base) { // true logic
+        case 0:
+          return true
+        case 1:
+          return that
+        default:
+          return space instanceof Space$ ? evaluate(clist[base], space) : null
+      }
+    }
+    switch (clist.length - base) { // false logic
+      case 0:
+        return false
+      case 1:
+        return space instanceof Space$ ? evaluate(clist[base], space) : null
+      default:
+        return space instanceof Space$ ? evaluate(clist[base + 1], space) : null
+    }
+  }))
+
+  // Emptiness Test.
+  // (x ?*) - booleanized emptiness, returns true or false.
+  // x ?* y) - empty fallback, returns x itself or returns y if x is empty.
+  // (x ?* y z) - empty switch, returns y if x is not an empty value, returns z otherwise.
+  link(Null, '?*', operator(function (space, clause, that) {
+    var clist = clause && clause.$
+    if (!clist || !clist.length || clist.length < 2) {
+      return null // invalid call
+    }
+    var base = clist[0] === symbolSubject ? 3 : 2
+    if (thisCall(that, 'not-empty')) {
       switch (clist.length - base) { // true logic
         case 0:
           return true

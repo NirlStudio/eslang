@@ -360,7 +360,7 @@
     (assert (t is-a object),
     (assert null (t type),
     (assert ((type of t) is object),
-    (assert 21 ((object fields-of t) length),
+    (assert 22 ((object fields-of t) length),
 
     (for (_ v) in t
       (if ($v is-a lambda)

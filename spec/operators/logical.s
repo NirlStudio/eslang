@@ -147,11 +147,13 @@
 (define "(value ? ...) - boolean test" (=> ()
   (define "(a ?) - booleanize" (=> ()
     (should "(falsy-value ?) returns false." (=> ()
+      (assert ((0 ?) is false),
       (for value in falsy-values
         (assert ((value ?) is false),
       ),
     ),
     (should "(truthy-value ?) returns true." (=> ()
+      (assert ((1 ?) is true),
       (for value in truthy-values
         (assert (($value ?) is true),
       ),
@@ -187,9 +189,90 @@
   ),
 ),
 
+(var empties (@
+  null 0 -0 false
+  "" (number invalid) (date of 0) (range empty) (symbol empty)
+  (tuple empty) (` ())
+  (operator empty) (=? X)
+  (lambda empty) (= x)
+  (function empty) (=> x)
+  (array empty) (@)
+  (iterator empty)
+  (object empty) (@:)
+  (class empty)
+  ((class empty) empty),
+  ((@:class x: 1) default),
+),
+(var non-empties (@
+  bool true
+  string " " "0" "null" "false"
+  number -1 1 (number max) (number min) (number smallest)
+  date (date of -1) (date of 1)
+  range (1 10)
+  symbol (` x)
+  tuple (` (null)) (` (false)) (` (x y z),
+  operator (=? X null) (=? X (X),
+  lambda (= x null) (= x x)
+  function (=> x null) (=> x x)
+  array (@ null) (@ 1) (@ 10:10) (@ 1 10:10)
+  iterator
+  (iterator of (@),
+  (iterator of (@ null),
+  (iterator of (@ 1 2),
+  object (@ x: null) (@:@ x ) (@ x: 1, y: 2)
+  class (@:class x: 1)
+  ((@:class x: 1) of (@ y: 2),
+),
+
+(define "(value ?* ...) - emptiness test" (=> ()
+  (define "(a ?*) - booleanize" (=> ()
+    (should "(empty-value ?*) returns false." (=> ()
+      assert false ((10 + -10)?*);
+      (for value in empties
+        assert (($value ?*) is false);
+      ),
+    ),
+    (should "(non-empty-value ?*) returns true." (=> ()
+      assert ((10 + 10)?*);
+      (for value in non-empties
+        assert (($value ?*) is true);
+      ),
+    ),
+  ),
+  (define "(a ?* b) - empty fallback" (=> ()
+    (should "(empty-value ?* value) returns the value." (=> ()
+      (for b in (empties + non-empties)
+        (for a in empties
+          assert ($a ?* b:: is b);
+      ),
+    ),
+    (should "(non-empty ?* value) returns the non-empty." (=> ()
+      (for b in (empties + non-empties)
+        (for a in non-empties
+          assert ($a ?* b:: is a);
+      ),
+    ),
+  ),
+  (define "(a ?* b c) - empty switch" (=> ()
+    (should "(empty-value ?* b c) returns the value of c." (=> ()
+      (for c in (empties concat non-empties)
+        (for a in empties
+          assert ($a ?* 100 c:: is c);
+      ),
+    ),
+    (should "(non-empty ?* b c) returns the value of b." (=> ()
+      (for b in (empties concat non-empties)
+        (for a in non-empties
+          assert ($a ?* b 100:: is b);
+      ),
+    ),
+  ),
+),
+
 (define "(value ?? ...) - null fallback" (=> ()
   (should "(null ??) returns null." (= ()
     (assert ((null ??) is null),
+    (assert (((null null) ??) is null),
   ),
   (should "(null ?? values ...) returns the first non-null value." (= ()
     (assert ((null ?? null) is null),

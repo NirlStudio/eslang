@@ -2,12 +2,16 @@
 
 module.exports = function ($void) {
   var $ = $void.$
-  var $Tuple = $.tuple
   var Tuple$ = $void.Tuple
   var warn = $.warn
   var $export = $void.export
   var tokenizer = $.tokenizer
   var isApplicable = $void.isApplicable
+  var sharedSymbolOf = $void.sharedSymbolOf
+
+  var symbolPairing = $.symbol.pairing
+  var symbolSubject = $.symbol.subject
+  var symbolToString = sharedSymbolOf('to-string')
 
   var compiler = $export($, 'compiler', function (evaluate) {
     if (!isApplicable(evaluate)) {
@@ -19,9 +23,9 @@ module.exports = function ($void) {
 
     function resetContext () {
       stack = [[]]
-      sourceStack = [[[0, 0, 0]]]
+      sourceStack = [[[[0, 0, 0]]]]
       waiter = null
-      lastToken = null
+      lastToken = ['space', '', [0, 0, 0]]
       openningLine = -1
       openningOffset = 0
     }
@@ -36,7 +40,7 @@ module.exports = function ($void) {
       if (stack.length > 1) {
         warn('compiling', 'open statements are not properly closed.',
           [lastToken])
-        endAll(null, lastToken ? lastToken[2] : [0, 0, 0])
+        endAll(null, lastToken[2])
       }
       tryToRaise()
       resetContext()
@@ -152,18 +156,54 @@ module.exports = function ($void) {
       }
     }
 
-    function endTopWith (ending, source) {
-      var srcTop = sourceStack.pop()
-      // append ending token(s)' source info.
-      Array.prototype.push.apply(srcTop[0], arguments)
+    function endTopWith (source) {
       // create a tuple for the top clause, and
       var statement = stack.pop()
-      var top = statement.length > 0
-        ? new Tuple$(statement, false, srcTop) : $Tuple.empty
+      // append ending token(s)' source info.
+      var sourceMap = sourceStack.pop()
+      sourceMap[0].push(source || lastToken[2])
+      while (statement.length > 2 &&
+        tryTofoldStatement(statement, sourceMap)
+      );
       // push it to the end of container clause.
-      stack[stack.length - 1].push(top)
-      // since the source has been saved into the tuple, only left a placeholder here
-      sourceStack[sourceStack.length - 1].push([])
+      stack[stack.length - 1].push(new Tuple$(statement, false, sourceMap))
+      // since the source has been saved into the tuple, only keeps its overall range.
+      sourceStack[sourceStack.length - 1].push(sourceMap[0])
+    }
+
+    function tryTofoldStatement (statement, sourceMap) { // sweeter time.
+      var max = statement.length - 1
+      for (var i = 1; i < max; i++) {
+        if (statement[i] === symbolPairing && statement[i + 1] === symbolPairing) {
+          statement.splice(i, 2)
+          sourceMap.splice(i + 1, 2)
+          foldStatement(statement, sourceMap, i)
+          return true
+        }
+      }
+      return false
+    }
+
+    function foldStatement (statement, sourceMap, length) {
+      // (x :: y) => ($(x) y)
+      var expr = statement.splice(0, length)
+      // re-arrange source map
+      var exprSrcMap = sourceMap.splice(1, length + 1)
+      var beginning = exprSrcMap[0].slice(0, 3)
+      var ending = exprSrcMap[exprSrcMap.length - 1]
+      exprSrcMap.unshift(beginning.concat(ending.slice(-2)))
+
+      // (x ::) => ($(x) to-string)
+      if (statement.length < 1) {
+        statement.push(symbolToString)
+        var last = ending.slice(-2)
+        sourceMap.push(ending.slice(0, 1).concat(last, last))
+      }
+
+      statement.unshift(symbolSubject, new Tuple$(expr, false, exprSrcMap))
+      sourceMap.splice(1, 0,
+        beginning.concat(beginning.slice(1)), exprSrcMap[0]
+      )
     }
 
     function endClause () {
@@ -172,8 +212,7 @@ module.exports = function ($void) {
           [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
-      var lastSource = lastToken[2]
-      endTopWith(lastSource, lastSource)
+      endTopWith()
     }
 
     function endMatched (value, source) {
@@ -186,14 +225,14 @@ module.exports = function ($void) {
         ? endIndent(value, source) : endLine(value, source)
     }
 
-    function endLine (value, source) {
+    function endLine (value, source) { // sugar time
       var depth = stack.length - 1
       while (depth > 0) {
         var startSource = sourceStack[depth][0][0] // start source.
         if (startSource[1] < source[1]) { // comparing line numbers.
           break
         }
-        endTopWith(lastToken[2], source)
+        endTopWith(source)
         depth = stack.length - 1
       }
     }
@@ -206,44 +245,36 @@ module.exports = function ($void) {
         openningLine > topSource[srcOffset][1]
     }
 
-    function closeLine (value, source) {
+    function closeLine (value, source) { // sweeter time.
       var depth = stack.length - 1
       stack.push(stack[depth].splice(openningOffset))
       var src = sourceStack[depth].splice(openningOffset + 1)
-      var lastSource
-      if (src.length > 0) {
-        src.unshift(src[0])
-        lastSource = lastToken[2]
-      } else {
-        src.push(source)
-        lastSource = source
-      }
+      src.length > 0 ? src.unshift(src[0]) : src.push(source)
       sourceStack.push(src)
-      endTopWith(lastSource, source)
+      endTopWith(source)
       openningOffset = stack[depth].length
     }
 
-    function endIndent (value, source) {
-      var lastSource = lastToken[2]
-      var endingIndent = lastSource[0]
+    function endIndent (value, source) { // sugar time
+      var endingIndent = lastToken[2][0]
       var depth = stack.length - 1
       while (depth > 0) {
         var indent = sourceStack[depth][0][0][0]
         // try to looking for and stop with the first matched indent.
         if (indent >= 0 && indent <= endingIndent) {
           if (indent === endingIndent) {
-            endTopWith(lastSource, source)
+            endTopWith(source)
           }
           break
         }
-        endTopWith(lastSource, source)
+        endTopWith(source)
         depth = stack.length - 1
       }
     }
 
-    function endAll (value, source) {
+    function endAll (value, source) { // sugar time
       while (stack.length > 1) {
-        endTopWith(lastToken[2], source)
+        endTopWith(source)
       }
     }
   })
@@ -251,7 +282,7 @@ module.exports = function ($void) {
   // a helper function to compile a piece of source code.
   $export($, 'compile', function (text) {
     var list = []
-    var src = [[0, 0, 0]]
+    var src = [[[0, 0, 0]]]
     var compiling = compiler(function collector (expr) {
       list.push(expr[0])
       src.push(expr[1])
@@ -260,6 +291,7 @@ module.exports = function ($void) {
       compiling('\n') // end any pending waiter.
     }
     compiling() // notify the end of stream.
-    return list.length > 0 ? new Tuple$(list, true, src) : $Tuple.blank
+    // TODO: save ending location
+    return new Tuple$(list, true, src)
   })
 }

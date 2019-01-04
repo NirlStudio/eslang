@@ -132,6 +132,8 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 # keyword.operator.general.sugly
 (x ? t f)
 ((1 + 1)? t f)
+(x ?* t f)
+((1 + 1)?* t f)
 (x ?? t f)
 ((1 + 1)?? t f)
 (x && t f)

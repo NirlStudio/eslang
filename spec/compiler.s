@@ -268,6 +268,15 @@
     (let statements (compile " let x 1; let y 2;"),
     (assert (unquote (let x 1) (let y  2)) statements),
 
+    (let statements (compile " let x 1; let y 2; let z 3"),
+    (assert (unquote (let x 1) (let y  2) let z 3) statements),
+
+    (let statements (compile " let x 1; let y 2; let z 3;"),
+    (assert (unquote (let x 1) (let y  2) (let z 3)) statements),
+
+    (let statements (compile " let x 1; let y 2; let z 3;;"),
+    (assert (unquote (let x 1) (let y  2) (let z 3) ()) statements),
+
     (let statements (compile " let x (let y 1;"),
     (assert (unquote (let x (let y 1))) statements),
 

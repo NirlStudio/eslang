@@ -65,7 +65,7 @@ module.exports = function ($void) {
       switch (c) {
         case '(':
           parse('punctuation', c, [clauseIndent, lineNo, lineOffset])
-          clauseIndent = -1 // clear begining indent
+          clauseIndent = -1 // clear beginning indent
           break
         case ')':
           parse('punctuation', c, [indenting, lineNo, lineOffset])
@@ -77,8 +77,8 @@ module.exports = function ($void) {
         case ',': // inline-closing, indent-closing
         case ';': // line-closing
         case '\\': // reserved as control punctuation
-        case '[': // reserved as block punctuation
-        case ']': // reserved as block punctuation
+        case '[': // reserved as annotation block beginning.
+        case ']': // reserved as annotation block.
         case '{': // reserved as block punctuation
         case '}': // reserved as block punctuation
           parse('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
@@ -225,7 +225,7 @@ module.exports = function ($void) {
       } else {
         pendingText += c
       }
-      return true
+      return c !== '\n'
     }
 
     function blockCommentWaiter (c) {

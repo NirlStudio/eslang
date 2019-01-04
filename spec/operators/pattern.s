@@ -1,6 +1,6 @@
 (define "($ ...) - explicit subject" (= ()
   (should "($) returns null." (=> ()
-    (assert null ($),
+    assert null ($);
   ),
   (should "($value) always returns the original value." (=> ()
     (var values (@
@@ -20,7 +20,7 @@
       class (class empty) ((class empty) default)
     ),
     (for value in values
-      assert value ($value;
+      assert value ($value);
     ),
   ),
   (should "($value ...) always intercepts the value as the subject." (=> ()
@@ -40,11 +40,12 @@
     assert ($op ?);
 
     assert null ($op call);
-    assert ($($op :"is") is-a lambda;
+    assert ($($op :"is") is-a lambda);
+    assert ($op "is":: is-a lambda);
 
     var obj (@ x:1);
-    assert ($obj ?)
-    assert ($obj is obj)
+    assert ($obj ?);
+    assert ($obj is obj);
   ),
 ),
 
@@ -78,18 +79,45 @@
       var f (=>() value;
     ),
     (for op in ops
-      (assert 10 (:op),
+      assert 10 (op);
+      assert 10 (:op);
     ),
   ),
 ),
 
-(define "(... : ...) - chain operation" (= ()
-  (should "(`) returns (symbol empty)." (=> ()
-    (assert (1 + 1 :> 1),
-    (assert (+ 1 1 :> 1),
+(define "(...:: ...:: ...) - chain operation" (= ()
+  (should "(expr ...::) returns ($(expr ...) to-string)." (=> ()
+    assert "1" (1::);
+    assert "true" (1:: is 1::);
+
+    assert "3" (1 + 2::);
+    assert "true" (1 + 2:: is 3::);
+
+    assert "3" (+ 1 2::);
+    assert "true" (+ 1 2:: is 3::);
+
+    var sum (=() 100);
+    assert "100" (sum::);
+    assert "(= () 100)" ($sum::);
+    assert "200" (sum:: + 100::);
+    assert "300" (sum::+ 100:: + 100::);
+    assert "400" (sum:: + 100:: + 100:: + 100::);
   ),
-  (should "(` sym) returns the symbol with a key of sym." (=> ()
-    (assert (symbol of "x") (` x),
-    (assert (symbol of "x") (` x y),
+  (should "(expr ...:: opr ...) returns ($(expr ...) opr ...)." (=> ()
+    var sum (=() 100);
+    assert 200 (sum::  + 100);
+    assert null ($sum::  + 100);
+    assert 300 (sum:: + 100::+ 100);
+    assert 500 (sum:: + 100:: + 100:: + 100 100);
+
+    assert "100" (print ""::  + 100);
+    assert "100100" (print "100"::  + 100);
+    assert "100 101100" (print "100" 101::  + 100);
+
+    assert 6 (1 + 2:: + 3);
+    assert true (1 + 2:: + 3:: is 6);
+
+    assert 6 (+ 1 2:: + 3);
+    assert true (+ 1 2:: + 3:: is 6);
   ),
 ),

@@ -353,9 +353,10 @@
 
       (let tokens (tokenize "# abc \n cde"),
       (assert (tokens is-a array),
-      (assert 2 (tokens length),
+      (assert 3 (tokens length),
       (assert-comment " abc " (tokens 0),
-      (assert-sym "cde" (tokens 1),
+      (assert-space "\n" (tokens 1),
+      (assert-sym "cde" (tokens 2),
     ),
     (should "(tokenize code) supports inline-comment enclosed in #(...)#." (=> ()
       (var tokens (tokenize "#( abc)# \tcde"),
