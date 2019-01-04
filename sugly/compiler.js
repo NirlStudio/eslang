@@ -82,7 +82,7 @@ module.exports = function ($void) {
           }
           break
         case 'comment':
-          // TODO: special comment as document?
+          // TODO: comment document should be put in specs.
           break
         default: // do nothing for free space.
           break

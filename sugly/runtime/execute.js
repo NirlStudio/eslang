@@ -8,8 +8,21 @@ module.exports = function execute ($void) {
   var createModuleSpace = $void.createModuleSpace
 
   $void.execute = function execute (space, code, uri, args, mainApp) {
-    var scope = mainApp ? createAppSpace(uri) : createModuleSpace(uri, space)
+    var scope
+    if (mainApp) {
+      scope = createAppSpace(uri)
+      if (typeof uri === 'string') {
+        scope.modules[uri] = Object.assign(Object.create(null), {
+          status: 201,
+          exports: scope.exporting,
+          timestamp: Date.now()
+        })
+      }
+    } else {
+      scope = createModuleSpace(uri, space)
+    }
     scope.populate(args)
+
     try {
       return [evaluate(code, scope), scope]
     } catch (signal) {

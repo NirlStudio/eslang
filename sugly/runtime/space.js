@@ -34,7 +34,7 @@ module.exports = function space ($void) {
   }
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
-      var value = this.context[key]
+      var value = $[key] || this.context[key]
       if (typeof value !== 'undefined') {
         return value
       }
@@ -116,7 +116,8 @@ module.exports = function space ($void) {
         this._reserved = {
           local: this.local,
           locals: this.locals,
-          app: this.app
+          app: this.app,
+          modules: this.modules
         }
       )
     }
@@ -127,8 +128,17 @@ module.exports = function space ($void) {
     app['-app'] = uri
     var local = Object.create(app)
     local['-module'] = uri
-    var space = new Space$(local, null, null, app)
+    var exporting = Object.create($Object.proto)
+    var space = new Space$(local, null, null, exporting)
     space.app = app
+    space.modules = Object.create(null)
+    space.export = function (key, value) {
+      if (typeof exporting[key] === 'undefined') {
+        app[key] = value
+        exporting[key] = value
+      }
+      return space.var(key, value)
+    }
     return space
   }
 
@@ -140,15 +150,17 @@ module.exports = function space ($void) {
     var space = new Space$(local, null, null, export_)
     if (app) {
       space.app = app
+      space.modules = appSpace.modules
     }
     return space
   }
 
-  $void.createLambdaSpace = function (app, module_) {
+  $void.createLambdaSpace = function (app, modules, module_) {
     var space
     if (app) {
       space = new Space$(Object.create(app))
       space.app = app
+      space.modules = modules
     } else {
       space = new Space$(Object.create($))
     }
@@ -164,6 +176,7 @@ module.exports = function space ($void) {
     )
     if (parent.app) {
       space.app = parent.app
+      space.modules = parent.modules
     }
     return space
   }
@@ -181,6 +194,7 @@ module.exports = function space ($void) {
     // reserve app
     if (parent.app) {
       this.app = parent.app
+      this.modules = parent.modules
     }
   }
   OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {

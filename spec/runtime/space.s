@@ -1,3 +1,17 @@
+(define "global" (= ()
+  (should "global entities cannot be overwritten" (= ()
+    var p (=);
+    let print p;
+    assert ($print is print);
+    assert ($print is-not p);
+
+    var m (@:);
+    let math p;
+    assert (math is math);
+    assert (math is-not m);
+  ),
+),
+
 (define "app" (= ()
   (should "in an app space, -app equals -module." (= ()
     (var result (run "spec/runtime/_app"),

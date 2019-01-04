@@ -24,6 +24,10 @@ module.exports = function import_ ($void) {
     if (clist.length < 2) {
       return null
     }
+    if (!space.modules) {
+      warn('import', 'invalid without an app.')
+      return null
+    }
     var src
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
@@ -74,10 +78,6 @@ module.exports = function import_ ($void) {
   // expose to be called by native code.
   $void.importModule = importModule
 
-  // the cached modules
-  // TODO: move into app space?
-  var modules = $void.modules = Object.create(null)
-
   function importModule (space, appUri, moduleUri, source, type) {
     if (typeof source !== 'string') {
       if (source instanceof Symbol$) {
@@ -96,7 +96,7 @@ module.exports = function import_ ($void) {
       return null
     }
     // look up it in cache.
-    var module_ = lookupInCache(uri, moduleUri)
+    var module_ = lookupInCache(space.modules, uri, moduleUri)
     var reloading
     switch (module_.status) {
       case 0:
@@ -159,7 +159,7 @@ module.exports = function import_ ($void) {
       : [ runtimeDir ] // for dynamic or unknown-source code.
   }
 
-  function lookupInCache (uri, moduleUri) {
+  function lookupInCache (modules, uri, moduleUri) {
     var module = modules[uri]
     if (!module) {
       module = modules[uri] = Object.assign(Object.create(null), {
