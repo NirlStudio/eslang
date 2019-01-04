@@ -18,13 +18,29 @@ module.exports = function ($void, JS, printer) {
 
   // standard error, but only warning exists in sugly space.
   var lastWarning = null // save to make it testable.
+
+  function generateWarningId () {
+    var ts = Date.now()
+    return !lastWarning || ts !== lastWarning[1][0] ? [ts, 0]
+      : [ts, lastWarning[1][1] + 1]
+  }
+
   $export($, 'warn', function (category) {
     if (typeof category === 'undefined') {
       return lastWarning
     }
-    lastWarning = Array.prototype.slice.call(arguments)
-    return typeof category !== 'string' || !category
-      ? '' // taken as clearing last warning.
-      : warn.apply(printer, arguments)
+
+    if (typeof category !== 'string' && category !== null) {
+      lastWarning = [category = 'warn', generateWarningId(),
+        'category should be a string.', category
+      ]
+    } else if (category) { // clear warning
+      lastWarning = [category, generateWarningId()]
+        .concat(Array.prototype.slice.call(arguments, 1))
+    } else {
+      return (lastWarning = ['', generateWarningId()])
+    }
+    warn.apply(printer, lastWarning)
+    return lastWarning
   })
 }

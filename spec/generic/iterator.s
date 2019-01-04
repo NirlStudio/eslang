@@ -58,7 +58,7 @@
   ),
 
   (define "Encoding" (=> ()
-    (should "an empty iterator is encoded to tupe (iterator empty)." (= ()
+    (should "an empty iterator is encoded to tuple (iterator empty)." (= ()
       (var code ((iterator empty) to-code),
       (assert (code is-a tuple),
       (assert 2 (code length),
@@ -68,11 +68,12 @@
     (should "a non-empty iterator is encoded to tuple (iterator of ...)." (=> ()
       (for value in the-values
         (var code (value to-code),
+        (print value code)
         (assert (code is-a tuple),
         (assert 3 (code length),
         (assert (`iterator) (code 0),
         (assert (`of) (code 1),
-        (assert (symbol etc) (code 2),
+        (assert ((code 2) is-a tuple),
       ),
     ),
   ),
@@ -83,7 +84,7 @@
     ),
     (should "a non-empty iterator is encoded to '(iterator of ...)'." (=> ()
       (for value in the-values
-        (assert "(iterator of ...)" (value to-string),
+        (assert ((value to-string) starts-with "(iterator of (",
     ),
   ),
 ),

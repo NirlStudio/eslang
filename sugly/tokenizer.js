@@ -4,7 +4,7 @@ module.exports = function ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']
-  var strReplace = $.string.proto.replace
+  var strUnescape = $.string.unescape
   var warn = $.warn
   var $export = $void.export
   var isApplicable = $void.isApplicable
@@ -130,7 +130,7 @@ module.exports = function ($void) {
         return raiseSpace(c)
       }
       if (c === '\t') {
-        warn('tokenizing', 'TAB-space is not suggested in indention.',
+        warn('tokenizer', 'TAB-space is not suggested in indention.',
           [lineNo, lineOffset, indenting])
       }
       clauseIndent = ++indenting
@@ -138,23 +138,7 @@ module.exports = function ($void) {
 
     function createStringWaiter (quote, tokenType) {
       function raiseValue () {
-        var value, error
-        try {
-          // TODO: to be replaced to native escape processor?
-          value = JSON.parse((quote === '"' ? pendingText
-            : strReplace.call(pendingText, '"', '\\"')
-          ) + '"')
-        } catch (err) {
-          error = err
-        }
-        if (typeof value !== 'string') {
-          warn('tokenizing', 'invalid string input: [JSON] ',
-            (error && error.message) || 'unknow error.', '\n',
-            pendingText + quote, '\n',
-            [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
-          value = pendingText.substring(1) // skip all escaping logic.
-        }
-        parse(tokenType || 'value', value,
+        parse(tokenType || 'value', strUnescape(pendingText + '"'),
           [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])
         waiter = null
         return true
@@ -162,7 +146,7 @@ module.exports = function ($void) {
 
       return function (c) {
         if (typeof c === 'undefined') { // unexpected ending
-          warn('tokenizing', 'a string value is not properly closed.',
+          warn('tokenizer', 'a string value is not properly closed.',
             [lineNo, lineOffset, pendingLine, pendingOffset])
           return raiseValue()
         }
@@ -199,7 +183,7 @@ module.exports = function ($void) {
         if (c === quote) {
           return raiseValue()
         }
-        pendingText += c
+        pendingText += quote === "'" && c === '"' ? '\\' + c : c
         if (c === '\\') {
           escaping = true
         }
@@ -236,7 +220,7 @@ module.exports = function ($void) {
         } // else, normal ending
       } else {
         pendingText += ')'
-        warn('tokenizing', 'a block comment is not properly closed.',
+        warn('tokenizer', 'a block comment is not properly closed.',
           [lineNo, lineOffset, pendingLine, pendingOffset])
       }
       parse('comment', pendingText,

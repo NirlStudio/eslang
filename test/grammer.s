@@ -251,6 +251,7 @@ concat((concat concat) concat)concat
 # meta.function-string-type-sugly
 ((string of-chars) of-chars)
 ((string of-code) of-code)
+((string unescape) unescape)
 ((string format) format)
 # meta.function-string-sugly
 starts-with((starts-with starts-with) starts-with)starts-with

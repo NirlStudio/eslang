@@ -137,9 +137,8 @@ module.exports = function ($void) {
     }
     return obj
   }, true)
-  // remove one or more values to create a new array.
+  // remove one or more values to create a new object.
   link(Type, 'remove', function (src, fields) {
-    // TODO: fields can be another object
     if (!isObject(src)) {
       return null
     }
@@ -152,6 +151,11 @@ module.exports = function ($void) {
         delete obj[name]
       } else if (name instanceof Symbol$) {
         delete obj[name.key]
+      } else if (name instanceof Object$) {
+        fields = Object.getOwnPropertyNames(name)
+        for (var j = 0; j < fields.length; j++) {
+          delete obj[fields[j]]
+        }
       }
     }
     var activator = src.type.proto.activator

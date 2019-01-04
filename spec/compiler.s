@@ -204,7 +204,7 @@
     (assert 3 (statements 1),
   ),
   (should "(compile code) automatically close all open clauses when reaching the end of code." (= ()
-    (warn '')
+    (warn *)
     (var statements (compile "(@(@ x: 1\n  m: (=(y)(x + y"),
     (var warning (warn),
 
@@ -219,33 +219,33 @@
     (assert 1 ((value 0) x),
     (assert ($((value 0) "m") is-a lambda),
 
-    (assert 'compiling' (warning 0),
+    (assert "compiler" (warning 0),
   ),
   (should "(compile code) allows but warns extra ending punctuations." (= ()
-    (warn '')
+    (warn *)
     (var statements (compile "(x))"),
     (var warning (warn),
-    (assert 'compiling' (warning 0),
+    (assert "compiler" (warning 0),
 
     (assert (statements is-a tuple),
     (assert (statements is-plain),
     (assert 1 (statements length),
     (assert (quote x) (statements 0),
 
-    (warn '')
+    (warn *)
     (var statements (compile "(x)),"),
     (var warning (warn),
-    (assert 'compiling' (warning 0),
+    (assert "compiler" (warning 0),
 
     (assert (statements is-a tuple),
     (assert (statements is-plain),
     (assert 1 (statements length),
     (assert (quote x) (statements 0),
 
-    (warn '')
+    (warn *)
     (var statements (compile "(x))."),
     (var warning (warn),
-    (assert 'compiling' (warning 0),
+    (assert "compiler" (warning 0),
 
     (assert (statements is-a tuple),
     (assert (statements is-plain),

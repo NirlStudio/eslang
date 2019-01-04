@@ -62,14 +62,15 @@ module.exports = function ($void) {
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
+  var ShortArray = 16
   var arrayFrom = link(Type, 'from', function () {
     var list = []
     var isSparse
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       if (Array.isArray(source)) {
-        // TODO: to deal with a large array.
-        list.push.apply(list, source)
+        source <= ShortArray ? list.push.apply(list, source)
+          : (list = list.concat(source))
         isSparse = isSparse || source.isSparse
       } else {
         var next = iterateOf(source)

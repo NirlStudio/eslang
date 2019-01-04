@@ -60,7 +60,7 @@ module.exports = function function_ ($void) {
             }
             throw signal
           }
-          warn('lambda', 'unexpected error:', signal)
+          warn('lambda:eval', 'unexpected error:', signal)
           return null
         }
       }
@@ -114,7 +114,7 @@ module.exports = function function_ ($void) {
             }
             throw signal
           } // for unexpected errors
-          warn('function', 'unexpected error:', signal)
+          warn('function:eval', 'unexpected error:', signal)
           return null
         }
       }

@@ -21,6 +21,9 @@ module.exports = function ($void) {
   var ClassType$ = $void.ClassType
   var isApplicable = $void.isApplicable
 
+  // flag indicates if it's running in native host.
+  $void.isNativeHost = typeof window === 'undefined'
+
   // generate an empty function.
   $void.createEmptyOperation = createEmptyOperation
 

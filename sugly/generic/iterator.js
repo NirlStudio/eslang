@@ -3,7 +3,7 @@
 module.exports = function iterate ($void) {
   var $ = $void.$
   var Type = $.iterator
-  var $Symbol = $.symbol
+  var $Array = $.array
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Iterator$ = $void.Iterator
@@ -314,22 +314,27 @@ module.exports = function iterate ($void) {
   })
 
   // all interators will be encoded to an empty iterator.
-  var code = new Tuple$([
-    sharedSymbolOf('iterator'), sharedSymbolOf('of'), $Symbol.etc
-  ])
-  var emptyCode = new Tuple$([
-    sharedSymbolOf('iterator'), sharedSymbolOf('empty')
-  ])
-  link(proto, 'to-code', function () {
-    return this.next ? code : emptyCode
+  var arrayProto = $Array.proto
+  var symbolOf = sharedSymbolOf('of')
+  var symbolIterator = sharedSymbolOf('iterator')
+  var emptyCode = new Tuple$([symbolIterator, sharedSymbolOf('empty')])
+  var toCode = link(proto, 'to-code', function () {
+    if (!this.next) {
+      return emptyCode
+    }
+    var list = this.collect()
+    this.next = arrayProto.iterate.call(list)
+    return new Tuple$([
+      symbolIterator, symbolOf, arrayProto['to-code'].call(list)
+    ])
   })
 
   // Description
-  var codeStr = thisCall(code, 'to-string')
-  var emptyCodeStr = thisCall(emptyCode, 'to-string')
+  var tupleToString = $.tuple.proto['to-string']
+  var emptyCodeStr = tupleToString.call(emptyCode)
   link(proto, 'to-string', function (separator) {
-    // TODO: show more details (action layers)?
-    return this.next ? codeStr : emptyCodeStr
+    return !this.next ? emptyCodeStr
+      : tupleToString.call(toCode.call(this))
   })
 
   // Indexer

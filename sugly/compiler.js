@@ -41,7 +41,7 @@ module.exports = function ($void) {
       // reset compiling context.
       waiter && waiter()
       if (stack.length > 1) {
-        warn('compiling', 'open statements are not properly closed.',
+        warn('compiler', 'open statements are not properly closed.',
           [lastToken])
         endAll(null, lastToken[2])
       }
@@ -82,9 +82,10 @@ module.exports = function ($void) {
           }
           break
         case 'comment':
-          // TODO: comment document should be put in specs.
+          // comment document should be put in specs.
           break
-        default: // do nothing for free space.
+        default:
+          // do nothing for a free space.
           break
       }
     }
@@ -105,7 +106,7 @@ module.exports = function ($void) {
         case ',':
           // a free comma functions only as a stronger visual indicator like
           // a whitespace, so it will be just skipped in building AST.
-          if (lastToken && lastToken[0] === 'symbol' && lastToken[1].key === ',') {
+          if (lastToken[0] === 'symbol' && lastToken[1].key === ',') {
             pushValue(null, source)
           }
           break
@@ -138,7 +139,7 @@ module.exports = function ($void) {
     function pushFormat (pattern, source) {
       var args = formatPattern(pattern)
       if (!args || !(args.length > 1)) {
-        warn('compiling', 'unnecessary format string.',
+        warn('compiler', 'unnecessary format string.',
           pattern, ['format', pattern, source])
         return pushValue(pattern, source)
       }
@@ -170,7 +171,7 @@ module.exports = function ($void) {
           if (stack.length > 1) {
             endAll(value, source)
           } else {
-            warn('compiling', 'extra enclosing ")." is found and ignored.',
+            warn('compiler', 'extra enclosing ")." is found and ignored.',
               [lastToken, ['symbol', value, source]])
           }
           return true
@@ -231,7 +232,7 @@ module.exports = function ($void) {
 
     function endClause () {
       if (stack.length < 2) {
-        warn('compiling', 'extra enclosing parentheses is found and ignored.',
+        warn('compiler', 'extra enclosing parentheses is found and ignored.',
           [lastToken])
         return // allow & ignore extra enclosing parentheses
       }
@@ -240,7 +241,7 @@ module.exports = function ($void) {
 
     function endMatched (value, source) {
       if (stack.length < 2) {
-        warn('compiling', 'extra ")," is found and ignored.',
+        warn('compiler', 'extra ")," is found and ignored.',
           [lastToken, ['symbol', value, source]])
         return // allow & ignore extra enclosing parentheses
       }

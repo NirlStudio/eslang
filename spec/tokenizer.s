@@ -198,7 +198,7 @@
 
       (assert (warning is-not old-warning),
       (assert (warning is-a array),
-      (assert "tokenizing" (warning 0),
+      (assert "tokenizer" (warning 0),
     ),
   ),
   (var assert-value (=? (V T)
@@ -274,18 +274,21 @@
     (should "(tokenize code) automatically closes current string when reaching the end of code." (=> ()
       (var old-warning (warn),
       (var tokens (tokenize "\"abc"),
+      (var warning (warn),
+
       (assert (tokens is-a array),
       (assert 1 (tokens length),
       (assert-value "abc" (tokens 0),
 
-      (var warning (warn),
       (assert (warning is-not old-warning),
       (assert (warning is-a array),
-      (assert "tokenizing" (warning 0),
+      (assert "tokenizer" (warning 0),
     ),
     (should "(tokenize code) keeps the literal string value if the un-escaping failed." (=> ()
       (var old-warning (warn),
       (var tokens (tokenize "\"abc\\"),
+      (var warning (warn),
+
       (var assert-str (=? STR
         (assert (tokens is-a array),
         (assert 1 (tokens length),
@@ -293,11 +296,10 @@
       ),
       (assert-str "abc\\")
 
-      (var warning (warn),
-      (var assert-warning (=? ()
+      (var assert-warning (=? C
         (assert (warning is-not old-warning),
         (assert (warning is-a array),
-        (assert "tokenizing" (warning 0),
+        (assert ((C) ?? "string:unescape") (warning 0),
       ),
       (assert-warning)
 
@@ -305,7 +307,7 @@
       (let tokens (tokenize "\"abc\\\""),
       (let warning (warn),
       (assert-str "abc\"")
-      (assert-warning)
+      (assert-warning "tokenizer")
 
       (let old-warning warning)
       (let tokens (tokenize "\"abc\t \""),
@@ -332,7 +334,7 @@
     (assert "format" ((T) 0),
     (assert (F) ((T) 1),
   ),
-  (define "format values - reserved" (=> ()
+  (define "format values" (=> ()
     (should "(tokenize code) feeds a single-quoted format value to parser function." (=> ()
       (var tokens (tokenize "'abc\"cde'"),
       (assert (tokens is-a array),
@@ -385,7 +387,7 @@
       (assert-comment "( abc)" (tokens 0),
 
       (assert (warning is-not old-warning),
-      (assert "tokenizing" (warning 0),
+      (assert "tokenizer" (warning 0),
 
       (let old-warning warning),
       (var tokens (tokenize "#( abc\n\t  cde"),
@@ -396,7 +398,7 @@
       (assert-comment "( abc\n\t  cde)" (tokens 0),
 
       (assert (warning is-not old-warning),
-      (assert "tokenizing" (warning 0),
+      (assert "tokenizer" (warning 0),
     ),
   ),
 ),

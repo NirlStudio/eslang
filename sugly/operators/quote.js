@@ -16,8 +16,7 @@ module.exports = function quote ($void) {
   staticOperator('quote', function (space, clause) {
     return clause._quoted || (
       clause._quoted = clause.$.length < 2 ? $Tuple.empty
-        // TODO: copy source to new tuple?
-        : new Tuple$(clause.$.slice(1))
+        : new Tuple$(clause.$.slice(1), false, clause.source)
     )
   })
 
@@ -25,8 +24,7 @@ module.exports = function quote ($void) {
   staticOperator('unquote', function (space, clause) {
     return clause._quoted || (
       clause._quoted = clause.$.length < 2 ? $Tuple.blank
-        // TODO: copy source to new tuple?
-        : new Tuple$(clause.$.slice(1), true)
+        : new Tuple$(clause.$.slice(1), true, clause.source)
     )
   })
 }

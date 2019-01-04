@@ -40,7 +40,7 @@ module.exports = function ($void) {
     return String.fromCharCode.apply(String, arguments)
   }, true)
 
-  // generate the source code string for a value
+  // generate the source code string for any value.
   link(Type, 'of-code', function (value) {
     return typeof value === 'undefined' ? ''
       : thisCall(thisCall(value, 'to-code'), 'to-string')
