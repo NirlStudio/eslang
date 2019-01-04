@@ -1,4 +1,5 @@
 (for spec in (@
+    "format"
     "json"
     "math"
     "print"

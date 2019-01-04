@@ -248,8 +248,11 @@ copy((copy copy) copy)copy
 slice((slice slice) slice)slice
 concat((concat concat) concat)concat
 
+# meta.function-string-type-sugly
+((string of-chars) of-chars)
+((string of-code) of-code)
+((string format) format)
 # meta.function-string-sugly
-of-chars((of-chars of-chars) of-chars)of-chars
 starts-with((starts-with starts-with) starts-with)starts-with
 ends-with((ends-with ends-with) ends-with)ends-with
 trim((trim trim) trim)trim

@@ -36,6 +36,7 @@ function initializeSpace ($void) {
 
 function initializeLib ($void, printer) {
   require('./lib/print')($void, JS, printer)
+  require('./lib/format')($void, JS)
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
   require('./lib/json')($void, JS)

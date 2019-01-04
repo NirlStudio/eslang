@@ -7,10 +7,13 @@ module.exports = function ($void) {
   var $export = $void.export
   var tokenizer = $.tokenizer
   var isApplicable = $void.isApplicable
+  var formatPattern = $void.formatPattern
   var sharedSymbolOf = $void.sharedSymbolOf
 
   var symbolPairing = $.symbol.pairing
   var symbolSubject = $.symbol.subject
+  var symbolString = sharedSymbolOf('string')
+  var symbolFormat = sharedSymbolOf('format')
   var symbolToString = sharedSymbolOf('to-string')
 
   var compiler = $export($, 'compiler', function (evaluate) {
@@ -70,8 +73,8 @@ module.exports = function ($void) {
         case 'punctuation':
           pushPunctuation(value, source)
           break
-        case 'format': // TODO: as a format string.
-          pushValue(value, source) // treat it as a common string now.
+        case 'format':
+          pushFormat(value, source)
           break
         case 'space':
           if (value === '\n') {
@@ -79,7 +82,7 @@ module.exports = function ($void) {
           }
           break
         case 'comment':
-          // TODO: special comment can works as annotation.
+          // TODO: special comment as document?
           break
         default: // do nothing for free space.
           break
@@ -130,6 +133,27 @@ module.exports = function ($void) {
         default: // just skip unknow punctuations as some placeholders.
           break
       }
+    }
+
+    function pushFormat (pattern, source) {
+      var args = formatPattern(pattern)
+      if (!args || !(args.length > 1)) {
+        warn('compiling', 'unnecessary format string.',
+          pattern, ['format', pattern, source])
+        return pushValue(pattern, source)
+      }
+
+      var beginning = source.slice(0, 3).concat(source.slice(1, 2))
+      var ending = source.slice(0, 1).concat(source.slice(-2))
+      stack.push([symbolString, symbolFormat])
+      sourceStack.push([[beginning], beginning, beginning])
+
+      pushValue(args[0], source)
+      for (var i = 1; i < args.length; i++) {
+        var code = $.compile(args[i])
+        pushValue(code.$.length > 0 ? code.$[0] : null, ending)
+      }
+      endTopWith(ending)
     }
 
     function endingWaiter (type, value, source) {
@@ -196,8 +220,7 @@ module.exports = function ($void) {
       // (x ::) => ($(x) to-string)
       if (statement.length < 1) {
         statement.push(symbolToString)
-        var last = ending.slice(-2)
-        sourceMap.push(ending.slice(0, 1).concat(last, last))
+        sourceMap.push(ending.slice(0, 1).concat(ending.slice(-2)))
       }
 
       statement.unshift(symbolSubject, new Tuple$(expr, false, exprSrcMap))
@@ -291,7 +314,6 @@ module.exports = function ($void) {
       compiling('\n') // end any pending waiter.
     }
     compiling() // notify the end of stream.
-    // TODO: save ending location
     return new Tuple$(list, true, src)
   })
 }

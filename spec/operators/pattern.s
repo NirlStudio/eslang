@@ -85,10 +85,16 @@
   ),
 ),
 
-(define "(...:: ...:: ...) - chain operation" (= ()
+(define "(...:: ...) - chain operation" (= ()
   (should "(expr ...::) returns ($(expr ...) to-string)." (=> ()
     assert "1" (1::);
     assert "true" (1:: is 1::);
+
+    assert "2" (++ 1::);
+    assert "false" (++ 1:: is 1::);
+
+    assert "1" (1 ++ ::);
+    assert "true" (1 ++ :: is 1::);
 
     assert "3" (1 + 2::);
     assert "true" (1 + 2:: is 3::);
