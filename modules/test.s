@@ -28,8 +28,9 @@
 (var assertions 0)
 (export ++assertions (=>() (++ assertions),
 
-(export assert (=? (expected expr note) # (expr) or (expected expr) or (expected expr note)
-  (if (expr is-empty)
+# (expr) or (expected expr) or (expected expr note)
+(export assert (=? (expected expr note)
+  (if (expr is null)
     (local "expr" expected)
     (local "expected" true)
   ),
@@ -106,18 +107,17 @@
 ).
 
 (let print-a (=> failure
-  (print (+ "  " (failure no.) ") "
-    "[ " ((failure path) join " / ") " ] " (failure behaviour),
+  (print
+    '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behaviour)'
   ),
   (let assertion (failure assertion),
-  (print (+
-    (red "     step-" (assertion step) " is expecting "),
-    (green (underline ($(assertion "expected") to-string),
-    (red " instead of " (underline ($(assertion "real") to-string),
+  (print
+    (red '     step-$(assertion step) is expecting'),
+    (green (underline (assertion "expected"::),
+    (red 'instead of $(underline (assertion "real"::))'),
   ),
-  (print (gray "     when asserting "
-    (underline ((assertion expr) to-string),
-    (((assertion note) is-empty) ? "" (", for " + (assertion note),
+  (print (gray '     when asserting $(underline (assertion expr::))'
+    ((assertion note:: is-empty) ? "" (", for " + (assertion note),
     "\n"
 ).
 
@@ -150,14 +150,14 @@
   (let ts ((date now) - t1),
 
   (print
-    (green "\n  passing: " passing),
+    (green '\n  passing: $passing'),
     (gray " ("
       ((ts > 1000) ? (ts / 1000) ts),
       ((ts > 1000)? "s, " "ms, "),
       assertions " assertions)"
   ),
   (if failing
-    (print (red "  failing: " failing "\n"),
+    (print (red '  failing: $failing\n'),
     (for failure in failures
       (print-a failure)
     ),

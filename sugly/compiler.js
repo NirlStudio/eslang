@@ -138,10 +138,10 @@ module.exports = function ($void) {
 
     function pushFormat (pattern, source) {
       var args = formatPattern(pattern)
-      if (!args || !(args.length > 1)) {
+      if (!(args.length > 1)) {
         warn('compiler', 'unnecessary format string.',
           pattern, ['format', pattern, source])
-        return pushValue(pattern, source)
+        return pushValue(args[0], source)
       }
 
       var beginning = source.slice(0, 3).concat(source.slice(1, 2))

@@ -348,10 +348,22 @@ module.exports = function ($void) {
     }
 
     switch (format) {
+      case 'H':
+      case 'HEX':
+        return normalize(this).toString(16)
+      case 'h':
       case 'hex':
         return '0x' + normalize(this).toString(16)
+      case 'O':
+      case 'OCT':
+        return normalize(this).toString(8)
+      case 'o':
       case 'oct':
         return '0' + normalize(this).toString(8)
+      case 'B':
+      case 'BIN':
+        return normalize(this).toString(2)
+      case 'b':
       case 'bin':
         return '0b' + normalize(this).toString(2)
       default:
