@@ -1,174 +1,168 @@
 # import rendering
-(let colors (import "colors" "js").
-(let (gray green red underline) colors).
+let colors (import "colors" "js");
+let (gray green red underline) colors;
 (let (sign-passed sign-failed)
-  (import (passed failed) from colors).
+  (import (passed failed) from colors
+).
 
 # to store all test cases.
-(let cases (@).
-(let current null). # the stack top
+let cases (@);
+let current null; # the stack top
 
 (export define (=> (feature describe-it)
-   (var top current) # save current context
-   (let current (var spec (@ feature), # create the spec object as an array.
-   ((top ?? cases) push spec), # save the spec into stack top.
-   (describe-it) # extract the description
-   (let current top) # recover the stack top.
-   (return spec)
+   var top current; # save current context
+   let current (var spec (@ feature); # create the spec object as an array.
+   (top ?? cases) push spec; # save the spec into stack top.
+   describe-it; # extract the description
+   let current top; # recover the stack top.
+   return spec;
 ).
 
 (export should (=> (behaviour action)
   (current push (@
-    behaviour: behaviour
+    behaviour: behaviour,
     action: action
   ),
 ).
 
 # assertion counter
-(var assertions 0)
-(export ++assertions (=>() (++ assertions),
+var assertions 0;
+export ++assertions (=>() (++ assertions);
 
 # (expr) or (expected expr) or (expected expr note)
-(export assert (=? (expected expr note)
+(export assert (=? (expected, expr, note)
   (if (expr is null)
-    (local "expr" expected)
-    (local "expected" true)
+    local "expr" expected;
+    local "expected" true;
   ),
-  (++assertions )
-  (++ asserting-step)
-  (local "expected" (expected),
-  (local "value" (expr),
-  (if ($value != expected)
-    (return (@
-      failed: true
-      step: asserting-step
-      expected: expected
-      real: value
-      expr: expr
-      note: (note)
+  ++assertions;
+  ++ asserting-step;
+  local "expected" (expected);
+  local "value" (expr);
+  (if ($value != expected) (@
+    failed: true,
+    step: asserting-step,
+    expected: expected,
+    real: value,
+    expr: expr,
+    note: (note)
+  ),
 ).
 
 # test results
-(let summary (@).
-(let failures (@).
+let summary (@);
+let failures (@);
 
 # testing status
-(let path (@).
-(let indent "  ")
+let path (@);
+let indent "  ";
 
-(let passing 0)
+let passing 0;
 (let pass (=> behaviour
-  (++ passing)
-  (print indent sign-passed (gray behaviour),
+  ++ passing;
+  print indent sign-passed (gray behaviour);
   (summary push (@
-    path: (path copy)
-    behaviour: behaviour
+    path: (path copy),
+    behaviour: behaviour,
     passed: true
   ),
 ).
 
-(let failing 0)
-(let fail (=> (behaviour assertion)
-  (++ failing)
-  (print indent sign-failed (red "(" failing ") " behaviour),
+let failing 0;
+(let fail (=> (behaviour, assertion)
+  ++ failing;
+  print indent sign-failed (red "(" failing ") " behaviour);
   (summary push (@
-    path: (path copy)
-    behaviour: behaviour
+    path: (path copy),
+    behaviour: behaviour,
     passed: false
   ),
   (failures push (@
-    no.: failing
-    path: (path copy)
-    behaviour: behaviour
+    no.: failing,
+    path: (path copy),
+    behaviour: behaviour,
     assertion: assertion
   ),
 ).
 
 (let test-a (=> (case)
   # print headline
-  (print indent (case first),
-  (path push (case first),
-  (indent += "  ")
+  print indent (case first);
+  path push (case first);
+  indent += "  ";
   # run test case or run into child cases.
   (for i in (1 (case length))
-    (var task (case:i),
+    var task (case:i);
     (if (task is-a array)
       (do task)
     else
-      (var assertion (task action),
+      var assertion (task action);
       (if (assertion failed)
-        (fail (task behaviour) assertion)
+        fail (task behaviour) assertion;
       else
-        (pass (task behaviour)
+        pass (task behaviour);
   ),
   # recover status
-  (path pop)
-  (indent -= 2),
+  path pop;
+  indent -= 2;
 ).
 
 (let print-a (=> failure
+  print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behaviour)';
+  let assertion (failure assertion);
   (print
-    '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behaviour)'
-  ),
-  (let assertion (failure assertion),
-  (print
-    (red '     step-$(assertion step) is expecting'),
-    (green (underline (assertion "expected"::),
-    (red 'instead of $(underline (assertion "real"::))'),
+    red '     step-$(assertion step) is expecting';
+    green (underline (assertion "expected"::;
+    red 'instead of $(underline (assertion "real"::))';
   ),
   (print (gray '     when asserting $(underline (assertion expr::))'
-    ((assertion note:: is-empty) ? "" (", for " + (assertion note),
-    "\n"
+    (assertion note:: is-empty) ? "" (", for " + (assertion note); "\n"
+  ),
 ).
 
-(let clear (=>
+(var clear (=> ()
   # targets
-  (let cases (@)
-  (let current null)
+  let cases (@);
+  let current null;
   # result
-  (let summary (@),
-  (let failures (@),
+  let summary (@);
+  let failures (@);
   # progress
-  (let path (@),
-  (let indent "  ")
+  let path (@);
+  let indent "  ";
   # counters
-  (let assertions 0)
-  (let passing 0)
-  (let failing 0)
+  let assertions 0;
+  let passing 0;
+  let failing 0;
 ).
 
 (export test (=> ()
-  (for suite in arguments (load suite),
-  (if (cases is-empty)
-    (return ),
-  ),
-  (print "  Start to run sugly test suites ...\n")
-  (let t1 (date now),
-  (for case in cases
-    (test-a case),
-  ),
-  (let ts ((date now) - t1),
+  for suite in arguments (load suite);
+  if (cases is-empty) (return);
+
+  print "  Start to run sugly test suites ...\n";
+  let t1 (date now);
+  for case in cases (test-a case);
+  let ts ((date now) - t1);
 
   (print
-    (green '\n  passing: $passing'),
+    green '\n  passing: $passing';
     (gray " ("
-      ((ts > 1000) ? (ts / 1000) ts),
-      ((ts > 1000)? "s, " "ms, "),
+      ts > 1000:: ? (ts / 1000) ts;
+      ts > 1000:: ? "s, " "ms, ";
       assertions " assertions)"
   ),
   (if failing
-    (print (red '  failing: $failing\n'),
-    (for failure in failures
-      (print-a failure)
-    ),
+    print (red '  failing: $failing\n');
+    for failure in failures (print-a failure);
   ),
   (if (colors is-missing)
-    (print "\n  P.S. To prettify output, please run 'npm install'.\n")
+    print "\n  P.S. To prettify output, please run 'npm install'.\n";
   ),
   (var report (@
-    summary: summary
+    summary: summary,
     failures: failures
   ),
-  (clear )
-  (return report)
+  clear;
+  return report;
 ).
