@@ -142,6 +142,14 @@ module.exports = function ($void) {
     return counter
   } : count)
 
+  // Mutability
+  link(proto, 'seal', function () {
+    return Object.freeze(this)
+  })
+  link(proto, 'is-sealed', function () {
+    return Object.isFrozen(this)
+  })
+
   var stopSignal = new Error('tracing.stopped')
   // call a handler for each element until it returns a truthy value.
   var each = function (tracer) {

@@ -31,7 +31,7 @@ export ++assertions (=>() (++ assertions);
 
 # (expr) or (expected expr) or (expected expr note)
 (export assert (=? (expected, expr, note)
-  (if (expr is null)
+  (if (operation length:: < 3)
     local "expr" expected;
     local "expected" true;
   ),
@@ -39,14 +39,14 @@ export ++assertions (=>() (++ assertions);
   ++ asserting-step;
   local "expected" (expected);
   local "value" (expr);
-  (if ($value != expected) (@
-    failed: true,
-    step: asserting-step,
-    expected: expected,
-    real: value,
-    expr: expr,
-    note: (note)
-  ),
+  (if ($value != expected)
+    (return (@ # break current case.
+      failed: true,
+      step: asserting-step,
+      expected: expected,
+      real: value,
+      expr: expr,
+      note: (note)
 ).
 
 # test results

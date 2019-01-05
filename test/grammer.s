@@ -206,8 +206,9 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 
 # meta.function.type.sugly (type)
 (((of of) of) of x)
-(((objectify objectify) objectify) objectify x)
-(((typify typify) typify) typify x)
+(((reflect reflect) reflect) reflect x)
+(((seal seal) seal) seal x)
+(((is-sealed is-sealed) is-sealed) is-sealed x)
 
 # meta.constant.empty.sugly
 (type empty)

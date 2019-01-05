@@ -923,6 +923,89 @@
   ),
 ),
 
+(define "(object is-sealed ...)" (=> ()
+  (should "(object is-sealed) returns true." (=> ()
+    (assert true (object is-sealed),
+  ),
+  (should "(object is-sealed obj) return true if obj is sealed." (=> ()
+    (var obj (@: x:1),
+    (assert false (object is-sealed obj),
+    (assert obj (object seal obj),
+    (assert (object is-sealed obj),
+  ),
+  (should "(object is-sealed inst) return true if the class instance is sealed." (=> ()
+    (var inst (@:class x: 1 :: default),
+    (assert false (object is-sealed inst),
+    (assert inst (object seal inst),
+    (assert (object is-sealed inst),
+  ),
+  (should "(object is-sealed an-array) return true if the array is sealed." (=> ()
+    (var a (@ 1 2),
+    (assert false (object is-sealed a),
+    (assert a (object seal a),
+    (assert (object is-sealed a),
+  ),
+  (should "(object is-sealed other-values) return false." (=> ()
+    (assert false (object is-sealed ""),
+    (assert false (object is-sealed (=(),
+  ),
+),
+
+(define "(object seal ...)" (=> ()
+  (should "(object seal) returns object." (=> ()
+    (assert object (object seal),
+  ),
+  (should "(object seal obj) seals obj to make it read-only and returns it." (=> ()
+    (var obj (@ x:1),
+    (obj "y" 2)
+    (assert 2 (obj y),
+    (assert false (object is-sealed obj),
+
+    (assert obj (object seal obj),
+    (assert (object is-sealed obj),
+
+    (obj "y" 2.2)
+    (obj "z" 3)
+    (assert 2 (obj y),
+    (assert null (obj z),
+  ),
+  (should "(object seal inst) seals an instance of a class to make it read-only." (=> ()
+    (var inst (@:class x:1 :: default),
+    (inst "y" 2)
+    (assert 2 (inst y),
+    (assert false (object is-sealed inst),
+
+    (assert inst (object seal inst),
+    (assert (object is-sealed inst),
+
+    (inst "y" 2.2)
+    (inst "z" 3)
+    (assert 2 (inst y),
+    (assert null (inst z),
+  ),
+  (should "(object seal an-array) seals an array to make it read-only." (=> ()
+    (var a (@ 1),
+    (a push 2)
+    (assert 2 (a length),
+    (assert false (a is-sealed),
+
+    (assert a (object seal a),
+    (assert (a is-sealed),
+
+    (a push 3)
+    (assert 2 (a length),
+  ),
+  (should "(object seal other-values) does nothing to other values and returns null." (=> ()
+    (var s "abc")
+    (assert null (object seal s),
+    (assert false (object is-sealed s),
+
+    (var f (= (x, y) (+ x y),
+    (assert null (object seal f),
+    (assert false (object is-sealed f),
+  ),
+),
+
 (define "(an-object iterate)" (= ()
   (should "(empty-obj iterate) returns an empty next function." (= ()
     (var next ((@:) iterate),

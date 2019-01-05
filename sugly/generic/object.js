@@ -192,6 +192,16 @@ module.exports = function ($void) {
     return isObject(obj) ? Object.getOwnPropertyNames(obj) : []
   }, true)
 
+  // Mutability
+  link(Type, 'seal', function (obj) {
+    return typeof obj === 'undefined' ? Type // operating on the type
+      : isObject(obj) || Array.isArray(obj) ? Object.freeze(obj) : null
+  })
+  link(Type, 'is-sealed', function (obj) {
+    return typeof obj === 'undefined' ? true // asking the type
+      : isObject(obj) || Array.isArray(obj) ? Object.isFrozen(obj) : false
+  })
+
   var proto = Type.proto
   // generate an iterator function to traverse all fields as [name, value].
   link(proto, 'iterate', function () {

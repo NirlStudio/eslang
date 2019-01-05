@@ -280,8 +280,9 @@
       (assert ($(s empty) is-a the-type),
       (assert ($(s "of") is-a lambda),
       (assert ($(s "indexer") is-a lambda),
-      (assert ($(s "objectify") is-a lambda),
-      (assert ($(s "typify") is-a lambda),
+      (assert ($(s "reflect") is-a lambda),
+      (assert ($(s "seal") is-a lambda),
+      (assert ($(s "is-sealed") is-a lambda),
     ),
   ),
 
@@ -454,18 +455,23 @@
       (should "each primary type has its own instance indexer." (=> ()
         (assert ($(the-type "indexer") is-not (type "indexer"),
     ),
-    (should "a common type's objectify function inherits type's." (=> ()
-      (assert ($(the-type "objectify") equals (type "objectify"),
+    (should "a common type's reflect function inherits type's." (=> ()
+      (assert ($(the-type "reflect") equals (type "reflect"),
     ),
-    (should "a common type's typify function inherits type's." (=> ()
-      (assert ($(the-type "typify") equals (type "typify"),
+    (if (the-type is-not object:: && (the-type is-not-a class))
+      (should "a common type's seal function inherits type's." (=> ()
+        (assert ($(the-type "seal") equals (type "seal"),
+      ),
+      (should "a common type's is-sealed function inherits type's." (=> ()
+        (assert ($(the-type "is-sealed") equals (type "is-sealed"),
+      ),
     ),
   ),
 ),
 
 (define "Type Reflection" (=> ()
-  (should "(type objectify) returns the object representation of type." (=> ()
-    (var t (the-type objectify),
+  (should "(type reflect) returns the object representation of type." (=> ()
+    (var t (the-type reflect),
     (assert (t is-a object),
     (assert ((type of t) is object),
     (for (k v) in t
@@ -477,6 +483,17 @@
     (for (k v) in (t type)
       (if ($v is-a lambda) (assert ($v is-bound),
       (if ($v is-a function) (assert ($v is-bound),
+    ),
+  ),
+),
+
+(if (the-type is-not-a class)
+  (define "Mutability" (=> ()
+    (should "(type is-sealed) returns true." (=> ()
+      (assert true (the-type is-sealed),
+    ),
+    (should "(type seal) returns the type." (=> ()
+      (assert the-type (the-type seal),
     ),
   ),
 ),

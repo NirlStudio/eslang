@@ -52,7 +52,8 @@ module.exports = function load ($void) {
     }
 
     try { // to load data
-      var result = execute(space, code, uri, args)
+      var result = execute(space, code, uri,
+        Array.isArray(args) ? args.slice() : args)
       var scope = result[1]
       return scope && Object.getOwnPropertyNames(scope.exporting).length > 0
         ? scope.exporting : result[0]

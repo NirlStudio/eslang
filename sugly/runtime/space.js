@@ -9,7 +9,7 @@ module.exports = function space ($void) {
   var ownsProperty = $void.ownsProperty
 
   // shared empty array
-  var EmptyArray = Object.freeze && Object.freeze([])
+  var EmptyArray = Object.freeze([])
 
   var atomOf = $.tuple['atom-of']
   // to be used for safely separating spaces.
@@ -34,7 +34,11 @@ module.exports = function space ($void) {
   }
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
-      var value = $[key] || this.context[key]
+      var value = $[key]
+      if (typeof value !== 'undefined') {
+        return value
+      }
+      value = this.context[key]
       if (typeof value !== 'undefined') {
         return value
       }
@@ -76,7 +80,8 @@ module.exports = function space ($void) {
     },
     populate: function (ctx) {
       if (Array.isArray(ctx)) {
-        this.context.arguments = ctx.length < 1 && EmptyArray ? EmptyArray : ctx
+        this.context.arguments = ctx.length < 1 ? EmptyArray
+          : Object.isFrozen(ctx) ? ctx : Object.freeze(ctx)
         return
       }
       if (ctx === null || typeof ctx !== 'object') {
@@ -92,8 +97,9 @@ module.exports = function space ($void) {
             break
           case 'arguments':
             if (Array.isArray(ctx.arguments)) {
-              this.context.arguments = ctx.arguments.length < 1 && EmptyArray
-                ? EmptyArray : ctx.arguments
+              this.context.arguments = ctx.arguments.length < 1 ? EmptyArray
+                : Object.isFrozen(ctx.arguments) ? ctx.arguments
+                  : Object.freeze(ctx.arguments.slice())
             }
             break
           default:
@@ -104,7 +110,8 @@ module.exports = function space ($void) {
     prepare: function (do_, this_, args) {
       this.context.do = do_
       this.context.this = typeof this_ === 'undefined' ? null : this_
-      this.context.arguments = args.length < 1 && EmptyArray ? EmptyArray : args
+      this.context.arguments = args.length < 1
+        ? EmptyArray : Object.freeze(args)
     },
     prepareOp: function (operation, operand, that) {
       this.context.operation = operation

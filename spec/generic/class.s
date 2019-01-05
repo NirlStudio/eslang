@@ -566,3 +566,34 @@
     (assert null (obj y),
   ),
 ),
+
+(define "(a-class is-sealed)" (= ()
+  (should "(a-class is-sealed) returns true if the class is readonly." (= ()
+    (var cat (@:class name: "Tom"),
+    (assert false (cat is-sealed),
+    (cat seal)
+    (assert (cat is-sealed),
+  ),
+),
+
+(define "(a-class seal)" (= ()
+  (should "(a-class seals) makes the class readonly and returns it." (= ()
+    (var cat (@:class name: "Tom"),
+    (assert null (cat breed),
+    (assert null (cat default:: age),
+    (assert false (cat is-sealed),
+
+    (cat as (@:class age: 10 type: (@ breed: 1),
+    (assert 1 (cat breed),
+    (assert 10 (cat default:: age),
+
+    (cat seal)
+    (assert (cat is-sealed),
+
+    (cat as (@:class color: "red" type: (@ legs: 4),
+    (assert 1 (cat breed),
+    (assert null (cat legs),
+    (assert 10 (cat default:: age),
+    (assert null (cat default:: color),
+  ),
+),

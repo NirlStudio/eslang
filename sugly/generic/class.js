@@ -168,6 +168,15 @@ module.exports = function ($void) {
     return typeDef
   })
 
+  // Mutability
+  link(proto, 'seal', function () {
+    Object.freeze(this.proto)
+    return Object.freeze(this)
+  })
+  link(proto, 'is-sealed', function () {
+    return Object.isFrozen(this)
+  })
+
   // Type Verification: a class is a class and a type.
   link(proto, 'is-a', function (type) {
     return type === Type || type === $Type

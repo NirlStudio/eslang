@@ -7,7 +7,7 @@ module.exports = function device ($void) {
   var createClass = $void.createClass
   var ownsProperty = $void.ownsProperty
 
-  var emitter = $export($, 'emitter', createClass())
+  var emitter = createClass()
   emitter.proto.on = function (event, listener) {
     if (!this._listeners) {
       this._listeners = $Object.empty()
@@ -44,4 +44,6 @@ module.exports = function device ($void) {
     }
     return null
   }
+
+  $export($, 'emitter', emitter)
 }

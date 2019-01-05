@@ -6,7 +6,7 @@ module.exports = function timer ($void) {
   var $export = $void.export
   var createClass = $void.createClass
 
-  var timer = $export($, 'timer', createClass())
+  var timer = createClass()
   timer.as($Emitter)
 
   timer.timeout = function (milliseconds, listener) {
@@ -37,4 +37,6 @@ module.exports = function timer ($void) {
       delete this.stop
     }
   }
+
+  $export($, 'timer', timer)
 }

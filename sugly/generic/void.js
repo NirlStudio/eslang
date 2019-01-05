@@ -126,8 +126,14 @@ module.exports = function ($void) {
     // ensure exported names are shared.
     sharedSymbolOf(name)
     // automatically bind null for static methods
-    space[name] = isApplicable(entity) ? bind(null, entity) : entity
-    return tryToUpdateName(entity, name)
+    if (isApplicable(entity)) {
+      entity = bind(null, entity)
+    }
+    tryToUpdateName(entity, name)
+    if (entity && typeof entity === 'object') {
+      entity.seal ? entity.seal() : Object.freeze(entity)
+    }
+    return (space[name] = entity)
   }
 
   // create a bound function from the original function or lambda.

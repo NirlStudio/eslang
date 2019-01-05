@@ -97,7 +97,8 @@ module.exports = function evaluate ($void) {
             ? indexer.get.call(subject, predicate.key)
             : indexer.call(subject, predicate.key)
           if (typeof predicate !== 'function') {
-            return predicate // interpret to getter if the result is not a function.
+            // interpret to getter if the result is not a function.
+            return typeof predicate === 'undefined' ? null : predicate
           }
         }
       } else if (typeof predicate !== 'function') {

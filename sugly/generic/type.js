@@ -7,7 +7,6 @@ module.exports = function ($void) {
   var $Object = $.object
   var Null = $void.null
   var Symbol$ = $void.Symbol
-  var Object$ = $void.Object
   var bind = $void.bind
   var link = $void.link
   var isApplicable = $void.isApplicable
@@ -41,14 +40,14 @@ module.exports = function ($void) {
   var indexer = link(proto, ':', function (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? index.key : ''
-    return name === 'proto' ? this.objectify()
+    return name === 'proto' ? this.reflect()
       : name !== 'indexer' ? protoValueOf(this, this, name)
         : bind(isApplicable(this.empty) ? this.empty() : this.empty,
           this.indexer
         )
   })
   indexer.get = function (key) {
-    return key === 'proto' ? this.objectify()
+    return key === 'proto' ? this.reflect()
       : key === 'indexer' ? null : this[key]
   }
 
@@ -56,7 +55,7 @@ module.exports = function ($void) {
   link(Type, 'empty', Type)
 
   // Retrieve the real type of an entity.
-  link(Type, 'of', function (entity) {
+  var typeOf = link(Type, 'of', function (entity) {
     var proto
     return entity === null || typeof entity === 'undefined' ? null
       : typeof entity === 'object' && ownsProperty(entity, 'type')
@@ -69,10 +68,10 @@ module.exports = function ($void) {
   link(Type, 'indexer', indexer)
 
   // Type Reflection: Convert this type to a type descriptor object.
-  link(Type, 'objectify', function (null_) {
+  link(Type, 'reflect', function (entity) {
     var typeDef = $Object.empty()
     var name
-    if (null_ === null) {
+    if (this === Type && entity === null) {
       for (name in Null) {
         typeDef[name] = bind(null, Null[name])
       }
@@ -82,6 +81,9 @@ module.exports = function ($void) {
 
     var proto_ = this.proto
     var value, thisEmpty
+    if (typeOf(entity) === this) {
+      thisEmpty = entity
+    }
     for (name in proto_) {
       if (name !== 'type' && typeof proto[name] === 'undefined') {
         value = proto_[name]
@@ -105,30 +107,12 @@ module.exports = function ($void) {
     return typeDef
   })
 
-  // Type Reflection: Extend this type with one or more type descriptor objects.
-  link(Type, 'typify', function () {
-    for (var i = 0; i < arguments.length; i++) {
-      var typeDef = arguments[i]
-      var props = typeDef instanceof Object$
-        ? Object.getOwnPropertyNames(typeDef) : []
-      for (var j = 0; j < props.length; j++) {
-        var prop = props[j]
-        if (prop === 'type') {
-          var typeStatic = typeDef.type
-          var sprops = typeStatic instanceof Object$
-            ? Object.getOwnPropertyNames(typeStatic) : []
-          for (var k = 0; k < sprops.length; k++) {
-            var sprop = sprops[k]
-            if (typeof this[sprop] === 'undefined') {
-              this[sprop] = typeStatic[sprop]
-            }
-          }
-        } else if (typeof this.proto[prop] === 'undefined') {
-          this.proto[prop] = typeDef[prop]
-        }
-      }
-    }
+  // Mutability
+  link(Type, 'seal', function () {
     return this
+  })
+  link(Type, 'is-sealed', function () {
+    return true // all primary types are sealed.
   })
 
   // Type Verification: Any type is a type.
@@ -157,6 +141,6 @@ module.exports = function ($void) {
 
   // Description for all types
   link(Type, 'to-string', function () {
-    return typeof this.name === 'string' ? this.name : '?type'
+    return typeof this.name === 'string' ? this.name : ''
   })
 }

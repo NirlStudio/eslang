@@ -284,6 +284,34 @@
   ),
 ),
 
+(define "(an-array is-sealed)" (= ()
+  (should "(an-array is-sealed) returns true if the array is readonly." (= ()
+    (var a (@ 1 2),
+    (assert false (a is-sealed),
+    (a seal)
+    (assert (a is-sealed),
+  ),
+),
+
+(define "(an-array seal)" (= ()
+  (should "(an-array seal) makes the array as readonly and returns it." (= ()
+    (var a (@ 1 2),
+    (assert false (a is-sealed),
+
+    (a 10 10)
+    (assert 11 (a length),
+
+    (a seal)
+    (assert (a is-sealed),
+
+    (a push 11)
+    (assert 11 (a length),
+
+    (a 100 100)
+    (assert 11 (a length),
+  ),
+),
+
 (define "(an-array trace ...)" (= ()
   (should "(an-array trace) returns the subject array." (= ()
     (var a (@),

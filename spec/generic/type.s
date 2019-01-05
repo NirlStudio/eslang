@@ -151,13 +151,15 @@
     (assert ((s type) is object),
     (assert ((s proto) is null),
 
-    (assert 6 ((object fields-of s) length),
+    (print (object fields-of s),
+    (assert 7 ((object fields-of s) length),
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
     (assert ($(s "of") is-a lambda),
     (assert ($(s "indexer") is-a lambda),
-    (assert ($(s "objectify") is-a lambda),
-    (assert ($(s "typify") is-a lambda),
+    (assert ($(s "reflect") is-a lambda),
+    (assert ($(s "seal") is-a lambda),
+    (assert ($(s "is-sealed") is-a lambda),
   ),
 ).
 
@@ -300,7 +302,7 @@
       (assert -1 y)
     ),
   ),
-).
+),
 
 (define "Type Reflection" (=> ()
   (should "(type of value) returns the real type of a value." (=> ()
@@ -325,8 +327,8 @@
       )
     ),
   ),
-  (should "(type objectify) returns the object representation of type." (= ()
-    (var t (type objectify),
+  (should "(type reflect) returns the object representation of type." (= ()
+    (var t (type reflect),
     (assert (t is-a object),
     (assert ((t type) is-a object),
     (assert ((type of t) is object),
@@ -345,18 +347,19 @@
     (assert (s is-a object),
     (assert ((s type) is object),
     (assert ((s proto) is null),
-    (assert 6 ((object fields-of s) length),
+    (assert 7 ((object fields-of s) length),
 
     (assert ((s name) is "type"),
     (assert ((s empty) is type),
 
     (assert ($(s "of") is-a lambda),
     (assert ($(s "indexer") is-a lambda),
-    (assert ($(s "objectify") is-a lambda),
-    (assert ($(s "typify") is-a lambda),
+    (assert ($(s "reflect") is-a lambda),
+    (assert ($(s "seal") is-a lambda),
+    (assert ($(s "is-sealed") is-a lambda),
   ),
-  (should "(type objectify null) returns all common operations defined on null." (= ()
-    (var t (type objectify null),
+  (should "(type reflect null) returns all common operations defined on null." (= ()
+    (var t (type reflect null),
     (assert (t is-a object),
     (assert null (t type),
     (assert ((type of t) is object),
@@ -369,56 +372,44 @@
       ),
     ),
   ),
-  (should "(type typify ...) extends type with type descriptor(s)." (=> ()
-    (assert null (type "__type_prop"),
-    (assert null (type "__type_method"),
+  (should "(type reflect value) returns all common operations bound with value." (= ()
+    (var t (type reflect),
+    (assert (t is-a object),
+    (assert 1 (object fields-of t:: length),
+    (assert "type" (t type:: name),
 
-    (assert null (bool "__inst_prop"),
-    (assert null (bool "__inst_method"),
+    (let t (type reflect string),
+    (assert (t is-a object),
+    (assert 1 (object fields-of t:: length),
+    (assert "type" (t type:: name),
 
-    (type typify (@
-      __inst_prop: 1
-      __inst_method: (= x (+ x ($this __inst_prop),
-      type: (@
-        __type_prop: 10
-        __type_method: (=> y (+ y (this __type_prop),
-    ),
+    (let t (string reflect),
+    (assert (t is-a object),
+    (assert "string" (t type:: name),
+    (assert 0 (t length),
 
-    (assert 1 (type "__inst_prop"),
-    (assert ($(type "__inst_method") is-a lambda),
-    (assert 11 (type __inst_method 10),
+    (let t (string reflect "abc"),
+    (assert (t is-a object),
+    (assert "string" (t type:: name),
+    (assert 3 (t length),
 
-    (assert 10 (type "__type_prop"),
-    (assert ($(type "__type_method") is-a function),
-    (assert 110 (type __type_method 100),
+    (let t (string reflect 123),
+    (assert (t is-a object),
+    (assert "string" (t type:: name),
+    (assert 0 (t length),
 
-    (for t in types
-      (var tt (t the-type))
-      (assert 1 (tt "__inst_prop"),
-      (assert ($(tt "__inst_method") is-a lambda),
-      (assert 11 (tt __inst_method 10),
+    (let t (string reflect null),
+    (assert (t is-a object),
+    (assert "string" (t type:: name),
+    (assert 0 (t length),
+  ),
+),
 
-      (assert 10 (tt "__type_prop"),
-      (assert ($(tt "__type_method") is-a function),
-      (assert 110 (tt __type_method 100),
-
-      (var te (t "empty"))
-      (assert 1 ($te "__inst_prop"),
-      (assert ($($te "__inst_method") is-a lambda),
-      (assert 11 ($te __inst_method 10),
-
-      (assert (? (tt is class) 10) ($te "__type_prop"),
-      (assert ($($te "__type_method") is-a (? (tt is class) function),
-      (assert (? (tt is class) 110) ($te __type_method 100),
-
-      (for v in (t values)
-        (assert 1 ($v "__inst_prop"),
-        (assert ($($v "__inst_method") is-a lambda),
-        (assert 11 ($v __inst_method 10),
-
-        (assert (? (tt is class) 10)  ($v "__type_prop"),
-        (assert ($($v "__type_method") is-a (? (tt is class) function),
-        (assert (? (tt is class) 110)  ($v __type_method 100),
-      ),
-    ),
-).
+(define "Mutability" (=> ()
+  (should "(type is-sealed) returns true." (=> ()
+    (assert true (type is-sealed),
+  ),
+  (should "(type seal) returns type." (=> ()
+    (assert type (type seal),
+  ),
+),
