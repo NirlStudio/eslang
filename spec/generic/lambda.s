@@ -142,9 +142,10 @@
 ),
 
 (define "Constant Value" (= ()
-  (define "(lambda noop)" (= ()
+  (define "(lambda \"noop\")" (= ()
     (should "(lambda \"noop\") is a lambda with empty parameters and an empty body." (= ()
       (assert ($(lambda "noop") is-a lambda),
+      (assert false (lambda "noop":: is-static),
       (assert "noop" ($(lambda "noop") name),
 
       (assert (($(lambda "noop") parameters) is-a tuple),
@@ -155,13 +156,36 @@
       (assert (($(lambda "noop") body) is-plain),
       (assert 0 (($(lambda "noop") parameters) length),
     ),
-    (should "(lambda noop) always return null." (= ()
+    (should "(lambda \"noop\") always return null." (= ()
       (assert null (lambda noop),
       (var noop (lambda "noop"),
       (assert null (noop),
     ),
-    (should "(lambda noop) is encoded to (tuple lambda)." (= ()
+    (should "(lambda \"noop\") is encoded to (tuple lambda)." (= ()
       (assert (($(lambda "noop") to-code) is (tuple lambda),
+    ),
+  ),
+  (define "($lambda \"static\")" (= ()
+    (should "(lambda \"static\") is a static lambda with empty parameters and an empty body." (= ()
+      (assert (lambda "static":: is-a lambda),
+      (assert (lambda "static":: is-static),
+      (assert "static" (lambda "static":: name),
+
+      (assert (($(lambda "static") parameters) is-a tuple),
+      (assert (($(lambda "static") parameters) not-plain),
+      (assert 0 (($(lambda "static") parameters) length),
+
+      (assert (($(lambda "static") body) is-a tuple),
+      (assert (($(lambda "static") body) is-plain),
+      (assert 0 (($(lambda "static") parameters) length),
+    ),
+    (should "(lambda \"static\") always return null." (= ()
+      (assert null (lambda static),
+      (var static (lambda "static"),
+      (assert null (static),
+    ),
+    (should "(lambda \"static\") is encoded to (tuple stambda)." (= ()
+      (assert (($(lambda "static") to-code) is (tuple stambda),
     ),
   ),
 ),
@@ -244,6 +268,74 @@
     (assert ((`(null)) as-plain) ($(= () null) body),
     (assert ((`((+ x y))) as-plain) ($(= (x  y) (+ x y)) body),
     (assert ((`((var z 100 )(+ x y  z))) as-plain) ($(= (x  y) (var z 100) (+ x y z)) body),
+  ),
+),
+
+(define "($a-lambda is-static)" (= ()
+  (should "($a-lambda is-static) returns true if it's a stambda - static lambda." (= ()
+    (assert ($(-> () null) is-static),
+    (assert ($(-> x x) is-static),
+    (assert ($(-> (x) x) is-static),
+  ),
+  (should "($a-lambda is-static) returns false for a common lambda." (= ()
+    (assert false ($(= () null) is-static),
+    (assert false ($(= x) is-static),
+    (assert false ($(= x x) is-static),
+    (assert false ($(= (x y)) is-static),
+    (assert false ($(= (x y) (+ x y)) is-static),
+  ),
+  (should "a stambda has not this, arguments, do." (= ()
+    (let ctx (->:() (@ this arguments do),
+    (assert (ctx is-a array),
+    (assert 3 (ctx length),
+    (assert null (ctx 0),
+    (assert null (ctx 1),
+    (assert null (ctx 2),
+  ),
+  (should "a stambda only allows one argument at most." (= ()
+    (var args (-> 10:x (@ 1 x),
+    (assert (args is-a array),
+    (assert 2 (args length),
+    (assert 1 (args 0),
+    (assert 10 (args 1),
+
+    (let args (->(1 2):(x y) (@ y x),
+    (assert (args is-a array),
+    (assert 2 (args length),
+    (assert null (args 0),
+    (assert 1 (args 1),
+  ),
+  (should "a stambda intercepts redo as return." (= ()
+    (assert 4 (-> 5:x (x > 0:: ? (redo (x - 1)) x),
+  ),
+  (should "a stambda has no access to -app and -module." (= ()
+    (var ctx (=:() (@ 1 -app -module),
+    (assert (ctx is-a array),
+    (assert 3 (ctx length),
+    (assert 1 (ctx 0),
+    (assert (ctx 1:: is-a string),
+    (assert (ctx 2:: is-a string),
+
+    (let ctx (->:() (@ 1 -app -module),
+    (assert (ctx is-a array),
+    (assert 3 (ctx length),
+    (assert 1 (ctx 0),
+    (assert null (ctx 1),
+    (assert null (ctx 2),
+  ),
+  (should "a stambda cannot import another module." (= ()
+    (var mod (=:() (import "test"),
+    (assert (mod is-a object),
+
+    (let mod (->:() (import "test"),
+    (assert (mod is null),
+  ),
+  (should "a stambda has no access to (env)." (= ()
+    (var envs (=:() (env),
+    (assert (envs is-a object),
+
+    (let envs (->:() (env),
+    (assert (envs is null),
   ),
 ),
 

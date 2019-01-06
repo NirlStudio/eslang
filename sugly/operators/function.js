@@ -10,10 +10,14 @@ module.exports = function function_ ($void) {
   var signalOf = $void.signalOf
   var lambdaOf = $void.lambdaOf
   var functionOf = $void.functionOf
+  var staticLamdaOf = $void.staticLamdaOf
   var staticOperator = $void.staticOperator
 
   // create lambda operator
   staticOperator('=', createOperator(lambdaOf, $Lambda.noop))
+
+  // create static lambda (pure function) operator - reserved
+  staticOperator('->', createOperator(staticLamdaOf, $Lambda.noop))
 
   // create function operator
   staticOperator('=>', createOperator(functionOf, $Function.noop))

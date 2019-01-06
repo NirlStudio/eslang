@@ -6,6 +6,7 @@ module.exports = function space ($void) {
   var ClassInst$ = $void.ClassInst
   var isObject = $void.isObject
   var indexerOf = $void.indexerOf
+  var defineConst = $void.defineConst
   var ownsProperty = $void.ownsProperty
 
   // shared empty array
@@ -49,8 +50,14 @@ module.exports = function space ($void) {
     var: function (key, value) {
       return (this.local[key] = value)
     },
+    const: function (key, value) {
+      return defineConst(this.local, key, value)
+    },
     lvar: function (key, value) {
       return (this.context[key] = value)
+    },
+    lconst: function (key, value) {
+      return defineConst(this.context, key, value)
     },
     let: function (key, value) {
       if (ownsProperty(this.local, key)) {
@@ -133,8 +140,16 @@ module.exports = function space ($void) {
   $void.createAppSpace = function (uri) {
     var app = Object.create($)
     app['-app'] = uri
+    app.env = $void.$env
+    app.run = $void.$run
+    app.interpreter = $void.$interpreter
+    app.print = $void.$print
+    app.warn = $void.$warn
+    app.timer = $void.$timer
+
     var local = Object.create(app)
     local['-module'] = uri
+
     var exporting = Object.create($Object.proto)
     var space = new Space$(local, null, null, exporting)
     space.app = app

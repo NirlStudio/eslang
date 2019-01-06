@@ -243,5 +243,16 @@ module.exports = function () {
     return defineProperty(proto, 'type', type)
   }
 
+  $void.defineConst = defineConst
+  function defineConst (ctx, key, value) {
+    Object.defineProperty ? Object.defineProperty(ctx, key, {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: value
+    }) : (ctx[key] = value)
+    return value
+  }
+
   return $void
 }

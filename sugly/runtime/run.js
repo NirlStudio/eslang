@@ -4,13 +4,13 @@ module.exports = function run ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
-  var warn = $.warn
+  var warn = $void.$warn
   var $export = $void.export
   var execute = $void.execute
   var atomicArrayOf = $void.atomicArrayOf
 
   // run a module from source as an application.
-  $export($, 'run', function (appSource, args, appHome) {
+  $export($void, '$run', function (appSource, args, appHome) {
     if (typeof appSource !== 'string') {
       return null
     }
@@ -18,7 +18,7 @@ module.exports = function run ($void) {
     args = Array.isArray(args) ? atomicArrayOf(args) : []
     // try to resolve the base uri of the whole application
     if (typeof appHome !== 'string' || appHome.length < 1) {
-      appHome = $.env('home')
+      appHome = $void.$env('home')
     }
     if (!appSource.endsWith('.s')) {
       appSource += '.s'

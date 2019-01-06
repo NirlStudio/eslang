@@ -22,14 +22,14 @@
     (var x 1)
     (let y 2)
     (local z 3)
-    (assert 106 ((quote + x y z (let "x" 100),
+    (assert 106 ((quote + x y z (let x 100),
     (assert 100 x)
   ),
   (should "(a-plain-tuple) evaluates each statement in current context." (= ()
     (var x 1)
     (let y 2)
     (local z 3)
-    (assert 4 ((unquote (+ x y) (+ y z) (let "y" 102) (+ z x),
+    (assert 4 ((unquote (+ x y) (+ y z) (let y 102) (+ z x),
     (assert 102 y)
   ),
   (should "(a-lambda) calls the lambda without argument." (= ()

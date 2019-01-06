@@ -11,14 +11,14 @@ module.exports = function interpreter ($void) {
   var createAppSpace = $void.createAppSpace
 
   // interactively feed & evaluate
-  $export($, 'interpreter', function (shell, args, appHome) {
+  $export($void, '$interpreter', function (shell, args, appHome) {
     if (!isApplicable(shell)) {
       return null
     }
     // formalize arguments values to separate spaces.
     args = Array.isArray(args) ? atomicArrayOf(args) : []
     if (typeof appHome !== 'string' || appHome.length < 1) {
-      appHome = $.env('home')
+      appHome = $void.$env('home')
     }
     // create a module space.
     var scope = createAppSpace(appHome + '/.') // to indicate a directory.

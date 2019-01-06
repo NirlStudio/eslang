@@ -6,7 +6,7 @@ module.exports = function import_ ($void) {
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
-  var warn = $.warn
+  var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
@@ -25,7 +25,7 @@ module.exports = function import_ ($void) {
       return null
     }
     if (!space.modules) {
-      warn('import', 'invalid without an app.')
+      warn('import', 'invalid without an app context.')
       return null
     }
     var src
@@ -140,7 +140,7 @@ module.exports = function import_ ($void) {
       source,
       moduleUri && loader.dir(moduleUri),
       loader.dir(appUri) + '/modules',
-      $.env('home') + '/modules',
+      $void.$env('home') + '/modules',
       $void.runtime('home') + '/modules'
     )
     var uri = loader.resolve(source, dirs)

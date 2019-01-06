@@ -3,7 +3,7 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Tuple$ = $void.Tuple
-  var warn = $.warn
+  var warn = $void.$warn
   var $export = $void.export
   var tokenizer = $.tokenizer
   var isApplicable = $void.isApplicable

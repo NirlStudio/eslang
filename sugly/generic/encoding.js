@@ -199,7 +199,7 @@ module.exports = function ($void) {
           : body.push(updateInst.apply(null, record))
       }
       body.push(root || this.clist[rootOffset][2])
-      return new Tuple$([ // (=:() (arguments push ...) ...)
+      return new Tuple$([ // (=>:() (local _ (@ ...)) ...)
         $Symbol.function, $Symbol.pairing, $Tuple.empty, new Tuple$(body, true)
       ])
     }

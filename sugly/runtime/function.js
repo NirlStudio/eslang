@@ -7,7 +7,7 @@ module.exports = function function_ ($void) {
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
-  var warn = $.warn
+  var warn = $void.$warn
   var lambda = $void.lambda
   var evaluate = $void.evaluate
   var function_ = $void.function
@@ -66,6 +66,50 @@ module.exports = function function_ ($void) {
       }
     }
     return $lambda
+  }
+
+  $void.staticLamdaOf = function staticLamdaOf (space, clause, offset) {
+    // compile code
+    var code = [$Symbol.stambda]
+    var params = formatParameters(clause.$[offset++], space, 1)
+    code.push(params[1])
+    params = params[0]
+    var body = clause.$.slice(offset) || []
+    if (body.length > 0) {
+      var tbody = new Tuple$(body, true)
+      code.push(tbody)
+      return lambda(createStaticLambda(params, tbody), new Tuple$(code))
+    } else {
+      code.push($Tuple.blank) // empty body
+      return params.length < 1 ? $.lambda.noop
+        : lambda(createEmptyOperation(), new Tuple$(code))
+    }
+  }
+
+  function createStaticLambda (params, tbody) {
+    var $stambda = function () {
+      var scope = createLambdaSpace()
+      // populate argument
+      if (params.length > 0) {
+        var param = params[0]
+        scope.local[param[0]] = arguments.length > 0 ? arguments[0] : param[1]
+      }
+      // execution
+      try {
+        return evaluate(tbody, scope)
+      } catch (signal) {
+        if (signal instanceof Signal$) {
+          if (signal.id !== 'exit') {
+            // redo, return, break & continue if they're not in loop.
+            return signal.value
+          }
+          throw signal
+        }
+        warn('stambda:eval', 'unexpected error:', signal)
+        return null
+      }
+    }
+    return $stambda
   }
 
   $void.functionOf = function functionOf (space, clause, offset) {
@@ -135,19 +179,22 @@ module.exports = function function_ ($void) {
 
   // accepts param, (param ...) or ((param default-value) ...)
   // returns [params-list, code]
-  function formatParameters (params, space) {
+  function formatParameters (params, space, maxArgs) {
     if (params instanceof Symbol$) {
       return [[[params.key, null]], params]
     }
     if (!(params instanceof Tuple$) || params.$.length < 1) {
       return [[], $Tuple.empty]
     }
+    params = params.$
+    maxArgs = maxArgs > 0
+      ? maxArgs > params.length ? params.length : maxArgs
+      : params.length
     var args = []
     var code = []
     var hasDefault = false
     var counter = 0
-    params = params.$
-    for (var i = 0; i < params.length; i++) {
+    for (var i = 0; i < maxArgs; i++) {
       var param = params[i]
       if (param instanceof Symbol$) {
         args.push([param.key, null])

@@ -45,7 +45,7 @@ function formatValue (cache, offset, rawValue, fmt, thisCall) {
 
 module.exports = function ($void, JS, printer) {
   var $ = $void.$
-  var warn = $.warn
+  var warn = $void.$warn
   var link = $void.link
   var thisCall = $void.thisCall
 

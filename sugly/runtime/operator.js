@@ -22,6 +22,7 @@ module.exports = function operators$operator ($void) {
     params = params[0]
     var body = clause.$.slice(2) || []
     if (body.length > 0) {
+      markOperatorClause(body)
       var tbody = new Tuple$(body, true)
       code.push(tbody)
       return operator(createOperator(params, tbody), new Tuple$(code))
@@ -29,6 +30,16 @@ module.exports = function operators$operator ($void) {
       code.push($Tuple.blank) // empty body
       return params.length < 1 ? $.operator.noop
         : operator(createEmptyOperation(), new Tuple$(code))
+    }
+  }
+
+  function markOperatorClause (statement) {
+    for (var i = 0; i < statement.length; i++) {
+      var expr = statement[i]
+      if (expr instanceof Tuple$ && expr.$.length > 0) {
+        expr.inop = true
+        markOperatorClause(expr.$)
+      }
     }
   }
 

@@ -38,5 +38,5 @@ module.exports = function timer ($void) {
     }
   }
 
-  $export($, 'timer', timer)
+  $export($void, '$timer', timer)
 }

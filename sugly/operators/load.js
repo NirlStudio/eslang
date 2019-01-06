@@ -4,7 +4,7 @@ module.exports = function load ($void) {
   var $ = $void.$
   var compile = $.compile
   var Tuple$ = $void.Tuple
-  var warn = $.warn
+  var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
@@ -13,6 +13,10 @@ module.exports = function load ($void) {
   staticOperator('load', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
+      return null
+    }
+    if (!space.modules) {
+      warn('load', 'invalid without an app context.')
       return null
     }
     // look into current space to have the base uri.
@@ -71,7 +75,7 @@ module.exports = function load ($void) {
     }
     var loader = $void.loader
     var dirs = loader.isAbsolute(source) ? []
-      : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $.env('home'))
+      : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $void.$env('home'))
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       warn('load', 'failed to resolve module ', source, 'in', dirs)

@@ -31,12 +31,15 @@ module.exports = function ($void) {
   link(Type, 'quote', sharedSymbolOf('`'))
 
   link(Type, 'lambda', sharedSymbolOf('='))
+  link(Type, 'stambda', sharedSymbolOf('->'))
   link(Type, 'function', sharedSymbolOf('=>'))
   link(Type, 'operator', sharedSymbolOf('=?'))
 
   link(Type, 'let', sharedSymbolOf('let'))
   link(Type, 'var', sharedSymbolOf('var'))
+  link(Type, 'const', sharedSymbolOf('const'))
   link(Type, 'local', sharedSymbolOf('local'))
+  link(Type, 'locon', sharedSymbolOf('locon'))
 
   // symbols for common punctuations
   link(Type, 'begin', sharedSymbolOf('('))

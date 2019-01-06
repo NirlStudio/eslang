@@ -21,7 +21,9 @@ unquote(unquote -unquote unquote unquote- unquote)unquote
 # keyword.operator.assignment.sugly
 let(let -let let let- let)let
 var(var -var var var- var)var
+const(const -const const const- const)const
 local(local -local local local- local)local
+locon(locon -locon locon locon- locon)locon
 export(export -export export export- export)export
 import(import -import import import- import)import
 load(load -load load load- load)load
@@ -104,6 +106,8 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 # meta.operator.lambda-decl.sugly
 =(=(= x )= )
 =(=(=: x )=: )
+->(->(-> x )-> )
+->(->(->: x )->: )
 =>(=>(=> x )=> )
 =>(=>(=> x : x )=> y : y)
 
@@ -235,9 +239,12 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 # meta.operator.noop.sugly
 (operator noop)
 
-# meta.operator.noop.sugly
+# meta.lambda.noop.sugly
 (lambda noop)
 (function noop)
+
+# meta.lambda.static.sugly
+(lambda static)
 
 # meta.function-collection-sugly: string, tuple, array
 length((length length) length)length
@@ -327,11 +334,14 @@ all((symbol all) all)
 any((symbol any) any)
 quote((symbol quote) quote)
 lambda((symbol lambda) lambda)
+stambda((symbol stambda) stambda)
 function((symbol function) function)
 operator((symbol operator) operator)
 let((symbol let) let)
 var((symbol var) var)
+const((symbol const) const)
 local((symbol local) local)
+locon((symbol locon) locon)
 begin((symbol begin) begin)
 end((symbol end) end)
 comma((symbol comma) comma)
@@ -350,6 +360,7 @@ else((symbol else) else)
 ((tuple blank) blank)
 ((tuple unknown) unknown)
 ((tuple lambda) lambda)
+((tuple stambda) stambda)
 ((tuple function) function)
 ((tuple operator) operator)
 ((tuple array) array)
@@ -371,6 +382,7 @@ to-array((t to-array) to-array)
 # meta.function-operation-sugly
 parameters((f parameters) parameters)
 body((f body) body)
+is-static((f is-static) is-static)
 is-generic((f is-generic) is-generic)
 not-generic((f not-generic) not-generic)
 is-bound((f is-bound) is-bound)

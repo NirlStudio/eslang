@@ -8,11 +8,12 @@ module.exports = function runtime ($void) {
   var environment = Object.assign(Object.create(null), {
     'runtime-core': 'js',
     'runtime-host': $void.isNativeHost ? 'native' : 'browser',
-    'runtime-version': '0.6.1',
+    'runtime-version': '0.7.1',
     'is-debugging': false
   })
 
-  $export($, 'env', function (name, defaulue) {
+  // this will be put into app space only.
+  $export($void, '$env', function (name, defaulue) {
     return typeof name === 'undefined' || name === null
       ? Object.assign(emptyObject(), environment)
       : typeof name !== 'string' ? null

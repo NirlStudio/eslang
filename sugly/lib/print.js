@@ -1,14 +1,13 @@
 'use strict'
 
 module.exports = function ($void, JS, printer) {
-  var $ = $void.$
   var warn = printer.warn
   var print = printer.print
   var $export = $void.export
 
   // standard output.
   var lastPrinting = null // save to make it testable.
-  $export($, 'print', function (value) {
+  $export($void, '$print', function (value) {
     if (typeof value === 'undefined') {
       return lastPrinting
     }
@@ -25,7 +24,7 @@ module.exports = function ($void, JS, printer) {
       : [ts, lastWarning[1][1] + 1]
   }
 
-  $export($, 'warn', function (category) {
+  $export($void, '$warn', function (category) {
     if (typeof category === 'undefined') {
       return lastWarning
     }

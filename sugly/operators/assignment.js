@@ -27,6 +27,9 @@ module.exports = function assignment ($void) {
   // in operator: (var name-expr value-expr)
   staticOperator('var', createOperatorFor('var'))
 
+  // the once-assignment variable.
+  staticOperator('const', createOperatorFor('const'))
+
   // 'let' update the variable in most recent context.
   // in function: (let var-name value)), or
   //              (let * object), or
@@ -43,6 +46,9 @@ module.exports = function assignment ($void) {
   // in operator: (local name-expr value-expr)
   staticOperator('local', createOperatorFor('lvar'))
 
+  // the local version of once-assignment variable.
+  staticOperator('locon', createOperatorFor('lconst'))
+
   function createOperatorFor (method) {
     return function (space, clause) {
       var clist = clause.$
@@ -52,7 +58,7 @@ module.exports = function assignment ($void) {
       }
       var sym = clist[1]
       var values = length < 3 ? null : evaluate(clist[2], space)
-      if (space.inop) { // in operator context, let & var works like a function
+      if (space.inop && clause.inop) { // in operator context, let & var works like a function
         sym = evaluate(sym, space)
         var key = typeof sym === 'string' ? sym
           : sym instanceof Symbol$ ? sym.key : null

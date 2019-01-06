@@ -27,8 +27,8 @@ sugly self-test
 ```
 - Use in Javascript code:
 ```javascript
-var $ = require('sugly')
-$.run('your-app')
+var $void = require('sugly')
+$void.$run('your-app')
 ```
 
 Run from source code

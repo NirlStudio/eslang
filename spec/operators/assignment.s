@@ -232,6 +232,59 @@
   ),
 ),
 
+(define "(const ...)" (= ()
+  (should "(const) returns null." (= ()
+    (var value_ (const),
+    (assert null value_),
+  ),
+  (should "(const sym) returns null and declares a const sym with value of null." (= ()
+    (var value_ (const x),
+    (assert null value_),
+    (assert null x),
+
+    (const x 1),
+    (assert null x),
+
+    (var x 1),
+    (assert null x),
+
+    (let x 1),
+    (assert null x),
+
+    (=>:() (const x 1),
+    (assert null x),
+
+    (=>:() (var x 1),
+    (assert null x),
+
+    (=>:() (let x 1),
+    (assert null x),
+  ),
+  (should "(const sym value) returns value and declares a const sym with value of value." (= ()
+    (var value_ (const x 100),
+    (assert 100 value_),
+    (assert 100 x),
+
+    (const x 1),
+    (assert 100 x),
+
+    (var x 1),
+    (assert 100 x),
+
+    (let x 1),
+    (assert 100 x),
+
+    (=>:() (const x 1),
+    (assert 100 x),
+
+    (=>:() (var x 1),
+    (assert 100 x),
+
+    (=>:() (let x 1),
+    (assert 100 x),
+  ),
+),
+
 (define "(let ...)" (= ()
   (should "(let) returns null." (= ()
     (var value_ (let),
@@ -562,6 +615,35 @@
     (var x 100)
     (let ret-x (=?() (local "x" 1) x),
     (assert 1 (ret-x),
+    (assert 100 x),
+  ),
+),
+
+(define "(locon ...)" (= ()
+  (should "(locon) returns null." (= ()
+    (var value_ (locon),
+    (assert null value_),
+  ),
+  (should "(locon sym) returns null and declares a const sym in current scope with value of null." (= ()
+    (var value_ (locon x),
+    (assert null value_),
+    (assert null x),
+
+    (locon x 1)
+    (assert 100 x),
+
+    (local x 1)
+    (assert 100 x),
+  ),
+  (should "(locon sym value) returns value and declares a const sym in current scope with value of value." (= ()
+    (var value_ (locon x 100),
+    (assert 100 value_),
+    (assert 100 x),
+
+    (locon x 1)
+    (assert 100 x),
+
+    (local x 1)
     (assert 100 x),
   ),
 ),

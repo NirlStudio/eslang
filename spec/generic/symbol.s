@@ -203,6 +203,20 @@
       (assert false ((symbol lambda) is-invalid),
     ),
   ),
+  (define "(symbol stambda)" (= ()
+    (should "its key value is \"->\"." (= ()
+      (assert "->" ((symbol stambda) key),
+      (assert "->" ((symbol stambda) to-string),
+      (assert ((symbol of "->") is (symbol stambda),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol stambda)) is (symbol stambda),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol stambda) is-valid),
+      (assert false ((symbol stambda) is-invalid),
+    ),
+  ),
   (define "(symbol function)" (= ()
     (should "its key value is \"=>\"." (= ()
       (assert "=>" ((symbol function) key),
@@ -259,6 +273,20 @@
       (assert false ((symbol var) is-invalid),
     ),
   ),
+  (define "(symbol const)" (= ()
+    (should "its key value is \"const\"." (= ()
+      (assert "const" ((symbol const) key),
+      (assert "const" ((symbol const) to-string),
+      (assert ((symbol of "const") is (symbol const),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol const)) is (symbol const),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol const) is-valid),
+      (assert false ((symbol const) is-invalid),
+    ),
+  ),
   (define "(symbol local)" (= ()
     (should "its key value is \"local\"." (= ()
       (assert "local" ((symbol local) key),
@@ -271,6 +299,20 @@
     (should "it is taken as an valid symbol." (= ()
       (assert ((symbol local) is-valid),
       (assert false ((symbol local) is-invalid),
+    ),
+  ),
+  (define "(symbol locon)" (= ()
+    (should "its key value is \"locon\"." (= ()
+      (assert "locon" ((symbol locon) key),
+      (assert "locon" ((symbol locon) to-string),
+      (assert ((symbol of "locon") is (symbol locon),
+    ),
+    (should "it is evaluated to itself." (= ()
+      (assert (((symbol locon)) is (symbol locon),
+    ),
+    (should "it is taken as an valid symbol." (= ()
+      (assert ((symbol locon) is-valid),
+      (assert false ((symbol locon) is-invalid),
     ),
   ),
   (define "(symbol begin)" (= ()

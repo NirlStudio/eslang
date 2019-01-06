@@ -5,7 +5,7 @@ module.exports = function run ($void) {
   var compile = $.compile
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var warn = $.warn
+  var warn = $void.$warn
   var $export = $void.export
   var execute = $void.execute
 

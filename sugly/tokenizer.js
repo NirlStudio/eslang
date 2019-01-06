@@ -5,7 +5,7 @@ module.exports = function ($void) {
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']
   var strUnescape = $.string.unescape
-  var warn = $.warn
+  var warn = $void.$warn
   var $export = $void.export
   var isApplicable = $void.isApplicable
 

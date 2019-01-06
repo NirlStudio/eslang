@@ -22,6 +22,7 @@ module.exports = function ($void) {
 
   // empty operations
   link(Type, 'lambda', new Tuple$([$Symbol.lambda, empty, blank]))
+  link(Type, 'stambda', new Tuple$([$Symbol.stambda, empty, blank]))
   link(Type, 'function', new Tuple$([$Symbol.function, empty, blank]))
   link(Type, 'operator', new Tuple$([$Symbol.operator, empty, blank]))
 

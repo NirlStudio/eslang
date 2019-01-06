@@ -12,7 +12,7 @@ var signFailed = '    ' + colors.passed + red('[FAILED]')
 
 module.exports = function ($void) {
   var $ = $void.$
-  var print = $.print
+  var print = $void.$print
 
   var passing = 0
   var failing = []
@@ -94,10 +94,10 @@ module.exports = function ($void) {
     ])
 
     checkStaticOperators('[void / operators] ', [
-      '`', 'export', 'let', 'var', 'local',
+      '`', 'export', 'let', 'var', 'const', 'local', 'locon',
       '?', 'if', 'while', 'for', 'break', 'continue',
       '+', '++', '--', '!', 'not', '~',
-      '@', '=?', '=', '=>', 'redo', 'return', 'exit',
+      '@', '=?', '=', '->', '=>', 'redo', 'return', 'exit',
       'load', 'import'
     ])
 
@@ -111,13 +111,18 @@ module.exports = function ($void) {
 
     checkFunctions($, '[Sugly / functions] ', [
       // runtime
-      'env', 'eval', 'run', 'interpreter',
+      'eval',
       // bootstrap
       'tokenizer', 'tokenize', 'compiler', 'compile'
     ])
 
-    checkFunctions($, '[Sugly / lib / functions] ', [
-      'print', 'warn'
+    checkFunctions($void, '[Sugly / functions] ', [
+      // runtime
+      '$env', '$run', '$interpreter'
+    ])
+
+    checkFunctions($void, '[Sugly / lib / functions] ', [
+      '$print', '$warn'
     ])
 
     checkObjects($, '[Sugly / lib / objects] ', [
@@ -125,7 +130,11 @@ module.exports = function ($void) {
     ])
 
     checkObjects($, '[Sugly / lib / classes] ', [
-      'emitter', 'timer'
+      'emitter'
+    ])
+
+    checkObjects($void, '[Sugly / lib / classes] ', [
+      '$timer'
     ])
 
     // bootstrap tests

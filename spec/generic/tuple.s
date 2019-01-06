@@ -291,6 +291,17 @@
       (assert (tuple empty) ((tuple lambda) 1),
       (assert (tuple blank) ((tuple lambda) 2),
       (assert ($((tuple lambda)) is-a lambda),
+      (assert false ($((tuple lambda)) is-static),
+    ),
+  ),
+  (define "(tuple stambda)" (= ()
+    (should "(tuple stambda) is a piece of code to generate an empty static lambda." (= ()
+      (assert 3 ((tuple stambda) length),
+      (assert (symbol stambda) ((tuple stambda) 0),
+      (assert (tuple empty) ((tuple stambda) 1),
+      (assert (tuple blank) ((tuple stambda) 2),
+      (assert ($((tuple stambda)) is-a lambda),
+      (assert ($((tuple stambda)) is-static),
     ),
   ),
   (define "(tuple function)" (= ()

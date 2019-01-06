@@ -1,9 +1,9 @@
 (define "global" (= ()
   (should "global entities cannot be overwritten" (= ()
-    var p (=);
-    let print p;
-    assert ($print is print);
-    assert ($print is-not p);
+    var eval_ (=);
+    let eval eval_;
+    assert ($eval is eval);
+    assert ($eval is-not eval_);
 
     var m (@:);
     let math p;
