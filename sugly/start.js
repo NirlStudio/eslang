@@ -34,8 +34,8 @@ function initializeSpace ($void) {
   require('./generic/global')($void)
 }
 
-function initializeLib ($void, printer) {
-  require('./lib/print')($void, JS, printer)
+function initializeLib ($void, stdout) {
+  require('./lib/stdout')($void, JS, stdout)
   require('./lib/format')($void, JS)
   require('./lib/math')($void, JS)
   require('./lib/uri')($void, JS)
@@ -80,7 +80,7 @@ function initializeOperators ($void) {
   require('./operators/import')($void)
 }
 
-module.exports = function start (printer) {
+module.exports = function start (stdout) {
   // Hello, world.
   var $void = require('./generic/genesis')()
 
@@ -88,7 +88,7 @@ module.exports = function start (printer) {
   initializeSpace($void)
 
   // prepare primary lib
-  initializeLib($void, printer($void.$))
+  initializeLib($void, stdout($void.$))
 
   // prepare tokenizer & compiler
   require('./tokenizer')($void)

@@ -1,19 +1,19 @@
 'use strict'
 
-module.exports = function ($void, JS, printer) {
-  var log = printer.log
-  var warn = printer.warn
-  var debug = printer.debug
-  var print = printer.print
+module.exports = function ($void, JS, stdout) {
+  var log = stdout.log
+  var warn = stdout.warn
+  var debug = stdout.debug
+  var print = stdout.print
   var $export = $void.export
 
   // standard output.
   $export($void, '$print', function (value) {
-    return print.apply(printer, arguments)
+    return print.apply(stdout, arguments)
   })
 
   $export($void, '$log', function (category) {
-    log.apply(printer, arguments)
+    log.apply(stdout, arguments)
     return arguments.length > 0 ? arguments[arguments.length - 1] : null
   })
 
@@ -41,13 +41,13 @@ module.exports = function ($void, JS, printer) {
     } else {
       return (lastWarning = ['', generateWarningId()])
     }
-    warn.apply(printer, lastWarning)
+    warn.apply(stdout, lastWarning)
     return lastWarning
   })
 
   $export($void, '$debug', function () {
     // TODO: mod:ts:...
-    debug.apply(printer, arguments)
+    debug.apply(stdout, arguments)
     return arguments.length > 0 ? arguments[arguments.length - 1] : null
   })
 }

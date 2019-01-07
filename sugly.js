@@ -2,10 +2,10 @@
 
 require('./lib/polyfill')
 
-module.exports = function sugly (output, loader/*, more options */) {
+module.exports = function sugly (stdout, loader/*, more options */) {
   // create the void.
   var start = require('./sugly/start')
-  var $void = start(output)
+  var $void = start(stdout)
   // create the source loader
   $void.loader = loader($void.$)
   // set the location of the runtime
