@@ -1,18 +1,20 @@
 'use strict'
 
 module.exports = function ($void, JS, printer) {
+  var log = printer.log
   var warn = printer.warn
+  var debug = printer.debug
   var print = printer.print
   var $export = $void.export
 
   // standard output.
-  var lastPrinting = null // save to make it testable.
   $export($void, '$print', function (value) {
-    if (typeof value === 'undefined') {
-      return lastPrinting
-    }
-    lastPrinting = Array.prototype.slice.call(arguments)
     return print.apply(printer, arguments)
+  })
+
+  $export($void, '$log', function (category) {
+    log.apply(printer, arguments)
+    return arguments.length > 0 ? arguments[arguments.length - 1] : null
   })
 
   // standard error, but only warning exists in sugly space.
@@ -41,5 +43,11 @@ module.exports = function ($void, JS, printer) {
     }
     warn.apply(printer, lastWarning)
     return lastWarning
+  })
+
+  $export($void, '$debug', function () {
+    // TODO: mod:ts:...
+    debug.apply(printer, arguments)
+    return arguments.length > 0 ? arguments[arguments.length - 1] : null
   })
 }
