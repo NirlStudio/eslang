@@ -96,7 +96,7 @@ module.exports = function ($void) {
     var value = proto[key]
     return typeof value === 'function' && (
       value.type === $Lambda || value.type === $Function
-    ) ? bind(subject, value) : value
+    ) ? bindThis(subject, value) : value
   }
 
   function thisCall (subject, methodName) {
@@ -127,7 +127,7 @@ module.exports = function ($void) {
     sharedSymbolOf(name)
     // automatically bind null for static methods
     if (isApplicable(entity)) {
-      entity = bind(null, entity)
+      entity = bindThis(null, entity)
     }
     tryToUpdateName(entity, name)
     if (entity && typeof entity === 'object') {
@@ -137,25 +137,29 @@ module.exports = function ($void) {
   }
 
   // create a bound function from the original function or lambda.
-  function bind ($this, func) {
-    if (typeof func.bound === 'function') {
-      return func // binding can only happen once.
+  function bindThis ($this, func) {
+    if (typeof func.this !== 'undefined') {
+      // a this-bound static lambda may not be bound.
+      return func
     }
-    var bound = func.bind($this)
-    func.$name && (
-      bound.$name = func.$name
-    )
-    bound.type !== func.type && (
-      bound.type = func.type
-    )
+    var binding = func.bind($this)
+    binding.this = $this
+    binding.bound = func
     typeof func.code !== 'undefined' && (
-      bound.code = func.code
+      binding.code = func.code
     )
-    bound.this = $this
-    bound.bound = func
-    return bound
+    if (typeof func.$name === 'string') {
+      binding.$name = func.$name
+    }
+    if (binding.type !== func.type) {
+      binding.type = func.type
+    }
+    if (func.type === $Lambda && func.static === true) {
+      binding.const = true // upgrade static to const lambda
+    }
+    return binding
   }
-  $void.bind = bind
+  $void.bindThis = bindThis
 
   // to link an entity to its owner.
   function link (owner, names, entity, autoBind) {
@@ -167,7 +171,7 @@ module.exports = function ($void) {
         entity.$name = typeof names === 'string' ? names : names[0]
       }
       if (autoBind && isApplicable(entity)) {
-        entity = bind(owner, entity)
+        entity = bindThis(owner, entity)
       }
     }
     if (typeof names === 'string') {
@@ -289,11 +293,6 @@ module.exports = function ($void) {
           : typeof args === 'undefined'
             ? this.call(subject)
             : this.call(subject, args)
-    })
-
-    // bind a function to a fixed subject.
-    link(proto, 'bind', function ($this) {
-      return typeof $this === 'undefined' ? this : bind($this, this)
     })
 
     link(proto, ['is', '==='], function (another) {

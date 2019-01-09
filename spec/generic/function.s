@@ -377,8 +377,13 @@
 
 (define "($a-func bind ...)" (= ()
   (should "($a-func bind) returns the original function." (= ()
-    (var l (=> x (+ 1 x),
-    (assert l ($l bind),
+    (var f (=> x (+ 1 x),
+    (var b ($f bind),
+    (assert f b),
+    (assert false ($b is f),
+
+    (assert ($b is-bound),
+    (assert null ($b this),
   ),
   (should "($a-func bind null) returns a bound function whose this is fixed to null." (= ()
     (var s (@ y: 100),

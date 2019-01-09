@@ -9,6 +9,8 @@ module.exports = function function_ ($void) {
   var Symbol$ = $void.Symbol
   var warn = $void.$warn
   var lambda = $void.lambda
+  var stambda = $void.stambda
+  var constambda = $void.constambda
   var evaluate = $void.evaluate
   var function_ = $void.function
   var createLambdaSpace = $void.createLambdaSpace
@@ -78,21 +80,28 @@ module.exports = function function_ ($void) {
     if (body.length > 0) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return lambda(createStaticLambda(params, tbody), new Tuple$(code))
+      return (params.length > 0 ? stambda : constambda)(
+        createStaticLambda(params, tbody), new Tuple$(code)
+      )
     } else {
       code.push($Tuple.blank) // empty body
-      return params.length < 1 ? $.lambda.noop
-        : lambda(createEmptyOperation(), new Tuple$(code))
+      return params.length < 1 ? $.lambda.static
+        : constambda(createEmptyOperation(), new Tuple$(code))
     }
   }
 
   function createStaticLambda (params, tbody) {
+    var key, defaultValue
+    if (params.length > 0) {
+      key = params[0][0]
+      defaultValue = params[0][1]
+    }
     var $stambda = function () {
       var scope = createLambdaSpace()
       // populate argument
-      if (params.length > 0) {
-        var param = params[0]
-        scope.local[param[0]] = arguments.length > 0 ? arguments[0] : param[1]
+      if (key) {
+        scope.local[key] = key === 'this' ? this
+          : arguments.length > 0 ? arguments[0] : defaultValue
       }
       // execution
       try {
@@ -108,6 +117,10 @@ module.exports = function function_ ($void) {
         warn('stambda:eval', 'unexpected error:', signal)
         return null
       }
+    }
+    if (key !== 'this') {
+      $stambda = $stambda.bind(null)
+      $stambda.this = null
     }
     return $stambda
   }

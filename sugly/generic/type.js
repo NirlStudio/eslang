@@ -7,8 +7,8 @@ module.exports = function ($void) {
   var $Object = $.object
   var Null = $void.null
   var Symbol$ = $void.Symbol
-  var bind = $void.bind
   var link = $void.link
+  var bindThis = $void.bindThis
   var isApplicable = $void.isApplicable
   var ownsProperty = $void.ownsProperty
   var protoValueOf = $void.protoValueOf
@@ -42,7 +42,7 @@ module.exports = function ($void) {
       : index instanceof Symbol$ ? index.key : ''
     return name === 'proto' ? this.reflect()
       : name !== 'indexer' ? protoValueOf(this, this, name)
-        : bind(isApplicable(this.empty) ? this.empty() : this.empty,
+        : bindThis(isApplicable(this.empty) ? this.empty() : this.empty,
           this.indexer
         )
   })
@@ -73,7 +73,7 @@ module.exports = function ($void) {
     var name
     if (this === Type && entity === null) {
       for (name in Null) {
-        typeDef[name] = bind(null, Null[name])
+        typeDef[name] = bindThis(null, Null[name])
       }
       typeDef.type = null
       return typeDef
@@ -88,7 +88,7 @@ module.exports = function ($void) {
       if (name !== 'type' && typeof proto[name] === 'undefined') {
         value = proto_[name]
         typeDef[name] = !isApplicable(value) ? value
-          : bind(typeof thisEmpty !== 'undefined' ? thisEmpty
+          : bindThis(typeof thisEmpty !== 'undefined' ? thisEmpty
             : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
           , value)
       }
@@ -98,7 +98,7 @@ module.exports = function ($void) {
       if (name !== 'proto' && name !== 'type' && typeof proto[name] === 'undefined') {
         value = this[name]
         typeStatic[name] = !isApplicable(value) ? value
-          : bind(name !== 'indexer' ? this
+          : bindThis(name !== 'indexer' ? this
             : typeof thisEmpty !== 'undefined' ? thisEmpty
               : (thisEmpty = isApplicable(this.empty) ? this.empty() : this.empty)
           , value)

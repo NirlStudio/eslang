@@ -153,6 +153,24 @@ module.exports = function () {
     impl.code = code
     return impl
   }
+  $void.stambda = function (impl, code) {
+    impl.type = $.lambda
+    impl.code = code
+    impl.static = true
+    return impl
+  }
+  $void.constambda = function (impl, code) {
+    impl.type = $.lambda
+    impl.code = code
+    impl.const = true
+    if (typeof impl.this === 'undefined') {
+      impl.this = null
+    }
+    if (typeof impl.bound !== 'function') {
+      impl.bound = impl
+    }
+    return impl
+  }
 
   // A function is an operation which works like a Closure. Its behaviour depends
   // on both the values of arguments and current values in its outer context.

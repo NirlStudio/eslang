@@ -7,12 +7,12 @@ module.exports = function ($void) {
   var $Tuple = $.tuple
   var $Symbol = $.symbol
   var $Object = $.object
-  var bind = $void.bind
-  var link = $void.link
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var ClassType$ = $void.ClassType
   var ClassInst$ = $void.ClassInst
+  var link = $void.link
+  var bindThis = $void.bindThis
   var isObject = $void.isObject
   var thisCall = $void.thisCall
   var boolValueOf = $void.boolValueOf
@@ -264,7 +264,7 @@ module.exports = function ($void) {
     var value
     if (member) {
       value = cls.proto[member]
-      return isApplicable(value) ? bind(this, value) : value
+      return isApplicable(value) ? bindThis(this, value) : value
     }
 
     var names = Object.getOwnPropertyNames(cls.proto)
@@ -272,7 +272,7 @@ module.exports = function ($void) {
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
       value = cls.proto[name]
-      persona[name] = isApplicable(value) ? bind(this, value) : value
+      persona[name] = isApplicable(value) ? bindThis(this, value) : value
     }
     return persona
   })

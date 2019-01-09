@@ -165,7 +165,7 @@
       (assert (($(lambda "noop") to-code) is (tuple lambda),
     ),
   ),
-  (define "($lambda \"static\")" (= ()
+  (define "(lambda \"static\")" (= ()
     (should "(lambda \"static\") is a static lambda with empty parameters and an empty body." (= ()
       (assert (lambda "static":: is-a lambda),
       (assert (lambda "static":: is-static),
@@ -337,6 +337,66 @@
     (let envs (->:() (env),
     (assert (envs is null),
   ),
+  (should "a stambda can choose to require for this instead of an argument." (= ()
+    (var self (-> this this),
+    (assert null (self 1),
+    (assert 1 ($self apply 1),
+  ),
+  (should "a stambda can be a member of an object." (= ()
+    (var obj (@ x: 1 read: (-> this x),
+    (assert (obj "read":: is-static),
+    (assert 1 (obj read),
+  ),
+  (should "a stambda can be a member of a class." (= ()
+    (var cat (@:class age: 1.5 how-old: (-> this age),
+    (var kitty (cat of (@ x: 10),
+    (assert (kitty "how-old":: is-static),
+    (assert 1.5 (kitty how-old),
+  ),
+),
+
+(define "($a-lambda is-const)" (= ()
+  (should "($a-lambda is-const) returns true if it's a constambda - constant lambda." (= ()
+    (assert (lambda "static":: is-const),
+  ),
+  (should "an empty - no body - static lambda is taken as constant." (= ()
+    (assert ($(->()) is-const),
+    (assert ($(->() 1) is-const),
+    (assert ($(-> x) is-const),
+    (assert false ($(-> x x) is-const),
+    (assert ($(-> this) is-const),
+    (assert false ($(-> this this) is-const),
+  ),
+  (should "a bound stambda generates a constambda." (= ()
+    (var sta (-> x x),
+    (assert ($sta is-static),
+    (var con ($sta bind 100),
+    (assert ($con is-static),
+    (assert ($con is-const),
+    (assert 100 (con),
+
+    (let sta (-> this this),
+    (assert ($sta is-static),
+    (var con ($sta bind 10),
+    (assert ($con is-static),
+    (assert ($con is-const),
+    (assert 10 (con),
+  ),
+  (should "a constambda can be a member of an object." (= ()
+    (var x 1),
+    (var obj (@ x: 10 read: (->() (100 + x),
+    (assert (obj "read":: is-static),
+    (assert (obj "read":: is-const),
+    (assert 100 (obj read),
+  ),
+  (should "a constambda can be a member of a class." (= ()
+    (var age 0.5),
+    (var cat (@:class age: 1.5 how-old: (->() (10 + age),
+    (var kitty (cat of (@ age: 2.5),
+    (assert (kitty "how-old":: is-static),
+    (assert (kitty "how-old":: is-const),
+    (assert 10 (kitty how-old),
+  ),
 ),
 
 (define "($a-lambda is-generic)" (= ()
@@ -466,11 +526,17 @@
 ),
 
 (define "($a-lambda bind ...)" (= ()
-  (should "($a-lambda bind) returns the original lambda." (= ()
+  (should "($a-lambda bind) implicitly binds the original lambda with null." (= ()
     (var l (= x (+ 1 x),
-    (assert l ($l bind),
+    (var b ($l bind),
+    (assert l b),
+    (assert ($b equals l),
+    (assert false ($b is l),
+
+    (assert ($b is-bound),
+    (assert null ($b this),
   ),
-  (should "($a-lambda bind null) returns a bound lambda whose this is fixed to null." (= ()
+  (should "($a-lambda bind null) explicitly binds the original lambda with null." (= ()
     (var s (@ y: 100),
     (var l (= () this),
     (assert false ($l is-bound),
