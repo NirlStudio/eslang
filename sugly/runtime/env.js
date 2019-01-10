@@ -9,7 +9,8 @@ module.exports = function runtime ($void) {
     'runtime-core': 'js',
     'runtime-host': $void.isNativeHost ? 'native' : 'browser',
     'runtime-version': '0.7.1',
-    'is-debugging': false
+    'is-debugging': true,
+    'logging-level': 3
   })
 
   // this will be put into app space only.

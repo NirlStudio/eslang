@@ -24,7 +24,7 @@ module.exports = function import_ ($void) {
     if (clist.length < 2) {
       return null
     }
-    if (!space.modules) {
+    if (!space.app) {
       warn('import', 'invalid without an app context.')
       return null
     }

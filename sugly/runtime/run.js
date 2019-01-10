@@ -25,7 +25,9 @@ module.exports = function run ($void) {
     }
     // try to resolve the uri for source
     var loader = $void.loader
-    var uri = loader.resolve(appSource, [appHome])
+    var uri = loader.resolve(appSource, [
+      appHome, $void.runtime('home')
+    ])
     if (typeof uri !== 'string') {
       warn('run', 'failed to resolve source for', uri)
       return null

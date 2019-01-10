@@ -15,7 +15,7 @@ module.exports = function load ($void) {
     if (clist.length < 2) {
       return null
     }
-    if (!space.modules) {
+    if (!space.app) {
       warn('load', 'invalid without an app context.')
       return null
     }

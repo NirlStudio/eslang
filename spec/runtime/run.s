@@ -6,6 +6,7 @@
 
 (define "(run app-source)" (= ()
   (should "load and return the evaluation result of file source." (= ()
+    (print -module)
     (var result (run "spec/runtime/_app"),
     (assert (result is-a array),
     (assert ((result 0) is-a string),

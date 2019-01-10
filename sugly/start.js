@@ -88,7 +88,7 @@ module.exports = function start (stdout) {
   initializeSpace($void)
 
   // prepare primary lib
-  initializeLib($void, stdout($void.$))
+  initializeLib($void, stdout($void))
 
   // prepare tokenizer & compiler
   require('./tokenizer')($void)

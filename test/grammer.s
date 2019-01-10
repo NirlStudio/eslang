@@ -469,6 +469,23 @@ activator((i activator) activator)
 (print)
 (warn)
 
+# meta.operator.lib.sugly
+(debug)
+(log)
+(log v)
+(log v v)
+(log verbose verbose)
+(log i i)
+(log info  info)
+(log w w)
+(log warn warn)
+(log warning warning)
+(log e e)
+(log err err)
+(log error error)
+(log d d)
+(log debug debug)
+
 # meta.function-uri-lib-sugly
 ((uri encode) encode)
 ((uri decode) decode)
@@ -508,8 +525,8 @@ math
 math(math math math)math
 
 # support.class.lib.sugly
-emmiter
-emmiter(emmiter emmiter emmiter)emmiter
+emitter
+emitter(emitter emitter emitter)emitter
 timer
 timer(timer timer timer)timer
 
