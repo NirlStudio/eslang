@@ -139,8 +139,10 @@ module.exports = function ($void) {
     function pushFormat (pattern, source) {
       var args = formatPattern(pattern)
       if (!(args.length > 1)) {
-        warn('compiler', 'unnecessary format string.',
-          pattern, ['format', pattern, source])
+        if (pattern.indexOf('"') < 0) {
+          warn('compiler', 'unnecessary format string.',
+            pattern, ['format', pattern, source])
+        }
         return pushValue(args[0], source)
       }
 

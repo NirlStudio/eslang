@@ -2,12 +2,11 @@
 
 module.exports = function ($void, JS) {
   var $ = $void.$
-  var Object$ = $void.Object
   var $export = $void.export
   var thisCall = $void.thisCall
   var copyType = $void.copyType
 
-  $export($, 'math', copyType(new Object$(), JS.Math, {
+  $export($, 'math', copyType($.object.empty(), JS.Math, {
     'E': 'e',
     'PI': 'pi',
     'LN2': 'ln2',

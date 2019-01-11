@@ -3,6 +3,7 @@
 module.exports = function import_ ($void) {
   var $ = $void.$
   var compile = $.compile
+  var $Object = $.object
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Object$ = $void.Object
@@ -36,7 +37,7 @@ module.exports = function import_ ($void) {
         clist.length > 2 ? evaluate(clist[2], space) : null
       )
       // clone to protect inner exports object.
-      return Object.assign(new Object$(), src)
+      return Object.assign($Object.empty(), src)
     }
     // (import field-or-fields from src)
     src = evaluate(clist[3], space)
@@ -117,7 +118,7 @@ module.exports = function import_ ($void) {
     }
     module_.exporting = exporting
     if (reloading) {
-      module_.exports = new Object$()
+      module_.exports = $Object.empty()
     }
     var keys = Object.getOwnPropertyNames(exporting)
     for (var i = 0; i < keys.length; i++) {
@@ -164,7 +165,7 @@ module.exports = function import_ ($void) {
     if (!module) {
       module = modules[uri] = Object.assign(Object.create(null), {
         status: 0, // loading
-        exports: new Object$(),
+        exports: $Object.empty(),
         timestamp: Date.now()
       })
     } else if (module.status === 100) {
