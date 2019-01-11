@@ -68,7 +68,6 @@
     (should "a non-empty iterator is encoded to tuple (iterator of ...)." (=> ()
       (for value in the-values
         (var code (value to-code),
-        (print value code)
         (assert (code is-a tuple),
         (assert 3 (code length),
         (assert (`iterator) (code 0),
@@ -564,6 +563,60 @@
   ),
   (should "(iter average default-value) returns the default value if the average value is not a valid number." (= ()
     (assert 10 ((iterator of (@ 1 2 10:10 100:100 "xxx")) average 10),
+  ),
+),
+
+(define "(an-iterator max ...)" (= ()
+  (should "(empty-iter max) returns null." (= ()
+    (assert null ((iterator empty) max),
+  ),
+  (should "(an-iter max) returns the maximum value." (= ()
+    (assert 1 ((iterator of (@ 1)) max),
+    (assert 1 ((iterator of (@ 1 null)) max),
+    (assert 1 ((iterator of (@ null 1)) max),
+
+    (assert 2 ((iterator of (@ 1 2)) max),
+    (assert 2 ((iterator of (@ 1 null 2)) max),
+    (assert 2 ((iterator of (@ null 1 2)) max),
+    (assert 2 ((iterator of (@ 1 2 null)) max),
+
+    (assert 3 ((iterator of (@ -1 0 1 2 3)) max),
+    (assert 3 ((iterator of (@ null -1 0 1 2 3)) max),
+    (assert 3 ((iterator of (@ -1 0 1 null 2 3)) max),
+    (assert 3 ((iterator of (@ -1 0 1 2 3 null)) max),
+  ),
+  (should "(an-iter max filter) returns the maximum value which matched by filter." (= ()
+    (assert -1 ((iterator of (@ -1 0 1 2 3)) max (->(x) (x < 0),
+    (assert 0 ((iterator of (@ null -1 0 1 2 3)) max (->(x) (x < 1),
+    (assert 1 ((iterator of (@ -1 0 1 null 2 3)) max (->(x) (x < 2),
+    (assert 2 ((iterator of (@ -1 0 1 2 3 null)) max (->(x) (x < 3),
+  ),
+),
+
+(define "(an-iterator min ...)" (= ()
+  (should "(empty-iter min) returns null." (= ()
+    (assert null ((iterator empty) min),
+  ),
+  (should "(an-iter min) returns the minimum value." (= ()
+    (assert 1 ((iterator of (@ 1)) min),
+    (assert 1 ((iterator of (@ 1 null)) min),
+    (assert 1 ((iterator of (@ null 1)) min),
+
+    (assert 1 ((iterator of (@ 1 2)) min),
+    (assert 1 ((iterator of (@ 1 null 2)) min),
+    (assert 1 ((iterator of (@ null 1 2)) min),
+    (assert 1 ((iterator of (@ 1 2 null)) min),
+
+    (assert -1 ((iterator of (@ -1 0 1 2 3)) min),
+    (assert -1 ((iterator of (@ null -1 0 1 2 3)) min),
+    (assert -1 ((iterator of (@ -1 0 1 null 2 3)) min),
+    (assert -1 ((iterator of (@ -1 0 1 2 3 null)) min),
+  ),
+  (should "(an-iter min filter) returns the minimum value which matched by filter." (= ()
+    (assert 0 ((iterator of (@ -1 0 1 2 3)) min (->(x) (x > -1),
+    (assert 1 ((iterator of (@ null -1 0 1 2 3)) min (->(x) (x > 0),
+    (assert 2 ((iterator of (@ -1 0 1 null 2 3)) min (->(x) (x > 1),
+    (assert 3 ((iterator of (@ -1 0 1 2 3 null)) min (->(x) (x > 2),
   ),
 ),
 

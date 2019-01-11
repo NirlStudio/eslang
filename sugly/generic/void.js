@@ -192,13 +192,13 @@ module.exports = function ($void) {
     var names = Object.getOwnPropertyNames(mapping)
     for (var i = 0; i < names.length; i++) {
       var name = names[i]
-      var func = target[mapping[name]] = src[name]
-      if (typeof func === 'function') {
-        func.type = $Lambda
-        if (!func.$name) {
-          func.$name = mapping[name]
-        }
+      var entity = src[name]
+      if (typeof entity === 'function') {
+        entity = entity.bind(src)
+        entity.type = $Lambda
+        entity.$name = mapping[name]
       }
+      target[mapping[name]] = entity
     }
     return target
   }

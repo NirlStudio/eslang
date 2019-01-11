@@ -258,6 +258,66 @@ module.exports = function iterate ($void) {
       : typeof defaultValue === 'number' ? defaultValue : 0
   })
 
+  // find the maximum value of all iterations.
+  link(proto, 'max', function (filter) {
+    var max = null
+    var value = this.next && this.next()
+    if (isApplicable(filter)) {
+      while (typeof value !== 'undefined' && value != null) {
+        if (Array.isArray(value) && value.length > 0) {
+          value = value[0]
+          if (filter.call(this, value) && (max === null ||
+            thisCall(value, 'compare', max) > 0)) {
+            max = value
+          }
+        }
+        value = this.next()
+      }
+    } else {
+      while (typeof value !== 'undefined' && value != null) {
+        if (Array.isArray(value) && value.length > 0) {
+          value = value[0]
+          if (max === null || thisCall(value, 'compare', max) > 0) {
+            max = value
+          }
+        }
+        value = this.next()
+      }
+    }
+    this.next = null
+    return max
+  })
+
+  // find the minimum value of all iterations.
+  link(proto, 'min', function (filter) {
+    var min = null
+    var value = this.next && this.next()
+    if (isApplicable(filter)) {
+      while (typeof value !== 'undefined' && value != null) {
+        if (Array.isArray(value) && value.length > 0) {
+          value = value[0]
+          if (filter.call(this, value) && (min === null ||
+            thisCall(value, 'compare', min) < 0)) {
+            min = value
+          }
+        }
+        value = this.next()
+      }
+    } else {
+      while (typeof value !== 'undefined' && value != null) {
+        if (Array.isArray(value) && value.length > 0) {
+          value = value[0]
+          if (min === null || thisCall(value, 'compare', min) < 0) {
+            min = value
+          }
+        }
+        value = this.next()
+      }
+    }
+    this.next = null
+    return min
+  })
+
   // determine emptiness by its inner iterator function.
   link(proto, 'is-empty', function () {
     return !this.next

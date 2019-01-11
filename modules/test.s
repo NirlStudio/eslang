@@ -1,15 +1,15 @@
 # import rendering
-let colors (import "colors" "js");
-let (gray green red underline) colors;
-(let (sign-passed sign-failed)
-  (import (passed failed) from colors
+const colors (import "colors" "js");
+const (gray, green, red, underline) colors;
+(const (sign-passed, sign-failed)
+  import (passed, failed) from colors;
 ).
 
 # to store all test cases.
-let cases (@);
-let current null; # the stack top
+var cases (@);
+var current null; # the stack top
 
-(export define (=> (feature describe-it)
+(export define (=> (feature, describe-it)
    var top current; # save current context
    let current (var spec (@ feature); # create the spec object as an array.
    (top ?? cases) push spec; # save the spec into stack top.
@@ -18,7 +18,7 @@ let current null; # the stack top
    return spec;
 ).
 
-(export should (=> (behaviour action)
+(export should (=> (behaviour, action)
   (current push (@
     behaviour: behaviour,
     action: action
@@ -50,15 +50,15 @@ export ++assertions (=>() (++ assertions);
 ).
 
 # test results
-let summary (@);
-let failures (@);
+var summary (@);
+var failures (@);
 
 # testing status
-let path (@);
-let indent "  ";
+var path (@);
+var indent "  ";
 
-let passing 0;
-(let pass (=> behaviour
+var passing 0;
+(var pass (=> behaviour
   ++ passing;
   print indent sign-passed (gray behaviour);
   (summary push (@
@@ -68,8 +68,8 @@ let passing 0;
   ),
 ).
 
-let failing 0;
-(let fail (=> (behaviour, assertion)
+var failing 0;
+(var fail (=> (behaviour, assertion)
   ++ failing;
   print indent sign-failed (red "(" failing ") " behaviour);
   (summary push (@
@@ -85,7 +85,7 @@ let failing 0;
   ),
 ).
 
-(let test-a (=> (case)
+(var test-a (=> (case)
   # print headline
   print indent (case first);
   path push (case first);
@@ -94,7 +94,7 @@ let failing 0;
   (for i in (1 (case length))
     var task (case:i);
     (if (task is-a array)
-      (do task)
+      do task;
     else
       var assertion (task action);
       (if (assertion failed)
@@ -107,7 +107,7 @@ let failing 0;
   indent -= 2;
 ).
 
-(let print-a (=> failure
+(var print-a (=> failure
   print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behaviour)';
   let assertion (failure assertion);
   (print

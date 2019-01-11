@@ -122,7 +122,11 @@ module.exports = function ($void) {
       '$env', '$run', '$interpreter'
     ])
 
-    checkFunctions($void, '[Sugly / lib / functions] ', [
+    checkFunctions($, '[Sugly / lib / functions] ', [
+      'max', 'min'
+    ])
+
+    checkFunctions($void, '[Sugly / lib / io functions] ', [
       '$print', '$warn'
     ])
 
