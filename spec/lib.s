@@ -1,8 +1,9 @@
 (for spec in (@
+    "emitter"
     "format"
     "json"
     "math"
-    "print"
+    "stdout"
     "timer"
     "uri"
   ) (define spec (=> ()

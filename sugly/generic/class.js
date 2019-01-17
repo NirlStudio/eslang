@@ -82,6 +82,9 @@ module.exports = function ($void) {
   // make this class to act as other classes and/or class descriptors.
   var isAtom = $Tuple.accepts
   var as = link(proto, 'as', function () {
+    if (Object.isFrozen(this)) {
+      return this
+    }
     var type_ = Object.create(null)
     var proto_ = Object.create(null)
     var args = Array.prototype.slice.call(arguments)
@@ -170,7 +173,6 @@ module.exports = function ($void) {
 
   // Mutability
   link(proto, 'seal', function () {
-    Object.freeze(this.proto)
     return Object.freeze(this)
   })
   link(proto, 'is-sealed', function () {
@@ -325,8 +327,19 @@ module.exports = function ($void) {
       return true
     }
     var overriding = this['is-a']
-    return overriding !== isA && isApplicable(overriding) &&
-      boolValueOf(overriding.call(this, t))
+    if (overriding !== isA && isApplicable(overriding)) {
+      return boolValueOf(overriding.call(this, t))
+    }
+    if (!(t instanceof ClassType$) || !t.proto) {
+      return false
+    }
+    var members = Object.getOwnPropertyNames(t.proto)
+    for (var i = 0; i < members.length; i++) {
+      if (typeof this[members[i]] === 'undefined') {
+        return false
+      }
+    }
+    return true
   })
   link(instance, 'is-not-a', function (t) {
     return !isA.call(this, t)
