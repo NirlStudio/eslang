@@ -4,24 +4,63 @@
   ),
   activator: (=()
     (this as emitter "activator");
+    (for event in (@ "ready", "data", "closed")
+      if (listeners: event:: is null) (listeners: event (@));
+    ),
+  ),
+),
+
+(define "(emitter default)" (=> ()
+  (should "(emitter default) constructs a default emitter instance." (=> ()
+    var device (emitter default);
+    assert (device is-a emitter);
+    assert (device is-a object);
+    assert (device listeners:: is-a object);
+
+    var events (object fields-of (device listeners);
+    assert 0 (events length);
   ),
 ),
 
 (define "(emitter of ...)" (=> ()
-  (should "(emitter of events ...) constructs a new emitter instance." (=> ()
-    var device (driver default);
+  (should "(emitter of) constructs a new default emitter instance." (=> ()
+    var device (emitter of);
+    assert (device is-a driver);
+    assert (device is-a emitter);
+    assert (device is-a object);
+    assert (device listeners:: is-a object);
+
+    var events (object fields-of (device listeners);
+    assert 0 (events length);
+
+    let device (driver of);
     assert (device is-a driver);
     assert (device is-a emitter);
     assert (device is-a object);
     assert (device listeners:: is-a object);
     assert 3 (object fields-of (device listeners):: length);
   ),
+  (should "(emitter of events ...) constructs a new emitter instance which allows given events." (=> ()
+    var device (emitter of "a" "b" "c");
+    assert (device is-a driver);
+    assert (device is-a emitter);
+    assert (device is-a object);
+    assert (device listeners:: is-a object);
+
+    var events (object fields-of (device listeners);
+    assert 3 (events length);
+    assert (events first-of "a" :: >= 0);
+    assert (events first-of "b" :: >= 0);
+    assert (events first-of "c" :: >= 0);
+  ),
 ),
 
 (define "(@:emitter ...)" (=> ()
-  (should "(@:emitter ...) activates a new emitter instance." (=> ()
+  (should "(@:emitter ...) activates a new emitter instance and cleans up empty event listeners." (=> ()
     (var device (@:driver listeners: (@
-      ready: (@), data: (@), closed: (@
+      ready: (@),
+      data: (@ (=),
+      closed: (@
         (=() (print "device is closed."),
       ),
     ),
@@ -30,6 +69,19 @@
     assert (device is-a object);
     assert (device listeners:: is-a object);
     assert 3 (object fields-of (device listeners):: length);
+    assert 0 (device listeners:: ready:: length);
+    assert 0 (device listeners:: data:: length);
+    assert 1 (device listeners:: closed:: length);
+  ),
+  (should "(@:emitter ...) tries to fix a corrupted instance." (=> ()
+    var device (@:driver);
+    assert (device is-a driver);
+    assert (device is-a emitter);
+    assert (device is-a object);
+    assert (device listeners:: is-a object);
+    assert 3 (object fields-of (device listeners):: length);
+    assert 0 (device listeners:: ready:: length);
+    assert 0 (device listeners:: data:: length);
     assert 0 (device listeners:: closed:: length);
   ),
 ),

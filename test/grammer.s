@@ -551,6 +551,7 @@ emit((e emit) emit)
 
 # meta.function-timer-sugly
 ((t start) start)
+((t is-elapsing) is-elapsing)
 ((t stop) stop)
 
 # meta.function.test.sugly

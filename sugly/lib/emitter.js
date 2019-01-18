@@ -4,15 +4,18 @@ module.exports = function device ($void) {
   var $ = $void.$
   var $Object = $.object
   var Object$ = $void.Object
+  var link = $void.link
   var $export = $void.export
+  var thisCall = $void.thisCall
   var createClass = $void.createClass
   var isApplicable = $void.isApplicable
 
   var emitter = createClass()
-  emitter.proto.listeners = null
+  var proto = emitter.proto
+  link(proto, 'listeners', null)
 
   // define allowed events for this emitter
-  emitter.proto.constructor = function () {
+  link(proto, 'constructor', function () {
     var listeners = this.listeners = $Object.empty()
     for (var i = 0; i < arguments.length; i++) {
       var event = arguments[i]
@@ -20,16 +23,31 @@ module.exports = function device ($void) {
         listeners[event] = []
       }
     }
-  }
+  })
+
   // clear legacy event handler on activation.
-  emitter.proto.activator = function () {
-    this.off()
-  }
+  link(proto, 'activator', function () {
+    if (!(this.listeners instanceof Object$)) {
+      this.listeners = $Object.empty()
+      return
+    }
+    var events = Object.getOwnPropertyNames(this.listeners)
+    for (var i = 0; i < events.length; i++) {
+      var listeners = this.listeners[events[i]]
+      if (Array.isArray(listeners)) {
+        for (var j = listeners.length - 1; j >= 0; j--) {
+          if (thisCall(listeners[j], 'is-empty')) {
+            listeners.splice(j, 1) // remove empty listeners
+          }
+        }
+      }
+    }
+  })
 
   // (an-emitter on) queries allowed events.
   // (an-emitter on event) queries all listeners for an event
   // (an-emitter on event listener) registers a listener for the event.
-  emitter.proto.on = function (event, listener) {
+  link(proto, 'on', function (event, listener) {
     if (!(this.listeners instanceof Object$)) {
       return null // invalid emitter instance.
     }
@@ -48,12 +66,12 @@ module.exports = function device ($void) {
     }
     listeners.push(listener)
     return listeners
-  }
+  })
 
   // (an-emitter off) clears all listeners for all events.
   // (an-emitter off event) clears all listeners for the event.
   // (an-emitter on event listener) clears a listener for the event.
-  emitter.proto.off = function (event, listener) {
+  link(proto, 'off', function (event, listener) {
     if (!(this.listeners instanceof Object$)) {
       return null
     }
@@ -86,9 +104,9 @@ module.exports = function device ($void) {
       }
     }
     return listeners
-  }
+  })
 
-  emitter.proto.emit = function (event, args) {
+  link(proto, 'emit', function (event, args) {
     if (!(this.listeners instanceof Object$) || typeof event !== 'string') {
       return null // invalid emitter instance.
     }
@@ -97,20 +115,20 @@ module.exports = function device ($void) {
       return null // partially invalid emitter instance at least.
     }
     if (typeof args === 'undefined') {
-      args = null
+      args = event
     }
     var handled = false
     for (var i = 0; i < listeners.length; i++) {
       var listener = listeners[i]
       if (isApplicable(listener)) {
-        if (listener(args, this) === true) {
+        if (listener(args, this, event) === true) {
           return true // event has been handled at least once.
         }
         handled = true
       }
     }
     return handled // no listener to handle this event.
-  }
+  })
 
   $export($, 'emitter', emitter)
 }
