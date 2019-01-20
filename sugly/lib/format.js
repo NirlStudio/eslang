@@ -43,7 +43,7 @@ function formatValue (cache, offset, rawValue, fmt, thisCall) {
   return (map[fmt] = thisCall(rawValue, 'to-string', fmt))
 }
 
-module.exports = function ($void, JS) {
+module.exports = function ($void) {
   var $ = $void.$
   var warn = $void.$warn
   var link = $void.link

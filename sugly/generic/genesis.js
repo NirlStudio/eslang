@@ -190,16 +190,24 @@ module.exports = function () {
     return typeof func === 'function' && func.type !== operator
   }
 
-  /* Compound Types */
-  /* Generally, all compound entities are mutable. */
-  /* All compound entities are also fixed points of evaluation funtion. */
+  /* Transient Entity Types */
+  /* All transient entities will be encoded to empty instances. */
 
-  // A special type to wrap an iterate function.
+  // A special type to wrap the transient state of an ongoing iteration.
   create('iterator')
   var Iterator$ = $void.Iterator = function (next) {
     this.next = next
   }
   Iterator$.prototype = $.iterator.proto
+
+  // A special type to wrap the transient state of an ongoing action.
+  create('promise')
+  // TODO: to be polyfilled ?
+  $void.Promise = Promise
+
+  /* Compound Types */
+  /* By default, compound entities are mutable. */
+  /* All compound entities are also fixed points of evaluation funtion. */
 
   // A collection of values indexed by zero-based integers.
   create('array')

@@ -62,6 +62,14 @@ module.exports = function timer ($void) {
     if (!Number.isSafeInteger(this.interval) || this.interval <= 0) {
       this.interval = DefaultInterval
     }
+    // trying to fix corrupted fields
+    var listeners = this.listeners
+    var fix = function (event) {
+      if (!Array.isArray(listeners[event])) {
+        listeners[event] = []
+      }
+    }
+    fix(Started); fix(Elapsed); fix(Stopped)
     if (ownsProperty.call(this, 'stop')) {
       delete this.stop
     }
@@ -70,6 +78,9 @@ module.exports = function timer ($void) {
   link(proto, 'start', function (args) {
     if (this.stop !== stop) {
       return this // the timer is active already.
+    }
+    if (typeof args === 'undefined') {
+      args = this.interval
     }
     // create inner timer.
     var id = setInterval(function () {

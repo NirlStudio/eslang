@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void, JS, stdout) {
+module.exports = function ($void, stdout) {
   var Symbol$ = $void.Symbol
   var $export = $void.export
   var staticOperator = $void.staticOperator

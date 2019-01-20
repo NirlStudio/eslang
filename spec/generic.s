@@ -12,6 +12,7 @@
     "lambda"
     "function"
     "iterator"
+    "promise"
     "array"
     "object"
     "class"

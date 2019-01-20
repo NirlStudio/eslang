@@ -1,11 +1,5 @@
 'use strict'
 
-var JS = (typeof window === 'undefined' ? function () {
-  return global
-} : function () {
-  return window
-})()
-
 function initializeSpace ($void) {
   require('./generic/void')($void)
   require('./generic/encoding')($void)
@@ -27,6 +21,8 @@ function initializeSpace ($void) {
   require('./generic/function')($void)
 
   require('./generic/iterator')($void)
+  require('./generic/promise')($void)
+
   require('./generic/array')($void)
   require('./generic/object')($void)
   require('./generic/class')($void)
@@ -35,13 +31,13 @@ function initializeSpace ($void) {
 }
 
 function initializeLib ($void, stdout) {
-  require('./lib/stdout')($void, JS, stdout)
-  require('./lib/format')($void, JS)
-  require('./lib/math')($void, JS)
-  require('./lib/uri')($void, JS)
-  require('./lib/json')($void, JS)
-  require('./lib/emitter')($void, JS)
-  require('./lib/timer')($void, JS)
+  require('./lib/stdout')($void, stdout)
+  require('./lib/format')($void)
+  require('./lib/math')($void)
+  require('./lib/uri')($void)
+  require('./lib/json')($void)
+  require('./lib/emitter')($void)
+  require('./lib/timer')($void)
 }
 
 function initializeRuntime ($void) {

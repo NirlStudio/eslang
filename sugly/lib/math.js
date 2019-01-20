@@ -1,12 +1,12 @@
 'use strict'
 
-module.exports = function ($void, JS) {
+module.exports = function ($void) {
   var $ = $void.$
   var $export = $void.export
   var thisCall = $void.thisCall
   var copyType = $void.copyType
 
-  $export($, 'math', copyType($.object.empty(), JS.Math, {
+  $export($, 'math', copyType($.object.empty(), Math, {
     'E': 'e',
     'PI': 'pi',
     'LN2': 'ln2',

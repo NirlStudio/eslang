@@ -101,6 +101,31 @@
   (=> (x y) (var z) (+ x y z),
 ).
 
+(e.g. iterator
+  (iterator of (@),
+  (iterator of (@ null),
+  (iterator of (@ 1 2),
+  (iterator of (@ 1 2 10:10),
+  (iterator of (@ 1 2 100:100),
+).
+
+(e.g. promise
+  (promise of),
+  (promise of null),
+  (promise of 1),
+  (promise of 1 2),
+  (promise of (= (resolve, reject)
+    (timer timeout 100 (=>()
+      resolve 100;
+    ),
+  ),
+  (promise of (= (resolve, reject)
+    (timer timeout 200 (=>()
+      reject 200;
+    ),
+  ),
+).
+
 (e.g. array
   (@ null) (@ null)
   (@ 1) (@ 1)
@@ -110,14 +135,6 @@
   (@ 1 2) (@ 1 2)
   (@ 1 2 100:100) (@ 1 2 100:100)
   (@ 1 2 true "x" (@) (@ x:1) 100:100)
-).
-
-(e.g. iterator
-  (iterator of (@),
-  (iterator of (@ null),
-  (iterator of (@ 1 2),
-  (iterator of (@ 1 2 10:10),
-  (iterator of (@ 1 2 100:100),
 ).
 
 (e.g. object

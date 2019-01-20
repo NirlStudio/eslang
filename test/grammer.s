@@ -82,6 +82,8 @@ operand(operand -operand operand operand- operand)operand
 (lambda lambda "lambda")
 (function function "function")
 (operator operator "operator")
+(iterator iterator "iterator")
+(promise promise "promise")
 (array array "array")
 (class class "class")
 (object object "object")
@@ -229,6 +231,7 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 (lambda empty)
 (function empty)
 (iterator empty)
+(promise empty)
 (array empty)
 (object empty)
 (class empty)
@@ -405,6 +408,18 @@ average((iter average) average)
 join((iter join) join)
 collect((iter collect) collect)
 finish((iter finish) finish)
+
+# meta.constant-promise-sugly
+nothing((promise nothing) nothing)
+# meta.function-promise-type-sugly
+((promise of-resolved) of-resolved)
+((promise of-rejected) of-rejected)
+((promise of-all) of-all)
+((promise of-any) of-any)
+# meta.function-promise-sugly
+then((prom then) then)
+catch((prom catch) catch)
+finally((prom finally) finally)
 
 # meta.function-array-type-sugly
 ((array from) from)

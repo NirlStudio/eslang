@@ -104,6 +104,19 @@
     assert 0 (t listeners:: elapsed:: length);
     assert 1 (t listeners:: stopped:: length);
   ),
+  (should "(@:timer ...) tries to fix a corrupted timer instance." (=> ()
+    var t (@:timer);
+    assert (t is-a timer);
+    assert (t is-a emitter);
+    assert (t is-a object);
+    assert 1000 (t interval);
+
+    assert (t listeners:: is-a object);
+    assert 3 (object fields-of (t listeners):: length);
+    assert 0 (t listeners:: started:: length);
+    assert 0 (t listeners:: elapsed:: length);
+    assert 0 (t listeners:: stopped:: length);
+  ),
 ),
 
 (define "(a-timer start ...)" (=> ()
@@ -115,7 +128,7 @@
     ),
 
     t start; t stop;
-    assert "started" args;
+    assert 100 args;
     assert t source;
     assert "started" event;
   ),
@@ -151,6 +164,13 @@
     assert null source;
     assert null event;
   ),
+  (should '(a-timer on "elapsed") does nothing for an active timer.' (=> ()
+    var (args, source, event);
+    (var t (timer of 100 (=(args t)
+      t stop;
+    ),
+    t start;
+  ),
 ),
 
 (define "(a-timer is-elapsing)" (=> ()
@@ -175,7 +195,7 @@
     ),
 
     t start; t stop;
-    assert "stopped" args;
+    assert 100 args;
     assert t source;
     assert "stopped" event;
   ),
