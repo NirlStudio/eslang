@@ -14,14 +14,18 @@
     assert 0 (timer timeout true);
     assert 0 (timer timeout (=();
   ),
-  (should "(timer timeout callback) returns 0 if milliseconds is not a valid positive integer value." (= async
+  (should "(timer timeout callback) returns 0 and invoke the callback asynchronously." (= async
     var timeout;
+    var called false;
     (var wait (promise of (=> async
       (let timeout (timer timeout (=> ms
+        let called true;
         async resolve ms;
       ),
     ),
     assert 0 timeout;
+    assert false called;
+
     wait then (async resolve 0);
   ),
   (should "(timer timeout milliseconds callback) will call the callback after the milliseconds." (= async
@@ -32,6 +36,7 @@
       ),
     ),
     assert 20 timeout;
+
     wait then (async resolve 20);
   ),
 ),
@@ -40,11 +45,13 @@
   (should "(timer countdown) returns promise with a default millisecond value of 0." (= async
     var countdown (timer countdown);
     assert (countdown is-a promise);
+
     countdown then (async resolve 0);
   ),
   (should "(timer countdown milliseconds) uses the given millisecond value." (= async
     var countdown (timer countdown 20);
     assert (countdown is-a promise);
+
     countdown then (async resolve 20);
   ),
   (should "(timer countdown milliseconds) returns a cancellable promise." (= async
@@ -52,6 +59,7 @@
     assert (countdown is-a promise);
     assert (countdown is-cancellable);
     assert countdown (countdown cancel);
+
     countdown then (async reject 30);
   ),
 ),
@@ -89,16 +97,16 @@
     assert (t is-a object)
 
     assert 1 (t listeners:: elapsed:: length)
-    assert on-elapsed (t listeners:: elapsed:: 0)
+    assert on-elapsed (t listeners:: elapsed:: first)
   ),
   (should "a timer instance has events of 'started', 'elapsed' and 'stopped'." (=> ()
     var t (timer of);
     var events (object fields-of (t listeners);
     assert (events is-a array);
     assert 3 (events length);
-    assert (events first-of "started":: >= 0);
-    assert (events first-of "elapsed":: >= 0);
-    assert (events first-of "stopped":: >= 0);
+    assert (events contains "started");
+    assert (events contains "elapsed");
+    assert (events contains "stopped");
   ),
 ),
 
@@ -141,7 +149,7 @@
 ),
 
 (define "(a-timer start ...)" (=> ()
-  (should "(a-timer start) enables the timer to run and triggers a 'started' event." (=> ()
+  (should "(a-timer start) enables the timer to run and synchronously triggers a 'started' event." (=> ()
     var (args, source, event);
     var t (timer of 100);
     (t on "started" (=> ()
@@ -185,13 +193,6 @@
     assert null source;
     assert null event;
   ),
-  (should '(a-timer on "elapsed") does nothing for an active timer.' (=> ()
-    var (args, source, event);
-    (var t (timer of 100 (=(args t)
-      t stop;
-    ),
-    t start;
-  ),
 ),
 
 (define "(a-timer is-elapsing)" (=> ()
@@ -199,16 +200,34 @@
     var t (timer default);
     assert false (t is-elapsing);
   ),
-  (should "(a-timer is-elapsing) returns false if the timer is not active yet." (=> ()
+  (should "(a-timer is-elapsing) returns true if the timer is running." (=> ()
     var t (timer default);
     t start;
     assert true (t is-elapsing);
     t stop;
   ),
+  (should 'an elapsing timer will repeatedly trigger the elapsed event until it gets stopped.' (=> async
+    var complete;
+    (var wait (promise of (=> async
+      (let complete (=>()
+        async resolve counter;
+      ),
+    ),
+    var counter 1;
+    (var t (timer of 20 (=> ()
+      counter ++;
+      (if (counter > 3)
+        t stop;
+        complete;
+      ),
+    ),
+    t start;
+    wait then (async resolve 4);
+  ),
 ),
 
 (define "(a-timer stop)" (=> ()
-  (should "(a-timer stop) disables the timer and triggers a 'stopped' event." (=> ()
+  (should "(a-timer stop) disables the timer and synchronously triggers a 'stopped' event." (=> ()
     var (args, source, event);
     var t (timer of 100);
     (t on "stopped" (=> ()
