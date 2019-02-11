@@ -194,7 +194,7 @@ module.exports = function function_ ($void) {
   // returns [params-list, code]
   function formatParameters (params, space, maxArgs) {
     if (params instanceof Symbol$) {
-      return [[[params.key, null]], params]
+      return [[[params.key, null]], new Tuple$([params])]
     }
     if (!(params instanceof Tuple$) || params.$.length < 1) {
       return [[], $Tuple.empty]
@@ -232,9 +232,6 @@ module.exports = function function_ ($void) {
     }
     if (counter === 0) {
       return [[], $Tuple.empty]
-    }
-    if (counter === 1 && !hasDefault) {
-      return [args, code[0][0]]
     }
     var list = []
     for (i = 0; i < code.length; i++) {

@@ -1,16 +1,20 @@
 'use strict'
 
-var Timeout = 'timeout'
-var Cancelled = 'cancelled'
-
 var Started = 'started'
 var Elapsed = 'elapsed'
 var Stopped = 'stopped'
 var DefaultInterval = 1000
 
+function safeDelayOf (milliseconds, defaultValue) {
+  return typeof milliseconds !== 'number' ? (defaultValue || 0)
+    : (milliseconds >>= 0) <= 0 ? (defaultValue || 0)
+      : milliseconds
+}
+
 module.exports = function timer ($void) {
   var $ = $void.$
   var $Emitter = $.emitter
+  var promiseOf = $.promise.of
   var link = $void.link
   var $export = $void.export
   var createClass = $void.createClass
@@ -20,27 +24,39 @@ module.exports = function timer ($void) {
   // a timer is an emitter.
   var timer = createClass().as($Emitter)
 
-  link(timer, 'timeout', function (milliseconds, listener) {
-    // an invalid timespan value will be replaced to 0.
-    if (typeof milliseconds !== 'number' || (milliseconds >>= 0) < 0) {
+  link(timer, 'timeout', function (milliseconds, callback) {
+    if (isApplicable(milliseconds)) {
+      callback = milliseconds
       milliseconds = 0
-    }
-    // use a default emitter to manage events
-    var emitter = $Emitter.of(Timeout, Cancelled)
-    emitter.on(Timeout, listener)
-    emitter.on(Cancelled, listener)
-    // create inner timeout.
-    var id = setTimeout(function () {
-      emitter.emit(Timeout, milliseconds)
-    }, milliseconds)
-    // construct and return the canceling function
-    return function () {
-      if (id !== null) {
-        clearTimeout(id)
-        id = null
-        emitter.emit(Cancelled, milliseconds)
+    } else {
+      milliseconds = safeDelayOf(milliseconds)
+      if (!isApplicable(callback)) {
+        return milliseconds
       }
     }
+    // a simple non-cancellable timeout.
+    setTimeout(callback.bind(null, milliseconds), milliseconds)
+    return milliseconds
+  })
+
+  link(timer, 'countdown', function (milliseconds) {
+    milliseconds = safeDelayOf(milliseconds)
+    // a cancellable promise-based timeout.
+    return promiseOf(function (async) {
+      var id = setTimeout(function () {
+        if (id !== null) {
+          id = null
+          async.resolve(milliseconds)
+        }
+      }, milliseconds)
+      return function cancel () {
+        if (id !== null) {
+          clearTimeout(id)
+          id = null
+          async.reject(milliseconds)
+        }
+      }
+    })
   })
 
   var proto = timer.proto
@@ -48,8 +64,7 @@ module.exports = function timer ($void) {
     // call super constructor
     $Emitter.proto.constructor.call(this, Started, Elapsed, Stopped)
     // apply local constructor logic
-    this.interval = typeof interval === 'number' && (interval >>= 0) > 0
-      ? interval : DefaultInterval
+    this.interval = safeDelayOf(interval, DefaultInterval)
     if (isApplicable(listener)) {
       this.on(Elapsed, listener)
     }
@@ -58,10 +73,10 @@ module.exports = function timer ($void) {
   link(proto, 'activator', function () {
     // call super activator
     $Emitter.proto.activator.apply(this, arguments)
+
     // apply local activator logic
-    if (!Number.isSafeInteger(this.interval) || this.interval <= 0) {
-      this.interval = DefaultInterval
-    }
+    this.interval = safeDelayOf(this.interval, DefaultInterval)
+
     // trying to fix corrupted fields
     var listeners = this.listeners
     var fix = function (event) {
@@ -104,7 +119,7 @@ module.exports = function timer ($void) {
   })
 
   var stop = link(proto, 'stop', function () {
-    // make this method overrideable by an instance method.
+    // make this method overridable by an instance method.
     if (this.stop !== stop && isApplicable(this.stop)) {
       this.stop()
       delete this.stop

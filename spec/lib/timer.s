@@ -1,37 +1,58 @@
 (define "(timer timeout ...)" (= ()
-  (should "(timer timeout milliseconds listener) returns a canceling function." (= ()
-    var cancel (timer timeout);
-    assert ($cancel is-a function);
-
-    let cancel (timer timeout 10);
-    assert ($cancel is-a function);
-
-    let cancel (timer timeout 10 (=);
-    assert ($cancel is-a function);
+  (should "(timer timeout) returns 0." (=()
+    assert 0 (timer timeout);
   ),
-  (should "milliseconds will be replaced to 0 if it's not a positive number." (= ()
-    var timespan;
-    (var cancel (timer timeout true (=>(ts)
-      let timespan ts;
-    ),
-    assert ($cancel is-a function);
-
-    cancel;
-    assert 0 timespan;
+  (should "(timer timeout milliseconds) returns milliseconds." (=()
+    assert 0 (timer timeout 0);
+    assert (timer timeout -0:: is 0);
+    assert 10 (timer timeout 10);
+    assert 10 (timer timeout 10.1);
   ),
-  (should "the canceling function can be called to cancel the timeout request." (= ()
-    var timespan;
-    var source;
-    var event;
-    (var cancel (timer timeout 10 (=>()
-      let (timespan source event) arguments;
+  (should "(timer timeout milliseconds) returns 0 if milliseconds is not a valid positive integer value." (=()
+    assert 0 (timer timeout "");
+    assert 0 (timer timeout "0");
+    assert 0 (timer timeout true);
+    assert 0 (timer timeout (=();
+  ),
+  (should "(timer timeout callback) returns 0 if milliseconds is not a valid positive integer value." (= async
+    var timeout;
+    (var wait (promise of (=> async
+      (let timeout (timer timeout (=> ms
+        async resolve ms;
+      ),
     ),
-    assert ($cancel is-a function);
+    assert 0 timeout;
+    wait then (async resolve 0);
+  ),
+  (should "(timer timeout milliseconds callback) will call the callback after the milliseconds." (= async
+    var timeout;
+    (var wait (promise of (=> async
+      (let timeout (timer timeout 20 (=> ms
+        async resolve ms;
+      ),
+    ),
+    assert 20 timeout;
+    wait then (async resolve 20);
+  ),
+),
 
-    cancel;
-    assert 10 timespan;
-    assert (source is-a emitter)
-    assert "cancelled" event;
+(define "(timer countdown ...)" (= ()
+  (should "(timer countdown) returns promise with a default millisecond value of 0." (= async
+    var countdown (timer countdown);
+    assert (countdown is-a promise);
+    countdown then (async resolve 0);
+  ),
+  (should "(timer countdown milliseconds) uses the given millisecond value." (= async
+    var countdown (timer countdown 20);
+    assert (countdown is-a promise);
+    countdown then (async resolve 20);
+  ),
+  (should "(timer countdown milliseconds) returns a cancellable promise." (= async
+    var countdown (timer countdown 30);
+    assert (countdown is-a promise);
+    assert (countdown is-cancellable);
+    assert countdown (countdown cancel);
+    countdown then (async reject 30);
   ),
 ),
 

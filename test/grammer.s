@@ -409,16 +409,38 @@ join((iter join) join)
 collect((iter collect) collect)
 finish((iter finish) finish)
 
+# meta.funtion-global-promise-sugly
+commit((commit)commit)
+commit*((commit*)commit*)
+commit?((commit?)commit?)
+
+# meta.object-promise-sugly
+waiting((waiting)waiting)waiting
+async((async)async)async
+
+# meta.constants-waiting-promise-sugly
+result((waiting result) result)result
+excuse((waiting excuse) excuse)excuse
+
+# meta.function-async-promise-sugly
+resolve((async resolve) resolve)resolve
+reject((async reject) reject)reject
+
 # meta.constant-promise-sugly
 nothing((promise nothing) nothing)
+
 # meta.function-promise-type-sugly
 ((promise of-resolved) of-resolved)
 ((promise of-rejected) of-rejected)
 ((promise of-all) of-all)
+((promise all) all)
 ((promise of-any) of-any)
+((promise any) any)
+
 # meta.function-promise-sugly
+is-cancellable((prom is-cancellable) is-cancellable)
+cancel((prom cancel) cancel)
 then((prom then) then)
-catch((prom catch) catch)
 finally((prom finally) finally)
 
 # meta.function-array-type-sugly
@@ -471,20 +493,20 @@ constructor((i constructor) constructor)
 activator((i activator) activator)
 
 # meta.function.runtime.sugly
-(compile)
-(compiler)
-(tokenize)
-(tokenizer)
-(interpreter)
-(eval)
-(run)
-(env)
+compile((compile)compile)compile
+compiler((compiler)compiler)compiler
+tokenize((tokenize)tokenize)tokenize
+tokenizer((tokenizer)tokenizer)tokenizer
+interpreter((interpreter)interpreter)interpreter
+eval((eval)eval)eval
+run((run)run)run
+env((env)env)env
 
 # meta.function.lib.sugly
-(print)
-(warn)
-(max)
-(min)
+print((print)print)print
+warn((warn)warn)warn
+max((max)max)max
+min((min)min)min
 
 # meta.operator.lib.sugly
 (debug)
@@ -563,6 +585,7 @@ emit((e emit) emit)
 
 # meta.function-timer-class-sugly
 ((timer timeout) timeout)
+((timer countdown) countdown)
 
 # meta.function-timer-sugly
 ((t start) start)

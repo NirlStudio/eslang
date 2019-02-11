@@ -21,12 +21,15 @@ module.exports = function importing (exporting) {
   if (os === 'win32') {
     exporting.passed = '\u221a '
     exporting.failed = '\u00d7 '
+    exporting.pending = '? '
   } else if (os === 'darwin' || proc.env['DISPLAY']) {
     exporting.passed = '✓ '
-    exporting.failed = '✖ '
-  } else { // freebsd, etc.
+    exporting.failed = '✘ '
+    exporting.pending = '\u22EF '
+  } else { // *nix without X.
     exporting.passed = '= '
     exporting.failed = 'x '
+    exporting.pending = '? '
     // mock them since they looks not working very well.
     exporting.gray = concatWith(function (text) { return text })
     exporting.underline = concatWith(function (text) { return text })

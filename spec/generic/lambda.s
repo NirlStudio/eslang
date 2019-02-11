@@ -243,18 +243,18 @@
 ),
 
 (define "($a-lambda parameters)" (= ()
-  (should "($a-lambda parameters) returns (tuple empty) for a lambda without any parameter." (= ()
+  (should "return (tuple empty) for a lambda without any parameter." (= ()
     (assert (($(= () null) parameters) is (tuple empty),
   ),
-  (should "($a-lambda parameters) returns a symbol when the lambda has only one parameter." (= ()
-    (assert (($(= x) parameters) is (`x),
-    (assert (($(= x x) parameters) is (`x),
-    (assert (($(= (x)) parameters) is (`x),
-    (assert (($(= (x) x) parameters) is (`x),
+  (should "return a tuple when the lambda has only one parameter." (= ()
+    (assert (quote x) ($(= x) parameters),
+    (assert (quote x) ($(= x x) parameters),
+    (assert (quote x) ($(= (x)) parameters),
+    (assert (quote x) ($(= (x) x) parameters),
   ),
-  (should "($a-lambda parameters) returns a tuple when the lambda has multiple parameters." (= ()
-    (assert (`(x y)) ($(= (x y)) parameters),
-    (assert (`(x y)) ($(= (x  y) (+ x y)) parameters),
+  (should "return a tuple when the lambda has multiple parameters." (= ()
+    (assert (quote x y) ($(= (x y)) parameters),
+    (assert (quote x y) ($(= (x  y) (+ x y)) parameters),
   ),
 ),
 

@@ -218,14 +218,14 @@
     (assert (($(=? () null) parameters) is (tuple empty),
   ),
   (should "($an-operator parameters) returns a symbol when the operator has only one parameter." (= ()
-    (assert (($(=? X) parameters) is (`X),
-    (assert (($(=? X (X)) parameters) is (`X),
-    (assert (($(=? (X)) parameters) is (`X),
-    (assert (($(=? (X) (X)) parameters) is (`X),
+    (assert (quote X) ($(=? X) parameters),
+    (assert (quote X) ($(=? X (X)) parameters),
+    (assert (quote X) ($(=? (X)) parameters),
+    (assert (quote X) ($(=? (X) (X)) parameters),
   ),
   (should "($an-operator parameters) returns a tuple when the operator has multiple parameters." (= ()
-    (assert (`(X Y)) ($(=> (X Y)) parameters),
-    (assert (`(X Y)) ($(=> (X Y) (+ X Y)) parameters),
+    (assert (quote X Y) ($(=> (X Y)) parameters),
+    (assert (quote X Y) ($(=> (X Y) (+ X Y)) parameters),
   ),
 ),
 

@@ -47,6 +47,9 @@ module.exports = function space ($void) {
       return typeof this_ === 'undefined' || this_ === null ? null
         : indexerOf(this_).call(this_, key)
     },
+    $resolve: function (key) {
+      return typeof $[key] === 'undefined' ? null : $[key]
+    },
     var: function (key, value) {
       return (this.local[key] = value)
     },
@@ -205,7 +208,9 @@ module.exports = function space ($void) {
 
   // customized the behaviour of the space of an operator
   $void.OperatorSpace = OperatorSpace$
-  function OperatorSpace$ (parent) {
+  function OperatorSpace$ (parent, origin) {
+    // the original context is preferred over global.
+    this.$ = origin
     // operator context is accessible to the context of calling function.
     this.context = Object.create(parent.context)
     // use the same local of calling function.
@@ -220,10 +225,15 @@ module.exports = function space ($void) {
     }
   }
   OperatorSpace$.prototype = Object.assign(Object.create(Space$.prototype), {
-    inop: true // indicates this is an operator space.
+    inop: true, // indicates this is an operator space.
+    $resolve: function (key) {
+      // global entities are not overridable
+      return typeof $[key] !== 'undefined' ? $[key]
+        : typeof this.$[key] === 'undefined' ? null : this.$[key]
+    }
   })
 
-  $void.createOperatorSpace = function (parent) {
-    return new OperatorSpace$(parent)
+  $void.createOperatorSpace = function (parent, origin) {
+    return new OperatorSpace$(parent, origin)
   }
 }

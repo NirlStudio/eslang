@@ -110,18 +110,20 @@
 ).
 
 (e.g. promise
-  (promise of),
-  (promise of null),
+  (promise of false),
+  (promise of true),
   (promise of 1),
   (promise of 1 2),
-  (promise of (= (resolve, reject)
+  (promise of (@ true),
+  (promise of (@ null true),
+  (promise of (= async
     (timer timeout 100 (=>()
-      resolve 100;
+      async resolve 100;
     ),
   ),
-  (promise of (= (resolve, reject)
+  (promise of (= async
     (timer timeout 200 (=>()
-      reject 200;
+      async reject 200;
     ),
   ),
 ).

@@ -15,7 +15,7 @@
   ),
 
   (define "Equivalence" (= ()
-    (should "an iterator's equivalence is defined their identity." (= ()
+    (should "iterators' equivalence is defined by their identity." (= ()
       (var iter (iterator of (@1 2 10: 10 100: 100),
       (assert ($(iter "equals") is (iter "is"),
       (assert ($(iter "not-equals") is (iter "is-not"),
@@ -78,10 +78,10 @@
   ),
 
   (define "Representation" (=> ()
-    (should "an empty iterator is encoded to '(iterator empty)'." (= ()
+    (should "an empty iterator is described as '(iterator empty)'." (= ()
       (assert "(iterator empty)" ((iterator empty) to-string),
     ),
-    (should "a non-empty iterator is encoded to '(iterator of ...)'." (=> ()
+    (should "a non-empty iterator is described as '(iterator of (@ ...))'." (=> ()
       (for value in the-values
         (assert ((value to-string) starts-with "(iterator of (",
     ),

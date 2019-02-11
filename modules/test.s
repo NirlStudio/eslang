@@ -1,115 +1,204 @@
+#!(module test)#
+
+# const values
+const indent-step "  ";
+
 # import rendering
 const colors (import "colors" "js");
 const (gray, green, red, underline) colors;
-(const (sign-passed, sign-failed)
-  import (passed, failed) from colors;
+(const (sign-passed, sign-failed, sign-pending)
+  import (passed, failed, pending) from colors;
 ).
 
 # to store all test cases.
 var cases (@);
 var current null; # the stack top
 
+# define a new feature or a feature group
 (export define (=> (feature, describe-it)
    var top current; # save current context
    let current (var spec (@ feature); # create the spec object as an array.
    (top ?? cases) push spec; # save the spec into stack top.
-   describe-it; # extract the description
-   let current top; # recover the stack top.
+   describe-it; # extract the description of this feature
+   let current top; # recover the original context.
    return spec;
 ).
 
-(export should (=> (behaviour, action)
-  (current push (@
-    behaviour: behaviour,
-    action: action
+# testing status
+var path (@);
+var indent indent-step;
+var pending-actions (@);
+
+# counters
+var passing 0;
+var failing 0;
+
+# test result data and helpers
+var summary (@);
+(var summary-append (=> (behavior, passed)
+  (summary push (var record (@
+    path: (path copy),
+    behavior,
+    passed
   ),
+  return record;
+).
+
+var failures (@);
+(var failures-append (=> (behavior, assertion, saved-path)
+  (failures push (@
+    no.: failing,
+    path: (saved-path ?? (path copy),
+    behavior,
+    assertion
+  ),
+).
+
+(var pass (=> behavior
+  ++ passing;
+  print indent sign-passed (gray behavior);
+  summary-append behavior, true;
+).
+
+(var fail (=> (behavior, assertion)
+  ++ failing;
+  print indent sign-failed (red "(" failing ") " behavior);
+  summary-append behavior, false;
+  failures-append behavior, assertion;
+).
+
+# async behavior helpers
+(var wait (=> behavior
+  print indent sign-pending (gray behavior);
+  summary-append behavior;
+).
+
+(var finalize (=> (record, assertion)
+  (if (assertion is-empty)
+    ++ passing;
+    record "passed" true;
+  else
+    ++ failing;
+    record "passed" false;
+    failures-append (record behavior), assertion, (record path);
+  ),
+).
+
+(var validate (= (action)
+  ($action is-a lambda:: || ($action is-a function):: ?
+    null # a valid action, else
+    (=> () # the original action is invalid.
+      (assert true false # a virtual assertion to generate a fault.
+        'expecting a lambda or function instead of $(type of action) for $action'
+      ),
+).
+
+(var wrap (=> (action, behavior) (=> ()
+  const using-async ($action parameters:: first:: is (`async);
+  # only supply async on request.
+  const result (using-async ? (action async) (action);
+  (if (type of result:: is-not promise)
+    result # an async feature may fail immediately too.
+  else
+    var record (wait behavior);
+    (promise of (=> async # a wrapper promise which always resolves to null.
+      (result finally (=> waiting
+        const excuse (waiting "excuse");
+        finalize record (? (type of excuse:: is fault) excuse);
+        async resolve;
+      ),
+  ),
+).
+
+(export should (=> (behavior, action)
+  (current push (var desc (@
+    behavior: behavior,
+    action: (validate action:: ?? (wrap action behavior),
+  ),
+  return desc;
 ).
 
 # assertion counter
 var assertions 0;
-export ++assertions (=>() (++ assertions);
+var ++assertions (=>() (++ assertions);
+
+# the type of assertion fault.
+(var fault (@:class
+  constructor: (=(step, expected, real, expr, note)
+    this "step" step;
+    this "expected" expected;
+    this "real" real;
+    this "expr" expr;
+    this "note" note;
+  ),
+).
 
 # (expr) or (expected expr) or (expected expr note)
-(export assert (=? (expected, expr, note)
-  (if (operation length:: < 3)
-    local "expr" expected;
-    local "expected" true;
+(export assert (=? (&expected, &expr, &note)
+  (if (operation length:: - operand:: < 2)
+    local "&expr" &expected;
+    local "&expected" true;
   ),
-  ++assertions;
-  ++ asserting-step;
-  local "expected" (expected);
-  local "value" (expr);
-  (if ($value != expected)
-    (return (@ # break current case.
-      failed: true,
-      step: asserting-step,
-      expected: expected,
-      real: value,
-      expr: expr,
-      note: (note)
+  (? ++assertions); # increment global counter
+  ++ &asserting-step; # counter in container scope.
+  # evaluate operands
+  locon "expected" (&expected);
+  locon "value" (&expr);
+  # by default, use equivalence to verify result.
+  (if ($value != expected) # break current case.
+    (return (? fault:: of
+      &asserting-step, expected, value, &expr, (&note)
 ).
 
-# test results
-var summary (@);
-var failures (@);
-
-# testing status
-var path (@);
-var indent "  ";
-
-var passing 0;
-(var pass (=> behaviour
-  ++ passing;
-  print indent sign-passed (gray behaviour);
-  (summary push (@
-    path: (path copy),
-    behaviour: behaviour,
-    passed: true
+# the async testing context with helper functions to assert promise results.
+(var async (object seal (@
+  resolve: (=> (value, note) (? (arguments not-empty)
+    (=> waiting # (async resolve value ) or (async resolve value note)
+      assert value (waiting "result") note;
+    ),
+    (=> waiting # (async resolve) - resolved to any value.
+      assert (waiting "excuse":: is null);
+    ),
   ),
+  reject: (=> (value, note) (? (arguments not-empty)
+    (=> waiting  # (async reject value ) or (async reject value note)
+      assert value (waiting "excuse") note;
+    ),
+    (=> waiting # (async rejected) - rejected to any value except a fault.
+      const excuse (waiting "excuse");
+      ($excuse is-a fault:: ? excuse # failed already, returns the original fault.
+        assert (waiting "excuse":: is-not null);
+      ),
 ).
 
-var failing 0;
-(var fail (=> (behaviour, assertion)
-  ++ failing;
-  print indent sign-failed (red "(" failing ") " behaviour);
-  (summary push (@
-    path: (path copy),
-    behaviour: behaviour,
-    passed: false
-  ),
-  (failures push (@
-    no.: failing,
-    path: (path copy),
-    behaviour: behaviour,
-    assertion: assertion
-  ),
-).
-
+# test a simple case or a suite of cases.
 (var test-a (=> (case)
-  # print headline
+  # print headline (feature name)
   print indent (case first);
   path push (case first);
-  indent += "  ";
-  # run test case or run into child cases.
+  indent += indent-step;
   (for i in (1 (case length))
     var task (case:i);
     (if (task is-a array)
-      do task;
+      do task; # a test suite
     else
-      var assertion (task action);
-      (if (assertion failed)
-        fail (task behaviour) assertion;
+      var result (task action); # a test case
+      (if (type of result:: is fault) # an exactly fault instance.
+        fail (task behavior) result;
       else
-        pass (task behaviour);
+        ($result is-not-a promise:: ?
+          pass (task behavior);
+          pending-actions push result; # to be waited.
+        ),
   ),
   # recover status
   path pop;
-  indent -= 2;
+  indent -= (indent-step length);
 ).
 
 (var print-a (=> failure
-  print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behaviour)';
-  let assertion (failure assertion);
+  print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behavior)';
+  const assertion (failure assertion);
   (print
     red '     step-$(assertion step) is expecting';
     green (underline (assertion "expected"::;
@@ -124,32 +213,26 @@ var failing 0;
   # targets
   let cases (@);
   let current null;
+  # progress
+  let path (@);
+  let indent indent-step;
+  let pending-actions (@);
   # result
   let summary (@);
   let failures (@);
-  # progress
-  let path (@);
-  let indent "  ";
   # counters
-  let assertions 0;
   let passing 0;
   let failing 0;
+  let assertions 0;
 ).
 
-(export test (=> ()
-  for suite in arguments (load suite);
-  if (cases is-empty) (return);
-
-  print "  Start to run sugly test suites ...\n";
-  let t1 (date now);
-  for case in cases (test-a case);
-  let ts ((date now) - t1);
-
+(var print-report (=> (ts)
   (print
     green '\n  passing: $passing';
     (gray " ("
       ts > 1000:: ? (ts / 1000) ts;
       ts > 1000:: ? "s, " "ms, ";
+      pending-actions ?* '$(pending-actions length) async cases, ', "";
       assertions " assertions)"
   ),
   (if failing
@@ -165,4 +248,20 @@ var failing 0;
   ),
   clear;
   return report;
+),
+
+(export test (=> ()
+  for suite in arguments (load suite);
+  if (cases is-empty) (return);
+
+  print "  Start to run sugly test suites ...\n";
+  var t1 (date now);
+  for case in cases (test-a case);
+  (if (pending-actions is-empty)
+    print-report ((date now) - t1);
+  else
+    (promise all pending-actions:: finally (=> ()
+      (@ (print-report ((date now) - t1),
+    ),
+  ),
 ).

@@ -222,15 +222,15 @@
   (should "($a-func parameters) returns (tuple empty) for a function without any parameter." (= ()
     (assert (($(=> () null) parameters) is (tuple empty),
   ),
-  (should "($a-func parameters) returns a symbol when the function has only one parameter." (= ()
-    (assert (($(=> x) parameters) is (`x),
-    (assert (($(=> x x) parameters) is (`x),
-    (assert (($(=> (x)) parameters) is (`x),
-    (assert (($(=> (x) x) parameters) is (`x),
+  (should "($a-func parameters) returns a tuple when the function has only one parameter." (= ()
+    (assert (quote x) ($(=> x) parameters),
+    (assert (quote x) ($(=> x x) parameters),
+    (assert (quote x) ($(=> (x)) parameters),
+    (assert (quote x) ($(=> (x) x) parameters),
   ),
   (should "($a-func parameters) returns a tuple when the function has multiple parameters." (= ()
-    (assert (`(x y)) ($(=> (x y)) parameters),
-    (assert (`(x y)) ($(=> (x  y) (+ x y)) parameters),
+    (assert (quote x y) ($(=> (x y)) parameters),
+    (assert (quote x y) ($(=> (x  y) (+ x y)) parameters),
   ),
 ),
 

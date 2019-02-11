@@ -36,13 +36,13 @@ module.exports = function evaluate ($void) {
     var implicitSubject = true // by default, use implicit mode.
     if (subject instanceof Symbol$) {
       if (subject === symbolSubject) { // switching to explicit mode.
-        if (length < 2) {
-          return null // no subject.
-        }
-        subject = evaluate(clist[1], space)
-        if (length === 2) {
-          // side effect: no more evaluation if only subject exists
-          return subject
+        switch (length) {
+          case 1:
+            return null // no subject.
+          case 2:
+            return evaluate(clist[1], space)
+          default:
+            subject = evaluate(clist[1], space)
         }
         offset = 2
         implicitSubject = false // explicit mode

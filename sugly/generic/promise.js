@@ -16,10 +16,12 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.promise
   var $Tuple = $.tuple
+  var $Object = $.object
   var $Symbol = $.symbol
   var Symbol$ = $void.Symbol
   var Promise$ = $void.Promise
   var link = $void.link
+  var $export = $void.export
   var isApplicable = $void.isApplicable
   var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
@@ -29,36 +31,79 @@ module.exports = function ($void) {
     return typeof excuse !== 'undefined' && excuse !== null
   }
 
-  function safeExcuse (excuse, alternative) {
+  function safeExcuse (excuse, waiting) {
     return hasExcuse(excuse) ? excuse
-      : hasExcuse(alternative) ? alternative
-        : true // the excuse of no excuse.
+      : waiting && hasExcuse(waiting.excuse) ? waiting.excuse
+        : true // the excuse of no excuse to make sure it's not a boolean false.
   }
 
-  function ignoreRejectionOf (promise) {
+  function assemble (promise, cancel) {
     if (promise.excusable !== true) {
       promise.excusable = true
+    }
+    if (cancel && isApplicable(cancel)) {
+      promise.cancel = cancel
     }
     return promise
   }
 
-  function makePromise (promising) {
-    // make sure all related promises are excusable.
-    return ignoreRejectionOf(promising instanceof Promise$ ? promising
-      : isApplicable(promising)
-        // a function will be intercepted as a promisee (executor).
-        ? new Promise$(promising)
-        // any other value will be intercepted as a resolved result.
-        : Promise$.resolve(promising)
+  function promiseOfAsync (async) {
+    var cancel
+    var promise = new Promise$(function (resolve, reject) {
+      cancel = async(Object.freeze($Object.of({
+        resolve: resolve,
+        reject: reject
+      })))
+    })
+    return assemble(promise, cancel)
+  }
+
+  function promiseOfExecutor (executor) {
+    var cancel
+    var promise = new Promise$(function (resolve, reject) {
+      cancel = executor(resolve, reject)
+    })
+    return assemble(promise, cancel)
+  }
+
+  function resolvedTo (next, result) {
+    return next(Object.freeze($Object.of({
+      result: result
+    })))
+  }
+
+  function rejectedTo (next, excuse) {
+    return next(Object.freeze($Object.of({
+      excuse: safeExcuse(excuse)
+    })))
+  }
+
+  function staticPromiseOf (result) {
+    return assemble(!Array.isArray(result)
+      // intercept a non-array value as an excuse. Otherwise,
+      ? Promise$.reject(safeExcuse(result))
+      // reject if any excuse exists. Otherwise,
+      : hasExcuse(result[1]) ? Promise$.reject(result[1])
+        // resolve even the final result value is null.
+        : Promise$.resolve(result[0] === undefined ? null : result[0])
     )
   }
 
-  function wrapStepResult (result) {
+  function makePromise (promising, isExecutor) {
+    return promising instanceof Promise$ ? assemble(promising)
+      : !isApplicable(promising) ? staticPromiseOf(promising)
+        : isExecutor ? promiseOfExecutor(promising)
+          : promiseOfAsync(promising)
+  }
+
+  function wrapStepResult (result, waiting) {
     return function (resolve, reject) {
-      // finally reject if any excuse exists. Otherwise,
-      hasExcuse(result[1]) ? reject(result[1])
-        // resolve even the final result value is null.
-        : resolve(result[0] === undefined ? null : result[0])
+      // any non-array result will be intercepted as an excuse
+      !Array.isArray(result) ? reject(safeExcuse(result, waiting))
+        // finally reject if any excuse exists. Otherwise,
+        : hasExcuse(result[1]) ? reject(result[1])
+          // resolve even the final result value is null.
+          : resolve(result[0] === undefined ? null : result[0])
     }
   }
 
@@ -69,65 +114,63 @@ module.exports = function ($void) {
   }
 
   function wrap (step) {
-    return step instanceof Promise$ ? function (result, excuse) {
-      return hasExcuse(excuse)
+    return step instanceof Promise$ ? function (waiting) {
+      return hasExcuse(waiting && waiting.excuse)
         // Any existing excuse will cause a final rejection. Otherwise,
-        ? rejectWith(excuse)
+        ? rejectWith(waiting.excuse)
         // the promise's result will be forwarded as the final one.
         : step.then.bind(step)
-    } : isApplicable(step) ? function (result, excuse) {
+    } : isApplicable(step) ? function (waiting) {
       // let a step function to decide if it forgives an existing excuse.
-      result = step(result, excuse)
+      var result = step.apply(null, arguments)
       return result instanceof Promise$ // continue and
         ? result.then.bind(result) // forward final promise's result.
         : isApplicable(result) // continue too, and
           // generate a final promise and forward its result.
           ? (result = makePromise(result)).then.bind(result)
-          // an array will be intercepted as a sync step result.
-          : Array.isArray(result) ? wrapStepResult(result)
-            // other type of value will be taken as a rejection excuse, which
-            // may fallback to any existing excuse.
-            : rejectWith(safeExcuse(result, excuse))
-    } : function (result, excuse) {
+          // other value will be intercepted as a sync step result.
+          : wrapStepResult(result, waiting)
+    } : function (waiting) {
       // any value other than a promise or an function will be intercepted as
       // a sync step result.
-      return hasExcuse(excuse) ? rejectWith(excuse)
-        : Array.isArray(step) ? wrapStepResult(step)
-          : rejectWith(safeExcuse(result, excuse))
+      return hasExcuse(waiting && waiting.excuse)
+        ? rejectWith(waiting.excuse)
+        : wrapStepResult(step)
     }
   }
 
-  function commit (promise, next) {
+  function awaitFor (promise, next) {
     return function (resolve, reject) {
       promise.then(function (result) {
-        next(result, null)(resolve, reject)
+        resolvedTo(next, result)(resolve, reject)
       }, function (excuse) {
-        next(null, safeExcuse(excuse))(resolve, reject)
+        rejectedTo(next, excuse)(resolve, reject)
       })
     }
   }
 
   function compose (promise, next) {
-    return function (result, excuse) {
-      // the overall promise will reject immediately if found an tolerated
-      // rejection, since a parallelizing promise cannot react to it.
-      return hasExcuse(excuse) ? rejectWith(excuse)
+    return function (waiting) {
+      return hasExcuse(waiting && waiting.excuse)
+        // the overall promise will reject immediately if found an tolerated
+        // rejection, since a parallelizing promise cannot react to it.
+        ? rejectWith(waiting.excuse)
         // otherwise, the current promise's result will be taken into account in turn.
-        : commit(promise, next)
+        : awaitFor(promise, next)
     }
   }
 
   function connect (step, next) {
-    return function (result, excuse) {
-      result = step(result, excuse)
+    return function (waiting) {
+      var result = step.apply(null, arguments)
       return result instanceof Promise$
         // a step function may return another promise, or
-        ? commit(result, next)
+        ? awaitFor(result, next)
         // return a new promisee function to generate a promise.
-        : isApplicable(result) ? commit(makePromise(result), next)
+        : isApplicable(result) ? awaitFor(makePromise(result), next)
           // any value other than a sync step result will be intercepted as
           // the excuse of a final rejection.
-          : !Array.isArray(result) ? rejectWith(safeExcuse(result, excuse))
+          : !Array.isArray(result) ? rejectWith(safeExcuse(result, waiting))
             // a sync step result will be relayed literally, so it may have
             // any number of values in theory.
             : function (resolve, reject) {
@@ -147,87 +190,111 @@ module.exports = function ($void) {
   }
 
   // the empty value which has been resolved to null.
-  var empty = link(Type, 'empty', makePromise(null))
+  var empty = link(Type, 'empty', makePromise([]))
 
   // guard sugly promises to ingore unhandled rejections.
   ingoreUnhandledRejectionsBy(function (promise, excuse) {
     // create warnings
     return promise.excusable === true
   })
+
   // another special value which has been rejected.
-  var nothing = link(Type, 'nothing', ignoreRejectionOf(Promise$.reject(true)))
+  var nothing = link(Type, 'nothing', makePromise())
+  // catch the rejection of nothing.
+  nothing.catch(function () {})
 
   // To make a promise from one or more promisee functions and/or other promises.
   // It's is fulfilled when all promise handlers have been invoked sequentially.
-  link(Type, 'of', function (promising, next) {
+  $export($, 'commit', link(Type, 'of', function (promising, next) {
     var last = arguments.length - 1
     next = last > 0 ? wrap(arguments[last]) : null
-    for (var i = last - 1; i > 0; i++) {
+    for (var i = last - 1; i > 0; i--) {
       var current = arguments[i]
       next = current instanceof Promise$ ? compose(current, next)
         : isApplicable(current) ? connect(current, next)
-          : compose(ofResolved(current), next)
+          : compose(staticPromiseOf(current), next)
     }
-    promising = makePromise(promising)
-    return next ? makePromise(compose(promising, next)()) : promising
-  }, true)
+    promising = typeof promising === 'undefined' || promising === null
+      ? nothing : makePromise(promising)
+    return next ? makePromise(compose(promising, next)(), true) : promising
+  }, true))
 
   // to make a resolved promise for a value.
-  var ofResolved = link(Type, 'of-resolved', function (result) {
+  link(Type, 'of-resolved', function (result) {
     return typeof result === 'undefined' || result === null ? empty
-      : ignoreRejectionOf(Promise$.resolve(result))
+      : assemble(Promise$.resolve(result))
   }, true)
 
   // to make a rejected promise with a cause.
+  var NonExcuse = safeExcuse()
   link(Type, 'of-rejected', function (excuse) {
     excuse = safeExcuse(excuse)
-    return excuse === true ? nothing
-      : ignoreRejectionOf(Promise$.reject(excuse))
+    return excuse === NonExcuse ? nothing
+      : assemble(Promise$.reject(excuse))
   }, true)
 
   // To make a promise from one or more promisee functions and/or other promises.
   // It's is fulfilled when all promise handlers have been invoked separately.
-  link(Type, 'of-all', function (promisings) {
-    var promises = makePromises(promisings)
-    return promises.length > 1 ? Promise$.all(promises)
-      : promises.length > 0 ? promises[0] : empty
-  }, true)
-  // the agument version of (promise of-all promisings)
-  link(Type, 'all', function (promising) {
+  $export($, 'commit*', link(Type, 'of-all', function (promising) {
     var promises = makePromises(Array.prototype.slice.call(arguments))
-    return promises.length > 1 ? Promise$.all(promises)
+    return promises.length > 1 ? assemble(Promise$.all(promises))
+      : promises.length > 0 ? promises[0] : empty
+  }, true))
+
+  // the array argument version of (promise of-all promisings)
+  link(Type, 'all', function (promisings) {
+    var promises = makePromises(promisings)
+    return promises.length > 1 ? assemble(Promise$.all(promises))
       : promises.length > 0 ? promises[0] : empty
   }, true)
 
   // To make a promise from one or more promisee functions and/or other promises.
   // It's is fulfilled when any one of them is fulfilled.
-  link(Type, 'of-any', function (promisings) {
-    var promises = makePromises(promisings)
-    return promises.length > 1 ? Promise$.race(promises)
-      : promises.length > 0 ? promises[0] : nothing
-  }, true)
-  // the agument version of (promise of-any promisings)
-  link(Type, 'any', function (promising) {
+  $export($, 'commit?', link(Type, 'of-any', function (promising) {
     var promises = makePromises(Array.prototype.slice.call(arguments))
-    return promises.length > 1 ? Promise$.race(promises)
+    return promises.length > 1 ? assemble(Promise$.race(promises))
+      : promises.length > 0 ? promises[0] : nothing
+  }, true))
+
+  // the array argument version of (promise of-any promisings)
+  link(Type, 'any', function (promisings) {
+    var promises = makePromises(promisings)
+    return promises.length > 1 ? assemble(Promise$.race(promises))
       : promises.length > 0 ? promises[0] : nothing
   }, true)
 
   var proto = Type.proto
-  // the logic after the promise has been resolved.
-  link(proto, 'then', function (resolving) {
-    return isApplicable(resolving) ? this.then(resolving.bind(this)) : this
+  // the optional cancellation capability of a promise.
+  link(proto, 'is-cancellable', function () {
+    return isApplicable(this.cancel)
   })
-  // the logic after the promise has been rejected.
-  link(proto, 'catch', function (rejecting) {
-    return isApplicable(rejecting) ? this.catch(rejecting.bind(this)) : this
+  // try to cancel the promised operation.
+  link(proto, 'cancel', function () {
+    if (isApplicable(this.cancel)) {
+      // a cancel function should be ready for being called multiple times.
+      this.cancel.apply(this, arguments)
+      return this
+    }
+    return null // also indicating this promise is not cancellable.
   })
-  // the cleanup logic after the promise is either resolved or rejected.
-  link(proto, 'finally', Promise$.prototype.finally ? function (finalizing) {
-    return isApplicable(finalizing) ? this.finally(finalizing.bind(this)) : this
-  } : function (finalizing) {
-    return !isApplicable(finalizing) ? this
-      : this.then((finalizing = finalizing.bind(this)), finalizing)
+
+  // the next step after this promise has been either resolved or rejected.
+  // this returns a new promise or this (only when step is missing).
+  link(proto, 'then', function (step) {
+    return typeof step === 'undefined' ? this
+      : makePromise(awaitFor(this, wrap(step)), true)
+  })
+
+  // the last step after this promise has been either resolved or rejected.
+  // this returns current promise
+  link(proto, 'finally', function (waiter) {
+    if (isApplicable(waiter)) {
+      this.then(
+        resolvedTo.bind(null, waiter),
+        rejectedTo.bind(null, waiter)
+      )
+    }
+    return this
   })
 
   // range is empty if it cannot iterate at least once.

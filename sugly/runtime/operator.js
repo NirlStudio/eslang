@@ -25,7 +25,7 @@ module.exports = function operators$operator ($void) {
       markOperatorClause(body)
       var tbody = new Tuple$(body, true)
       code.push(tbody)
-      return operator(createOperator(params, tbody), new Tuple$(code))
+      return operator(createOperator(params, tbody, space.local), new Tuple$(code))
     } else {
       code.push($Tuple.blank) // empty body
       return params.length < 1 ? $.operator.noop
@@ -43,7 +43,7 @@ module.exports = function operators$operator ($void) {
     }
   }
 
-  function createOperator (params, tbody) {
+  function createOperator (params, tbody, origin) {
     return function (space, clause, that) {
       if (!(space instanceof Space$)) {
         return null // invalid call.
@@ -53,7 +53,7 @@ module.exports = function operators$operator ($void) {
       var offset = typeof that !== 'undefined'
         ? clist[0] === symbolSubject ? 3 : 2
         : clist[0] === symbolPairing ? 2 : 1
-      var scope = createOperatorSpace(space)
+      var scope = createOperatorSpace(space, origin)
       for (var i = 0; i < params.length; i++) {
         var j = i + offset
         scope.context[params[i]] = j < clist.length ? clist[j] : null
@@ -67,7 +67,7 @@ module.exports = function operators$operator ($void) {
   // returns [operand-list, code]
   function formatOperands (params) {
     if (params instanceof Symbol$) {
-      return [[params.key], params]
+      return [[params.key], new Tuple$([params])]
     }
     if (!(params instanceof Tuple$) || params.$.length < 1) {
       return [[], $Tuple.empty]
@@ -82,8 +82,6 @@ module.exports = function operators$operator ($void) {
         code.push(param)
       }
     }
-    return oprs.length < 1 ? [[], $Tuple.empty]
-      : oprs.length === 1 ? [oprs, code[0]]
-        : [oprs, new Tuple$(code)]
+    return oprs.length < 1 ? [[], $Tuple.empty] : [oprs, new Tuple$(code)]
   }
 }

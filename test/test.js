@@ -107,10 +107,13 @@ module.exports = function ($void) {
       'bool', 'string', 'number', 'date', 'range',
       'symbol', 'tuple',
       'operator', 'lambda', 'function',
-      'array', 'iterator', 'object', 'class'
+      'iterator', 'promise',
+      'array', 'object', 'class'
     ])
 
     checkFunctions($, '[Sugly / functions] ', [
+      // generic
+      'commit', 'commit*', 'commit?',
       // runtime
       'eval',
       // bootstrap

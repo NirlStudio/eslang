@@ -32,8 +32,8 @@
     (assert ($opr not-empty),
 
     (assert "opr" ($opr name),
-    (assert (($opr parameters) is-a symbol),
-    (assert (`X) ($opr parameters),
+    (assert (($opr parameters) is-a tuple),
+    (assert (quote X) ($opr parameters),
 
     (assert 2 (($opr body) length),
     (assert 10 (($opr body) 0),

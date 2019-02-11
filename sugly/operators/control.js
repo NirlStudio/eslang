@@ -12,14 +12,19 @@ module.exports = function control ($void) {
   var symbolElse = sharedSymbolOf('else')
   var symbolIn = sharedSymbolOf('in')
 
+  // (? sym) - resolve in global scope or orginal scope (in operator only).
   // (? cond true-branch false-branch)
   staticOperator('?', function (space, clause) {
     var clist = clause.$
     var length = clist.length
-    if (length < 3) {
+    if (length < 2) {
       return null // short circuit - the result will be null anyway.
     }
-    var cond = evaluate(clist[1], space)
+    var cond = clist[1]
+    if (length < 3) {
+      return cond instanceof Symbol$ ? space.$resolve(cond.key) : null
+    }
+    cond = evaluate(cond, space)
     if (typeof cond !== 'undefined' && cond !== null && cond !== 0 && cond !== false) {
       return evaluate(clist[2], space)
     }

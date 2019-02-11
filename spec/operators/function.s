@@ -32,8 +32,8 @@
     (assert ($f not-empty),
 
     (assert "f" ($f name),
-    (assert (($f parameters) is-a symbol),
-    (assert (`x) ($f parameters),
+    (assert (($f parameters) is-a tuple),
+    (assert (quote x) ($f parameters),
 
     (assert 2 (($f body) length),
     (assert 10 (($f body) 0),
@@ -106,8 +106,8 @@
     (assert ($f not-empty),
 
     (assert "f" ($f name),
-    (assert (($f parameters) is-a symbol),
-    (assert (`x) ($f parameters),
+    (assert (($f parameters) is-a tuple),
+    (assert (quote x) ($f parameters),
 
     (assert 2 (($f body) length),
     (assert 10 (($f body) 0),
