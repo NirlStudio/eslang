@@ -12,7 +12,7 @@ module.exports = function control ($void) {
   var symbolElse = sharedSymbolOf('else')
   var symbolIn = sharedSymbolOf('in')
 
-  // (? sym) - resolve in global scope or orginal scope (in operator only).
+  // (? sym) - resolve in global scope or original scope (in operator only).
   // (? cond true-branch false-branch)
   staticOperator('?', function (space, clause) {
     var clist = clause.$

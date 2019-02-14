@@ -154,6 +154,7 @@ var ++assertions (=>() (++ assertions);
 (var async (object seal (@
   resolve: (=> (value, note) (? (arguments not-empty)
     (=> waiting # (async resolve value ) or (async resolve value note)
+      assert (waiting "excuse":: is null);
       assert value (waiting "result") note;
     ),
     (=> waiting # (async resolve) - resolved to any value.

@@ -111,11 +111,11 @@
 
 (e.g. promise
   (promise of false),
-  (promise of true),
   (promise of 1),
   (promise of 1 2),
+  (promise of (@ false),
   (promise of (@ true),
-  (promise of (@ null true),
+  (promise of (@ true false),
   (promise of (= async
     (timer timeout 100 (=>()
       async resolve 100;

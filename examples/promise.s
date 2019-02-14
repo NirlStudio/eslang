@@ -1,4 +1,4 @@
-#(var step (=> (i)
+(var step (=> (i)
   var value (i * 100);
   print 'step-$i $value @$(date timestamp)';
   value
@@ -57,10 +57,10 @@ print-p 210;
     (timer timeout 100 (=>()
       async resolve (step 3);
   ),
-  (@ null 310),
-  (=> waiting
-    print "from step-3.1", waiting;
-    (=> async
+  (@ 310),
+  (=> value
+    print "from step-3.1", value;
+    (promise of (=> async
       (timer timeout 100 (=>()
         async resolve (step 3.2);
     ),
@@ -115,7 +115,7 @@ print-p 450;
     @ (waiting excuse:: + 10), 10, 1;
   ),
   (=> (base, increment, extra)
-    print "from step-5.2", arguments;
+    print "from step-5.2", base, arguments;
     @ (base + increment extra);
   ),
   (=> value
@@ -139,7 +139,7 @@ print-p 550;
       async resolve (step 6.2);
   ),
 ),
-print-p 600;
+print-p (@ 610, 620);
 
 (let p (commit?
   (=> async
@@ -151,8 +151,7 @@ print-p 600;
       async resolve (step 7.2);
   ),
 ),
-print-p 700;
-)#
+print-p 710;
 
 (var p1 (promise of (= async
   (timer timeout 100 (=> ms
@@ -170,26 +169,25 @@ var pall (promise all (@ p1 p2);
 
 var timeout;
 (var wait (promise of (=> async
-  (let timeout (timer timeout 2000 (=> ms
+  (let timeout (timer timeout 1000 (=> ms
     print "timeouted" ms;
-    print (async "resolve");
     async resolve ms;
   ),
 ),
 
 (var pw (wait then (= waiting
   print "waiting" waiting;
-  assert 20 (waiting result);
+  @ (waiting result);
 ),
 
 (var px (promise of (=> async
   (pw finally (=> waiting
     print "waiting completed" waiting;
-    async resolve;
+    async resolve null;
   ),
 ),
 
-(promise all (@ px):: finally (= waiting
+(promise all (@ pw px):: finally (= waiting
   print "all completed" waiting;
 ),
 

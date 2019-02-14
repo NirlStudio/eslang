@@ -55,6 +55,7 @@ module.exports = function timer ($void) {
           id = null
           async.reject(milliseconds)
         }
+        return milliseconds
       }
     })
   })

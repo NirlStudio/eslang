@@ -58,7 +58,7 @@
     var countdown (timer countdown 30);
     assert (countdown is-a promise);
     assert (countdown is-cancellable);
-    assert countdown (countdown cancel);
+    assert 30 (countdown cancel);
 
     countdown then (async reject 30);
   ),

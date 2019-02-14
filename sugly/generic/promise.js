@@ -31,17 +31,18 @@ module.exports = function ($void) {
     return typeof excuse !== 'undefined' && excuse !== null
   }
 
+  // use true to make sure it's not a boolean false by default.
+  var NoExcuse = true
   function safeExcuse (excuse, waiting) {
     return hasExcuse(excuse) ? excuse
-      : waiting && hasExcuse(waiting.excuse) ? waiting.excuse
-        : true // the excuse of no excuse to make sure it's not a boolean false.
+      : waiting && hasExcuse(waiting.excuse) ? waiting.excuse : NoExcuse
   }
 
   function assemble (promise, cancel) {
     if (promise.excusable !== true) {
       promise.excusable = true
     }
-    if (cancel && isApplicable(cancel)) {
+    if (isApplicable(cancel)) {
       promise.cancel = cancel
     }
     return promise
@@ -79,13 +80,16 @@ module.exports = function ($void) {
   }
 
   function staticPromiseOf (result) {
+    var value
     return assemble(!Array.isArray(result)
       // intercept a non-array value as an excuse. Otherwise,
-      ? Promise$.reject(safeExcuse(result))
+      ? (value = safeExcuse(result)) === NoExcuse ? nothing
+        : Promise$.reject(value)
       // reject if any excuse exists. Otherwise,
-      : hasExcuse(result[1]) ? Promise$.reject(result[1])
+      : hasExcuse((value = result[1])) ? Promise$.reject(value)
         // resolve even the final result value is null.
-        : Promise$.resolve(result[0] === undefined ? null : result[0])
+        : ((value = result[0]) === undefined || value === null) ? empty
+          : Promise$.resolve(value)
     )
   }
 
@@ -114,13 +118,7 @@ module.exports = function ($void) {
   }
 
   function wrap (step) {
-    return step instanceof Promise$ ? function (waiting) {
-      return hasExcuse(waiting && waiting.excuse)
-        // Any existing excuse will cause a final rejection. Otherwise,
-        ? rejectWith(waiting.excuse)
-        // the promise's result will be forwarded as the final one.
-        : step.then.bind(step)
-    } : isApplicable(step) ? function (waiting) {
+    return isApplicable(step) ? function (waiting) {
       // let a step function to decide if it forgives an existing excuse.
       var result = step.apply(null, arguments)
       return result instanceof Promise$ // continue and
@@ -133,7 +131,7 @@ module.exports = function ($void) {
     } : function (waiting) {
       // any value other than a promise or an function will be intercepted as
       // a sync step result.
-      return hasExcuse(waiting && waiting.excuse)
+      return waiting && hasExcuse(waiting.excuse)
         ? rejectWith(waiting.excuse)
         : wrapStepResult(step)
     }
@@ -151,7 +149,7 @@ module.exports = function ($void) {
 
   function compose (promise, next) {
     return function (waiting) {
-      return hasExcuse(waiting && waiting.excuse)
+      return waiting && hasExcuse(waiting.excuse)
         // the overall promise will reject immediately if found an tolerated
         // rejection, since a parallelizing promise cannot react to it.
         ? rejectWith(waiting.excuse)
@@ -190,7 +188,7 @@ module.exports = function ($void) {
   }
 
   // the empty value which has been resolved to null.
-  var empty = link(Type, 'empty', makePromise([]))
+  var empty = link(Type, 'empty', Promise$.resolve(null))
 
   // guard sugly promises to ingore unhandled rejections.
   ingoreUnhandledRejectionsBy(function (promise, excuse) {
@@ -199,20 +197,22 @@ module.exports = function ($void) {
   })
 
   // another special value which has been rejected.
-  var nothing = link(Type, 'nothing', makePromise())
+  var nothing = link(Type, 'nothing', Promise$.reject(NoExcuse))
   // catch the rejection of nothing.
   nothing.catch(function () {})
 
   // To make a promise from one or more promisee functions and/or other promises.
   // It's is fulfilled when all promise handlers have been invoked sequentially.
+  var noop = function () { return this }
   $export($, 'commit', link(Type, 'of', function (promising, next) {
     var last = arguments.length - 1
     next = last > 0 ? wrap(arguments[last]) : null
     for (var i = last - 1; i > 0; i--) {
       var current = arguments[i]
-      next = current instanceof Promise$ ? compose(current, next)
-        : isApplicable(current) ? connect(current, next)
-          : compose(staticPromiseOf(current), next)
+      if (!isApplicable(current)) {
+        current = noop.bind(current)
+      }
+      next = connect(current, next)
     }
     promising = typeof promising === 'undefined' || promising === null
       ? nothing : makePromise(promising)
@@ -226,10 +226,9 @@ module.exports = function ($void) {
   }, true)
 
   // to make a rejected promise with a cause.
-  var NonExcuse = safeExcuse()
   link(Type, 'of-rejected', function (excuse) {
     excuse = safeExcuse(excuse)
-    return excuse === NonExcuse ? nothing
+    return excuse === NoExcuse ? nothing
       : assemble(Promise$.reject(excuse))
   }, true)
 
@@ -243,6 +242,9 @@ module.exports = function ($void) {
 
   // the array argument version of (promise of-all promisings)
   link(Type, 'all', function (promisings) {
+    if (!Array.isArray(promisings)) {
+      return empty
+    }
     var promises = makePromises(promisings)
     return promises.length > 1 ? assemble(Promise$.all(promises))
       : promises.length > 0 ? promises[0] : empty
@@ -258,6 +260,9 @@ module.exports = function ($void) {
 
   // the array argument version of (promise of-any promisings)
   link(Type, 'any', function (promisings) {
+    if (!Array.isArray(promisings)) {
+      return nothing
+    }
     var promises = makePromises(promisings)
     return promises.length > 1 ? assemble(Promise$.race(promises))
       : promises.length > 0 ? promises[0] : nothing
@@ -270,12 +275,8 @@ module.exports = function ($void) {
   })
   // try to cancel the promised operation.
   link(proto, 'cancel', function () {
-    if (isApplicable(this.cancel)) {
-      // a cancel function should be ready for being called multiple times.
-      this.cancel.apply(this, arguments)
-      return this
-    }
-    return null // also indicating this promise is not cancellable.
+    // a cancel function should be ready for being called multiple times.
+    return isApplicable(this.cancel) ? this.cancel.apply(this, arguments) : null
   })
 
   // the next step after this promise has been either resolved or rejected.
