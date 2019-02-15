@@ -8,3 +8,4 @@
     "space"
   ) (define spec (=> ()
     (load ("./runtime/" + spec).
+).

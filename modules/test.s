@@ -37,10 +37,10 @@ var failing 0;
 var summary (@);
 (var summary-append (=> (behavior, passed)
   (summary push (var record (@
-    path: (path copy),
+    path: (path copy).
     behavior,
     passed
-  ),
+  ).
   return record;
 ).
 
@@ -48,10 +48,10 @@ var failures (@);
 (var failures-append (=> (behavior, assertion, saved-path)
   (failures push (@
     no.: failing,
-    path: (saved-path ?? (path copy),
+    path: (saved-path ?? (path copy).
     behavior,
     assertion
-  ),
+  ).
 ).
 
 (var pass (=> behavior
@@ -80,8 +80,8 @@ var failures (@);
   else
     ++ failing;
     record "passed" false;
-    failures-append (record behavior), assertion, (record path);
-  ),
+    failures-append (record behavior) , assertion, (record path);
+  ).
 ).
 
 (var validate (= (action)
@@ -90,7 +90,7 @@ var failures (@);
     (=> () # the original action is invalid.
       (assert true false # a virtual assertion to generate a fault.
         'expecting a lambda or function instead of $(type of action) for $action'
-      ),
+      ).
 ).
 
 (var wrap (=> (action, behavior) (=> ()
@@ -106,15 +106,15 @@ var failures (@);
         const excuse (waiting "excuse");
         finalize record (? (type of excuse:: is fault) excuse);
         async resolve;
-      ),
-  ),
+      ).
+  ).
 ).
 
 (export should (=> (behavior, action)
   (current push (var desc (@
     behavior: behavior,
-    action: (validate action:: ?? (wrap action behavior),
-  ),
+    action: (validate action:: ?? (wrap action behavior).
+  ).
   return desc;
 ).
 
@@ -130,7 +130,7 @@ var ++assertions (=>() (++ assertions);
     this "real" real;
     this "expr" expr;
     this "note" note;
-  ),
+  ).
 ).
 
 # (expr) or (expected expr) or (expected expr note)
@@ -138,7 +138,7 @@ var ++assertions (=>() (++ assertions);
   (if (operation length:: - operand:: < 2)
     local "&expr" &expected;
     local "&expected" true;
-  ),
+  ).
   (? ++assertions); # increment global counter
   ++ &asserting-step; # counter in container scope.
   # evaluate operands
@@ -156,20 +156,20 @@ var ++assertions (=>() (++ assertions);
     (=> waiting # (async resolve value ) or (async resolve value note)
       assert (waiting "excuse":: is null);
       assert value (waiting "result") note;
-    ),
+    ).
     (=> waiting # (async resolve) - resolved to any value.
       assert (waiting "excuse":: is null);
-    ),
-  ),
+    ).
+  ).
   reject: (=> (value, note) (? (arguments not-empty)
     (=> waiting  # (async reject value ) or (async reject value note)
       assert value (waiting "excuse") note;
-    ),
+    ).
     (=> waiting # (async rejected) - rejected to any value except a fault.
       const excuse (waiting "excuse");
       ($excuse is-a fault:: ? excuse # failed already, returns the original fault.
         assert (waiting "excuse":: is-not null);
-      ),
+      ).
 ).
 
 # test a simple case or a suite of cases.
@@ -190,8 +190,8 @@ var ++assertions (=>() (++ assertions);
         ($result is-not-a promise:: ?
           pass (task behavior);
           pending-actions push result; # to be waited.
-        ),
-  ),
+        ).
+  ).
   # recover status
   path pop;
   indent -= (indent-step length);
@@ -204,10 +204,10 @@ var ++assertions (=>() (++ assertions);
     red '     step-$(assertion step) is expecting';
     green (underline (assertion "expected"::;
     red 'instead of $(underline (assertion "real"::))';
-  ),
+  ).
   (print (gray '     when asserting $(underline (assertion expr::))'
     (assertion note:: is-empty) ? "" (", for " + (assertion note); "\n"
-  ),
+  ).
 ).
 
 (var clear (=> ()
@@ -235,21 +235,21 @@ var ++assertions (=>() (++ assertions);
       ts > 1000:: ? "s, " "ms, ";
       pending-actions ?* '$(pending-actions length) async cases, ', "";
       assertions " assertions)"
-  ),
+  ).
   (if failing
     print (red '  failing: $failing\n');
     for failure in failures (print-a failure);
-  ),
+  ).
   (if (colors is-missing)
     print "\n  P.S. To prettify output, please run 'npm install'.\n";
-  ),
+  ).
   (var report (@
     summary: summary,
     failures: failures
-  ),
+  ).
   clear;
   return report;
-),
+).
 
 (export test (=> ()
   for suite in arguments (load suite);
@@ -262,7 +262,7 @@ var ++assertions (=>() (++ assertions);
     print-report ((date now) - t1);
   else
     (promise all pending-actions:: finally (=> ()
-      (@ (print-report ((date now) - t1),
-    ),
-  ),
+      (@ (print-report ((date now) - t1).
+    ).
+  ).
 ).

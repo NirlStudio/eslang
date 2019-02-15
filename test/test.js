@@ -451,15 +451,15 @@ module.exports = function ($void) {
 
   function checkOperations () {
     print('\n  - Operations')
-    seval(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b), (add x y)')
+    seval(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b). (add x y)')
 
-    seval(21, '(let z 100) (let add (= (x y) (x + y z), (add 1 20)')
+    seval(21, '(let z 100) (let add (= (x y) (x + y z). (add 1 20)')
     seval(21, '(let z 100) (= (1 20): (x y) (x + y z).')
 
-    seval(121, '(let z 100) (let add (=> (x y) (x + y z), (add 1 20)')
+    seval(121, '(let z 100) (let add (=> (x y) (x + y z). (add 1 20)')
     seval(121, '(let z 100) (=> (1 20): (x y) (x + y z).')
 
-    seval(11, '(let summer (@:class add: (= () ((this x) + (this y), (let s (summer of (@ x: 1 y: 10), (s add)')
-    seval(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y), (summer add 1 10)')
+    seval(11, '(let summer (@:class add: (= () ((this x) + (this y). (let s (summer of (@ x: 1 y: 10). (s add)')
+    seval(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y). (summer add 1 10)')
   }
 }

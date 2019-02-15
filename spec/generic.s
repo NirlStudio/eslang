@@ -20,3 +20,4 @@
     "global"
   ) (define spec (=> ()
     (load ("./generic/" + spec).
+).

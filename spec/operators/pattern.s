@@ -1,7 +1,7 @@
 (define "($ ...) - explicit subject" (= ()
   (should "($) returns null." (=> ()
     assert null ($);
-  ),
+  ).
   (should "($value) always returns the original value." (=> ()
     (var values (@
       null type
@@ -18,11 +18,11 @@
       array (@)
       object (@:)
       class (class empty) ((class empty) default)
-    ),
+    ).
     (for value in values
       assert value ($value);
-    ),
-  ),
+    ).
+  ).
   (should "($value ...) always intercepts the value as the subject." (=> ()
     var l (= () 1);
     assert ($l is l);
@@ -46,13 +46,13 @@
     var obj (@ x:1);
     assert ($obj ?);
     assert ($obj is obj);
-  ),
-),
+  ).
+).
 
 (define "(: ...) - explicit operation" (= ()
   (should "(:) returns null." (=> ()
     assert null (:);
-  ),
+  ).
   (should "(:non-operation) returns null." (=> ()
     assert null (: null);
     assert null (: type);
@@ -65,7 +65,7 @@
     assert null (: (unquote x y);
     assert null (: (@ 1 2 3);
     assert null (: (@ x: 1);
-  ),
+  ).
   (should "(:operation ...) invokes operation normally." (=> ()
     var value 1;
     assert 1 (:(=?() 1);
@@ -77,13 +77,13 @@
       var op (=?() 10;
       var l (=() 10;
       var f (=>() value;
-    ),
+    ).
     (for op in ops
       assert 10 (op);
       assert 10 (:op);
-    ),
-  ),
-),
+    ).
+  ).
+).
 
 (define "(...:: ...) - chain operation" (= ()
   (should "(expr ...::) returns ($(expr ...) to-string)." (=> ()
@@ -108,7 +108,7 @@
     assert "200" (sum:: + 100::);
     assert "300" (sum::+ 100:: + 100::);
     assert "400" (sum:: + 100:: + 100:: + 100::);
-  ),
+  ).
   (should "(expr ...:: opr ...) returns ($(expr ...) opr ...)." (=> ()
     var sum (=() 100);
     assert 200 (sum::  + 100);
@@ -125,5 +125,5 @@
 
     assert 6 (+ 1 2:: + 3);
     assert true (+ 1 2:: + 3:: is 6);
-  ),
-),
+  ).
+).

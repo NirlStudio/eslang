@@ -1,9 +1,9 @@
 (let color-of (import "colors" "js").
 
 (let display-as (= color
-  ($color ?? (let color (= () (arguments join ""),
+  ($color ?? (let color (= () (arguments join "").
   (=> (feature)
-    (print (color ("[" + (($do name) to-upper) "] ") feature),
+    (print (color ("[" + (($do name) to-upper) "] ") feature).
 ).
 
 (let new (display-as (color-of "green").

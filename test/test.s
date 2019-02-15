@@ -18,7 +18,7 @@
 const scope (arguments ?* arguments, all-specs);
 (for name in scope
   (define name (=> ()
-    (load '../spec/$name'),
+    load '../spec/$name';
 ).
 
 (if direct-testing

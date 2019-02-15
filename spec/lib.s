@@ -8,3 +8,4 @@
     "uri"
   ) (define spec (=> ()
     (load ("./lib/" + spec).
+).

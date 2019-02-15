@@ -33,8 +33,8 @@
   (date of -100)
   (date invalid)
   (date now)
-  ((date now) - (24 * 60 60 1000),
-  ((date now) + (24 * 60 60 1000),
+  ((date now) - (24 * 60 60 1000).
+  ((date now) + (24 * 60 60 1000).
 ).
 (e.g. range
   (0 10) (0 10 2) (0 10 -2)
@@ -51,14 +51,14 @@
 ).
 
 (e.g. tuple
-  (` (null),
-  (` (x),
-  (` (x null),
-  (` (x null 1),
-  (` (x null 1 true),
-  (` (x null 1 true "abc"),
+  (` (null).
+  (` (x).
+  (` (x null).
+  (` (x null 1).
+  (` (x null 1 true).
+  (` (x null 1 true "abc").
   (unquote null)
-  (unquote (` x),
+  (unquote (` x).
   (unquote (` x) null)
   (unquote (` x) null 1)
   (unquote (` x) null 1 true)
@@ -71,10 +71,10 @@
   (=? X null)
   (=? X (X))
   (=? X (X))
-  (=? (X Y),
-  (=? (X Y) null),
-  (=? (X Y) (+ (X) (Y),
-  (=? (X Y) (var z 100) (+ (X) (Y) z),
+  (=? (X Y).
+  (=? (X Y) null).
+  (=? (X Y) (+ (X) (Y).
+  (=? (X Y) (var z 100) (+ (X) (Y) z).
 ).
 
 (e.g. lambda
@@ -83,10 +83,10 @@
   (= x null)
   (= x x)
   (= x x)
-  (= (x y),
-  (= (x y) null),
-  (= (x y) (+ x y),
-  (= (x y) (var z) (+ x y z),
+  (= (x y).
+  (= (x y) null).
+  (= (x y) (+ x y).
+  (= (x y) (var z) (+ x y z).
 ).
 
 (e.g. function
@@ -95,37 +95,37 @@
   (=> x null)
   (=> x x)
   (=> x x)
-  (=> (x y),
-  (=> (x y) null),
-  (=> (x y) (+ x y),
-  (=> (x y) (var z) (+ x y z),
+  (=> (x y).
+  (=> (x y) null).
+  (=> (x y) (+ x y).
+  (=> (x y) (var z) (+ x y z).
 ).
 
 (e.g. iterator
-  (iterator of (@),
-  (iterator of (@ null),
-  (iterator of (@ 1 2),
-  (iterator of (@ 1 2 10:10),
-  (iterator of (@ 1 2 100:100),
+  (iterator of (@).
+  (iterator of (@ null).
+  (iterator of (@ 1 2).
+  (iterator of (@ 1 2 10:10).
+  (iterator of (@ 1 2 100:100).
 ).
 
 (e.g. promise
-  (promise of false),
-  (promise of 1),
-  (promise of 1 2),
-  (promise of (@ false),
-  (promise of (@ true),
-  (promise of (@ true false),
+  (promise of false).
+  (promise of 1).
+  (promise of 1 2).
+  (promise of (@ false).
+  (promise of (@ true).
+  (promise of (@ true false).
   (promise of (= async
     (timer timeout 100 (=>()
       async resolve 100;
-    ),
-  ),
+    ).
+  ).
   (promise of (= async
     (timer timeout 200 (=>()
       async reject 200;
-    ),
-  ),
+    ).
+  ).
 ).
 
 (e.g. array
@@ -148,28 +148,28 @@
 
 (var spring (@:class
   z: 100
-  add: (= (x y) (+ x y (this z),
+  add: (= (x y) (+ x y (this z).
 ).
 (var summer (@:class type: null
   z: 200
-  constructor: (= z (this "z" z),
-  add: (= (x y) (+ x y (this z),
+  constructor: (= z (this "z" z).
+  add: (= (x y) (+ x y (this z).
 ).
 (var autumn (@:class type: (@ x: 1)
   z: 400
-  constructor: (= z (this "z" z),
-  activator: (=) (src) (),
-  add: (= (x y) (+ x y (this z),
+  constructor: (= z (this "z" z).
+  activator: (=) (src) ().
+  add: (= (x y) (+ x y (this z).
 ).
 (var winter (@:class
   type: (@
     x: 1
-    add: (= (x y) (+ x y),
-  ),
+    add: (= (x y) (+ x y).
+  ).
   z: 400
-  activator: (=) (src) (this "z" (src z),
-  constructor: (= z (this "z" z),
-  add: (= (x y) (+ x y (this z),
+  activator: (=) (src) (this "z" (src z).
+  constructor: (= z (this "z" z).
+  add: (= (x y) (+ x y (this z).
 ).
 (e.g. class
   spring summer autumn winter
@@ -180,12 +180,12 @@
     target: (samples reduce
       (@ the-type: matched
         empty: (matched empty)
-        values: (values ?? (@),
-      ),
+        values: (values ?? (@).
+      ).
       (=> (target sample)
         (if ((sample the-type) is matched)
           sample
         else
-          (if (matched is-not-a (sample the-type)) (others push sample),
+          (if (matched is-not-a (sample the-type)) (others push sample).
           target
 ).

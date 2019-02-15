@@ -1,8 +1,9 @@
 
 (let sum (= (x base)
   ((x <= 1) ?
-    (x + base),
-    (redo (x - 1) (x + base).
+    (x + base).
+    (redo (x - 1) (x + base)
+).
 
 (print "sum 1" (sum 1).
 (print "sum 2" (sum 2).

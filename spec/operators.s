@@ -14,3 +14,4 @@
     "quote"
   ) (define spec (=> ()
     (load ("./operators/" + spec).
+).

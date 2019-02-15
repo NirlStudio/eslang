@@ -166,12 +166,9 @@ module.exports = function ($void) {
         return false // stop waiting
       }
       switch (value.key) {
-        case ',':
-          endMatched(value, source)
-          return true
         case '.':
           if (stack.length > 1) {
-            endAll(value, source)
+            endMatched(value, source)
           } else {
             warn('compiler', 'extra enclosing ")." is found and ignored.',
               [lastToken, ['symbol', value, source]])
