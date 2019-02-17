@@ -8,8 +8,8 @@
   (should "(symbol all) is resolved to null." (= ()
     (assert null ((symbol all).
   ).
-  (should "(symbol any) is resolved to null." (= ()
-    (assert null ((symbol any).
+  (should "(symbol any) is resolved to itself." (= ()
+    (assert ((symbol any) :: is (symbol any).
   ).
   (should "(symbol etc) is resolved to null." (= ()
     (assert null ((symbol etc).
@@ -29,6 +29,10 @@
 ).
 
 (define "Punctuations are pure symbols, which is resolved to itself by default" (= ()
+  (should "(symbol of \"\\\") is resolved to itself." (= ()
+    (var sym (symbol of "\\").
+    (assert sym (sym).
+  ).
   (should "(symbol of \"(\") is resolved to itself." (= ()
     (var sym (symbol of "(").
     (assert sym (sym).

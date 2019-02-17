@@ -8,9 +8,6 @@ module.exports = function ($void) {
   // an empty symbol to be resolve to null.
   $export($, '', null)
 
-  // an invalid symbol to be resolve to null.
-  $export($, '\t', null)
-
   // special empty symbols
   $export($, '*', null)
   $export($, '...', null)
@@ -21,6 +18,7 @@ module.exports = function ($void) {
   $export($, 'false', false)
 
   // punctuation pure Symbols
+  $export($, '\\', sharedSymbolOf('\\'))
   $export($, '(', sharedSymbolOf('('))
   $export($, ')', sharedSymbolOf(')'))
   $export($, ',', sharedSymbolOf(','))

@@ -57,6 +57,7 @@ module.exports = function ($void) {
 
   $void.regexNumber = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d+)/
   $void.regexDecimal = /(^)([-+]?\d*\.\d+|[-+]?\d+\.\d*|[+-]\d+|\d\b|[1-9]\d*)/
+  $void.regexPunctuation = /[\\(,)\s]/
   $void.regexSpecialSymbol = /[(`@:$"#)',;\\\s[\]{}]/
 
   $void.regexConstants = /^(null|true|false)$/
@@ -68,15 +69,32 @@ module.exports = function ($void) {
 
   var regexNumber = $void.regexNumber
   var regexConstants = $void.regexConstants
+  var regexPunctuation = $void.regexPunctuation
   var regexSpecialSymbol = $void.regexSpecialSymbol
 
-  var isSafeSymbol = $void.isSafeSymbol = function (key) {
-    return !regexSpecialSymbol.test(key) &&
-      !regexConstants.test(key) && !regexNumber.test(key)
+  var isSafeName = $void.isSafeName = function (key) {
+    return !!key && !regexSpecialSymbol.test(key) &&
+      !regexConstants.test(key) &&
+        !regexNumber.test(key)
+  }
+  $void.isSafeSymbol = function (key) {
+    return !!key && !regexPunctuation.test(key) &&
+      (!regexSpecialSymbol.test(key) || key.length < 2) &&
+        !regexConstants.test(key) &&
+          !regexNumber.test(key)
+  }
+  $void.escapeSymbol = function (key) {
+    var chars = []
+    for (var i = 0; i < key.length; i++) {
+      regexSpecialSymbol.test(key[i]) && chars.push('\\')
+      chars.push(key[i])
+    }
+    return chars.join('')
   }
   $void.encodeFieldName = function (name) {
-    return isSafeSymbol(name) ? (sharedSymbols[name] || new Symbol$(name))
-      : name // use the raw string in the place of symbol.
+    return isSafeName(name)
+      ? (sharedSymbols[name] || new Symbol$(name)) // print as a symbol.
+      : name // print as a literal string.
   }
 
   // to check if an value is a compatible object.

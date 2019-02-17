@@ -70,13 +70,16 @@ module.exports = function ($void) {
         case ')':
           parse('punctuation', c, [indenting, lineNo, lineOffset])
           break
+        case '\\': // force to start a symbol.
+          escaping = true
+          beginSymbol('')
+          break
         case '`':
         case '@':
         case ':':
         case '$':
         case ',': // inline-closing, indent-closing
         case ';': // line-closing
-        case '\\': // reserved as control punctuation
         case '[': // reserved as annotation block beginning.
         case ']': // reserved as annotation block.
         case '{': // reserved as block punctuation
@@ -105,7 +108,7 @@ module.exports = function ($void) {
 
     function finalizeChar (c) {
       lastChar = c
-      spacing = /[\s]/.test(c)
+      spacing = !waiter && /[\s]/.test(c)
       if (c !== ' ' && c !== '\t') {
         indenting = -1
       }
@@ -235,11 +238,21 @@ module.exports = function ($void) {
     }
 
     function symbolWaiter (c) {
+      if (c && escaping) {
+        pendingText += c
+        escaping = false
+        return true
+      }
+      if (c === '\\') {
+        escaping = true
+        return true
+      }
       if (c && !RegexSpecialSymbol.test(c)) {
         pendingText += c
         return true
       }
       raiseSymbol()
+      escaping = false
       waiter = null
       return false // return the char to tokenizer.
     }

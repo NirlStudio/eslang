@@ -125,9 +125,9 @@
   ).
   (define "symbols" (=> ()
     (should "(tokenize special-symbols) produces each special symbol character literally." (=> ()
-      (var tokens (tokenize "``@@::$$[[]]{{}}\\\\,,;;").
+      (var tokens (tokenize "``@@::$$[[]]{{}},,;;").
       (assert (tokens is-a array).
-      (assert 22 (tokens length).
+      (assert 20 (tokens length).
       (assert-sym "`" (tokens 0).
       (assert-sym "@" (tokens 2).
       (assert-sym ":" (tokens 4).
@@ -136,9 +136,8 @@
       (assert-sym "]" (tokens 10).
       (assert-sym "{" (tokens 12).
       (assert-sym "}" (tokens 14).
-      (assert-sym "\\" (tokens 16).
-      (assert-sym "," (tokens 18).
-      (assert-sym ";" (tokens 20).
+      (assert-sym "," (tokens 16).
+      (assert-sym ";" (tokens 18).
     ).
     (should "(tokenize symbols) allows any characters in a symbol as long as it's neither a punctuation nor a space." (=> ()
       (var tokens (tokenize "~!%^&*_abc ABC -+=|<>.?/123").
@@ -149,6 +148,58 @@
       (assert-sym "ABC" (tokens 2).
       （assert-space " " (tokens 3).
       (assert-sym "-+=|<>.?/123" (tokens 4).
+    ).
+    (should "a punctuation may be included in a symbol by escaping." (=> ()
+      (var tokens (tokenize "\\( \\) \\(\\) \\)\\( \\(a\\\\b\\)").
+      (assert (tokens is-a array).
+      (assert 9 (tokens length).
+      (assert-sym "(" (tokens 0).
+      (assert-space " " (tokens 1).
+      (assert-sym ")" (tokens 2).
+      (assert-space " " (tokens 3).
+      (assert-sym "()" (tokens 4).
+      (assert-space " " (tokens 5).
+      (assert-sym ")(" (tokens 6).
+      (assert-space " " (tokens 7).
+      (assert-sym "(a\\b)" (tokens 8).
+    ).
+    (should "a space may be included in a symbol by escaping." (=> ()
+      (var tokens (tokenize "\\ \t\\\t \\ \\\t \\\t\\  \\ a\\\tb\\  \\").
+      (assert (tokens is-a array).
+      (print "tokens:" tokens)
+      (assert 11 (tokens length).
+      (assert-sym " " (tokens 0).
+      (assert-space "\t" (tokens 1).
+      (assert-sym "\t" (tokens 2).
+      (assert-space " " (tokens 3).
+      (assert-sym " \t" (tokens 4).
+      (assert-space " " (tokens 5).
+      (assert-sym "\t " (tokens 6).
+      (assert-space " " (tokens 7).
+      (assert-sym " a\tb " (tokens 8).
+      (assert-space " " (tokens 9).
+      (assert-sym "" (tokens 10).
+    ).
+    (should "a special symbol may be included in a symbol by escaping." (=> ()
+      (var tokens (tokenize "\\` \\@ \\: \\$ \\[ \\] \\{ \\} \\, \\; \\\\").
+      (assert (tokens is-a array).
+      (assert 21 (tokens length).
+      (assert-sym "`" (tokens 0).
+      (assert-sym "@" (tokens 2).
+      (assert-sym ":" (tokens 4).
+      (assert-sym "$" (tokens 6).
+      (assert-sym "[" (tokens 8).
+      (assert-sym "]" (tokens 10).
+      (assert-sym "{" (tokens 12).
+      (assert-sym "}" (tokens 14).
+      (assert-sym "," (tokens 16).
+      (assert-sym ";" (tokens 18).
+      (assert-sym "\\" (tokens 20).
+
+      (assert (symbol quote) (` \`).
+      (assert (symbol escape) (` \\).
+      (assert (symbol begin) (` \().
+      (assert (symbol end) (` \)).
     ).
   ).
   (define "indention" (=> ()

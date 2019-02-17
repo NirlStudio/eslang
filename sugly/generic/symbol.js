@@ -3,13 +3,17 @@
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.symbol
+  var $Tuple = $.tuple
   var $String = $.string
   var Symbol$ = $void.Symbol
   var link = $void.link
+  var isSafeName = $void.isSafeName
   var isSafeSymbol = $void.isSafeSymbol
+  var escapeSymbol = $void.escapeSymbol
   var protoValueOf = $void.protoValueOf
-  var strCompare = $.string.proto.compare
-  var strToString = $.string.proto['to-string']
+
+  var strCompare = $String.proto.compare
+  var strToString = $String.proto['to-string']
 
   // common symbol repository
   var sharedSymbols = $void.sharedSymbols
@@ -18,14 +22,12 @@ module.exports = function ($void) {
   // the empty value.
   var empty = link(Type, 'empty', sharedSymbolOf(''))
 
-  // the invalid value.
-  var invalid = link(Type, 'invalid', sharedSymbolOf('\t'))
-
   // a sepcial symbol to indicate "etc." or "more" for parser and operator
   link(Type, 'etc', sharedSymbolOf('...'))
 
   // a sepcial symbol to indicate "all" or "any" for parser and operator
-  link(Type, ['all', 'any'], sharedSymbolOf('*'))
+  link(Type, 'all', sharedSymbolOf('*'))
+  link(Type, 'any', sharedSymbolOf('?'))
 
   // symbols for common operators
   link(Type, 'quote', sharedSymbolOf('`'))
@@ -42,11 +44,13 @@ module.exports = function ($void) {
   link(Type, 'locon', sharedSymbolOf('locon'))
 
   // symbols for common punctuations
+  link(Type, 'escape', sharedSymbolOf('\\'))
   link(Type, 'begin', sharedSymbolOf('('))
   link(Type, 'end', sharedSymbolOf(')'))
   link(Type, 'comma', sharedSymbolOf(','))
-  link(Type, 'semicolon', sharedSymbolOf(';'))
+  // period is only special when it's immediately after a ')'.
   link(Type, 'period', sharedSymbolOf('.'))
+  link(Type, 'semicolon', sharedSymbolOf(';'))
   link(Type, 'literal', sharedSymbolOf('@'))
   link(Type, 'pairing', sharedSymbolOf(':'))
   link(Type, 'subject', sharedSymbolOf('$'))
@@ -54,23 +58,25 @@ module.exports = function ($void) {
 
   // create a symbol from a key.
   link(Type, 'of', function (key) {
-    return typeof key !== 'string'
-      ? key instanceof Symbol$ ? key
-        : typeof key === 'undefined' || key === null ? empty : invalid
-      : /\s/g.test(key) ? /\S/g.test(key) ? invalid : empty
-        : sharedSymbols[key] || new Symbol$(key)
+    return typeof key === 'string'
+      ? sharedSymbols[key] || new Symbol$(key)
+      : key instanceof Symbol$ ? key : empty
   }, true)
 
   // create a shared symbol from a key.
   link(Type, 'of-shared', function (key) {
-    return typeof key !== 'string' ? invalid
-      : /\s/g.test(key) || !key ? invalid
-        : sharedSymbols[key] || (sharedSymbols[key] = new Symbol$(key))
+    return typeof key === 'string' ? sharedSymbolOf(key)
+      : key instanceof Symbol$ ? sharedSymbolOf(key.key)
+        : empty
   }, true)
 
-  // to test if a string is a valid symbol key.
-  link(Type, 'is-valid', function (key) {
-    return typeof key === 'string' && key !== '\t'
+  // to test if a string is a safe key or a symbol has a safe key.
+  link(Type, 'is-safe', function (key, type) {
+    return typeof key === 'string'
+      ? type === Type ? isSafeSymbol(key) : isSafeName(key)
+      : key instanceof Symbol$
+        ? type === Type ? isSafeSymbol(key.key) : isSafeName(this.key)
+        : false
   }, true)
 
   var proto = Type.proto
@@ -78,12 +84,12 @@ module.exports = function ($void) {
     return this.key
   })
 
-  // test if this is a valid symbol.
-  link(proto, 'is-valid', function () {
-    return this.key !== '\t'
+  // test if this symbol has a safe key.
+  link(proto, 'is-safe', function (type) {
+    return type === Type ? isSafeSymbol(this.key) : isSafeName(this.key)
   })
-  link(proto, 'is-invalid', function () {
-    return this.key === '\t'
+  link(proto, 'is-unsafe', function (type) {
+    return type === Type ? !isSafeSymbol(this.key) : !isSafeName(this.key)
   })
 
   // Identity and Equivalence is determined by the key
@@ -116,14 +122,21 @@ module.exports = function ($void) {
 
   // Representation
   link(proto, 'to-string', function (format) {
-    return format !== Type
-      ? format !== $String ? this.key
-        : isSafeSymbol(this.key) ? this.key
-          : strToString.call(this.key)
-      : this.key === '\t' ? '(symbol invalid)'
-        : !this.key ? '(`)'
+    switch (format) {
+      case $String:
+        // result can be either a literal symbol or string, like field name.
+        return isSafeSymbol(this.key) ? this.key : strToString.call(this.key)
+      case $Tuple:
+        // make sure the result can be recover to a symbol.
+        return !this.key ? '(`)'
           : isSafeSymbol(this.key) ? '(`' + this.key + ')'
             : '(symbol of ' + strToString.call(this.key) + ')'
+      case Type:
+        // result can be either a literal symbol or other literal value.
+        return isSafeSymbol(this.key) ? this.key : escapeSymbol(this.key)
+      default:
+        return this.key
+    }
   })
 
   // Indexer

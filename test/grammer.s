@@ -331,7 +331,6 @@ week-day((d week-day) week-day)
 timestamp((d timestamp) timestamp)
 
 # meta.constant-symbol-sugly
-invalid((symbol invalid) invalid)
 etc((symbol etc) etc)
 all((symbol all) all)
 any((symbol any) any)
@@ -345,6 +344,7 @@ var((symbol var) var)
 const((symbol const) const)
 local((symbol local) local)
 locon((symbol locon) locon)
+escape((symbol escape) escape)
 begin((symbol begin) begin)
 end((symbol end) end)
 comma((symbol comma) comma)
@@ -356,8 +356,15 @@ subject((symbol subject) subject)
 comment((symbol comment) comment)
 in((symbol in) in)
 else((symbol else) else)
+
 # meta.function-symbol-type-sugly
 ((symbol of-shared) of-shared)
+((symbol is-safe) is-safe)
+
+# meta.function-symbol-sugly
+key((sym key) key)
+is-safe((sym is-safe) is-safe)
+is-unsafe((sym is-unsafe) is-unsafe)
 
 # meta.constant-tuple-sugly
 ((tuple blank) blank)
