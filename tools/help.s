@@ -1,8 +1,9 @@
-(print "sugly app usage")
-(print "  - sugly, use sugly interactively.")
-(print "  - sugly sugly-file [options ...], execute a sugly file.")
-(print "  - sugly test [[test-file] ...], run one or more test suites.")
-(print "  - sugly selftest [[spec] ...], run all or given spec cases.")
-(print "  - sugly version, display sugly version.")
-(print "  - sugly changelog, display sugly changelog.")
-(print "  - sugly help, display this help information.")
+#!/usr/bin/env sugly
+
+(print "Usage:\tsugly\t\t\t\tuse sugly interactively.\
+  \tsugly app[.s] [options ...]\texecute a sugly file.\
+  \tsugly test [[test-file] ...]\trun one or more test suites.\
+  \tsugly self-test [[spec] ...]\trun all or given spec cases.\
+  \tsugly version\t\t\tdisplay sugly version.\
+  \tsugly help\t\t\tdisplay this help information."
+).

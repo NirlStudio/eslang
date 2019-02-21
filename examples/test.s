@@ -1,14 +1,9 @@
 (if ($define is null)
-  (let direct-testing true)
-  (print "---- loading testing framework ----")
-  (let * (import "test").
-  (print "define is a function?" (type of define).
-  (print "should is a function?" (type of should).
-  (print "assert is a operator?" (type of assert).
-  (print "test is a function?" (type of test).
-  (print "---- testing framework loaded. ----\n").
+  (var direct-testing true)
+  (var * (import "test").
+  (print "---- testing framework is loaded. ----\n").
 else
-  (print " ---- testing framework is pre-loaded. ----\n")
+  (print "---- testing framework has been loaded. ----\n")
 ).
 
 (define "feature1" (=> ()
@@ -35,5 +30,4 @@ else
 
 (if direct-testing
   (test )
-  "Testing is done." # slience the report
 ).

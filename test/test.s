@@ -1,3 +1,5 @@
+#!/usr/bin/env sugly
+
 # check the existence of testing framework
 (if ($test is null) # running as an app.
   const direct-testing true;
@@ -23,5 +25,4 @@ const scope (arguments ?* arguments, all-specs);
 
 (if direct-testing
   test;
-  (`) # hide report from console.
 ).

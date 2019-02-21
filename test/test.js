@@ -54,7 +54,8 @@ module.exports = function ($void) {
   }
 
   function checkJavascript () {
-    passed('JS is using the space of ' + (global ? 'global.' : 'window.'))
+    passed('JS is using the space of ' + (global ? 'global.' : 'window.'));
+    (typeof Promise === 'undefined' ? failed : passed)('Promise')
   }
 
   function checkPolyfill () {
@@ -64,7 +65,7 @@ module.exports = function ($void) {
       var padding = '      - '
       print(gray(padding, polyfill.join('\n' + padding)))
     } else {
-      passed('Congratulations! Sugly does not need any polyfill.')
+      print(green('      Congratulations! Sugly does not need any polyfill.'))
     }
   }
 
@@ -77,6 +78,7 @@ module.exports = function ($void) {
     checkFunctions($void, '[Void / constructors] ', [
       // genesis
       'Type', 'Date', 'Range', 'Symbol', 'Tuple',
+      'Iterator', 'Promise',
       'Object', 'ClassType',
       // runtime
       'Signal', 'Space', 'OperatorSpace'
@@ -94,7 +96,8 @@ module.exports = function ($void) {
     ])
 
     checkStaticOperators('[void / operators] ', [
-      '`', 'export', 'let', 'var', 'const', 'local', 'locon',
+      '`', 'quote', 'unquote',
+      'export', 'var', 'let', 'const', 'local', 'locon',
       '?', 'if', 'while', 'for', 'break', 'continue',
       '+', '++', '--', '!', 'not', '~',
       '@', '=?', '=', '->', '=>', 'redo', 'return', 'exit',
@@ -129,7 +132,7 @@ module.exports = function ($void) {
       'max', 'min'
     ])
 
-    checkFunctions($void, '[Sugly / lib / io functions] ', [
+    checkFunctions($void, '[Sugly / lib / IO functions] ', [
       '$print', '$warn'
     ])
 
@@ -212,9 +215,13 @@ module.exports = function ($void) {
     check('tuple', typeOf($.tuple.empty) === $.tuple)
 
     check('operator', typeOf($.operator.empty()) === $.operator)
-    check('lambda', typeOf($.lambda.empty()) === $.lambda)
+    check('lambda', typeOf($.lambda.noop) === $.lambda)
+    check('stambda', typeOf($.lambda.static) === $.lambda)
     check('function', typeOf($.function.empty()) === $.function)
     check('function (generic)', typeOf(function () {}) === $.function)
+
+    check('iterator', typeOf($.iterator.empty) === $.iterator)
+    check('promise', typeOf($.promise.empty) === $.promise)
 
     check('array', typeOf($.array.empty()) === $.array)
     check('array (generic)', typeOf([]) === $.array)
@@ -229,7 +236,7 @@ module.exports = function ($void) {
     print('\n  - Static indexer-of')
     var indexerOf = $void.indexerOf
 
-    check('[undefined]', indexerOf() === $void.null[':'])
+    check('undefined', indexerOf() === $void.null[':'])
     check('null', indexerOf(null) === $void.null[':'])
     check('type', indexerOf($.type) === $.type[':'])
 
@@ -261,6 +268,9 @@ module.exports = function ($void) {
     check('function', indexerOf($.function) === $.function[':'])
     check('function: empty', indexerOf($.function.empty()) === $.function.proto[':'])
     check('function: generic', indexerOf(function () {}) === $.function.proto[':'])
+
+    check('array', indexerOf($.iterator.empty) === $.iterator.proto[':'])
+    check('array', indexerOf($.promise.empty) === $.promise.proto[':'])
 
     check('array', indexerOf($.array) === $.array[':'])
     check('array: empty', indexerOf($.array.empty()) === $.array.proto[':'])
