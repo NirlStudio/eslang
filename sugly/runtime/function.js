@@ -38,12 +38,13 @@ module.exports = function function_ ($void) {
   }
 
   function createLambda (params, tbody, app, modules, module_) {
+    var createScope = createLambdaSpace.bind(null, app, modules, module_)
+
     var $lambda = function () {
-      var scope = createLambdaSpace(app, modules, module_)
+      var scope = createScope()
       // populate arguments
       for (var i = 0; i < params.length; i++) {
-        var param = params[i]
-        scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
+        scope.local[params[i]] = i < arguments.length ? arguments[i] : null
       }
       scope.prepare($lambda, this, Array.prototype.slice.call(arguments))
       // execution
@@ -53,7 +54,7 @@ module.exports = function function_ ($void) {
         } catch (signal) {
           if (signal instanceof Signal$) {
             if (signal.id === 'redo') { // clear space context
-              scope = prepareToRedo(createLambdaSpace(app, modules, module_),
+              scope = prepareToRedo(createScope(),
                 $lambda, this, params, signal.value, signal.count)
               continue
             } else if (signal.id !== 'exit') {
@@ -91,17 +92,16 @@ module.exports = function function_ ($void) {
   }
 
   function createStaticLambda (params, tbody) {
-    var key, defaultValue
+    var key
     if (params.length > 0) {
-      key = params[0][0]
-      defaultValue = params[0][1]
+      key = params[0]
     }
     var $stambda = function () {
       var scope = createLambdaSpace()
       // populate argument
       if (key) {
         scope.local[key] = key === 'this' ? this
-          : arguments.length > 0 ? arguments[0] : defaultValue
+          : arguments.length > 0 ? arguments[0] : null
       }
       // execution
       try {
@@ -151,8 +151,7 @@ module.exports = function function_ ($void) {
       var scope = createFunctionSpace(parent)
       // populate arguments
       for (var i = 0; i < params.length; i++) {
-        var param = params[i]
-        scope.local[param[0]] = i < arguments.length ? arguments[i] : param[1]
+        scope.local[params[i]] = i < arguments.length ? arguments[i] : null
       }
       scope.prepare($func, this, Array.prototype.slice.call(arguments))
       // execution
@@ -184,8 +183,7 @@ module.exports = function function_ ($void) {
     var args = count === 0 ? [] : count === 1 ? [value] : value
     scope.prepare(me, t, args)
     for (var i = 0; i < params.length; i++) {
-      var param = params[i]
-      scope.local[param[0]] = i < args.length ? args[i] : param[1]
+      scope.local[params[i]] = i < args.length ? args[i] : null
     }
     return scope
   }
@@ -194,7 +192,7 @@ module.exports = function function_ ($void) {
   // returns [params-list, code]
   function formatParameters (params, space, maxArgs) {
     if (params instanceof Symbol$) {
-      return [[[params.key, null]], new Tuple$([params])]
+      return [[params.key], new Tuple$([params])]
     }
     if (!(params instanceof Tuple$) || params.$.length < 1) {
       return [[], $Tuple.empty]
@@ -205,43 +203,13 @@ module.exports = function function_ ($void) {
       : params.length
     var args = []
     var code = []
-    var hasDefault = false
-    var counter = 0
     for (var i = 0; i < maxArgs; i++) {
       var param = params[i]
       if (param instanceof Symbol$) {
-        args.push([param.key, null])
-        code.push([param, null])
-        counter++
-      } else if (param instanceof Tuple$ && param.length > 0) {
-        var sym = param.$[0]
-        if (sym instanceof Symbol$) {
-          if (param.length < 2) {
-            args.push([sym.key, null])
-            code.push([sym, null])
-            counter++
-          } else {
-            var value = evaluate(param.$[1], space)
-            hasDefault = $Tuple.accepts(value) && value !== null
-            args.push([sym.key, hasDefault ? value : null])
-            code.push([sym, hasDefault ? value : null])
-            counter++
-          }
-        }
+        args.push(param.key)
+        code.push(param)
       }
     }
-    if (counter === 0) {
-      return [[], $Tuple.empty]
-    }
-    var list = []
-    for (i = 0; i < code.length; i++) {
-      var pair = code[i]
-      if (pair[1] === null) {
-        list.push(pair[0])
-      } else {
-        list.push(new Tuple$(pair))
-      }
-    }
-    return [args, new Tuple$(list)]
+    return args.length > 0 ? [args, new Tuple$(code)] : [[], $Tuple.empty]
   }
 }
