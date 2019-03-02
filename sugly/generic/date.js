@@ -88,10 +88,8 @@ module.exports = function ($void) {
   }, true)
 
   // get current time as its timestamp value.
-  link(Type, 'timestamp', Date.now ? function () {
+  link(Type, 'timestamp', function () {
     return Date.now()
-  } : function () {
-    return (new Date()).getTime()
   }, true)
 
   link(Type, 'timezone', function () {

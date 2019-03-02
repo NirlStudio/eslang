@@ -43,9 +43,10 @@ module.exports = function load ($void) {
       return null
     }
     // try to load file
-    var text = $void.loader.read(uri)
-    if (typeof text !== 'string') {
-      warn('load', 'failed to load source', source, 'for', text)
+    var doc = $void.loader.read(uri)
+    var text = doc[0]
+    if (!text) {
+      warn('load', 'failed to load source', source, 'for', doc[1])
       return null
     }
     // compile text
@@ -74,7 +75,7 @@ module.exports = function load ($void) {
       return null
     }
     var loader = $void.loader
-    var dirs = loader.isAbsolute(source) ? []
+    var dirs = loader.isResolved(source) ? []
       : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $void.$env('home'))
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {

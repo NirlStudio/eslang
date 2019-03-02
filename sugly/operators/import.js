@@ -132,12 +132,12 @@ module.exports = function import_ ($void) {
 
   function resolve (appUri, moduleUri, source) {
     var loader = $void.loader
-    var isAbsolute = loader.isAbsolute(source)
-    if (!moduleUri && isAbsolute) {
-      warn('import', "It's forbidden to import a module", 'from a absolute uri.')
+    var isResolved = loader.isResolved(source)
+    if (!moduleUri && isResolved) {
+      warn('import', "It's forbidden to import a module from an absolute uri.")
       return null
     }
-    var dirs = isAbsolute ? [] : dirsOf(
+    var dirs = isResolved ? [] : dirsOf(
       source,
       moduleUri && loader.dir(moduleUri),
       loader.dir(appUri) + '/modules',
@@ -179,10 +179,11 @@ module.exports = function import_ ($void) {
   function loadModule (space, uri, module_, source, moduleUri) {
     try {
       // try to load file
-      var text = $void.loader.read(uri)
+      var doc = $void.loader.read(uri)
+      var text = doc[0]
       if (typeof text !== 'string') {
         module_.status = 415 // unspported media type
-        warn('import', 'failed to read source', source, 'for', text)
+        warn('import', 'failed to read source', source, 'for', doc[1])
         return null
       }
       // compile text

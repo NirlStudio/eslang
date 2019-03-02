@@ -33,9 +33,10 @@ module.exports = function run ($void) {
       return null
     }
     // try to load file
-    var text = loader.read(uri)
-    if (typeof text !== 'string') {
-      warn('run', 'failed to read source', appSource, 'for', text)
+    var doc = loader.read(uri)
+    var text = doc[0]
+    if (!text) {
+      warn('run', 'failed to read source', appSource, 'for', doc[1])
       return null
     }
     // compile text
