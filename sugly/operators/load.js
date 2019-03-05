@@ -7,6 +7,7 @@ module.exports = function load ($void) {
   var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
+  var appendExt = $void.appendExt
   var staticOperator = $void.staticOperator
 
   // load: a module from source.
@@ -30,27 +31,24 @@ module.exports = function load ($void) {
   $void.loadData = loadData
 
   function loadData (space, appUri, moduleUri, source, args) {
-    if (typeof source !== 'string') {
+    if (!source || typeof source !== 'string') {
       warn('load', 'invalid source:', source)
       return null
     }
-    if (!source.endsWith('.s')) {
-      source += '.s'
-    }
     // try to locate the sourcevar uri
-    var uri = resolve(appUri, moduleUri, source)
+    var uri = resolve(appUri, moduleUri, appendExt(source))
     if (typeof uri !== 'string') {
       return null
     }
     // try to load file
-    var doc = $void.loader.read(uri)
+    var doc = $void.loader.load(uri)
     var text = doc[0]
     if (!text) {
       warn('load', 'failed to load source', source, 'for', doc[1])
       return null
     }
     // compile text
-    var code = compile(text)
+    var code = compile(text, uri, doc[1])
     if (!(code instanceof Tuple$)) {
       warn('load', 'compiler warnings:', code)
       return null
@@ -75,8 +73,11 @@ module.exports = function load ($void) {
       return null
     }
     var loader = $void.loader
-    var dirs = loader.isResolved(source) ? []
-      : dirsOf(source, loader.dir(moduleUri), loader.dir(appUri), $void.$env('home'))
+    var dirs = loader.isResolved(source) ? [] : dirsOf(source,
+      loader.dir(moduleUri),
+      loader.dir(appUri),
+      $void.$env('home')
+    )
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       warn('load', 'failed to resolve module ', source, 'in', dirs)
@@ -85,12 +86,13 @@ module.exports = function load ($void) {
     if (uri !== moduleUri) {
       return uri
     }
-    warn('load', 'a module,', moduleUri, ',cannot load itself by resolving', source, 'in', dirs)
+    warn('load', 'a module,', moduleUri, ', cannot load itself by resolving', source, 'in', dirs)
     return null
   }
 
   function dirsOf (source, moduleDir, appDir, homeDir) {
-    return source.startsWith('.') ? [ moduleDir ]
+    return source.startsWith('./') || source.startsWith('../')
+      ? [ moduleDir ]
       : [ moduleDir, appDir, homeDir ]
   }
 }

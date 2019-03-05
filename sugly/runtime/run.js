@@ -33,14 +33,14 @@ module.exports = function run ($void) {
       return null
     }
     // try to load file
-    var doc = loader.read(uri)
+    var doc = loader.load(uri)
     var text = doc[0]
     if (!text) {
       warn('run', 'failed to read source', appSource, 'for', doc[1])
       return null
     }
     // compile text
-    var code = compile(text)
+    var code = compile(text, uri, doc[1])
     if (!(code instanceof Tuple$)) {
       warn('run', 'compiler warnings:', code)
       return null

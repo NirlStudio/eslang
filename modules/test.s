@@ -4,7 +4,7 @@
 const indent-step "  ";
 
 # import rendering
-const colors (import "colors" "js");
+const colors (import "$colors.js");
 const (gray, green, red, underline) colors;
 (const (sign-passed, sign-failed, sign-pending)
   import (passed, failed, pending) from colors;

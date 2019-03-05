@@ -10,6 +10,7 @@ module.exports = function import_ ($void) {
   var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
+  var appendExt = $void.appendExt
   var staticOperator = $void.staticOperator
   var symbolFrom = $void.sharedSymbolOf('from')
 
@@ -33,8 +34,7 @@ module.exports = function import_ ($void) {
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
       src = importModule(space, space.local['-app'], space.local['-module'],
-        evaluate(clist[1], space),
-        clist.length > 2 ? evaluate(clist[2], space) : null
+        evaluate(clist[1], space)
       )
       // clone to protect inner exports object.
       return Object.assign($Object.empty(), src)
@@ -43,9 +43,7 @@ module.exports = function import_ ($void) {
     src = evaluate(clist[3], space)
     var imported = src instanceof Object$ ? src
       : typeof src !== 'string' ? null
-        : importModule(space, space.local['-app'], space.local['-module'], src,
-          clist.length > 4 ? evaluate(clist[4], space) : null
-        )
+        : importModule(space, space.local['-app'], space.local['-module'], src)
     if (typeof imported !== 'object') {
       return null // importing failed.
     }
@@ -79,7 +77,7 @@ module.exports = function import_ ($void) {
   // expose to be called by native code.
   $void.importModule = importModule
 
-  function importModule (space, appUri, moduleUri, source, type) {
+  function importModule (space, appUri, moduleUri, source) {
     if (typeof source !== 'string') {
       if (source instanceof Symbol$) {
         source = source.key
@@ -88,11 +86,14 @@ module.exports = function import_ ($void) {
         return null
       }
     }
-    // try to locate the source in dirs.
-    var check = function (ext) {
-      return source.endsWith(ext) ? source : source + ext
+    var type
+    var offset = source.indexOf('$')
+    if (offset >= 0) {
+      type = source.substring(0, ++offset)
+      source = source.substring(offset)
     }
-    var uri = resolve(appUri, moduleUri, check(type === 'js' ? '.js' : '.s'))
+    // try to locate the source in dirs.
+    var uri = resolve(appUri, moduleUri, type ? source : appendExt(source))
     if (!uri) {
       return null
     }
@@ -110,7 +111,7 @@ module.exports = function import_ ($void) {
         return module_.exports
     }
 
-    var exporting = (type === 'js' ? loadJsModule : loadModule)(
+    var exporting = (type ? loadNativeModule : loadModule)(
       space, uri, module_, source, moduleUri
     )
     if (!exporting || exporting === module_.exporting) {
@@ -137,8 +138,7 @@ module.exports = function import_ ($void) {
       warn('import', "It's forbidden to import a module from an absolute uri.")
       return null
     }
-    var dirs = isResolved ? [] : dirsOf(
-      source,
+    var dirs = isResolved ? [] : dirsOf(source,
       moduleUri && loader.dir(moduleUri),
       loader.dir(appUri) + '/modules',
       $void.$env('home') + '/modules',
@@ -154,7 +154,7 @@ module.exports = function import_ ($void) {
 
   function dirsOf (source, moduleDir, appDir, homeDir, runtimeDir) {
     return moduleDir
-      ? source.startsWith('.')
+      ? source.startsWith('./') || source.startsWith('../')
         ? [ moduleDir ]
         : [ appDir, homeDir, runtimeDir, moduleDir ]
       : [ runtimeDir ] // for dynamic or unknown-source code.
@@ -179,7 +179,7 @@ module.exports = function import_ ($void) {
   function loadModule (space, uri, module_, source, moduleUri) {
     try {
       // try to load file
-      var doc = $void.loader.read(uri)
+      var doc = $void.loader.load(uri)
       var text = doc[0]
       if (typeof text !== 'string') {
         module_.status = 415 // unspported media type
@@ -187,7 +187,7 @@ module.exports = function import_ ($void) {
         return null
       }
       // compile text
-      var code = compile(text)
+      var code = compile(text, uri, doc[1])
       if (!(code instanceof Tuple$)) {
         module_.status = 400 //
         warn('import', 'failed to compile source', source, 'for', code)
@@ -209,12 +209,13 @@ module.exports = function import_ ($void) {
     return null
   }
 
-  function loadJsModule (space, uri, module_, source, moduleUri) {
+  function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
-      var importing = require(uri) // the JS module must export a loader function.
+      // the native module must export a loader function.
+      var importing = require(uri)
       if (typeof importing !== 'function') {
         module_.status = 400
-        warn('import', 'invalid JS module', source, 'at', uri)
+        warn('import', 'invalid native module', source, 'at', uri)
         return null
       }
       var scope = $void.createModuleSpace(uri, space)
@@ -226,11 +227,11 @@ module.exports = function import_ ($void) {
         return scope.exporting
       }
       module_.status = 500 // internal error
-      warn('import', 'failed to import JS module of', source,
+      warn('import', 'failed to import native module of', source,
         'for', status, 'at', uri)
     } catch (err) {
       module_.status = 503 // service unavailable
-      warn('import', 'failed to import JS module of', source,
+      warn('import', 'failed to import native module of', source,
         'for', err, 'at', uri, 'from', moduleUri)
     }
     return null

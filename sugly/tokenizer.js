@@ -13,9 +13,14 @@ module.exports = function ($void) {
   var RegexDecimal = $void.regexDecimal
   var RegexSpecialSymbol = $void.regexSpecialSymbol
 
-  var tokenizer = $export($, 'tokenizer', function (parse) {
+  var tokenizer = $export($, 'tokenizer', function (parse, srcUri) {
     if (!isApplicable(parse)) {
       return $.tokenize
+    }
+
+    var srcText = ''
+    if (!srcUri || typeof srcUri !== 'string') {
+      srcUri = ''
     }
 
     var lineNo, lineOffset, lastChar, spacing, indenting, clauseIndent
@@ -46,10 +51,12 @@ module.exports = function ($void) {
 
     return function tokenizing (text) {
       if (typeof text !== 'string') {
+        srcText = ''
         waiter && waiter() // finalize pending action
         resumeParsing() // clear parsing context
         return false // indicate a reset happened.
       }
+      srcText = text
       // start parsing
       for (var i = 0; i < text.length; i++) {
         var c = text[i]
@@ -78,7 +85,7 @@ module.exports = function ($void) {
         case '@':
         case ':':
         case '$':
-        case ',': // inline-closing, indent-closing
+        case ',': // logical separator
         case ';': // line-closing
         case '[': // reserved as annotation block beginning.
         case ']': // reserved as annotation block.
@@ -86,8 +93,8 @@ module.exports = function ($void) {
         case '}': // reserved as block punctuation
           parse('symbol', symbolOf(c), [indenting, lineNo, lineOffset])
           break
-        case "'": // reserved for format string
-          // JSON.parse requires double-quote
+        case "'":
+          // always use double quote internally.
           beginWaiting('"', singleQuoteWaiter)
           break
         case '"':
@@ -134,7 +141,7 @@ module.exports = function ($void) {
       }
       if (c === '\t') {
         warn('tokenizer', 'TAB-space is not suggested in indention.',
-          [lineNo, lineOffset, indenting])
+          [srcUri || srcText, lineNo, lineOffset, indenting])
       }
       clauseIndent = ++indenting
     }
@@ -150,7 +157,7 @@ module.exports = function ($void) {
       return function (c) {
         if (typeof c === 'undefined') { // unexpected ending
           warn('tokenizer', 'a string value is not properly closed.',
-            [lineNo, lineOffset, pendingLine, pendingOffset])
+            [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
           return raiseValue()
         }
         if (c === '\r') { // skip '\r' anyway
@@ -224,7 +231,7 @@ module.exports = function ($void) {
       } else {
         pendingText += ')'
         warn('tokenizer', 'a block comment is not properly closed.',
-          [lineNo, lineOffset, pendingLine, pendingOffset])
+          [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
       }
       parse('comment', pendingText,
         [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])

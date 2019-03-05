@@ -16,9 +16,20 @@ module.exports = function ($void) {
   var symbolFormat = sharedSymbolOf('format')
   var symbolToString = sharedSymbolOf('to-string')
 
-  var compiler = $export($, 'compiler', function (evaluate) {
+  var makeSourceUri = function (uri, version) {
+    return !uri || typeof uri !== 'string' ? ''
+      : !version || typeof version !== 'string' ? uri
+        : uri + '@' + version
+  }
+
+  var compiler = $export($, 'compiler', function (evaluate, srcUri) {
     if (!isApplicable(evaluate)) {
       return $.compile
+    }
+
+    var srcText = ''
+    if (!srcUri || typeof srcUri !== 'string') {
+      srcUri = ''
     }
 
     var stack, sourceStack, waiter, lastToken, openningLine, openningOffset
@@ -33,8 +44,9 @@ module.exports = function ($void) {
       openningOffset = 0
     }
 
-    var tokenizing = tokenizer(compileToken)
+    var tokenizing = tokenizer(compileToken, srcUri)
     return function compiling (text) {
+      srcText = text && typeof text === 'string' ? text : ''
       if (tokenizing(text)) {
         return stack.length
       }
@@ -42,7 +54,7 @@ module.exports = function ($void) {
       waiter && waiter()
       if (stack.length > 1) {
         warn('compiler', 'open statements are not properly closed.',
-          [lastToken])
+          [lastToken, srcUri || srcText])
         endAll(null, lastToken[2])
       }
       tryToRaise()
@@ -141,7 +153,7 @@ module.exports = function ($void) {
       if (!(args.length > 1)) {
         if (pattern.indexOf('"') < 0) {
           warn('compiler', 'unnecessary format string.',
-            pattern, ['format', pattern, source])
+            pattern, ['format', pattern, source, srcUri || srcText])
         }
         return pushValue(args[0], source)
       }
@@ -171,7 +183,7 @@ module.exports = function ($void) {
             endMatched(value, source)
           } else {
             warn('compiler', 'extra enclosing ")." is found and ignored.',
-              [lastToken, ['symbol', value, source]])
+              [lastToken, ['symbol', value, source], srcUri || srcText])
           }
           return true
         default:
@@ -190,9 +202,10 @@ module.exports = function ($void) {
         tryTofoldStatement(statement, sourceMap)
       );
       // push it to the end of container clause.
+      sourceMap[0].unshift(srcUri || srcText)
       stack[stack.length - 1].push(new Tuple$(statement, false, sourceMap))
       // since the source has been saved into the tuple, only keeps its overall range.
-      sourceStack[sourceStack.length - 1].push(sourceMap[0])
+      sourceStack[sourceStack.length - 1].push(sourceMap[0].slice(1))
     }
 
     function tryTofoldStatement (statement, sourceMap) { // sweeter time.
@@ -223,16 +236,17 @@ module.exports = function ($void) {
         sourceMap.push(ending.slice(0, 1).concat(ending.slice(-2)))
       }
 
+      exprSrcMap[0].unshift(srcUri || srcText)
       statement.unshift(symbolSubject, new Tuple$(expr, false, exprSrcMap))
       sourceMap.splice(1, 0,
-        beginning.concat(beginning.slice(1)), exprSrcMap[0]
+        beginning.concat(beginning.slice(1)), exprSrcMap[0].slice(1)
       )
     }
 
     function endClause () {
       if (stack.length < 2) {
         warn('compiler', 'extra enclosing parentheses is found and ignored.',
-          [lastToken])
+          [lastToken, srcUri || srcText])
         return // allow & ignore extra enclosing parentheses
       }
       endTopWith()
@@ -241,7 +255,7 @@ module.exports = function ($void) {
     function endMatched (value, source) {
       if (stack.length < 2) {
         warn('compiler', 'extra ")," is found and ignored.',
-          [lastToken, ['symbol', value, source]])
+          [lastToken, ['symbol', value, source], srcUri || srcText])
         return // allow & ignore extra enclosing parentheses
       }
       lastToken[2][0] >= 0 // the indent value of ')'
@@ -302,18 +316,46 @@ module.exports = function ($void) {
     }
   })
 
+  // a simple memory cache
+  var cache = {
+    code: Object.create(null),
+    versions: Object.create(null),
+
+    get: function (uri, version) {
+      return !uri || typeof uri !== 'string' ? null
+        : !version || typeof version !== 'string' ? this.code[uri]
+          : this.versions[uri] === version ? this.code[uri] : null
+    },
+    set: function (code, uri, version) {
+      if (uri && typeof uri === 'string') {
+        this.code[uri] = code
+        if (version && typeof version === 'string') {
+          this.versions[uri] = version
+        }
+      }
+      return code
+    }
+  }
+
   // a helper function to compile a piece of source code.
-  $export($, 'compile', function (text) {
+  $export($, 'compile', function (text, uri, version) {
+    var code = cache.get(uri, version)
+    if (code) {
+      return code
+    }
+
+    var srcUri = makeSourceUri(uri || text, version)
     var list = []
-    var src = [[[0, 0, 0]]]
+    var src = [[[srcUri, 0, 0, 0]]]
     var compiling = compiler(function collector (expr) {
       list.push(expr[0])
       src.push(expr[1])
-    })
+    }, srcUri)
     if (compiling(text) > 1) {
       compiling('\n') // end any pending waiter.
     }
     compiling() // notify the end of stream.
-    return new Tuple$(list, true, src)
+    code = new Tuple$(list, true, src)
+    return cache.set(code, uri, version)
   })
 }

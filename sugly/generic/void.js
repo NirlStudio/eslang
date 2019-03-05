@@ -37,6 +37,13 @@ module.exports = function ($void) {
   )
   $void.ownsProperty = ownsProperty
 
+  // make sure a file uri has correct sugly extension
+  $void.appendExt = function (path) {
+    return !path || typeof path !== 'string' ? path
+      : path.endsWith('.s') || path.endsWith('.sugly') ? path
+        : path + '.s'
+  }
+
   // to retrieve or create a shared symbol.
   var sharedSymbols = $void.sharedSymbols = Object.create(null)
   function sharedSymbolOf (key) {

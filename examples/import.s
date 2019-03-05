@@ -1,5 +1,5 @@
 # simple importing
-(let colors (import "colors" "js").
+(let colors (import "$colors.js").
 (print "(colors green) is-a function?" ($(colors "green") is-a function).
 
 # populate fields from an object into current context.
@@ -15,18 +15,18 @@
 (print "list length?" (list length) ((list length) == 2).
 
 # populate values from an array
-(let (gray green) list)
+(let (gray green) list).
 (print (gray "- gray is gray").
 (print (green "- green is green").
 
 # directly populate module exporting into current space.
-(let (gray green) (import "colors" "js").
+(let (gray green) (import "$colors.js").
 (print (gray "- gray is gray").
 (print (green "- green is green").
 
 # import and rename selected exporting.
 (let (not-gray not-green)
-  (import (green gray) from "colors" "js").
+  (import (green gray) from "$colors.js")
+).
 (print (not-gray "- green is not gray").
 (print (not-green "- gray is not green").
-;

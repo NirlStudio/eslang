@@ -505,41 +505,57 @@ var * (load "share/type" (@ the-type: promise);
     assert (p is (promise empty);
   ).
   (define "(promise of-all promising)" (= ()
-    (should "(promise of-all null) returns (promise nothing)." (= ()
+    (should "(promise of-all null) returns a promise rejected by true." (= async
       var p (promise of-all null);
-      assert (p is (promise nothing);
+      p then (async reject true);
     ).
-    (should "(promise of-all a-promise) returns the original promise." (= ()
-      var p (promise of (=> ();
-      assert (p is (promise of-all p);
-    ).
-    (should "(promise of-all (@)) returns (promise empty)." (= ()
+    (should "(promise of-all (@)) returns a promise resolved to (@ null)." (= ()
       var p (promise of-all (@);
-      assert (p is (promise empty);
+      (p then (=> waiting
+        assert (waiting result:: is-a array);
+        assert 1 (waiting result:: length);
+        assert null (waiting result:: 0);
+      ).
     ).
-    (should "(promise of-all (@ null)) returns (promise empty)." (= ()
+    (should "(promise of-all (@ null)) returns a promise resolved to (@ null)." (= ()
       var p (promise of-all (@ null);
-      assert (p is (promise empty);
+      (p then (=> waiting
+        assert (waiting result:: is-a array);
+        assert 1 (waiting result:: length);
+        assert null (waiting result:: 0);
+      ).
     ).
-    (should "(promise of-all (@ value)) returns a promise resolved to value." (= async
+    (should "(promise of-all (@ value)) returns a promise resolved to (@ value)." (= ()
       var p (promise of-all (@ 100);
-      p then (async resolve 100);
+      (p then (=> waiting
+        assert (waiting result:: is-a array);
+        assert 1 (waiting result:: length);
+        assert 100 (waiting result:: 0);
+      ).
     ).
-    (should "(promise of-all (@ value null)) returns a promise resolved to value." (= async
+    (should "(promise of-all (@ value null)) returns a promise resolved to (@ value)." (= ()
       var p (promise of-all (@ 100 null);
-      p then (async resolve 100);
+      (p then (=> waiting
+        assert (waiting result:: is-a array);
+        assert 1 (waiting result:: length);
+        assert 100 (waiting result:: 0);
+      ).
     ).
-    (should "(promise of-all (@ * value)) returns a promise rejected to value." (= async
+    (should "(promise of-all (@ * value)) returns a promise rejected by value." (= async
       var p (promise of-all (@ 100 999);
       p then (async reject 999);
     ).
-    (should "(promise of-all async-func) returns a promise to invoke async-func." (= async
+    (should "(promise of-all async-func) returns a promise to invoke async-func." (= ()
       (var p (promise of-all (= async
         (timer timeout (=> ms
           async resolve (ms + 99);
         ).
       ).
-      p then (async resolve 99);
+      (p then (=> waiting
+        assert (waiting result:: is-a array);
+        assert 1 (waiting result:: length);
+        assert 99 (waiting result:: 0);
+      ).
     ).
     (should "(promise of-all other-value) returns a promise rejected to the value." (= async
       var p (promise of-all 99.9);
@@ -582,9 +598,13 @@ var * (load "share/type" (@ the-type: promise);
       ).
     ).
     (define "when there are one promising," (= ()
-      (should "resolve to the result of the promising." (= async
+      (should "resolve to the result of the promising." (= ()
         var p (promise all (@ (@ 100);
-        (p then (async resolve 100).
+        (p then (=> waiting
+          assert (waiting result:: is-a array);
+          assert 1 (waiting result:: length);
+          assert 100 (waiting result:: 0);
+        ).
       ).
     ).
     (define "when there are multiple promisings," (= ()

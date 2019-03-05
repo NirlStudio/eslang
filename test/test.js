@@ -101,7 +101,7 @@ module.exports = function ($void) {
       '?', 'if', 'while', 'for', 'break', 'continue',
       '+', '++', '--', '!', 'not', '~',
       '@', '=?', '=', '->', '=>', 'redo', 'return', 'exit',
-      'load', 'import',
+      'import', 'load', 'fetch',
       'debug', 'log'
     ])
 

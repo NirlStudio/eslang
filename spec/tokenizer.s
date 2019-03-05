@@ -166,7 +166,6 @@
     (should "a space may be included in a symbol by escaping." (=> ()
       (var tokens (tokenize "\\ \t\\\t \\ \\\t \\\t\\  \\ a\\\tb\\  \\").
       (assert (tokens is-a array).
-      (print "tokens:" tokens)
       (assert 11 (tokens length).
       (assert-sym " " (tokens 0).
       (assert-space "\t" (tokens 1).
@@ -368,14 +367,12 @@
 
       (let old-warning warning)
       (let tokens (tokenize "\"abc\\1 \"").
-      (print tokens)
       (let warning (warn).
       (assert-str "abc\1 ")
       (assert-warning)
 
       (let old-warning warning)
       (let tokens (tokenize "\"abc\\u12 \"").
-      (print tokens)
       (let warning (warn).
       (assert-str "abc\u12 ")
       (assert-warning)

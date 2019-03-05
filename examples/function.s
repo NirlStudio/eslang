@@ -5,7 +5,8 @@
 (print "(and 111 222)" sum (sum == 433).
 
 (let x-and (=> y
-  (=> x (+ x y z).
+  (=> x (+ x y z)
+).
 (let and300 (x-and 200).
 (let and1100 (x-and 1000).
 

@@ -236,8 +236,7 @@ module.exports = function ($void) {
   // It's is fulfilled when all promise handlers have been invoked separately.
   $export($, 'commit*', link(Type, 'of-all', function (promising) {
     var promises = makePromises(Array.prototype.slice.call(arguments))
-    return promises.length > 1 ? assemble(Promise$.all(promises))
-      : promises.length > 0 ? promises[0] : empty
+    return promises.length > 0 ? assemble(Promise$.all(promises)) : empty
   }, true))
 
   // the array argument version of (promise of-all promisings)
@@ -246,8 +245,7 @@ module.exports = function ($void) {
       return empty
     }
     var promises = makePromises(promisings)
-    return promises.length > 1 ? assemble(Promise$.all(promises))
-      : promises.length > 0 ? promises[0] : empty
+    return promises.length > 0 ? assemble(Promise$.all(promises)) : empty
   }, true)
 
   // To make a promise from one or more promisee functions and/or other promises.

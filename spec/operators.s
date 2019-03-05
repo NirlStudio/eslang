@@ -3,6 +3,7 @@
     "assignment"
     "bitwise"
     "control"
+    "fetch"
     "function"
     "general"
     "import"

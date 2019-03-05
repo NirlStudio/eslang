@@ -72,8 +72,9 @@ function initializeOperators ($void) {
   require('./operators/function')($void)
   require('./operators/operator')($void)
 
-  require('./operators/load')($void)
   require('./operators/import')($void)
+  require('./operators/load')($void)
+  require('./operators/fetch')($void)
 }
 
 module.exports = function start (stdout) {

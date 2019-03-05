@@ -27,6 +27,7 @@ locon(locon -locon locon locon- locon)locon
 export(export -export export export- export)export
 import(import -import import import- import)import
 load(load -load load load- load)load
+fetch(fetch -fetch fetch fetch- fetch)fetch
 
 # keyword.control.flow.sugly
 if
