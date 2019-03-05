@@ -36,11 +36,15 @@ module.exports = function load ($void) {
       warn('fetch', 'invalid resource uri to fetch.', source)
       return promiseOfResolved(source)
     }
-    source = appendExt(source)
+
+    var offset = source.indexOf('$')
+    source = offset >= 0 ? source.substring(++offset)
+      : source = appendExt(source)
+
     if (!loader.isResolved(source)) {
       source = loader.resolve(source, dirs)
       if (typeof source !== 'string') {
-        warn('fetch', 'failed to resolve module ', source, 'in', dirs)
+        warn('fetch', 'failed to resolve module:', source)
         return promiseOfResolved(source)
       }
     }

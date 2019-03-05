@@ -1,6 +1,6 @@
 (define "(fetch ...)" (=> ()
   (should "(fetch) returns null." (= ()
-    (assert null (fetch).
+    assert null (fetch);
   ).
   (should "(fetch module) returns a promise resolved to (@ module)." (=> ()
     (fetch "_data":: then (= waiting
@@ -17,12 +17,22 @@
       assert (waiting result:: 1:: ends-with "spec/operators/_module.s");
     ).
   ).
+  (should "(fetch module1 module2 ...) returns a promise resolved to (@ module1 module2 ...)." (=> ()
+    const remote-mod "https://example.com/index.html";
+    (fetch "_data" "_module" '$$$remote-mod':: then (=> waiting
+      assert (waiting result:: is-a array);
+      assert 3 (waiting result:: length);
+      assert (waiting result:: 0:: ends-with "spec/operators/_data.s");
+      assert (waiting result:: 1:: ends-with "spec/operators/_module.s");
+      assert remote-mod (waiting result:: 2);
+    ).
+  ).
   (should "(fetch remote-module) returns a promise resolved to (@ remote-module)." (=> ()
-    const remote-mod "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test.s";
+    const remote-mod "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test";
     (fetch remote-mod:: then (=> waiting
       assert (waiting result:: is-a array);
       assert 1 (waiting result:: length);
-      assert remote-mod (waiting result:: 0);
+      assert '$(remote-mod).s' (waiting result:: 0);
     ).
   ).
   (should "(fetch remote-module) returns a rejected promise if the module does not exist." (=> ()
