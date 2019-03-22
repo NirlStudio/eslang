@@ -1,7 +1,7 @@
 'use strict'
 
-// running as an application
 if (require.main === module) {
+  // running as an application
   module.exports = require('./lib/app')()
 } else {
   // export assembled Sugly runtime.

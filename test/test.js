@@ -34,7 +34,7 @@ module.exports = function ($void) {
     }
 
     // print failures
-    print(red('  failing: ', failing.length))
+    print(red('  failing: ' + failing.length))
     print('\n  There might be some issues to prevent running sugly')
     for (var i = 0; i < failing.length; i++) {
       print(red('  - ' + failing[i]))

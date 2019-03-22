@@ -137,6 +137,12 @@ module.exports = function space ($void) {
           modules: this.modules
         }
       )
+    },
+    bindOperators: function () {
+      // convert operators to internal helper functions
+      $void.bindOperatorFetch(this)
+      $void.bindOperatorImport(this)
+      $void.bindOperatorLoad(this)
     }
   })
 
@@ -165,6 +171,13 @@ module.exports = function space ($void) {
       return space.var(key, value)
     }
     return space
+  }
+
+  // a bootstrap app space can be used to fetch app's dependencies.
+  $void.createBootstrapSpace = function (appUri) {
+    var bootstrap = $void.bootstrap = $void.createAppSpace(appUri)
+    bootstrap.bindOperators()
+    return bootstrap
   }
 
   $void.createModuleSpace = function (uri, appSpace) {

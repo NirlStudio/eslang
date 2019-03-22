@@ -8,10 +8,13 @@ module.exports = function load ($void) {
   var execute = $void.execute
   var evaluate = $void.evaluate
   var appendExt = $void.appendExt
+  var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
+  var symbolLoad = sharedSymbolOf('load')
+
   // load: a module from source.
-  staticOperator('load', function (space, clause) {
+  var operator = staticOperator('load', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return null
@@ -27,9 +30,6 @@ module.exports = function load ($void) {
     )
   })
 
-  // expose to be called by native code
-  $void.loadData = loadData
-
   function loadData (space, appUri, moduleUri, source, args) {
     if (!source || typeof source !== 'string') {
       warn('load', 'invalid source:', source)
@@ -44,7 +44,7 @@ module.exports = function load ($void) {
     var doc = $void.loader.load(uri)
     var text = doc[0]
     if (!text) {
-      warn('load', 'failed to load source', source, 'for', doc[1])
+      warn('load', 'failed to load', source, 'for', doc[1])
       return null
     }
     // compile text
@@ -80,7 +80,7 @@ module.exports = function load ($void) {
     )
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
-      warn('load', 'failed to resolve module ', source, 'in', dirs)
+      warn('load', 'failed to resolve', source, 'in', dirs)
       return null
     }
     if (uri !== moduleUri) {
@@ -94,5 +94,15 @@ module.exports = function load ($void) {
     return source.startsWith('./') || source.startsWith('../')
       ? [ moduleDir ]
       : [ moduleDir, appDir, homeDir ]
+  }
+
+  $void.bindOperatorLoad = function (space) {
+    return (space.$load = function (uri) {
+      if (!uri || typeof uri !== 'string') {
+        warn('$load', 'invalid source uri:', uri)
+        return null
+      }
+      return operator(space, new Tuple$([symbolLoad, uri]))
+    })
   }
 }

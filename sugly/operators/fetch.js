@@ -3,16 +3,21 @@
 module.exports = function load ($void) {
   var $ = $void.$
   var $Promise = $.promise
+  var run = $void.$run
   var warn = $void.$warn
+  var Tuple$ = $void.Tuple
+  var Promise$ = $void.Promise
   var evaluate = $void.evaluate
   var appendExt = $void.appendExt
+  var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
   var promiseAll = $Promise.all
+  var symbolFetch = sharedSymbolOf('fetch')
   var promiseOfResolved = $Promise['of-resolved']
 
   // fetch: asychronously load a module from source.
-  staticOperator('fetch', function (space, clause) {
+  var operator = staticOperator('fetch', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return null // at least one file.
@@ -36,18 +41,39 @@ module.exports = function load ($void) {
       warn('fetch', 'invalid resource uri to fetch.', source)
       return promiseOfResolved(source)
     }
-
-    var offset = source.indexOf('$')
-    source = offset >= 0 ? source.substring(++offset)
-      : source = appendExt(source)
-
+    source = appendExt(source)
     if (!loader.isResolved(source)) {
       source = loader.resolve(source, dirs)
       if (typeof source !== 'string') {
-        warn('fetch', 'failed to resolve module:', source)
+        warn('fetch', 'failed to resolve ', source)
         return promiseOfResolved(source)
       }
     }
-    return loader.fetch(source)
+    return source.endsWith('/@.s')
+      ? new Promise$(function (resolve, reject) {
+        loader.fetch(source).then(function () {
+          var result = run(source)
+          if (result instanceof Promise$) {
+            result.then(resolve, reject)
+          }
+        }, reject)
+      })
+      : loader.fetch(source)
+  }
+
+  $void.bindOperatorFetch = function (space) {
+    return (space.$fetch = function (uris) {
+      var clist = Array.isArray(uris) ? uris.slice()
+        : Array.prototype.slice.call(arguments)
+      clist.unshift(symbolFetch)
+      for (var i = 1; i < clist.length; i++) {
+        var uri = clist[i]
+        if (!uri || typeof uri !== 'string') {
+          warn('$fetch', 'invalid source uri:', uri)
+          clist[i] = null
+        }
+      }
+      return operator(space, new Tuple$(clist))
+    })
   }
 }

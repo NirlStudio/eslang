@@ -11,8 +11,11 @@ module.exports = function import_ ($void) {
   var execute = $void.execute
   var evaluate = $void.evaluate
   var appendExt = $void.appendExt
+  var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
-  var symbolFrom = $void.sharedSymbolOf('from')
+
+  var symbolFrom = sharedSymbolOf('from')
+  var symbolImport = sharedSymbolOf('import')
 
   // const values
   var RefreshInterval = 60 * 1000 // milliseconds
@@ -21,7 +24,7 @@ module.exports = function import_ ($void) {
   //   (import src), or
   //   (import field from module), or
   //   (import (fields ...) from module)
-  staticOperator('import', function (space, clause) {
+  var operator = staticOperator('import', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return null
@@ -74,9 +77,6 @@ module.exports = function import_ ($void) {
     return values
   })
 
-  // expose to be called by native code.
-  $void.importModule = importModule
-
   function importModule (space, appUri, moduleUri, source) {
     if (typeof source !== 'string') {
       if (source instanceof Symbol$) {
@@ -93,7 +93,7 @@ module.exports = function import_ ($void) {
       source = source.substring(offset)
     }
     // try to locate the source in dirs.
-    var uri = resolve(appUri, moduleUri, type ? source : appendExt(source))
+    var uri = type ? source : resolve(appUri, moduleUri, appendExt(source))
     if (!uri) {
       return null
     }
@@ -148,7 +148,7 @@ module.exports = function import_ ($void) {
     if (typeof uri === 'string') {
       return uri
     }
-    warn('import', 'failed to resolve module ', source, 'in', dirs)
+    warn('import', 'failed to resolve', source, 'in', dirs)
     return null
   }
 
@@ -183,14 +183,14 @@ module.exports = function import_ ($void) {
       var text = doc[0]
       if (typeof text !== 'string') {
         module_.status = 415 // unspported media type
-        warn('import', 'failed to read source', source, 'for', doc[1])
+        warn('import', 'failed to read', source, 'for', doc[1])
         return null
       }
       // compile text
       var code = compile(text, uri, doc[1])
       if (!(code instanceof Tuple$)) {
         module_.status = 400 //
-        warn('import', 'failed to compile source', source, 'for', code)
+        warn('import', 'failed to compile', source, 'for', code)
         return null
       }
       // to load module
@@ -212,7 +212,8 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      var importing = require(uri)
+      // eslint-disable-next-line
+      var importing = $void.require(uri)
       if (typeof importing !== 'function') {
         module_.status = 400
         warn('import', 'invalid native module', source, 'at', uri)
@@ -235,5 +236,15 @@ module.exports = function import_ ($void) {
         'for', err, 'at', uri, 'from', moduleUri)
     }
     return null
+  }
+
+  $void.bindOperatorImport = function (space) {
+    return (space.$import = function (uri) {
+      if (!uri || typeof uri !== 'string') {
+        warn('$import', 'invalid source uri:', uri)
+        return null
+      }
+      return operator(space, new Tuple$([symbolImport, uri]))
+    })
   }
 }

@@ -18,7 +18,7 @@ module.exports = function interpreter ($void) {
     // formalize arguments values to separate spaces.
     args = Array.isArray(args) ? atomicArrayOf(args) : []
     if (typeof appHome !== 'string' || appHome.length < 1) {
-      appHome = $void.$env('home')
+      appHome = $void.runtime('home')
     }
     // create a module space.
     var scope = createAppSpace(appHome + '/.') // to indicate a directory.

@@ -1,7 +1,6 @@
 {
   "name": "sugly",
-  "main": "index.js",
-  "version": "0.8.1",
+  "version": "0.9.6",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi"
@@ -9,10 +8,16 @@
   "license": "GPL-3.0",
   "repository": "nirlstudio/sugly-lang",
   "description": "A conceptual implementation of Sugly programming language.",
+  "main": "index.js",
   "scripts": {
     "test": "node . self-test",
     "check": "node test/test.js",
-    "assert": "node . test examples/test"
+    "assert": "node . test examples/test",
+    "build": "webpack & webpack --mode=production",
+    "build-dev": "webpack",
+    "build-prod": "webpack --mode=production",
+    "clean": "rm -r dist/*",
+    "start": "webpack-dev-server --mode development"
   },
   "bin": {
     "sugly": "./bin/sugly"
@@ -21,5 +26,13 @@
     "axios": "^0.18.0",
     "colors": "^1.3.3",
     "node-localstorage": "^1.3.1"
+  },
+  "devDependencies": {
+    "hooks-webpack-plugin": "^1.0.3",
+    "html-webpack-plugin": "^3.2.0",
+    "shelljs": "^0.8.3",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1"
   }
 }

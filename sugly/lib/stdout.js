@@ -51,9 +51,10 @@ module.exports = function ($void, stdout) {
     if (clist.length < 2 || !space.app) {
       return null
     }
-    var args = [clause, ':']
+    var args = [clause, '\n ']
     for (var i = 1; i < clist.length; i++) {
-      args.push(evaluate(clist[i], space))
+      (i > 1) && args.push('\n ')
+      args.push(clist[i], '=', evaluate(clist[i], space))
     }
     if (env('is-debugging') === true) {
       stdout.debug.apply(stdout, args)

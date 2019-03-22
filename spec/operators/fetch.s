@@ -18,17 +18,18 @@
     ).
   ).
   (should "(fetch module1 module2 ...) returns a promise resolved to (@ module1 module2 ...)." (=> ()
-    const remote-mod "https://example.com/index.html";
-    (fetch "_data" "_module" '$$$remote-mod':: then (=> waiting
+    (fetch "_data" "_module":: then (=> waiting
       assert (waiting result:: is-a array);
-      assert 3 (waiting result:: length);
+      assert 2 (waiting result:: length);
       assert (waiting result:: 0:: ends-with "spec/operators/_data.s");
       assert (waiting result:: 1:: ends-with "spec/operators/_module.s");
-      assert remote-mod (waiting result:: 2);
     ).
   ).
   (should "(fetch remote-module) returns a promise resolved to (@ remote-module)." (=> ()
-    const remote-mod "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test";
+    (const remote-mod (env "runtime-host":: == "browser":: ?
+      "http://localhost:6501/test/test"
+      "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test"
+    ).
     (fetch remote-mod:: then (=> waiting
       assert (waiting result:: is-a array);
       assert 1 (waiting result:: length);
@@ -36,7 +37,10 @@
     ).
   ).
   (should "(fetch remote-module) returns a rejected promise if the module does not exist." (=> ()
-    const remote-mod "https://example.com/index.s";
+    (const remote-mod (env "runtime-host":: == "browser":: ?
+      "http://localhost:6501/non-existed.s"
+      "https://example.com/index.s"
+    ).
     (fetch remote-mod:: then (=> waiting
       assert null (waiting result);
       assert (waiting excuse:: is-a array);

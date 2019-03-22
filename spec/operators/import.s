@@ -37,19 +37,4 @@
     (assert 10 p)
     (assert 102 b)
   ).
-  (should '(import "$./module.js") imports a JavaScript module.' (=> ()
-    (var mod (import "$./_module.js").
-    (assert 1 (mod x).
-    (assert 2 (mod y).
-    (assert 3 (mod z).
-
-    (assert 10 (mod p).
-    (assert 10 (mod q).
-
-    (assert 101 (mod a).
-    (assert 102 (mod b).
-
-    (assert null (mod -a).
-    (assert null (mod _b).
-  ).
 ).

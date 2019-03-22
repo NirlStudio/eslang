@@ -1,6 +1,11 @@
 'use strict'
 
-var proc = global.process
+var proc = typeof window === 'undefined' ? global.process : {
+  platform: window.navigator ? 'navigator' : '',
+  env: {
+    'DISPLAY': window.navigator ? window.navigator.userAgent : ''
+  }
+}
 var os = proc.platform
 
 var exportingColors = ['red', 'gray', 'green', 'underline']
