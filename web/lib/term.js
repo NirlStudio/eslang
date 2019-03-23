@@ -34,15 +34,6 @@ function drain () {
   }, MinimalDelay)
 }
 
-function exec (value) {
-  setTimeout(function () {
-    spooling = true
-    window.$(value)
-    spooling = false
-    drain()
-  }, MinimalDelay)
-}
-
 function updatePanel () {
   if (panel.childElementCount > MaxLines) {
     var half = MaxLines / 2
@@ -54,10 +45,14 @@ function updatePanel () {
   input.focus()
 }
 
-function writeTo (panel, type) {
+function writeTo (panel, type, max) {
   function write (prompt, text, draining) {
     if (!draining && (spooling || pool.length > 0)) {
       return enqueue([write, prompt, text])
+    }
+    if (max && text.length > max) {
+      text = text.substring(0, max - 10) + '... ... ...' +
+        text.substring(text.length - 10) + ' # use (print ...) to display all text.'
     }
     var lines = text.split('\n')
     for (var i = 0, len = lines.length; i < len; i++) {
@@ -96,6 +91,7 @@ function replaceWhitespace (text) {
   }
   return text
 }
+
 function loadHistory () {
   if (!window.localStorage) {
     return []
@@ -131,9 +127,21 @@ function updateHistory (records, value) {
   return records.length
 }
 
-function enableInput (term) {
+function bindInput (term) {
   var inputHistory = loadHistory()
   var inputOffset = inputHistory.length
+  var inputValue = ''
+
+  function exec (value) {
+    if (term.reader) {
+      setTimeout(function () {
+        spooling = true
+        term.reader(value)
+        spooling = false
+        drain()
+      }, MinimalDelay)
+    }
+  }
 
   enter.onclick = function () {
     if (!input.value) {
@@ -141,6 +149,7 @@ function enableInput (term) {
     }
     var value = input.value
     input.value = ''
+    inputValue = ''
     inputOffset = updateHistory(inputHistory, value)
     term.input(value)
     exec(value)
@@ -154,14 +163,16 @@ function enableInput (term) {
   input.addEventListener('keydown', function (event) {
     switch (event.keyCode) {
       case KeyUpArrow:
+        (inputOffset === inputHistory.length) && (inputValue = input.value)
         if (--inputOffset >= 0 && inputOffset < inputHistory.length) {
           input.value = inputHistory[inputOffset]
         } else {
           inputOffset = inputHistory.length
-          input.value = ''
+          input.value = inputValue
         }
         break
       case KeyDownArrow:
+        (inputOffset === inputHistory.length) && (inputValue = input.value)
         if (++inputOffset < inputHistory.length) {
           input.value = inputHistory[inputOffset]
         } else if (inputOffset > inputHistory.length) {
@@ -171,7 +182,7 @@ function enableInput (term) {
               ? inputHistory[inputOffset] : ''
           }
         } else {
-          input.value = ''
+          input.value = inputValue
         }
         break
       default:
@@ -197,7 +208,7 @@ module.exports = function () {
   term.error = writerOf('error').bind(null, '#E')
   term.debug = writerOf('debug').bind(null, '#D')
   // serve shell
-  term.echo = writerOf('echo').bind(null, '=')
+  term.echo = writerOf('echo', 80).bind(null, '=')
   // serve stdin
   var inputPrompt = '>'
   var prompt = document.getElementById('stdin-prompt')
@@ -210,6 +221,12 @@ module.exports = function () {
   term.input = function (text) {
     writeInput(inputPrompt, text)
   }
-  enableInput(term)
+  bindInput(term)
+  term.connect = function (reader) {
+    return (term.reader = typeof reader === 'function' ? reader : null)
+  }
+  term.disconnect = function () {
+    term.reader = null
+  }
   return term
 }

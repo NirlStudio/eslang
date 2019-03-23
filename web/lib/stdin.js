@@ -7,10 +7,10 @@ module.exports = function ($void, term) {
   }
 
   return {
-    open: function () {
-      return reader
-    },
     prompt: term.prompt,
+    open: function () {
+      return term.connect(reader)
+    },
     on: function (event, callback) {
       // only allow line event now.
       switch (event) {
@@ -22,7 +22,7 @@ module.exports = function ($void, term) {
       }
     },
     close: function () {
-      interpreter = null
+      term.disconnect()
     }
   }
 }

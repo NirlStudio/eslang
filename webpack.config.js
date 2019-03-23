@@ -23,15 +23,17 @@ const prepareDevWebSite = new HooksPlugin({
     shell.mkdir('dist/www')
     shell.mkdir('dist/www/modules')
     shell.mkdir('dist/www/test')
+    shell.mkdir('dist/www/tools')
   },
   done: () => {
     shell.cp('dist/sugly.js', 'dist/www/')
     shell.cp('dist/sugly.map', 'dist/www/')
-    shell.cp('web/@.s', 'dist/www/')
+    shell.cp('web/*.s', 'dist/www/')
     shell.cp('-r', 'examples/', 'dist/www/')
     shell.cp('-r', 'spec/', 'dist/www/')
     shell.cp('modules/*.s', 'dist/www/modules/')
     shell.cp('test/test.s', 'dist/www/test/')
+    shell.cp('tools/*.s', 'dist/www/tools/')
   }
 })
 
@@ -47,7 +49,7 @@ module.exports = (env, options) => {
     prepareDevWebSite
   ]
   const config = {
-    entry: './web/index.js',
+    entry: './web/lib/shell.js',
     mode,
     plugins,
     output: {

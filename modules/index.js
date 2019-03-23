@@ -1,9 +1,13 @@
+'use strict'
+
 var loaders = []
 
 module.exports = function (uri) {
   switch (uri) {
     case 'colors':
       return require('./colors')
+    case 'web':
+      return require('./web')
     default:
       break
   }

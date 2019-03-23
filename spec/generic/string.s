@@ -365,6 +365,54 @@
   ).
 ).
 
+(define "(a-string contains ...)" (= ()
+  (should "(str contains) always returns false." (= ()
+    (assert false ("" contains).
+    (assert false ("A" contains).
+    (assert false ("ABC" contains).
+  ).
+  (should "(str contains (string empty)) always returns true." (= ()
+    (assert ("" contains "").
+    (assert ("" contains (string empty).
+    (assert ("A" contains (string empty).
+    (assert ("ABC" contains "").
+    (assert ("ABC" contains (string empty).
+  ).
+  (should "(str contains s) returns true if s is a sub-string of str." (= ()
+    (assert ("A" contains "A").
+    (assert ("ABC" contains "A").
+    (assert ("ABC" contains "B").
+    (assert ("ABC" contains "C").
+    (assert ("ABC" contains "AB").
+    (assert ("ABC" contains "BC").
+    (assert ("ABCD" contains "BC").
+  ).
+  (should "(str contains s) returns true if s is a case-sensitive sub-string of str." (= ()
+    (assert ("A" contains "A").
+    (assert ("AbC" contains "A").
+    (assert ("AbC" contains "b").
+    (assert ("AbC" contains "C").
+    (assert ("AbC" contains "Ab").
+    (assert ("AbC" contains "bC").
+    (assert ("AbCd" contains "bC").
+  ).
+  (should "(str contains s) returns false if s is not a case-sensitive sub-string of str." (= ()
+    (assert false ("A" contains "a").
+    (assert false ("A" contains "b").
+    (assert false ("a" contains "A").
+    (assert false ("a" contains "b").
+
+    (assert false ("AbC" contains "a").
+    (assert false ("AbC" contains "B").
+    (assert false ("AbC" contains "c").
+    (assert false ("AbC" contains "d").
+
+    (assert false ("AbC" contains "AB").
+    (assert false ("AbC" contains "BC").
+    (assert false ("AbCd" contains "BC").
+  ).
+).
+
 (define "(a-string starts-with ...)" (= ()
   (should "(str starts-with) always returns false." (= ()
     (assert false ("" starts-with).

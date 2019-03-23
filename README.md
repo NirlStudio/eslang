@@ -13,9 +13,9 @@ Run from npm
 ```
 npm install -g sugly
 ```
-- Run self-test suite:
+- Run test suite:
 ```
-sugly self-test
+sugly selftest
 ```
 - Run sugly code:
 ```
@@ -23,7 +23,7 @@ sugly some-sugly-file[.s]
 ```
 - Run sugly interactively:
 ```
-sugly self-test
+sugly
 ```
 - Use in Javascript code:
 ```javascript
@@ -38,7 +38,7 @@ Run from source code
 ```
 npm install
 ```
-- Execute self-test suite.
+- Execute test suite.
 ```
 npm test
 ```

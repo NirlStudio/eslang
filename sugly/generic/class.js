@@ -23,6 +23,9 @@ module.exports = function ($void) {
   var sharedSymbolOf = $void.sharedSymbolOf
   var EncodingContext$ = $void.EncodingContext
 
+  // a static placeholder class.
+  link(Type, 'unknown', createClass())
+
   // initialize the meta class.
   link(Type, 'empty', createClass, true)
 
@@ -348,8 +351,8 @@ module.exports = function ($void) {
   // Enable the customization of Encoding.
   var toCode = link(instance, 'to-code', function (ctx) {
     var overriding = this['to-code']
-    if (overriding === toCode) { // not overridden
-      return objectToCode.call(this, ctx)
+    if (overriding === toCode || typeof overriding !== 'function') {
+      return objectToCode.call(this, ctx) // not overridden
     }
     if (ctx instanceof EncodingContext$) {
       var sym = ctx.begin(this)
@@ -368,7 +371,7 @@ module.exports = function ($void) {
   // Enable the customization of Description.
   var toString = link(instance, 'to-string', function () {
     var overriding = this['to-string']
-    return overriding === toString
+    return overriding === toString || typeof overriding !== 'function'
       ? thisCall(toCode.call(this), 'to-string')
       : overriding.apply(this, arguments)
   })

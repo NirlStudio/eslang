@@ -80,6 +80,9 @@ module.exports = function ($void) {
         )
   })
 
+  link(proto, 'contains', function (str) {
+    return typeof str === 'string' && (this.indexOf(str) >= 0)
+  })
   link(proto, 'starts-with', function (prefix) {
     return typeof prefix === 'string' && this.startsWith(prefix)
   })

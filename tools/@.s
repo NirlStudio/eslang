@@ -1,0 +1,4 @@
+(fetch
+  "help"
+  "version"
+).

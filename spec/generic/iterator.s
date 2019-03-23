@@ -512,6 +512,13 @@
   ).
 ).
 
+(define "(an-iterator for-each ...)" (= ()
+  (should "(an-iterator for-each ...) is an alias of (an-iterator count ...)." (= ()
+    (var iter (iterator of (@ 1 2 3).
+    (assert (iter "count":: is (iter "for-each").
+    (assert (iter "for-each":: is (iter "count").
+).
+
 (define "(an-iterator sum ...)" (= ()
   (should "(empty-iter sum) returns 0." (= ()
     (assert 0 ((iterator empty) sum).

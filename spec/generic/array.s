@@ -284,6 +284,13 @@
   ).
 ).
 
+(define "(an-array for-each ...)" (= ()
+  (should "(an-array for-each ...) is an alias of (an-array count ...)." (= ()
+    (var a (@).
+    (assert (a "count":: is (a "for-each").
+    (assert (a "for-each":: is (a "count").
+).
+
 (define "(an-array is-sealed)" (= ()
   (should "(an-array is-sealed) returns true if the array is readonly." (= ()
     (var a (@ 1 2).

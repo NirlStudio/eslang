@@ -9,70 +9,73 @@ function ensure (factory, alternative) {
   return typeof factory === 'function' ? factory : alternative
 }
 
-module.exports = window.$void = function (term, stdout, loader) {
+module.exports = function (term, stdout, loader) {
   term = ensure(term, defaultTerm)()
   stdout = ensure(stdout, defaultStdout)(term)
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
   $void.env('home', window.location.origin)
-  $void.$['check-runtime'] = require('../test/test')($void)
-  var bootstrap = $void.createBootstrapSpace(window.location.origin + '//.')
+  var bootstrap = $void.createBootstrapSpace(window.location.origin + '/@')
 
   function run (app, context) {
-    var initialize = prepare(context)
-    var initialized = initialize && initialize(bootstrap, $void)
-    if (initialized instanceof Promise) {
-      return new Promise(function (resolve, reject) {
-        initialized.then(function () {
-          resolve(innerRun(app))
+    return initialize(context, function () {
+      return $void.$run(app)
+    })
+  }
+
+  function initialize (context, main) {
+    var preparing = prepare(context)
+    var prepared = preparing(bootstrap, $void)
+    return !(prepared instanceof Promise) ? main()
+      : new Promise(function (resolve, reject) {
+        prepared.then(function () {
+          resolve(main())
         }, reject)
       })
-    } else {
-      return innerRun(app)
-    }
   }
 
   function prepare (context) {
-    if (typeof context === 'function') { // an initializer function.
-      return context
-    } else if (typeof context === 'string') { // a customized dependency loader
-      return execute.bind(null, context)
-    } else if (Array.isArray(context)) { // dependency modules
-      return preload.bind(null, context)
-    } else if (context) {
-      console.warn('unknown type of context:', context)
-    }
-    return null
+    return typeof context === 'function'
+      ? context // a customized initializer function.
+      : typeof context === 'string'
+        ? executor.bind(null, context) // an initializatoin profile.
+        : Array.isArray(context) ? function () {
+          // a list of dependency modules
+          return bootstrap.$fetch(context)
+        } : function () {
+          // try to fetch the default root module loader.
+          return bootstrap.$fetch('@')
+        }
   }
 
-  function execute (loader) {
+  function executor (profile) {
     return new Promise(function (resolve, reject) {
-      bootstrap.$fetch(loader).then(function () {
-        resolve(bootstrap.$load(loader))
+      bootstrap.$fetch(profile).then(function () {
+        resolve(bootstrap.$load(profile))
       }, reject)
     })
   }
 
-  function preload (modules) {
-    return bootstrap.$fetch(modules)
+  function shell (args, context) {
+    // export global shell commands
+    $void.$['test-bootstrap'] = require('../test/test')($void)
+
+    // generate shell agent.
+    return initialize(context, function () {
+      var reader = require('./lib/stdin')($void, term)
+      var agent = require('../lib/shell')($void, reader,
+        require('./lib/process')($void)
+      )
+      agent(args, term.echo,
+        '(var * (import "profile"))'
+      )
+      return reader.open()
+    })
   }
 
-  function innerRun (app) {
-    return $void.$run(app)
-  }
-
-  function shell (args) {
-    var reader
-    var agent = require('../lib/shell')($void,
-      (reader = require('./lib/stdin')($void, term)),
-      require('./lib/process')($void)
-    )
-    agent(args, term.echo)
-    return reader.open()
-  }
-
-  return function sugly (context, app) { // a runner function
-    return app && typeof app === 'string' ? run(app, context) : shell(context)
+  return function sugly (context, app) {
+    return typeof app === 'string' ? run(app, context)
+      : shell(Array.isArray(app) ? app : [], context)
   }
 }

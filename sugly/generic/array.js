@@ -124,7 +124,7 @@ module.exports = function ($void) {
     }
     return counter
   }
-  link(proto, 'count', Array.prototype.forEach ? function (filter) {
+  link(proto, ['count', 'for-each'], Array.prototype.forEach ? function (filter) {
     if (isSimple(this)) {
       return count.call(this, filter)
     }

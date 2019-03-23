@@ -205,7 +205,7 @@ module.exports = function iterate ($void) {
   })
 
   // count the number of iterations.
-  var count = link(proto, 'count', function (filter) {
+  var count = link(proto, ['count', 'for-each'], function (filter) {
     var counter = 0
     var value = this.next && this.next()
     if (isApplicable(filter)) {

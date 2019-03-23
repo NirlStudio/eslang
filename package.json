@@ -10,7 +10,7 @@
   "description": "A conceptual implementation of Sugly programming language.",
   "main": "index.js",
   "scripts": {
-    "test": "node . self-test",
+    "test": "node . selftest",
     "check": "node test/test.js",
     "assert": "node . test examples/test",
     "build": "webpack & webpack --mode=production",

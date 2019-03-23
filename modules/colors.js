@@ -10,7 +10,7 @@ var os = proc.platform
 
 var exportingColors = ['red', 'gray', 'green', 'underline']
 
-module.exports = function importing (exporting) {
+module.exports = function (exporting) {
   try { // to load native module
     var colors = require('colors/safe')
     for (var i = 0; i < exportingColors.length; i++) {

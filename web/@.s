@@ -2,5 +2,7 @@
   "examples/@"
   "modules/@",
   "spec/@",
-  "test/test"
+  "tools/@",
+  "test/test",
+  "profile"
 ).
