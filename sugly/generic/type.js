@@ -5,7 +5,6 @@ module.exports = function ($void) {
   var Type = $.type
   var $Symbol = $.symbol
   var $Object = $.object
-  var $Class = $.class
   var Null = $void.null
   var Symbol$ = $void.Symbol
   var link = $void.link
@@ -61,7 +60,7 @@ module.exports = function ($void) {
     return entity === null || typeof entity === 'undefined' ? null
       : typeof entity === 'object' && ownsProperty(entity, 'type')
         ? (proto = Object.getPrototypeOf(entity)) === null
-          ? $Object : proto.type || $Class.unknown
+          ? $Object : proto.type
         : entity.type
   }, true)
 

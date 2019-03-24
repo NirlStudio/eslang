@@ -23,9 +23,6 @@ module.exports = function ($void) {
   var sharedSymbolOf = $void.sharedSymbolOf
   var EncodingContext$ = $void.EncodingContext
 
-  // a static placeholder class.
-  link(Type, 'unknown', createClass())
-
   // initialize the meta class.
   link(Type, 'empty', createClass, true)
 

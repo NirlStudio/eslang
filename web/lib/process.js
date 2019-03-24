@@ -23,7 +23,7 @@ function reload (print) {
     } else {
       window.location.reload()
     }
-  }, 1000)
+  }, 500)
   return 'reloading ...'
 }
 

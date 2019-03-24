@@ -72,8 +72,9 @@
   (should "(math exp x)" (= ()
     assert (math "exp":: is-a lambda);
     assert (math exp:: is-a number);
-    assert (math exp 0:: is 1);
-    assert (math exp 1:: is (math e);
+    assert 1 (math exp 0);
+    assert 1 (math exp -0);
+    assert (math e) (math exp 1);
   ).
   (should "(math pow base exp)" (= ()
     assert (math "pow":: is-a lambda);
