@@ -153,6 +153,7 @@ module.exports = function space ($void) {
     app.run = $void.$run
     app.interpreter = $void.$interpreter
     app.print = $void.$print
+    app.printf = $void.$printf
     app.warn = $void.$warn
     app.timer = $void.$timer
 

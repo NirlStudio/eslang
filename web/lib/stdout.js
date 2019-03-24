@@ -17,7 +17,12 @@ module.exports = function (term) {
     var connect = connectTo.bind(null, term, tracing)
     var stdout = {}
     for (var type in tracing) {
-      stdout[type] = connect(type)
+      stdout[type] = type !== 'printf' ? connect(type)
+        : function (value, format) {
+          value = tracing.printf(value)
+          term.printf(value, format)
+          return value
+        }
     }
     return stdout
   }

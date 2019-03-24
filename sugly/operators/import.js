@@ -212,7 +212,6 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      // eslint-disable-next-line
       var importing = $void.require(uri)
       if (typeof importing !== 'function') {
         module_.status = 400

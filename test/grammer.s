@@ -512,6 +512,7 @@ env((env)env)env
 
 # meta.function.lib.sugly
 print((print)print)print
+printf((printf)printf)printf
 warn((warn)warn)warn
 max((max)max)max
 min((min)min)min

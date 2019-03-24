@@ -1,1 +1,1 @@
-fetch "test";
+fetch "styledout" "test";

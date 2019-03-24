@@ -1,18 +1,29 @@
 'use strict'
 
-var colors = Object.create(null)
-require('../modules/colors')(colors)
-
-var red = colors.red
-var gray = colors.gray
-var green = colors.green
-
-var signPassed = '    ' + colors.passed + gray('[PASSED]')
-var signFailed = '    ' + colors.passed + red('[FAILED]')
+var symbols = Object.create(null)
+require('../modules/symbols')(symbols)
 
 module.exports = function ($void) {
   var $ = $void.$
   var print = $void.$print
+  var printf = $void.$printf
+
+  var printInColor = function (color) {
+    return function (text) {
+      printf(text + '\n', color)
+    }
+  }
+
+  var red = printInColor('red')
+  var gray = printInColor('gray')
+  var green = printInColor('green')
+
+  var signPassed = function () {
+    printf('    ' + symbols.passed + '[PASSED] ', 'green')
+  }
+  var signFailed = function () {
+    printf('    ' + symbols.failed + '[FAILED] ', 'red')
+  }
 
   var passing = 0
   var failing = []
@@ -27,17 +38,17 @@ module.exports = function ($void) {
     checkSuglyRuntime()
 
     // start to report result
-    print(green('\n  passing: ', passing))
+    green('\n  passing: ' + passing)
     if (failing.length < 1) {
-      print(green('\n  Sugly is ready to run.\n'))
+      green('\n  Sugly is ready to run.\n')
       return true
     }
 
     // print failures
-    print(red('  failing: ' + failing.length))
+    red('  failing: ' + failing.length)
     print('\n  There might be some issues to prevent running sugly')
     for (var i = 0; i < failing.length; i++) {
-      print(red('  - ' + failing[i]))
+      red('  - ' + failing[i])
     }
     print()
     return false
@@ -45,12 +56,12 @@ module.exports = function ($void) {
 
   function passed (feature) {
     passing += 1
-    print(signPassed, gray(feature))
+    signPassed(); gray(feature)
   }
 
   function failed (feature) {
     failing.push(feature)
-    print(signFailed, red(feature))
+    signFailed(); red(feature)
   }
 
   function checkJavascript () {
@@ -63,9 +74,9 @@ module.exports = function ($void) {
     if (polyfill.length > 0) {
       passed('Sugly is using some polyfill functions:')
       var padding = '      - '
-      print(gray(padding, polyfill.join('\n' + padding)))
+      gray(padding + polyfill.join('\n' + padding))
     } else {
-      print(green('      Congratulations! Sugly does not need any polyfill.'))
+      green('      Congratulations! Sugly does not need any polyfill.')
     }
   }
 
@@ -133,7 +144,7 @@ module.exports = function ($void) {
     ])
 
     checkFunctions($void, '[Sugly / lib / IO functions] ', [
-      '$print', '$warn'
+      '$print', '$printf', '$warn'
     ])
 
     checkObjects($, '[Sugly / lib / objects] ', [

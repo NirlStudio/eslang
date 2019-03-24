@@ -50,7 +50,16 @@ module.exports = function ($void, environ, exit) {
     },
     exit: function (code) {
       code = typeof code === 'number' ? code >> 0 : 1
-      return typeof exit === 'function' ? exit(code) : reload($void.$print)
+      return typeof exit === 'function' ? exit(code) : reload(function (counter) {
+        switch (counter) {
+          case 1:
+            return $void.$printf('.' + counter, 'red')
+          case 2:
+            return $void.$printf('..' + counter, 'yellow')
+          default:
+            return $void.$printf('...' + counter, 'blue')
+        }
+      })
     }
   }
 }

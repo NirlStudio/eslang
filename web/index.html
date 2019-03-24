@@ -24,12 +24,12 @@
     margin: 0;
     padding: 0;
     font-size: 12px;
-    color: #DDD;
+    color: lightgray;
   }
   ul.stdout > li > span.prompt {
     width: 16px;
     padding-left: 8px;
-    color: #666;
+    color: gray;
   }
   ul.stdout > li > span.text {
     word-wrap: break-word;
@@ -37,36 +37,40 @@
     width: 95%;
   }
   ul.stdout > li.input > span.prompt, ul.stdout > li.echo > span.prompt {
-    color: #CCC;
+    color: gray;
   }
   ul.stdout > li.input > span.text {
-    color: #EEE;
+    color: lightgray;
+  }
+  ul.stdout > li.print {
+    padding-left: 24px;
   }
   ul.stdout > li.print > span.text {
-    color: #EEE;
-    font-weight: bolder;
+    padding-right: 6px;
+    color: white;
+    width: auto;
   }
   ul.stdout > li.verbose > span.text {
-    color: #CCC;
+    color: gray;
     font-weight: lighter;
   }
   ul.stdout > li.info > span.text {
-    color: #CCC;
+    color: gray;
   }
   ul.stdout > li.warn > span.text {
-    color: #FF8;
+    color: yellow;
   }
   ul.stdout > li.error > span.text {
-    color: #F88;
+    color: red;
   }
   ul.stdout > li.debug > span.text {
-    color: #88F;
+    color: aqua;
   }
   ul.stdout > li.echo {
     padding-bottom: 4px;
   }
   ul.stdout > li.echo > span.text {
-    color: #8F8;
+    color: green;
   }
   div.stdin {
     display: block;

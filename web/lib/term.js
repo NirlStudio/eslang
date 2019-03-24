@@ -1,15 +1,18 @@
 'use strict'
 
 var MaxLines = 4000
+var DrainBatch = 200
 
 var KeyEnter = 0x0D
 var KeyUpArrow = 0x26
 var KeyDownArrow = 0x28
 
+// the key to be used in localStorage
 var InputHistoryKey = '~/.sugly_history'
 
 // Firefox requires a non-zero timeout to refresh UI.
-var MinimalDelay = navigator.userAgent.toLowerCase().indexOf('firefox') > -1 ? 15 : 0
+var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+var MinimalDelay = isFirefox ? 15 : 0
 
 var pool = []
 var spooling = false
@@ -25,7 +28,7 @@ function enqueue (todo) {
 function drain () {
   if (pool.length < 1) { return }
   setTimeout(function () {
-    var todos = pool.splice(0, 100)
+    var todos = pool.splice(0, DrainBatch)
     for (var i = 0, len = todos.length; i < len; i++) {
       var todo = todos[i]
       todo[0](todo[1], todo[2], true)
@@ -45,14 +48,107 @@ function updatePanel () {
   input.focus()
 }
 
-function writeTo (panel, type, max) {
-  function write (prompt, text, draining) {
+var currentLine = null
+
+function writeTo (panel) {
+  function write (text, render, draining) {
     if (!draining && (spooling || pool.length > 0)) {
-      return enqueue([write, prompt, text])
+      return enqueue([write, text, render])
+    }
+    var lines = text.split('\n')
+    var spans = []
+    var i = 0
+    var len = lines.length
+    for (; i < len; i++) {
+      var line = lines[i]
+      line ? spans.push(
+        appendText(currentLine || (currentLine = createNewLine()), line)
+      ) : currentLine = currentLine ? null
+        : createNewLine(document.createElement('br'))
+    }
+    if (render && spans.length > 0) {
+      for (i = 0, len = spans.length; i < len; i++) { render(spans[i]) }
+    }
+    updatePanel()
+  }
+  return write
+}
+
+function createNewLine (child) {
+  var li = document.createElement('li')
+  li.className = 'print'
+  if (child) {
+    li.appendChild(child)
+  }
+  panel.appendChild(li)
+  return li
+}
+
+function appendText (li, text) {
+  var span = document.createElement('span')
+  span.className = 'text'
+  span.appendChild(document.createTextNode(replaceWhitespace(text)))
+  li.appendChild(span)
+  return span
+}
+
+function styleOf (format) {
+  var style = ''
+  for (var key in format) {
+    var value = format[key]
+    if (typeof value === 'string') {
+      style += key + ': ' + value + ';'
+    }
+  }
+  return style
+}
+
+var styleClasses = Object.assign(Object.create(null), {
+  red: 'color',
+  green: 'color',
+  blue: 'color',
+  yellow: 'color',
+  grey: 'color',
+  gray: 'color',
+  underline: '*text-decoration',
+  overline: '*text-decoration',
+  'line-through': '*text-decoration'
+})
+
+function applyClass (cls) {
+  var values = cls.split(/\s/)
+  var style = {}
+  for (var i = 0; i < values.length; i++) {
+    var value = values[i]
+    if (styleClasses[value]) {
+      var key = styleClasses[value]
+      if (key.startsWith('*')) {
+        key = key.substring(1)
+        style[key] = style[key] ? style[key] + ' ' + value : value
+      } else {
+        style[key] = value
+      }
+    }
+  }
+  return applyStyle(style)
+}
+
+function applyStyle (obj) {
+  var style = styleOf(obj)
+  return style && function (span) {
+    span.style.cssText = style
+  }
+}
+
+function logTo (panel, type, max) {
+  function log (prompt, text, draining) {
+    if (!draining && (spooling || pool.length > 0)) {
+      return enqueue([log, prompt, text])
     }
     if (max && text.length > max) {
       text = text.substring(0, max - 10) + '... ... ...' +
-        text.substring(text.length - 10) + ' # use (print ...) to display all text.'
+        text.substring(text.length - 10) +
+        ' # use (print ...) to display all text.'
     }
     var lines = text.split('\n')
     for (var i = 0, len = lines.length; i < len; i++) {
@@ -64,7 +160,7 @@ function writeTo (panel, type, max) {
     }
     updatePanel()
   }
-  return write
+  return log
 }
 
 function appendLine (li, text, prompt) {
@@ -201,14 +297,27 @@ module.exports = function () {
 
   // serve stdout
   var writerOf = writeTo.bind(null, panel)
-  term.print = writerOf('print').bind(null, '')
-  term.verbose = writerOf('verbose').bind(null, '#V')
-  term.info = writerOf('info').bind(null, '#I')
-  term.warn = writerOf('warn').bind(null, '#W')
-  term.error = writerOf('error').bind(null, '#E')
-  term.debug = writerOf('debug').bind(null, '#D')
+  var write = writerOf('print')
+  term.print = function (text) {
+    write(text.charAt(text.length - 1) === '\n' ? text : text + '\n')
+  }
+  term.printf = function (text, format) {
+    var render = typeof format === 'string' ? applyClass(format)
+      : typeof format === 'object' ? applyStyle(format) : null
+    write(text, render)
+  }
+
+  // serve stderr
+  var loggerOf = logTo.bind(null, panel)
+  term.verbose = loggerOf('verbose').bind(null, '#V')
+  term.info = loggerOf('info').bind(null, '#I')
+  term.warn = loggerOf('warn').bind(null, '#W')
+  term.error = loggerOf('error').bind(null, '#E')
+  term.debug = loggerOf('debug').bind(null, '#D')
+
   // serve shell
-  term.echo = writerOf('echo', 80).bind(null, '=')
+  term.echo = loggerOf('echo', 80).bind(null, '=')
+
   // serve stdin
   var inputPrompt = '>'
   var prompt = document.getElementById('stdin-prompt')
@@ -217,7 +326,7 @@ module.exports = function () {
       prompt.innerText = inputPrompt = text
     }
   }
-  var writeInput = writerOf('input')
+  var writeInput = loggerOf('input')
   term.input = function (text) {
     writeInput(inputPrompt, text)
   }

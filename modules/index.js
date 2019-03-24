@@ -4,8 +4,8 @@ var loaders = []
 
 module.exports = function (uri) {
   switch (uri) {
-    case 'colors':
-      return require('./colors')
+    case 'symbols':
+      return require('./symbols')
     case 'web':
       return require('./web')
     default:

@@ -10,6 +10,14 @@ module.exports = function ($void, stdout) {
     return stdout.print.apply(stdout, arguments)
   })
 
+  // standard output.
+  $export($void, '$printf', function (value, format) {
+    return stdout.printf(
+      typeof value === 'undefined' ? '' : value,
+      typeof format === 'undefined' ? null : format
+    )
+  })
+
   // standard error, but only warning exists in sugly space.
   var lastWarning = null // save to make it testable.
   function generateWarningId () {

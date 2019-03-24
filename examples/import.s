@@ -1,32 +1,36 @@
 # simple importing
-(let colors (import "$colors").
-(print "(colors green) is-a function?" ($(colors "green") is-a function).
+(let symbols (import "$symbols").
+(print "(symbols passed)" (symbols passed).
 
 # populate fields from an object into current context.
-(let (green gray) colors).
-(print "green is-a function?" ($green is-a function).
-(print "gray is-a function?" ($gray is-a function).
-(print (gray "- gray is gray").
-(print (green "- green is green").
+(let (passed failed) symbols).
+(print "(symbols passed)" passed).
+(print "(symbols failed)" failed).
 
 # import fields from an object into an array.
-(let list (import (gray green) from colors).
+(let list (import (passed failed) from symbols).
 (print "list is-a array?" (list is-a array).
-(print "list length?" (list length) ((list length) == 2).
+(print "list length?" (list length) (list length:: == 2).
 
 # populate values from an array
-(let (gray green) list).
-(print (gray "- gray is gray").
-(print (green "- green is green").
+(let (failed passed) list).
+(print failed "- failed is passed").
+(print passed "- passed is failed").
 
 # directly populate module exporting into current space.
-(let (gray green) (import "$colors").
-(print (gray "- gray is gray").
-(print (green "- green is green").
+(let (passed failed) (import "$symbols").
+(print passed "- passed is passed").
+(print failed "- failed is failed").
 
 # import and rename selected exporting.
-(let (not-gray not-green)
-  (import (green gray) from "$colors")
+(let (not-failed not-passed)
+  (import (passed failed) from "$symbols")
 ).
-(print (not-gray "- green is not gray").
-(print (not-green "- gray is not green").
+(print not-failed "- not-failed is passed").
+(print not-passed "- not-passed is failed").
+
+# import all from exporting.
+(let * (import "$symbols").
+(print passed "- passed is passed").
+(print failed "- failed is failed").
+(print pending "- pending is pending").

@@ -2,13 +2,15 @@
 
 # const values
 const indent-step "  ";
+var indent indent-step;
 
 # import rendering
-const colors (import "$colors");
-const (gray, green, red, underline) colors;
-(const (sign-passed, sign-failed, sign-pending)
-  import (passed, failed, pending) from colors;
-).
+const symbols (import "$symbols");
+const (gray, green, red, yellow, underlined) (import "styledout");
+
+const sign-passed (=> () (green indent, (symbols passed);
+const sign-failed (=> () (red indent, (symbols failed);
+const sign-pending (=> () (yellow indent, (symbols pending);
 
 # to store all test cases.
 var cases (@);
@@ -26,7 +28,6 @@ var current null; # the stack top
 
 # testing status
 var path (@);
-var indent indent-step;
 var pending-actions (@);
 
 # counters
@@ -56,20 +57,20 @@ var failures (@);
 
 (var pass (=> behavior
   ++ passing;
-  print indent sign-passed (gray behavior);
+  sign-passed; gray behavior, "\n";
   summary-append behavior, true;
 ).
 
 (var fail (=> (behavior, assertion)
   ++ failing;
-  print indent sign-failed (red "(" failing ") " behavior);
+  sign-failed; red "(", failing, ") ", behavior, "\n";
   summary-append behavior, false;
   failures-append behavior, assertion;
 ).
 
 # async behavior helpers
 (var wait (=> behavior
-  print indent sign-pending (gray behavior);
+  sign-pending; gray behavior, "\n";
   summary-append behavior;
 ).
 
@@ -175,7 +176,7 @@ var ++assertions (=>() (++ assertions);
 # test a simple case or a suite of cases.
 (var test-a (=> (case)
   # print headline (feature name)
-  print indent (case first);
+  print indent, (case first);
   path push (case first);
   indent += indent-step;
   (for i in (1 (case length))
@@ -200,14 +201,11 @@ var ++assertions (=>() (++ assertions);
 (var print-a (=> failure
   print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behavior)';
   const assertion (failure assertion);
-  (print
-    red '     step-$(assertion step) is expecting';
-    green (underline (assertion "expected"::;
-    red 'instead of $(underline (assertion "real"::))';
-  ).
-  (print (gray '     when asserting $(underline (assertion expr::))'
-    (assertion note:: is-empty) ? "" (", for " + (assertion note); "\n"
-  ).
+  red '     step-$(assertion step) is expecting ';
+  underlined "green", (assertion "expected"), " ";
+  red "instead of "; underlined "red", (assertion "real"), "\n";
+  gray "     when asserting "; underlined "gray", (assertion "expr"), " ";
+  gray (assertion note:: is-empty:: ? "", (", for " + (assertion note))), "\n\n";
 ).
 
 (var clear (=> ()
@@ -228,20 +226,18 @@ var ++assertions (=>() (++ assertions);
 ).
 
 (var print-report (=> (ts)
-  (print
-    green '\n  passing: $passing';
-    (gray " ("
-      ts > 1000:: ? (ts / 1000) ts;
-      ts > 1000:: ? "s, " "ms, ";
-      pending-actions ?* '$(pending-actions length) async cases, ', "";
-      assertions " assertions)"
+  green '\n  passing: $passing';
+  (gray " ("
+    ts > 1000:: ? (ts / 1000) ts;
+    ts > 1000:: ? "s, " "ms, ";
+    pending-actions ?* '$(pending-actions length) async cases, ', "";
+    assertions " assertions)\n"
   ).
   (if failing
-    print (red '  failing: $failing\n');
+    red '  failing: $failing\n\n';
     for failure in failures (print-a failure);
-  ).
-  (if (colors is-missing)
-    print "\n  P.S. To prettify output, please run 'npm install'.\n";
+  else
+    print;
   ).
   (var report (@
     summary: summary,

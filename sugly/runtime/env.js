@@ -8,7 +8,7 @@ module.exports = function runtime ($void) {
   var environment = Object.assign(Object.create(null), {
     'runtime-core': 'js',
     'runtime-host': $void.isNativeHost ? 'native' : 'browser',
-    'runtime-version': '0.9.7',
+    'runtime-version': '0.9.8',
     'is-debugging': true,
     'logging-level': 3
   })

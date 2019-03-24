@@ -19,6 +19,34 @@
   ).
 ).
 
+(define "(printf ...)" (= ()
+  (should "(printf ) returns (string empty)." (= ()
+    assert "" (printf); print;
+  ).
+  (should "(printf value) returns (string of value)." (= ()
+    assert "xyz" (printf "xyz");
+    assert "0" (printf 0);
+    assert "-0" (printf -0);
+    assert "1" (printf 1);
+    assert "-1" (printf -1);
+    assert "true" (printf true);
+    assert "null" (printf null);
+    assert "(1 10 1)" (printf (1 10);
+    print;
+  ).
+  (should "(printf value format) returns (string of value)." (= ()
+    assert "xyz" (printf "xyz" "red");
+    assert "0" (printf 0 "green");
+    assert "-0" (printf -0 "blue");
+    assert "1" (printf 1 "yellow");
+    assert "-1" (printf -1 "gray");
+    assert "true" (printf true "grey");
+    assert "null" (printf null "underline");
+    assert "(1 10 1)" (printf (1 10) "overline line-through");
+    print;
+  ).
+).
+
 (define "(warn ...)" (= ()
   (should "(warn ) returns the last warning." (= ()
     warn "c" 1 2 3;
