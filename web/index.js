@@ -16,6 +16,9 @@ module.exports = function (term, stdout, loader) {
 
   var $void = sugly(stdout, loader)
   $void.env('home', window.location.origin)
+  $void.env('user-home', window.location.origin)
+  $void.env('os', window.navigator.userAgent)
+
   var bootstrap = $void.createBootstrapSpace(window.location.origin + '/@')
 
   function run (app, context) {

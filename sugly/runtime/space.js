@@ -149,6 +149,7 @@ module.exports = function space ($void) {
   $void.createAppSpace = function (uri) {
     var app = Object.create($)
     app['-app'] = uri
+    app['-app-dir'] = $void.loader.dir(uri)
     app.env = $void.$env
     app.run = $void.$run
     app.interpreter = $void.$interpreter
@@ -159,6 +160,7 @@ module.exports = function space ($void) {
 
     var local = Object.create(app)
     local['-module'] = uri
+    local['-module-dir'] = $void.loader.dir(uri)
 
     var exporting = Object.create($Object.proto)
     var space = new Space$(local, null, null, exporting)
@@ -185,6 +187,7 @@ module.exports = function space ($void) {
     var app = appSpace && appSpace.app
     var local = Object.create(app || $)
     local['-module'] = uri || ''
+    local['-module-dir'] = uri ? $void.loader.dir(uri) : ''
     var export_ = Object.create($Object.proto)
     var space = new Space$(local, null, null, export_)
     if (app) {
@@ -205,6 +208,7 @@ module.exports = function space ($void) {
     }
     if (module_) {
       space.local['-module'] = module_ || ''
+      space.local['-module-dir'] = module_ ? $void.loader.dir(module_) : ''
     }
     return space
   }

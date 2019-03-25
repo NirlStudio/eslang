@@ -11,7 +11,8 @@ var KeyDownArrow = 0x28
 var InputHistoryKey = '~/.sugly_history'
 
 // Firefox requires a non-zero timeout to refresh UI.
-var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+var isFirefox = typeof firefox !== 'undefined' ||
+  navigator.userAgent.indexOf('Firefox') > 0
 var MinimalDelay = isFirefox ? 15 : 0
 
 var pool = []

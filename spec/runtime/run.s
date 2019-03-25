@@ -121,8 +121,7 @@
 
 (define "(run app-source args app-home)" (=> ()
   (should "pass app-home to new app if it's a string." (=> ()
-    (var module-home (-module slice 0 (-module last-of "/").
-    (var result (run "_app" null module-home).
+    (var result (run "_app" null -module-dir).
     (assert (result is-a array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -132,7 +131,7 @@
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
-    (assert ((result 3) starts-with module-home).
+    (assert ((result 3) starts-with -module-dir).
 
     (assert ((result 4) is-a string).
     (assert ((result 4) ends-with "_app.s").

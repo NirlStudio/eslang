@@ -116,13 +116,13 @@
 
     (let interpret (interpreter shell (@ 1 10 100) "").
     (interpret "(@ -app -module)\n").
-    (assert ((env "home") + "/.") app-home)
-    (assert ((env "home") + "/.") mod-home)
+    (assert ((env "runtime-home") + "/.") app-home)
+    (assert ((env "runtime-home") + "/.") mod-home)
   ).
   (should "pass (env \"home\") to new space as app-home if it's missing or not a string." (= ()
     (var app-home)
     (var mod-home)
-    (var home ((env "home") + "/.").
+    (var home ((env "runtime-home") + "/.").
     (var shell (=> (fb) (let (app-home mod-home) fb).
     (var interpret (interpreter shell (@ 1 10 100).
     (interpret "(@ -app -module)\n").
