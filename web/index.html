@@ -136,4 +136,18 @@
     <input type="button" id="stdin-enter" value="&#x23ce;" />
   </div>
 </body>
+<script>
+((function () {
+  var head = document.getElementsByTagName('head')[0]
+  function insertScript (src) {
+    var node = document.createElement('script')
+    node.src = src
+    head.appendChild(node)
+  }
+  if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+    insertScript('https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js')
+  }
+  insertScript('../sugly.js')
+})())
+</script>
 </html>

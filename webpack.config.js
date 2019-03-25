@@ -1,7 +1,5 @@
-const path = require('path')
 const shell = require('shelljs')
 const webpack = require('webpack')
-const HtmlPlugin = require('html-webpack-plugin')
 const HooksPlugin = require('hooks-webpack-plugin')
 
 const MODE_PROD = 'production'
@@ -10,12 +8,6 @@ const MODE_DEV = 'development'
 const ignoreNativeModules = new webpack.IgnorePlugin(
   /^(\.\/loader-fs|node-localstorage|colors\/safe)$/
 )
-
-const injectPackedScript = new HtmlPlugin({
-  template: path.join(__dirname, 'web/index.html'),
-  inject: 'head',
-  filename: './www/index.html'
-})
 
 const prepareDevWebSite = new HooksPlugin({
   beforeRun: () => {
@@ -28,6 +20,7 @@ const prepareDevWebSite = new HooksPlugin({
   done: () => {
     shell.cp('dist/sugly.js', 'dist/www/')
     shell.cp('dist/sugly.map', 'dist/www/')
+    shell.cp('web/index.html', 'dist/www/')
     shell.cp('web/*.s', 'dist/www/')
     shell.cp('-r', 'examples/', 'dist/www/')
     shell.cp('-r', 'spec/', 'dist/www/')
@@ -45,7 +38,6 @@ module.exports = (env, options) => {
     ignoreNativeModules
   ] : [
     ignoreNativeModules,
-    injectPackedScript,
     prepareDevWebSite
   ]
   const config = {

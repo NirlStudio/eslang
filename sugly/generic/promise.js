@@ -3,7 +3,11 @@
 function ingoreUnhandledRejectionsBy (filter) {
   if (typeof window !== 'undefined') {
     window.addEventListener('unhandledrejection', function (event) {
-      filter(event.promise, event.reason) && event.preventDefault()
+      var detail = event.promise ? event
+        : event.detail // for bluebird polyfill.
+      if (detail.promise && filter(event.promise, event.reason)) {
+        event.preventDefault()
+      }
     })
   } else if (typeof process !== 'undefined') {
     process.on('unhandledRejection', function (reason, promise) {
@@ -43,7 +47,7 @@ module.exports = function ($void) {
       promise.excusable = true
     }
     if (isApplicable(cancel)) {
-      promise.cancel = cancel
+      promise.$cancel = cancel
     }
     return promise
   }
@@ -269,12 +273,12 @@ module.exports = function ($void) {
   var proto = Type.proto
   // the optional cancellation capability of a promise.
   link(proto, 'is-cancellable', function () {
-    return isApplicable(this.cancel)
+    return isApplicable(this.$cancel)
   })
   // try to cancel the promised operation.
   link(proto, 'cancel', function () {
     // a cancel function should be ready for being called multiple times.
-    return isApplicable(this.cancel) ? this.cancel.apply(this, arguments) : null
+    return isApplicable(this.$cancel) ? this.$cancel.apply(this, arguments) : null
   })
 
   // the next step after this promise has been either resolved or rejected.
