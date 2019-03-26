@@ -70,9 +70,7 @@ module.exports = function (term, stdout, loader) {
       var agent = require('../lib/shell')($void, reader,
         require('./lib/process')($void)
       )
-      agent(args, term.echo,
-        '(var * (import "profile"))'
-      )
+      agent(args, term.echo)
       return reader.open()
     })
   }

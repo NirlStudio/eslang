@@ -1,7 +1,16 @@
+const gray (= text (printf text, "gray");
+const blue (= text (printf text, "blue");
+
+# secret aliases of exit.
+export (bye quit) (->() (exit );
+
+gray "# functions";
+blue " version"; gray ",";
 (export version (= ()
   run "tools/version";
 ).
 
+blue " describe"; gray " and";
 (export describe (=> it
   (if ($it is-a object)
     (object fields-of it:: sort:: for-each (=> p
@@ -12,6 +21,7 @@
       print '#($(i), $(type of v))# $v';
 ).
 
+blue " selftest";
 (export selftest (= spec
   (if (spec is-empty)
     test-bootstrap;
@@ -22,4 +32,4 @@
       run "test/test" arguments;
 ).
 
-print "# functions version, describe and selftest are exported.";
+gray " are imported.\n";

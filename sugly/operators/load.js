@@ -93,7 +93,7 @@ module.exports = function load ($void) {
   function dirsOf (source, moduleDir, appDir, homeDir) {
     return source.startsWith('./') || source.startsWith('../')
       ? [ moduleDir ]
-      : [ moduleDir, appDir, homeDir ]
+      : [ moduleDir, appDir, homeDir, $void.runtime('home') ]
   }
 
   $void.bindOperatorLoad = function (space) {

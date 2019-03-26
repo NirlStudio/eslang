@@ -1,3 +1,4 @@
+const fs = require('fs')
 const shell = require('shelljs')
 const webpack = require('webpack')
 const HooksPlugin = require('hooks-webpack-plugin')
@@ -11,13 +12,14 @@ const ignoreNativeModules = new webpack.IgnorePlugin(
 
 const prepareDevWebSite = new HooksPlugin({
   beforeRun: () => {
-    shell.rm('-r', 'dist/www')
+    fs.existsSync('dist/www') && shell.rm('-r', 'dist/www')
     shell.mkdir('dist/www')
     shell.mkdir('dist/www/modules')
     shell.mkdir('dist/www/test')
     shell.mkdir('dist/www/tools')
   },
   done: () => {
+    shell.cp('profile.s', 'dist/www/')
     shell.cp('dist/sugly.js', 'dist/www/')
     shell.cp('dist/sugly.map', 'dist/www/')
     shell.cp('web/index.html', 'dist/www/')

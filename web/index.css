@@ -54,7 +54,6 @@ ul.stdout > li.print {
 }
 
 ul.stdout > li.print > span.text {
-  padding-right: 6px;
   color: white;
   width: auto;
 }
