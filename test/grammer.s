@@ -411,6 +411,7 @@ select((iter select) select)
 map((iter map) map)
 reduce((iter reduce) reduce)
 count((iter count) count)
+for-each((iter for-each) for-each)
 sum((iter sum) sum)
 average((iter average) average)
 join((iter join) join)
@@ -488,7 +489,7 @@ find((a find) find)
 ((object clear) clear)
 ((object has) has)
 ((object owns) owns)
-((object fields-of) fields-of)
+object fields-of ((object fields-of) fields-of)
 
 # meta.function-class-type-sugly
 ((class attach) attach)
@@ -538,7 +539,7 @@ min((min)min)min
 ((uri encode) encode)
 ((uri decode) decode)
 ((uri escape) escape)
-((uri unescape) unescape)
+uri unescape ((uri unescape) unescape)
 
 # meta.function-json-lib-sugly
 ((json of) of)

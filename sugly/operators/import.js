@@ -220,7 +220,7 @@ module.exports = function import_ ($void) {
       }
       var scope = $void.createModuleSpace(uri, space)
       var status = importing.call(
-        module_.exporting, scope.exporting, scope.context
+        module_.exporting, scope.exporting, scope.context, $void
       )
       if (status === true) { // the loader can report error details
         module_.status = 200

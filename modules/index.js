@@ -4,6 +4,8 @@ var loaders = []
 
 module.exports = function (uri) {
   switch (uri) {
+    case 'restful':
+      return require('./restful')
     case 'symbols':
       return require('./symbols')
     case 'web':

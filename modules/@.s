@@ -1,1 +1,5 @@
-fetch "styledout" "test";
+(fetch
+  "restful"
+  "styledout"
+  "test"
+).
