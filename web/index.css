@@ -98,6 +98,7 @@ div.stdin {
   border: none;
   width: 100%;
   height: 16px;
+  line-height: 16px;
 }
 
 div.stdin > input {

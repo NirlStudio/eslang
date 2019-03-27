@@ -2,9 +2,13 @@ const gray (= text (printf text, "gray");
 const blue (= text (printf text, "blue");
 
 # secret aliases of exit.
-export (bye quit) (->() (exit );
+(if (env "runtime-host":: is "native")
+  export (bye quit) (->() (exit );
+else
+  export reload (->() (exit );
+).
 
-gray "# functions";
+gray "# profile functions";
 blue " version"; gray ",";
 (export version (= ()
   run "tools/version";

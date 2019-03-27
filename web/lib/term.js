@@ -1,7 +1,7 @@
 'use strict'
 
-var MaxLines = 4000
-var DrainBatch = 200
+var MaxLines = 4800
+var DrainBatch = 300
 
 var KeyEnter = 0x0D
 var KeyUpArrow = 0x26
@@ -10,10 +10,8 @@ var KeyDownArrow = 0x28
 // the key to be used in localStorage
 var InputHistoryKey = '~/.sugly_history'
 
-// Firefox requires a non-zero timeout to refresh UI.
-var isFirefox = typeof firefox !== 'undefined' ||
-  navigator.userAgent.indexOf('Firefox') > 0
-var MinimalDelay = isFirefox ? 15 : 0
+// Firefox, IE and Edge require a non-zero timeout to refresh UI.
+var MinimalDelay = 20 // milliseconds
 
 var pool = []
 var spooling = false
