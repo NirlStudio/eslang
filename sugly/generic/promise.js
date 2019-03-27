@@ -5,7 +5,7 @@ function ingoreUnhandledRejectionsBy (filter) {
     window.addEventListener('unhandledrejection', function (event) {
       var detail = event.promise ? event
         : event.detail // for bluebird polyfill.
-      if (detail.promise && filter(event.promise, event.reason)) {
+      if (detail.promise && filter(detail.promise, detail.reason)) {
         event.preventDefault()
       }
     })
