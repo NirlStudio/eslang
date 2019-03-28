@@ -24,7 +24,7 @@ module.exports = function (exporting, context, $void) {
   // create a service instance with a particular configuration set.
   exporting.of = function (config) {
     if (!config || typeof config !== 'object') {
-      config = $Object.of()
+      config = $Object.empty()
     }
     return bind($Object.of({ config: config }), axios.create(config))
   }

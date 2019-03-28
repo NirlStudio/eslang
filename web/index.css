@@ -10,14 +10,18 @@ body {
   background-color: #111;
 }
 
+span, input{
+  font: 12pt;
+}
+
 ul.stdout {
   margin: 0;
-  padding: 8px 0;
+  padding: 8pt 0;
   list-style: none;
 }
 
 ul.stdout > li {
-  padding: 2px 0;
+  padding: 2pt 0;
 }
 
 ul.stdout > li > span {
@@ -25,13 +29,12 @@ ul.stdout > li > span {
   vertical-align: top;
   margin: 0;
   padding: 0;
-  font-size: 12px;
   color: lightgray;
 }
 
 ul.stdout > li > span.prompt {
-  width: 16px;
-  padding-left: 8px;
+  width: 15pt;
+  padding-left: 8pt;
   color: gray;
 }
 
@@ -50,7 +53,7 @@ ul.stdout > li.input > span.text {
 }
 
 ul.stdout > li.print {
-  padding-left: 24px;
+  padding-left: 24pt;
 }
 
 ul.stdout > li.print > span.text {
@@ -80,7 +83,7 @@ ul.stdout > li.debug > span.text {
 }
 
 ul.stdout > li.echo {
-  padding-bottom: 4px;
+  padding-bottom: 2pt;
 }
 
 ul.stdout > li.echo > span.text {
@@ -92,11 +95,11 @@ div.stdin {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin: 0;
-  padding: 0 24px;
+  padding: 0 24pt;
   color: white;
   border: none;
   width: 100%;
-  height: 16px;
+  height: 15pt;
   line-height: 1px;
 }
 
@@ -106,12 +109,11 @@ div.stdin > input {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-size: 12px;
   font-family: monospace;
   color: white;
   background-color: #333;
   border: none;
-  height: 16px;
+  height: 15pt;
 }
 
 div.stdin > input:active, div.stdin > input:focus {
@@ -120,15 +122,15 @@ div.stdin > input:active, div.stdin > input:focus {
 }
 
 div.stdin > #stdin-prompt {
+  display: block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   float: left;
-  margin: 7px 0 0 -16px;
+  margin: 7pt 0 0 -15pt;
   padding: 0;
-  font-size: 12px;
-  width: 16px;
-  height: 16px;
+  width: 15pt;
+  height: 15pt;
 }
 
 div.stdin > #stdin-input {
@@ -140,7 +142,7 @@ div.stdin > #stdin-input {
 
 div.stdin > #stdin-enter {
   position: relative;
-  top: -16px;
+  top: -15pt;
   left: 100%;
-  width: 16px;
+  width: 15pt;
 }

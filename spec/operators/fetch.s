@@ -30,7 +30,7 @@
   ).
   (should "(fetch remote-module) returns a promise resolved to (@ remote-module)." (=> ()
     (const remote-mod (env "runtime-host":: == "browser":: ?
-      "http://localhost:6501/test/test"
+      (env "runtime-home":: + "/test/test")
       "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test"
     ).
     (fetch remote-mod:: then (=> waiting
@@ -41,7 +41,7 @@
   ).
   (should "(fetch remote-module) returns a rejected promise if the module does not exist." (=> ()
     (const remote-mod (env "runtime-host":: == "browser":: ?
-      "http://localhost:6501/non-existed.s"
+      (env "runtime-home":: + "/non-existed.s")
       "https://example.com/index.s"
     ).
     (fetch remote-mod:: then (=> waiting

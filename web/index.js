@@ -9,17 +9,23 @@ function ensure (factory, alternative) {
   return typeof factory === 'function' ? factory : alternative
 }
 
+function getAppHome () {
+  var href = window.location.href
+  return href.substring(0, href.lastIndexOf('/'))
+}
+
 module.exports = function (term, stdout, loader) {
   term = ensure(term, defaultTerm)()
   stdout = ensure(stdout, defaultStdout)(term)
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
-  $void.env('home', window.location.origin)
-  $void.env('user-home', window.location.origin)
+  var home = getAppHome()
+  $void.env('home', home)
+  $void.env('user-home', home)
   $void.env('os', window.navigator.userAgent)
 
-  var bootstrap = $void.createBootstrapSpace(window.location.origin + '/@')
+  var bootstrap = $void.createBootstrapSpace(home + '/@')
 
   function run (app, context) {
     return initialize(context, function () {

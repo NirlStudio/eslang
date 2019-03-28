@@ -201,11 +201,11 @@ var ++assertions (=>() (++ assertions);
 (var print-a (=> failure
   print '  $(failure no.)) [ $((failure path) join " / ") ] $(failure behavior)';
   const assertion (failure assertion);
-  red '     step-$(assertion step) is expecting ';
-  underlined "green", (assertion "expected"), " ";
-  red "instead of "; underlined "red", (assertion "real"), "\n";
-  gray "     when asserting "; underlined "gray", (assertion "expr"), " ";
-  gray (assertion note:: is-empty:: ? "", (", for " + (assertion note))), "\n\n";
+  red '     step-$(assertion step) is expecting';
+  underlined "green", " ", (assertion "expected");
+  red " instead of"; underlined "red", " ", (assertion "real"), "\n";
+  gray "     when asserting"; underlined "gray", " ", (assertion "expr");
+  gray (assertion note:: is-empty:: ? "", (" , for " + (assertion note))), "\n\n";
 ).
 
 (var clear (=> ()

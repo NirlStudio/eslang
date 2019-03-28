@@ -9,7 +9,7 @@
   <ul id="stdout-panel" class="stdout">
   </ul>
   <div class="stdin">
-    <div id="stdin-prompt">&gt;</div>
+    <span id="stdin-prompt">&gt;</span>
     <input type="text" id="stdin-input" autocomplete="off" value=""/>
     <input type="button" id="stdin-enter" value="&#x23ce;" />
   </div>
@@ -27,7 +27,9 @@
       '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
     )
   }
-  insertScript('../sugly.js')
+  var href = window.location.href
+  window.SUGLY_HOME = href.substring(0, href.lastIndexOf('/'))
+  insertScript('sugly.js')
 })())
 </script>
 </html>

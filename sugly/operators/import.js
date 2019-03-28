@@ -17,9 +17,6 @@ module.exports = function import_ ($void) {
   var symbolFrom = sharedSymbolOf('from')
   var symbolImport = sharedSymbolOf('import')
 
-  // const values
-  var RefreshInterval = 60 * 1000 // milliseconds
-
   // import: a module from source.
   //   (import src), or
   //   (import field from module), or
@@ -99,18 +96,11 @@ module.exports = function import_ ($void) {
     }
     // look up it in cache.
     var module_ = lookupInCache(space.modules, uri, moduleUri)
-    var reloading
-    switch (module_.status) {
-      case 0:
-        module_.status = 100
-        break // continue to load
-      case 205:
-        reloading = true
-        break // try to reload
-      default:
-        return module_.exports
+    if (module_.status) {
+      return module_.exports
     }
 
+    module_.status = 100 // indicate loading
     var exporting = (type ? loadNativeModule : loadModule)(
       space, uri, module_, source, moduleUri
     )
@@ -118,13 +108,12 @@ module.exports = function import_ ($void) {
       return module_.exports
     }
     module_.exporting = exporting
-    if (reloading) {
-      module_.exports = $Object.empty()
-    }
     var keys = Object.getOwnPropertyNames(exporting)
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i]
-      if (!/^[-_]/.test(key)) { // only expose public fields
+      if (!/^[-_]/.test(key)) {
+        // only expose public fields.
+        // private fields are allowed to support hot-reloading
         module_.exports[key] = exporting[key]
       }
     }
@@ -170,8 +159,6 @@ module.exports = function import_ ($void) {
       })
     } else if (module.status === 100) {
       warn('import', 'loop dependency when loading', uri, 'from', moduleUri)
-    } else if ((Date.now() - modules[uri].timestamp) > RefreshInterval) {
-      module.status = 205
     }
     return module
   }
@@ -194,8 +181,11 @@ module.exports = function import_ ($void) {
         return null
       }
       // to load module
-      var scope = execute(space, code, uri, { this: module_.exporting })[1]
+      var scope = execute(space, code, uri, {
+        this: module_.exporting // TODO: reserved to support hot-reloading
+      })[1]
       if (scope) {
+        // TODO: register monitoring tasks for hot-reloading.
         module_.status = 200
         return scope.exporting
       }
@@ -220,9 +210,11 @@ module.exports = function import_ ($void) {
       }
       var scope = $void.createModuleSpace(uri, space)
       var status = importing.call(
-        module_.exporting, scope.exporting, scope.context, $void
+        module_.exporting, // TODO: reserved to support hot reloading.
+        scope.exporting, scope.context, $void
       )
       if (status === true) { // the loader can report error details
+        // TODO?: register monitoring tasks for hot-reloading.
         module_.status = 200
         return scope.exporting
       }
