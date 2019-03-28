@@ -56,17 +56,23 @@ function writeTo (panel) {
     }
     var lines = text.split('\n')
     var spans = []
-    var i = 0
-    var len = lines.length
-    for (; i < len; i++) {
+    for (var i = 0, last = lines.length - 1; i <= last; i++) {
       var line = lines[i]
-      line ? spans.push(
-        appendText(currentLine || (currentLine = createNewLine()), line)
-      ) : currentLine = currentLine ? null
-        : createNewLine(document.createElement('br'))
+      if (i > 0 || !line) {
+        currentLine = null
+      }
+      if (line) {
+        spans.push(
+          appendText(currentLine || (currentLine = createNewLine()), line)
+        )
+      } else if (i < last) {
+        createNewLine(document.createElement('br'))
+      }
     }
     if (render && spans.length > 0) {
-      for (i = 0, len = spans.length; i < len; i++) { render(spans[i]) }
+      for (var j = 0, len = spans.length; j < len; j++) {
+        render(spans[j])
+      }
     }
     updatePanel()
   }

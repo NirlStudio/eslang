@@ -205,7 +205,7 @@ var ++assertions (=>() (++ assertions);
   underlined "green", " ", (assertion "expected");
   red " instead of"; underlined "red", " ", (assertion "real"), "\n";
   gray "     when asserting"; underlined "gray", " ", (assertion "expr");
-  gray (assertion note:: is-empty:: ? "", (" , for " + (assertion note))), "\n\n";
+  gray (assertion note:: is-empty:: ? "", (" , for " + (assertion note))), "\n";
 ).
 
 (var clear (=> ()
@@ -236,9 +236,8 @@ var ++assertions (=>() (++ assertions);
   (if failing
     red '  failing: $failing\n\n';
     for failure in failures (print-a failure);
-  else
-    print;
   ).
+  print;
   (var report (@
     summary: summary,
     failures: failures

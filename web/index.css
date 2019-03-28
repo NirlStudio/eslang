@@ -11,7 +11,7 @@ body {
 }
 
 span, input{
-  font: 12pt;
+  font-size: 10pt;
 }
 
 ul.stdout {
