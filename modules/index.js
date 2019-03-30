@@ -6,6 +6,8 @@ module.exports = function (uri) {
   switch (uri) {
     case 'restful':
       return require('./restful')
+    case 'shell':
+      return require('./shell')
     case 'symbols':
       return require('./symbols')
     case 'web':

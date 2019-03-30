@@ -1,5 +1,5 @@
 (fetch
-  "restful"
-  "styledout"
-  "test"
+  "restful",
+  "styledout",
+  "test",
 ).

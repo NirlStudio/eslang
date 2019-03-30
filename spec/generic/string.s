@@ -1168,7 +1168,7 @@
   ).
 ).
 
-(define "(str : ...)" (= ()
+(define "(a-string : ...)" (= ()
   (should "(str: offset) returns the charact at the offset or an empty string." (= ()
     (assert "" ("": 0).
     (assert "" ("": 1).

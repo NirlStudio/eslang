@@ -176,7 +176,9 @@ module.exports = function ($void) {
         if (/[\s]/.test(c)) {
           if (stringPadding >= 0) { // padding or padded
             if (stringPadding === 0) { // pading
-              pendingText += ' ' // keeps the first space character.
+              if (pendingText.length > 1) { // avoid a leading whitespace
+                pendingText += ' ' // keeps the first space character.
+              }
               stringPadding = 1
             }
             return true

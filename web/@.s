@@ -1,8 +1,8 @@
 (fetch
-  "examples/@"
+  "examples/@",
   "modules/@",
   "spec/@",
   "tools/@",
   "test/test",
-  "profile"
+  "profile",
 ).

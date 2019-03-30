@@ -1,3 +1,5 @@
+const (get-help, set-help) (import (get set) from "tools/help");
+
 const gray (= text (printf text, "gray");
 const blue (= text (printf text, "blue");
 
@@ -25,15 +27,24 @@ blue " describe"; gray " and";
       print '#($(i), $(type of v))# $v';
 ).
 
-blue " selftest";
-(export selftest (= spec
-  (if (spec is-empty)
-    test-bootstrap;
-    run "test/test";
+gray " operators";
+blue " help"; gray ",";
+(export help (=? (subject, topic)
+  local "content" ((? get-help) (subject key) (topic key);
+  (if (content is-empty)
+    "not available."; false
   else
-    (spec is "bootstrap":: ?
-      test-bootstrap;
-      run "test/test" arguments;
+    print content; true
 ).
 
+blue " selftest";
+(export selftest (=? spec
+  (if (spec is-empty)
+    (? test-bootstrap);
+    run "test/test";
+  else
+    (spec key:: is "bootstrap":: ?
+      (? test-bootstrap);
+      run "test/test" (operation slice operand:: to-array:: map (= p (p key);
+).
 gray " are imported.\n";

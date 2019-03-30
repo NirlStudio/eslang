@@ -40,7 +40,7 @@ ul.stdout > li > span.prompt {
 
 ul.stdout > li > span.text {
   word-wrap: break-word;
-  white-space: normal;
+  white-space: pre;
   width: 95%;
 }
 

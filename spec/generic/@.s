@@ -19,5 +19,5 @@
   "string",
   "symbol",
   "tuple",
-  "type"
+  "type",
 ).

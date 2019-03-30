@@ -25,11 +25,11 @@ const prepareDevWebSite = new HooksPlugin({
     shell.cp('web/index.html', 'dist/www/')
     shell.cp('web/index.css', 'dist/www/')
     shell.cp('web/*.s', 'dist/www/')
-    shell.cp('-r', 'examples/', 'dist/www/')
-    shell.cp('-r', 'spec/', 'dist/www/')
     shell.cp('modules/*.s', 'dist/www/modules/')
     shell.cp('test/test.s', 'dist/www/test/')
-    shell.cp('tools/*.s', 'dist/www/tools/')
+    shell.cp('-r', 'examples/', 'dist/www/')
+    shell.cp('-r', 'spec/', 'dist/www/')
+    shell.cp('-r', 'tools/', 'dist/www/')
   }
 })
 

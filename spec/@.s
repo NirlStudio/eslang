@@ -8,5 +8,5 @@
   "lib",
   "operators",
   "runtime",
-  "tokenizer"
+  "tokenizer",
 ).

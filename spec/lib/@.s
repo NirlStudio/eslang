@@ -5,5 +5,5 @@
   "math",
   "stdout",
   "timer",
-  "uri"
+  "uri",
 ).

@@ -14,5 +14,5 @@
   "logical",
   "operator",
   "pattern",
-  "quote"
+  "quote",
 ).

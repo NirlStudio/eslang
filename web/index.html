@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <title>Sugly Console</title>
+  <title>Sugly Shell | Sugly.DEV</title>
   <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -22,11 +22,11 @@
     node.src = src
     head.appendChild(node)
   }
-  if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
-    insertScript(
-      '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
-    )
-  }
+
+  /MSIE \d|Trident.*rv:/.test(navigator.userAgent) && insertScript(
+    '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
+  )
+
   var href = window.location.href
   window.SUGLY_HOME = href.substring(0, href.lastIndexOf('/'))
   insertScript('sugly.js')

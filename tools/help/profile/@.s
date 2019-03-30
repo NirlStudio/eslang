@@ -1,5 +1,6 @@
 (fetch
-  "help/@",
+  "describe",
   "help",
+  "selftest",
   "version",
 ).

@@ -5,7 +5,7 @@ module.exports = function (exporting) {
     return 'web module is only available when hosted in web browser'
   }
 
-  // exports here may be wrapped in future.
+  // exports may be wrapped in future.
   exporting.window = window
   exporting.location = window.location
   exporting.document = window.document

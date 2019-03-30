@@ -2,5 +2,5 @@
   "false",
   "true",
   "type",
-  "value"
+  "value",
 ).

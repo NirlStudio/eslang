@@ -21,5 +21,5 @@
   "sort-data",
   "test",
   "while",
-  "yc"
+  "yc",
 ).
