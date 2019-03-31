@@ -180,10 +180,10 @@ module.exports = function ($void) {
   })
 
   // Type Verification: a class is a class and a type.
-  link(proto, 'is-a', function (type) {
+  link(proto, ['is-a', 'is-an'], function (type) {
     return type === Type || type === $Type
   })
-  link(proto, 'is-not-a', function (type) {
+  link(proto, ['is-not-a', 'is-not-an'], function (type) {
     return type !== Type && type !== $Type
   })
 
@@ -322,7 +322,7 @@ module.exports = function ($void) {
   })
 
   // Type Verification
-  var isA = link(instance, 'is-a', function (t) {
+  var isA = link(instance, ['is-a', 'is-an'], function (t) {
     if (t === $Object || t === this.type) {
       return true
     }
@@ -341,7 +341,7 @@ module.exports = function ($void) {
     }
     return true
   })
-  link(instance, 'is-not-a', function (t) {
+  link(instance, ['is-not-a', 'is-not-an'], function (t) {
     return !isA.call(this, t)
   })
 

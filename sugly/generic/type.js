@@ -22,10 +22,10 @@ module.exports = function ($void) {
   // Ordering inherits null.
 
   // Type Verification: Any non-empty value is an instance of its type.
-  link(proto, 'is-a', function (type) {
+  link(proto, ['is-a', 'is-an'], function (type) {
     return this.type === type
   })
-  link(proto, 'is-not-a', function (type) {
+  link(proto, ['is-not-a', 'is-not-an'], function (type) {
     return this.type !== type
   })
 
@@ -116,10 +116,10 @@ module.exports = function ($void) {
   })
 
   // Type Verification: Any type is a type.
-  link(Type, 'is-a', function (type) {
+  link(Type, ['is-a', 'is-an'], function (type) {
     return Type === type
   }, true)
-  link(Type, 'is-not-a', function (type) {
+  link(Type, ['is-not-a', 'is-not-an'], function (type) {
     return Type !== type
   }, true)
 

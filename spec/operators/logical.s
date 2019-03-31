@@ -104,6 +104,10 @@
       ).
     )
   ).
+  (should "(value \"and\") is an alias of (value \"&&\")." (=> ()
+    (for value in (falsy-values + truthy-values)
+      (assert ($value "and":: is ($value "&&").
+  ).
 ).
 
 (define "(value || ...) - logical OR" (=> ()
@@ -141,6 +145,10 @@
         (assert ($($value || false false falsy-value) is falsy-value).
       ).
     ).
+  ).
+  (should "(value \"or\") is an alias of (value \"||\")." (=> ()
+    (for value in (falsy-values + truthy-values)
+      (assert ($value "or":: is ($value "||").
   ).
 ).
 

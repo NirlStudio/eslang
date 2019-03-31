@@ -23,7 +23,7 @@ module.exports = function logical ($void) {
   staticOperator('not', not)
 
   // global logical AND operator
-  link(Null, '&&', operator(function (space, clause, that) {
+  link(Null, ['&&', 'and'], operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
       return null
     }
@@ -46,7 +46,7 @@ module.exports = function logical ($void) {
   }))
 
   // global logical OR operator
-  link(Null, '||', operator(function (space, clause, that) {
+  link(Null, ['||', 'or'], operator(function (space, clause, that) {
     var clist = clause && clause.$
     if (typeof that === 'undefined') {
       that = null

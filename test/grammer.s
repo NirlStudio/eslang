@@ -127,6 +127,15 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 ~
 (~)
 (~(~ ~ ~))
+not
+(not)
+(not(not not not))
+or
+(or)
+(or(or or or))
+and
+(and)
+(and(and and and))
 
 # keyword.operator.double.sugly
 ++
@@ -207,7 +216,9 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 (((is-empty is-empty) is-empty) is-empty x)
 (((not-empty not-empty) not-empty) not-empty x)
 (((is-a is-a) is-a) is-a x)
+(((is-an is-an) is-an) is-an x)
 (((is-not-a is-not-a) is-not-a) is-not-a x)
+(((is-not-an is-not-an) is-not-an) is-not-an x)
 (((to-code to-code) to-code) to-code x)
 (((to-string to-string) to-string) to-string x)
 

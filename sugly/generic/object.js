@@ -218,10 +218,10 @@ module.exports = function ($void) {
   })
 
   // Type Verification
-  link(proto, 'is-a', function (t) {
+  link(proto, ['is-a', 'is-an'], function (t) {
     return t === Type
   })
-  link(proto, 'is-not-a', function (t) {
+  link(proto, ['is-not-a', 'is-not-an'], function (t) {
     return t !== Type
   })
 

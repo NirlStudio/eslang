@@ -17,15 +17,18 @@
     (var x the-value)
     (assert the-value ($x &&).
   ).
-  (should "(type && x) returns x." (=> ()
+  (should "(the-value && x) returns x." (=> ()
     (assert true ($the-value && true).
     (var x the-value)
     (assert true ($x && true).
   ).
-  (should "(type && x y) returns y." (=> ()
+  (should "(the-value && truthy-value x) returns x." (=> ()
     (assert false ($the-value && true false).
     (var x the-value)
     (assert false ($x && true false).
+  ).
+  (should "(the-value \"and\") is an alias of (the-value \"&&\")." (=> ()
+    (assert ($the-value "and":: is ($the-value "&&").
   ).
 ).
 
@@ -44,6 +47,9 @@
     (assert the-value ($the-value || 1 2).
     (var x the-value)
     (assert the-value ($x || 1 2).
+  ).
+  (should "(the-value \"or\") is an alias of (the-value \"||\")." (=> ()
+    (assert ($the-value "or":: is ($the-value "||").
   ).
 ).
 

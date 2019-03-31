@@ -363,7 +363,20 @@
     (assert (t is-a object).
     (assert null (t type).
     (assert ((type of t) is object).
-    (assert 22 ((object fields-of t) length).
+
+    (const all-fields (@
+      "is", "===", "is-not", "!==",
+      "equals", "==", "not-equals", "!=", "compare",
+      "is-empty", "not-empty",
+      "is-a", "is-an", "is-not-a", "is-not-an",
+      "to-code", "to-string", ":",
+      "&&", "and", "||", "or", "?", "?*", "??", "type"
+    ).
+    (var fields (object fields-of t).
+    (for field in fields
+      (assert (all-fields first-of field:: >= 0).
+    ).
+    (assert (all-fields length) (fields length).
 
     (for (_ v) in t
       (if ($v is-a lambda)

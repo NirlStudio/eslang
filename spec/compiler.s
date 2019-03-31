@@ -187,9 +187,9 @@
     (assert 1 (statements length).
 
     (var value (eval (statements 0).
-    (assert (value is-a array).
+    (assert (value is-an array).
     (assert 2 (value length).
-    (assert ((value 0) is-a object).
+    (assert ((value 0) is-an object).
     (assert 3 (value 1).
   ).
   (should "(compile code) automatically close all open clauses when reaching the end of code." (= ()

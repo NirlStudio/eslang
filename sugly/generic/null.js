@@ -52,12 +52,12 @@ module.exports = function ($void) {
   })
 
   // Type Verification: to test if an entity is an instance of a type.
-  link(Null, 'is-a', function (type) {
+  link(Null, ['is-a', 'is-an'], function (type) {
     // null is null and null is a null.
     // type.proto is not null but is a null.
     return typeof type === 'undefined' || type === null
   })
-  link(Null, 'is-not-a', function (type) {
+  link(Null, ['is-not-a', 'is-not-an'], function (type) {
     return typeof type !== 'undefined' && type !== null
   })
 
