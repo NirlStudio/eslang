@@ -321,7 +321,7 @@ module.exports = function () {
   term.debug = loggerOf('debug').bind(null, '#D')
 
   // serve shell
-  term.echo = loggerOf('echo', 80).bind(null, '=')
+  term.echo = loggerOf('echo', 150).bind(null, '=')
 
   // serve stdin
   var inputPrompt = '>'

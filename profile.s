@@ -30,6 +30,7 @@ blue " describe"; gray " and";
 gray " operators";
 blue " help"; gray ",";
 (export help (=? (subject, topic)
+  "try '(help)' or 'help;' to ask for help."
   local "content" ((? get-help) (subject key) (topic key);
   (if (content is-empty)
     "not available."; false
@@ -39,12 +40,13 @@ blue " help"; gray ",";
 
 blue " selftest";
 (export selftest (=? spec
+  "try '(selftest)' or 'selftest;' to run all specifications."
   (if (spec is-empty)
-    (? test-bootstrap);
+    test-bootstrap;
     run "test/test";
   else
     (spec key:: is "bootstrap":: ?
-      (? test-bootstrap);
+      test-bootstrap;
       run "test/test" (operation slice operand:: to-array:: map (= p (p key);
 ).
 gray " are imported.\n";

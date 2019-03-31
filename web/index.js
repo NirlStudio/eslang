@@ -67,15 +67,14 @@ module.exports = function (term, stdout, loader) {
   }
 
   function shell (args, context) {
-    // export global shell commands
-    $void.$['test-bootstrap'] = require('../test/test')($void)
-
     // generate shell agent.
     return initialize(context, function () {
       var reader = require('./lib/stdin')($void, term)
       var agent = require('../lib/shell')($void, reader,
         require('./lib/process')($void)
       )
+      // export global shell commands
+      $void.$shell['test-bootstrap'] = require('../test/test')($void)
       agent(args, term.echo)
       return reader.open()
     })
