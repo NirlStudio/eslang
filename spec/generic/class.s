@@ -305,12 +305,12 @@
   (should "(a-class empty) returns a new empty and uninitialized instance." (= ()
     (var cls (class empty).
     (var inst1 (cls empty).
-    (assert (inst1 is-a object).
+    (assert (inst1 is-an object).
     (assert (inst1 is-a cls).
     (assert (inst1 is-empty).
 
     (let inst2 (cls empty).
-    (assert (inst2 is-a object).
+    (assert (inst2 is-an object).
     (assert (inst2 is-a cls).
     (assert (inst2 is-empty).
 
@@ -322,7 +322,7 @@
       activator: (= () (a ++).
     ).
     (var inst (cls empty).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert 1 (inst c).
     (assert 1 (inst a).
@@ -334,12 +334,12 @@
   (should "(a-class default) returns a new default instance without construct argument." (= ()
     (var cls (class empty).
     (var inst1 (cls default).
-    (assert (inst1 is-a object).
+    (assert (inst1 is-an object).
     (assert (inst1 is-a cls).
     (assert (inst1 is-empty).
 
     (let inst2 (cls default).
-    (assert (inst2 is-a object).
+    (assert (inst2 is-an object).
     (assert (inst2 is-a cls).
     (assert (inst2 is-empty).
 
@@ -354,7 +354,7 @@
       activator: (= () (a ++).
     ).
     (var inst (cls default).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert 2 (inst c).
     (assert 0 (inst args).
@@ -367,12 +367,12 @@
   (should "(a-class of) returns a new instance of the class." (= ()
     (var cls (class empty).
     (var inst1 (cls of).
-    (assert (inst1 is-a object).
+    (assert (inst1 is-an object).
     (assert (inst1 is-a cls).
     (assert (inst1 is-empty).
 
     (var inst2 (cls of).
-    (assert (inst2 is-a object).
+    (assert (inst2 is-an object).
     (assert (inst2 is-a cls).
     (assert (inst2 is-empty).
 
@@ -381,14 +381,14 @@
   (should "(a-class of obj) copys all fields of obj into a new instance of the class if it has not a constructor." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 1 (inst x).
 
     (let cls (@:class x: 1).
     (let inst (cls of (@ x: 2).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 2 (inst x).
@@ -396,7 +396,7 @@
   (should "(a-class of objs ...) copys all fields of all objs into a new instance of the class if it has not a constructor." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 1 (inst x).
@@ -404,7 +404,7 @@
 
     (let cls (@:class x: 1).
     (let inst (cls of (@ x: 2) (@ y: 3).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 2 (inst x).
@@ -422,12 +422,12 @@
       ).
     ).
     (var inst (cls of 1 (@ y:2).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert 2 (inst c).
     (assert 1 (inst a).
     (assert 1 (inst x).
-    (assert ((inst y) is-a object).
+    (assert ((inst y) is-an object).
     (assert 2 ((inst y) y).
     (assert (inst not-empty).
   ).
@@ -437,12 +437,12 @@
   (should "(a-class from) returns a new empty instance of the class." (= ()
     (var cls (class empty).
     (var inst1 (cls from).
-    (assert (inst1 is-a object).
+    (assert (inst1 is-an object).
     (assert (inst1 is-a cls).
     (assert (inst1 is-empty).
 
     (var inst2 (cls from).
-    (assert (inst2 is-a object).
+    (assert (inst2 is-an object).
     (assert (inst2 is-a cls).
     (assert (inst2 is-empty).
 
@@ -451,7 +451,7 @@
   (should "(a-class from obj) copys all fields of obj into a new empty instance and calls the activator on obj." (= ()
     (var cls (class empty).
     (var inst (cls from (@ x: 1).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 1 (inst x).
@@ -463,7 +463,7 @@
         (this "args" (arguments length).
     ).
     (let inst (cls from (@ x: 1).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 1 (inst x).
@@ -474,7 +474,7 @@
   (should "(a-class from objs ...) copys all fields of all objs into a new instance and calls activator on each." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 1 (inst x).
@@ -487,7 +487,7 @@
         (this "args" (arguments length).
     ).
     (let inst (cls from (@ x: 2) (@ y: 3).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst not-empty).
     (assert 2 (inst x).
@@ -509,7 +509,7 @@
     (assert 2 (cls y).
 
     (var inst (cls default).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst is-empty).
     (assert 1 (inst x).
@@ -521,7 +521,7 @@
     (assert 2 (cls y).
 
     (var inst (cls default).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst is-empty).
     (assert 1 (inst x).
@@ -538,7 +538,7 @@
     (assert 33 (cls pp).
 
     (var inst (cls default).
-    (assert (inst is-a object).
+    (assert (inst is-an object).
     (assert (inst is-a cls).
     (assert (inst is-empty).
     (assert 1 (inst x).
@@ -553,13 +553,13 @@
 (define "(a-class to-object ...)" (= ()
   (should "(a-class to-object) returns an empty object if this class is an empty class." (= ()
     (var obj ((class empty) to-object).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert (obj is-empty).
   ).
   (should "(a-class to-object) returns an object holding both type and instance members." (= ()
     (var cls (@:class x: 1 type: (@ y: 2).
     (var obj (cls to-object).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert (obj not-empty).
     (assert 2 ((obj type) y).
     (assert 1 (obj x).

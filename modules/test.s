@@ -86,7 +86,7 @@ var failures (@);
 ).
 
 (var validate (= (action)
-  ($action is-a lambda:: || ($action is-a function):: ?
+  ($action is-a lambda:: or ($action is-a function):: ?
     null # a valid action, else
     (=> () # the original action is invalid.
       (assert true false # a virtual assertion to generate a fault.
@@ -181,7 +181,7 @@ var ++assertions (=>() (++ assertions);
   indent += indent-step;
   (for i in (1 (case length))
     var task (case:i);
-    (if (task is-a array)
+    (if (task is-an array)
       do task; # a test suite
     else
       var result (task action); # a test case

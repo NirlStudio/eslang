@@ -319,14 +319,14 @@
       (assert (symbol operator) ((tuple operator) 0).
       (assert (tuple empty) ((tuple operator) 1).
       (assert (tuple blank) ((tuple operator) 2).
-      (assert ($((tuple operator)) is-a operator).
+      (assert ($((tuple operator)) is-an operator).
     ).
   ).
   (define "(tuple array)" (= ()
     (should "(tuple array) is a piece of code to generate an empty array." (= ()
       (assert 1 ((tuple array) length).
       (assert (symbol literal) ((tuple array) 0).
-      (assert (((tuple array)) is-a array).
+      (assert (((tuple array)) is-an array).
     ).
   ).
   (define "(tuple object)" (= ()
@@ -334,7 +334,7 @@
       (assert 2 ((tuple object) length).
       (assert (symbol literal) ((tuple object) 0).
       (assert (symbol pairing) ((tuple object) 1).
-      (assert (((tuple object)) is-a object).
+      (assert (((tuple object)) is-an object).
     ).
   ).
   (define "(tuple class)" (= ()
@@ -703,11 +703,11 @@
     (var t (tuple of null true 1).
     (var iter (t iterate).
     (assert ($iter is-a function).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert null ((iter true) 0).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert true ((iter true) 0).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 1 ((iter true) 0).
     (assert null (iter).
 

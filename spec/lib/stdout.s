@@ -52,7 +52,7 @@
     warn "c" 1 2 3;
     var warning (warn);
     assert "c" (warning 0);
-    assert (warning 1:: is-a array);
+    assert (warning 1:: is-an array);
     assert 1 (warning 2);
     assert 2 (warning 3);
     assert 3 (warning 4);
@@ -60,7 +60,7 @@
   (should "(warn category ...) returns the new warning." (= ()
     var warning (warn "c" 1 2 3);
     assert "c" (warning 0);
-    assert (warning 1:: is-a array);
+    assert (warning 1:: is-an array);
     assert 1 (warning 2);
     assert 2 (warning 3);
     assert 3 (warning 4);
@@ -68,7 +68,7 @@
   (should "(warn category ...) requires that the category be a string." (= ()
     var warning (warn 100 200 300);
     assert "stdout:warn" (warning 0);
-    assert (warning 1:: is-a array);
+    assert (warning 1:: is-an array);
     assert "category should be a string:" (warning 2);
     assert 100 (warning 3);
   ).

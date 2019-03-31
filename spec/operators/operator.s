@@ -1,7 +1,7 @@
 (define "(=? ...)" (= ()
   (should "(=?) returns the empty operator." (= ()
     (var opr (=?).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr is-empty).
 
     (assert ($opr is (operator empty).
@@ -9,17 +9,17 @@
   ).
   (should "(=? PARAM) returns an empty operator." (= ()
     (var opr (=? X).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr is-empty).
   ).
   (should "(=? (PARAMS ...)) returns an empty operator." (= ()
     (var opr (=? (X Y).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr is-empty).
   ).
   (should "(=? () body ...) returns a new operator which has no explicit parameter." (= ()
     (var opr (=?() 10).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr not-empty).
 
     (assert "opr" ($opr name).
@@ -28,7 +28,7 @@
   ).
   (should "(=? PARAM body ...) returns a new operator having an explicit parameter." (= ()
     (var opr (=? X 10 X).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr not-empty).
 
     (assert "opr" ($opr name).
@@ -41,7 +41,7 @@
   ).
   (should "(=? (PARAMS ...) body ...) returns a new operator having multiple parameters." (= ()
     (var opr (=? (X Y) 10 ((X) + (Y)).
-    (assert ($opr is-a operator).
+    (assert ($opr is-an operator).
     (assert ($opr not-empty).
 
     (assert "opr" ($opr name).

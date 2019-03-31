@@ -38,7 +38,7 @@
       (assert 1 (eval "(1 + 10) (return 1) (10 + 100)").
 
       (var r (eval "(1 + 10) (return 1 2) (10 + 100)").
-      (assert (r is-a array).
+      (assert (r is-an array).
       (assert 2 (r length).
       (assert 1 (r 0).
       (assert 2 (r 1).
@@ -49,7 +49,7 @@
       (assert 1 (eval "(1 + 10) (exit 1) (10 + 100)").
 
       (var r (eval "(1 + 10) (exit 1 2) (10 + 100)").
-      (assert (r is-a array).
+      (assert (r is-an array).
       (assert 2 (r length).
       (assert 1 (r 0).
       (assert 2 (r 1).
@@ -85,7 +85,7 @@
       (assert 1 (eval (unquote (1 + 10) (return 1) (10 + 100).
 
       (var r (eval (unquote (1 + 10) (return 1 2) (10 + 100).
-      (assert (r is-a array).
+      (assert (r is-an array).
       (assert 2 (r length).
       (assert 1 (r 0).
       (assert 2 (r 1).
@@ -97,7 +97,7 @@
       (assert 1 (eval (unquote (1 + 10) (exit 1) (10 + 100).
 
       (var r (eval (unquote (1 + 10) (exit 1 2) (10 + 100).
-      (assert (r is-a array).
+      (assert (r is-an array).
       (assert 2 (r length).
       (assert 1 (r 0).
       (assert 2 (r 1).

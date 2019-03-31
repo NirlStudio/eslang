@@ -24,13 +24,13 @@
   ).
   (should "(json parse str) returns a value from the json string." (= ()
     var list (json parse "[1,2,3]");
-    assert (list is-a array);
+    assert (list is-an array);
     assert 1 (list 0);
     assert 2 (list 1);
     assert 3 (list 2);
 
     (var obj (json parse '{"x":1,"y":2}').
-    assert (obj is-a object);
+    assert (obj is-an object);
     assert 1 (obj x);
     assert 2 (obj y);
   ).

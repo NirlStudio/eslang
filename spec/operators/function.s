@@ -188,13 +188,13 @@
   ).
   (should "(return values ...) returns an array which contains the values for current lambda or function." (=> ()
     (var a (=:() (return 1 2) 100).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 2 (a length).
     (assert 1 (a 0).
     (assert 2 (a 1).
 
     (let a (=:() (return 3 4 5) 100).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 3 (a length).
     (assert 3 (a 0).
     (assert 4 (a 1).
@@ -211,13 +211,13 @@
   ).
   (should "(exit values ...) returns an array which contains the values for current module." (=> ()
     (var a (eval "(exit 1 2) 100").
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 2 (a length).
     (assert 1 (a 0).
     (assert 2 (a 1).
 
     (let a (eval "(exit 3 4 5) 100").
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 3 (a length).
     (assert 3 (a 0).
     (assert 4 (a 1).

@@ -8,13 +8,13 @@
   (should "load and return the evaluation result of file source." (= ()
     (print -module)
     (var result (run "spec/runtime/_app").
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
 
-    (assert ((result 2) is-a array).
+    (assert ((result 2) is-an array).
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
@@ -32,12 +32,12 @@
 (define "(run app-source args)" (= ()
   (should "pass args to the app as arguments." (= ()
     (var result (run "spec/runtime/_app" (@ 1 10 100).
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
-    (assert ((result 2) is-a array).
+    (assert ((result 2) is-an array).
     (assert 1 ((result 2) 0).
     (assert 10 ((result 2) 1).
     (assert 100 ((result 2) 2).
@@ -51,12 +51,12 @@
   ).
   (should "requires args must be an array." (= ()
     (var result (run "spec/runtime/_app" (@ x: 1).
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
-    (assert ((result 2) is-a array).
+    (assert ((result 2) is-an array).
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
@@ -74,13 +74,13 @@
     ).
 
     (var result (run "spec/runtime/_app" args).
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
     (var feedback (result 2).
-    (assert (feedback is-a array).
+    (assert (feedback is-an array).
 
     (assert ((result 3) is-a string).
 
@@ -89,7 +89,7 @@
 
     (assert (result 3) (result 4).
 
-    (assert (feedback is-a array).
+    (assert (feedback is-an array).
     (assert (args length) (feedback length).
 
     (assert null (feedback 0).
@@ -122,12 +122,12 @@
 (define "(run app-source args app-home)" (=> ()
   (should "pass app-home to new app if it's a string." (=> ()
     (var result (run "_app" null -module-dir).
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
-    (assert ((result 2) is-a array).
+    (assert ((result 2) is-an array).
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
@@ -140,12 +140,12 @@
   ).
   (should "use current home if it's not a string." (= ()
     (var result (run "spec/runtime/_app" null true).
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
-    (assert ((result 2) is-a array).
+    (assert ((result 2) is-an array).
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).

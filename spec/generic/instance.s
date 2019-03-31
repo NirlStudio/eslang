@@ -639,7 +639,7 @@
       (assert "Bark!" (kitty roar).
       (var m (kitty as mammal).
 
-      (assert (m is-a object).
+      (assert (m is-an object).
       (assert 0 (m age).
       (assert 0 (m height).
       (assert 0 (m weight).

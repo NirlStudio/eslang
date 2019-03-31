@@ -9,7 +9,7 @@
 
 # import fields from an object into an array.
 (let list (import (passed failed) from symbols).
-(print "list is-a array?" (list is-a array).
+(print "list is-an array?" (list is-an array).
 (print "list length?" (list length) (list length:: == 2).
 
 # populate values from an array

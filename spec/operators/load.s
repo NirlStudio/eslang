@@ -17,7 +17,7 @@
     (assert 3 (data z).
 
     (assert null (data this).
-    (assert ((data arguments) is-a array).
+    (assert ((data arguments) is-an array).
     (assert ((data arguments) is-empty).
   ).
   (should "(load \"module\" args) returns the evaluation result with arguments." (=> ()
@@ -31,7 +31,7 @@
     (assert 103 (data z).
 
     (assert 100 (data this).
-    (assert ((data arguments) is-a array).
+    (assert ((data arguments) is-an array).
     (assert ((data arguments) not-empty).
     (assert 2 ((data arguments) length).
     (assert 200 ((data arguments) 0).

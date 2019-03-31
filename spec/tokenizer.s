@@ -97,7 +97,7 @@
 (define "(tokenize ...)" (= ()
   (should "(tokenize) returns an empty array." (= ()
     (var tokens (tokenize).
-    (assert (tokens is-a array).
+    (assert (tokens is-an array).
     (assert 0 (tokens length).
   ).
   (var assert-punc (=? (C T)
@@ -106,7 +106,7 @@
   ).
   (should "(tokenize punctuation-characters) produces each punctuation character literally." (=> ()
     (var tokens (tokenize "(()())").
-    (assert (tokens is-a array).
+    (assert (tokens is-an array).
     (assert 6 (tokens length).
     (assert-punc "(" (tokens 0).
     (assert-punc "(" (tokens 1).
@@ -126,7 +126,7 @@
   (define "symbols" (=> ()
     (should "(tokenize special-symbols) produces each special symbol character literally." (=> ()
       (var tokens (tokenize "``@@::$$[[]]{{}},,;;").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 20 (tokens length).
       (assert-sym "`" (tokens 0).
       (assert-sym "@" (tokens 2).
@@ -141,7 +141,7 @@
     ).
     (should "(tokenize symbols) allows any characters in a symbol as long as it's neither a punctuation nor a space." (=> ()
       (var tokens (tokenize "~!%^&*_abc ABC -+=|<>.?/123").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 5 (tokens length).
       (assert-sym "~!%^&*_abc" (tokens 0).
       （assert-space " " (tokens 1).
@@ -151,7 +151,7 @@
     ).
     (should "a punctuation may be included in a symbol by escaping." (=> ()
       (var tokens (tokenize "\\( \\) \\(\\) \\)\\( \\(a\\\\b\\)").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 9 (tokens length).
       (assert-sym "(" (tokens 0).
       (assert-space " " (tokens 1).
@@ -165,7 +165,7 @@
     ).
     (should "a space may be included in a symbol by escaping." (=> ()
       (var tokens (tokenize "\\ \t\\\t \\ \\\t \\\t\\  \\ a\\\tb\\  \\").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 11 (tokens length).
       (assert-sym " " (tokens 0).
       (assert-space "\t" (tokens 1).
@@ -181,7 +181,7 @@
     ).
     (should "a special symbol may be included in a symbol by escaping." (=> ()
       (var tokens (tokenize "\\` \\@ \\: \\$ \\[ \\] \\{ \\} \\, \\; \\\\").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 21 (tokens length).
       (assert-sym "`" (tokens 0).
       (assert-sym "@" (tokens 2).
@@ -204,7 +204,7 @@
   (define "indention" (=> ()
     (should "(tokenize code) ignores the indenting spaces for each line." (=> ()
       (var tokens (tokenize " \t|\r\n\t |\n \t\t |").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 6 (tokens length).
       (assert-sym "|" (tokens 0).
       (assert-space "\r" (tokens 1).
@@ -215,7 +215,7 @@
     ).
     (should "(tokenize code) produces the first space only for a space character sequence." (=> ()
       (var tokens (tokenize "( \t\r|\t \r|\r  \t|\n )").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 9 (tokens length).
       (assert-punc "(" (tokens 0).
       (assert-space " " (tokens 1).
@@ -229,7 +229,7 @@
     ).
     (should "(tokenize code) ignores the indenting spaces for each line." (=> ()
       (var tokens (tokenize " \t|\r\n\t |\n \t\t |").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 6 (tokens length).
       (assert-sym "|" (tokens 0).
       (assert-space "\r" (tokens 1).
@@ -247,7 +247,7 @@
       (assert-sym "|" (tokens 0).
 
       (assert (warning is-not old-warning).
-      (assert (warning is-a array).
+      (assert (warning is-an array).
       (assert "tokenizer" (warning 0).
     ).
   ).
@@ -258,7 +258,7 @@
   (define "constant values" (=> ()
     (should "(tokenize code) feeds all constant values directly to parser." (=> ()
       (var tokens (tokenize "null true false").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 5 (tokens length).
       (assert-value null (tokens 0).
       (assert-value true (tokens 2).
@@ -268,7 +268,7 @@
   (define "number values" (=> ()
     (should "(tokenize code) takes all symbols leading by a number as a number." (=> ()
       (var tokens (tokenize "0 1 1.1 1.1e2 1.1e-2 0x0 0xff 0xFF 00 011 0b0 0b1111").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 23 (tokens length).
       (assert-value 0 (tokens 0).
       (assert-value 1 (tokens 2).
@@ -285,7 +285,7 @@
     ).
     (should "(tokenize code) allows a lead negative sign for float and decimal integer number." (=> ()
       (var tokens (tokenize "-0 -1 -1.1 -1.1e2 -1.1e-2").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 9 (tokens length).
       (assert-value -0 (tokens 0).
       (assert (((tokens 0) 1) is -0).
@@ -299,25 +299,25 @@
   (define "string values" (=> ()
     (should "(tokenize code) feeds a string value to parser function." (=> ()
       (var tokens (tokenize "\"abc\"").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-value "abc" (tokens 0).
     ).
     (should "(tokenize code) allows a string value has multiple lines." (=> ()
       (var tokens (tokenize "\"abc\ncde\n\"").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-value "abccde" (tokens 0).
     ).
     (should "(tokenize code) only keeps the first space character in new line." (=> ()
       (var tokens (tokenize "\"abc\n cde\n\t efg\n \t \\nghi\"").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-value "abc cde efg \nghi" (tokens 0).
     ).
     (should "(tokenize code) keeps the new-line after a trailing escaping char '\\'." (=> ()
       (var tokens (tokenize "\"abc ccc\\\ncde\\teee\\\n efg\\\n\t  ghi\"").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-value "abc ccc\ncde\teee\nefg\nghi" (tokens 0).
     ).
@@ -326,12 +326,12 @@
       (var tokens (tokenize "\"abc").
       (var warning (warn).
 
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-value "abc" (tokens 0).
 
       (assert (warning is-not old-warning).
-      (assert (warning is-a array).
+      (assert (warning is-an array).
       (assert "tokenizer" (warning 0).
     ).
     (should "(tokenize code) keeps the literal string value if the un-escaping failed." (=> ()
@@ -340,7 +340,7 @@
       (var warning (warn).
 
       (var assert-str (=? STR
-        (assert (tokens is-a array).
+        (assert (tokens is-an array).
         (assert 1 (tokens length).
         (assert-value (STR) (tokens 0).
       ).
@@ -348,7 +348,7 @@
 
       (var assert-warning (=? C
         (assert (warning is-not old-warning).
-        (assert (warning is-a array).
+        (assert (warning is-an array).
         (assert ((C) ?? "string:unescape") (warning 0).
       ).
       (assert-warning)
@@ -385,7 +385,7 @@
   (define "format values" (=> ()
     (should "(tokenize code) feeds a single-quoted format value to parser function." (=> ()
       (var tokens (tokenize "'abc\"cde'").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-format "abc\"cde" (tokens 0).
     ).
@@ -397,12 +397,12 @@
   (define "comments" (=> ()
     (should "(tokenize code) supports line comment leading by '#'." (=> ()
       (var tokens (tokenize "# abc").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-comment " abc" (tokens 0).
 
       (let tokens (tokenize "# abc \n cde").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 3 (tokens length).
       (assert-comment " abc " (tokens 0).
       (assert-space "\n" (tokens 1).
@@ -410,7 +410,7 @@
     ).
     (should "(tokenize code) supports inline-comment enclosed in #(...)#." (=> ()
       (var tokens (tokenize "#( abc)# \tcde").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 3 (tokens length).
       (assert-comment "( abc)" (tokens 0).
       (assert-space " " (tokens 1).
@@ -418,7 +418,7 @@
     ).
     (should "(tokenize code) supports multiline-comment enclosed in #(...\\n...)#." (=> ()
       (var tokens (tokenize "#( abc \n \n\t cde\nefg)#ghi ijk").
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 4 (tokens length).
       (assert-comment "( abc \n \n\t cde\nefg)" (tokens 0).
       (assert-sym "ghi" (tokens 1).
@@ -430,7 +430,7 @@
       (var tokens (tokenize "#( abc").
       (var warning (warn).
 
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-comment "( abc)" (tokens 0).
 
@@ -441,7 +441,7 @@
       (var tokens (tokenize "#( abc\n\t  cde").
       (let warning (warn).
 
-      (assert (tokens is-a array).
+      (assert (tokens is-an array).
       (assert 1 (tokens length).
       (assert-comment "( abc\n\t  cde)" (tokens 0).
 

@@ -250,28 +250,28 @@
       ).
     ).
     (should "type's proto is a descriptor object." (=> ()
-      (assert ((the-type proto) is-a object).
+      (assert ((the-type proto) is-an object).
 
-      (assert ((the-type "proto") is-a object).
-      (assert ((the-type (`proto)) is-a object).
+      (assert ((the-type "proto") is-an object).
+      (assert ((the-type (`proto)) is-an object).
 
-      (assert ((the-type :"proto") is-a object).
-      (assert ((the-type :(`proto)) is-a object).
+      (assert ((the-type :"proto") is-an object).
+      (assert ((the-type :(`proto)) is-an object).
 
-      (assert ((the-type :"proto" x) is-a object).
-      (assert ((the-type :(`proto) x) is-a object).
+      (assert ((the-type :"proto" x) is-an object).
+      (assert ((the-type :(`proto) x) is-an object).
     ).
     (should "type's proto returns the objectified type." (=> ()
       (var t (the-type proto).
       # a type descriptor is an common object.
-      (assert (t is-a object).
+      (assert (t is-an object).
       (assert ((type of t) is object).
-      (assert ((t type) is-a object).
+      (assert ((t type) is-an object).
       (assert the-type ((t type) indexer "type").
 
       (var s (t type).
       # a type's type descriptor is an common object.
-      (assert (s is-a object).
+      (assert (s is-an object).
       (assert ((s type) is object).
       # proto is not directly visible.
       (assert ((s proto) is null).
@@ -472,14 +472,14 @@
 (define "Type Reflection" (=> ()
   (should "(type reflect) returns the object representation of type." (=> ()
     (var t (the-type reflect).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert ((type of t) is object).
     (for (k v) in t
       (if ($v is-a lambda) (assert ($v is-bound).
       (if ($v is-a function) (assert ($v is-bound).
     ).
 
-    (assert ((t type) is-a object).
+    (assert ((t type) is-an object).
     (for (k v) in (t type)
       (if ($v is-a lambda) (assert ($v is-bound).
       (if ($v is-a function) (assert ($v is-bound).

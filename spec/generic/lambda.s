@@ -286,7 +286,7 @@
   ).
   (should "a stambda has not this, arguments, do." (= ()
     (let ctx (->:() (@ this arguments do).
-    (assert (ctx is-a array).
+    (assert (ctx is-an array).
     (assert 3 (ctx length).
     (assert null (ctx 0).
     (assert null (ctx 1).
@@ -294,13 +294,13 @@
   ).
   (should "a stambda only allows one argument at most." (= ()
     (var args (-> 10:x (@ 1 x).
-    (assert (args is-a array).
+    (assert (args is-an array).
     (assert 2 (args length).
     (assert 1 (args 0).
     (assert 10 (args 1).
 
     (let args (->(1 2):(x y) (@ y x).
-    (assert (args is-a array).
+    (assert (args is-an array).
     (assert 2 (args length).
     (assert null (args 0).
     (assert 1 (args 1).
@@ -310,14 +310,14 @@
   ).
   (should "a stambda has no access to -app and -module." (= ()
     (var ctx (=:() (@ 1 -app -module).
-    (assert (ctx is-a array).
+    (assert (ctx is-an array).
     (assert 3 (ctx length).
     (assert 1 (ctx 0).
     (assert (ctx 1:: is-a string).
     (assert (ctx 2:: is-a string).
 
     (let ctx (->:() (@ 1 -app -module).
-    (assert (ctx is-a array).
+    (assert (ctx is-an array).
     (assert 3 (ctx length).
     (assert 1 (ctx 0).
     (assert null (ctx 1).
@@ -325,14 +325,14 @@
   ).
   (should "a stambda cannot import another module." (= ()
     (var mod (=:() (import "test").
-    (assert (mod is-a object).
+    (assert (mod is-an object).
 
     (let mod (->:() (import "test").
     (assert (mod is null).
   ).
   (should "a stambda has no access to (env)." (= ()
     (var envs (=:() (env).
-    (assert (envs is-a object).
+    (assert (envs is-an object).
 
     (let envs (->:() (env).
     (assert (envs is null).

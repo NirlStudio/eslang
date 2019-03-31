@@ -107,7 +107,7 @@
     (assert null (obj: "x").
 
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 1 (fields length).
     (assert "x" (fields 0).
 
@@ -123,7 +123,7 @@
     (assert 2 (obj: "y").
 
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 2 (fields length).
     (assert "x" (fields 0).
     (assert "y" (fields 1).
@@ -145,7 +145,7 @@
     (assert 3 (obj: "z").
 
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 3 (fields length).
     (assert "x" (fields 0).
     (assert "y" (fields 1).
@@ -166,7 +166,7 @@
     (assert 2 (obj: "y").
 
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 1 (fields length).
     (assert "y" (fields 0).
   ).
@@ -195,7 +195,7 @@
     (var obj (object of (@ x: 1).
     (assert 1 (obj x).
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 1 (fields length).
     (assert "x" (fields 0).
 
@@ -204,7 +204,7 @@
     (assert 2 (obj y).
 
     (let fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 2 (fields length).
     (assert "x" (fields 0).
     (assert "y" (fields 1).
@@ -215,7 +215,7 @@
     (assert 3 (obj z).
 
     (let fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 3 (fields length).
     (assert "x" (fields 0).
     (assert "y" (fields 1).
@@ -231,7 +231,7 @@
     (assert 3 (obj z).
 
     (var fields (object fields-of obj).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 2 (fields length).
     (assert "y" (fields 0).
     (assert "z" (fields 1).
@@ -466,7 +466,7 @@
     (var src (@ x:1 y:null z: 3).
     (var obj (object copy src).
     (assert (obj is-not src).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert 1 (obj x).
     (assert true (object owns obj "y").
     (assert null (obj y).
@@ -484,12 +484,12 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
     (assert null (tom cloned).
 
     (var tomm (object copy tom).
     (assert (tomm is-not tom).
-    (assert (tomm is-a object).
+    (assert (tomm is-an object).
 
     (assert (tomm is-a cat).
     (assert "Tom" (tomm name).
@@ -499,7 +499,7 @@
     (var src (@ x:1 y:null z: 3).
     (var obj (object copy src "y" (`z).
     (assert (obj is-not src).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert false (object owns obj "x").
     (assert (object owns obj "y").
     (assert null (obj y).
@@ -518,12 +518,12 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
     (assert null (tom cloned).
 
     (var tomm (object copy tom "name" "hate").
     (assert (tomm is-not tom).
-    (assert (tomm is-a object).
+    (assert (tomm is-an object).
 
     (assert (tomm is-a cat).
     (assert (object owns tomm "name").
@@ -589,7 +589,7 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
 
     (assert tom (object clear tom).
     (assert false (object owns tom "name").
@@ -616,7 +616,7 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
 
     (assert tom (object clear tom "name" (` inner-name).
     (assert false (object owns tom "name").
@@ -666,7 +666,7 @@
     (var src (@ x:1 y:null z: 3).
     (var obj (object remove src).
     (assert (obj is-not src).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert 1 (obj x).
     (assert true (object owns obj "y").
     (assert null (obj y).
@@ -684,12 +684,12 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
     (assert null (tom cloned).
 
     (var tomm (object remove tom).
     (assert (tomm is-not tom).
-    (assert (tomm is-a object).
+    (assert (tomm is-an object).
 
     (assert (tomm is-a cat).
     (assert "Tom" (tomm name).
@@ -699,7 +699,7 @@
     (var src (@ x:1 y:null z: 3).
     (var obj (object remove src "y" (`z).
     (assert (obj is-not src).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert (object owns obj "x").
     (assert 1 (obj x).
     (assert false (object owns obj "y").
@@ -720,12 +720,12 @@
     ).
     (assert (cat is-a class).
     (var tom (cat of "Tom").
-    (assert (tom is-a object).
+    (assert (tom is-an object).
     (assert null (tom cloned).
 
     (var tomm (object remove tom "name" "hate").
     (assert (tomm is-not tom).
-    (assert (tomm is-a object).
+    (assert (tomm is-an object).
 
     (assert (tomm is-a cat).
     (assert false (object owns tomm "name").
@@ -877,7 +877,7 @@
 (define "(object fields-of ...)" (= ()
   (should "(object fields-of) returns an empty array." (= ()
     (var fields (object fields-of).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 0 (fields length).
   ).
   (should "(object fields-of target) returns an empty array if target is not an object." (= ()
@@ -889,7 +889,7 @@
     ).
     (for target in targets
       (var fields (object fields-of target).
-      (assert (fields is-a array).
+      (assert (fields is-an array).
       (assert 0 (fields length).
     ).
   ).
@@ -898,13 +898,13 @@
     (var targets (@ (@:) (object empty) (object of) (object from) (cat of) (cat empty).
     (for target in targets
       (var fields (object fields-of target).
-      (assert (fields is-a array).
+      (assert (fields is-an array).
       (assert 0 (fields length).
     ).
   ).
   (should "(object fields-of obj) returns an array of field names." (= ()
     (var fields (object fields-of (@ x:1 y).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 2 (fields length).
     (assert "x" (fields 0).
     (assert "y" (fields 1).
@@ -916,7 +916,7 @@
       ).
     ).
     (var fields (object fields-of (cat of 2).
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 2 (fields length).
     (assert "y" (fields 0).
     (assert "z" (fields 1).

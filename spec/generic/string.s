@@ -917,45 +917,45 @@
 
 (define "(a-string split)" (= ()
   (should "(str split) returns an array with single element of the original string" (= ()
-    (assert (("" split) is-a array).
+    (assert (("" split) is-an array).
     (assert ((("" split) length) is 1).
     (assert ((("" split) 0) is "").
 
-    (assert (("ABC" split) is-a array).
+    (assert (("ABC" split) is-an array).
     (assert ((("ABC" split) length) is 1).
     (assert ((("ABC" split) 0) is "ABC").
   ).
   (should "(str split \"\") returns an array with single element of the original string" (= ()
-    (assert (("" split "") is-a array).
+    (assert (("" split "") is-an array).
     (assert ((("" split "") length) is 1).
     (assert ((("" split "") 0) is "").
 
-    (assert (("ABC" split "") is-a array).
+    (assert (("ABC" split "") is-an array).
     (assert ((("ABC" split "") length) is 1).
     (assert ((("ABC" split "") 0) is "ABC").
   ).
   (should "(str split separater) returns an array splted by the separater." (= ()
-    (assert (("" split "A") is-a array).
+    (assert (("" split "A") is-an array).
     (assert ((("" split "A") length) is 1).
     (assert ((("" split "A") 0) is "").
 
-    (assert (("ABC" split "A") is-a array).
+    (assert (("ABC" split "A") is-an array).
     (assert ((("ABC" split "A") length) is 2).
     (assert ((("ABC" split "A") 0) is "").
     (assert ((("ABC" split "A") 1) is "BC").
 
-    (assert (("ABC" split "B") is-a array).
+    (assert (("ABC" split "B") is-an array).
     (assert ((("ABC" split "B") length) is 2).
     (assert ((("ABC" split "B") 0) is "A").
     (assert ((("ABC" split "B") 1) is "C").
 
-    (assert (("ABBC" split "B") is-a array).
+    (assert (("ABBC" split "B") is-an array).
     (assert ((("ABBC" split "B") length) is 3).
     (assert ((("ABBC" split "B") 0) is "A").
     (assert ((("ABBC" split "B") 1) is "").
     (assert ((("ABBC" split "B") 2) is "C").
 
-    (assert (("ABC" split "C") is-a array).
+    (assert (("ABC" split "C") is-an array).
     (assert ((("ABC" split "C") length) is 2).
     (assert ((("ABC" split "C") 0) is "AB").
     (assert ((("ABC" split "C") 1) is "").

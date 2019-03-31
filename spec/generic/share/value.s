@@ -2,8 +2,8 @@
 # external the-value, other-values, the-type, other-types
 ($the-value ?? (warn "the-value is missing.").
 (($the-value is-a the-type) ? (warn "the-value does not match with the-type.").
-(($other-values is-a array) ? (warn "other-values should be an array").
-(($other-types is-a array) ? (warn "other-types should be an array").
+(($other-values is-an array) ? (warn "other-values should be an array").
+(($other-types is-an array) ? (warn "other-types should be an array").
 ################################################################################
 (define "Identity" (=> ()
   (should "A value is always itself." (=> ()

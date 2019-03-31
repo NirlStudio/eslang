@@ -114,7 +114,7 @@
     (var result (while (i < 10) (++ i) (continue 10 100) (i ++).
     (assert 10 i)
 
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert 10 (result 0).
     (assert 100 (result 1).
   ).
@@ -127,7 +127,7 @@
     (var i 0)
     (var result (while (i < 10) (++ i) (? (i > 5) (break 10 100).
     (assert 6 i)
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert 10 (result 0).
     (assert 100 (result 1).
   ).
@@ -215,7 +215,7 @@
     (var i 0)
     (var result (for i in (1 10) (++ i) (? (i > 5) (break 10 100).
     (assert 6 i)
-    (assert (result is-a array).
+    (assert (result is-an array).
     (assert 10 (result 0).
     (assert 100 (result 1).
   ).

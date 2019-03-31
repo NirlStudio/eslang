@@ -655,33 +655,33 @@
 (define "(an-iterator collect ...)" (= ()
   (should "(empty-iter collect) returns an empty array." (= ()
     (var a ((iterator empty) collect).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert (a is-empty).
   ).
   (should "(empty-iter collect list) returns the original list if it's an array." (= ()
     (var a (@ 1 2).
     (var b ((iterator empty) collect a).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is a).
   ).
   (should "(iter collect) returns an array with the values of all iterations." (= ()
     (var c ((iterator empty) collect).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 0 (c length).
 
     (let c ((iterator of (@ 1)) collect).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 1 (c length).
     (assert 1 (c 0).
 
     (let c ((iterator of (@ 1 10:"10")) collect).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 2 (c length).
     (assert 1 (c 0).
     (assert "10" (c 1).
 
     (let c ((iterator of (@ 1 10:"10" 100:"xxx")) collect).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 3 (c length).
     (assert 1 (c 0).
     (assert "10" (c 1).
@@ -690,25 +690,25 @@
   (should "(iter collect list) appends the values of all iterations to list if it's an array." (= ()
     (var a (@ 1 2).
     (var c ((iterator empty) collect a).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 2 (c length).
 
     (let a (@ 1 2).
     (let c ((iterator of (@ 1)) collect a).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 3 (c length).
     (assert 1 (c 2).
 
     (let a (@ 1 2).
     (let c ((iterator of (@ 1 10:"10")) collect a).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 4 (c length).
     (assert 1 (c 2).
     (assert "10" (c 3).
 
     (let a (@ 1 2).
     (let c ((iterator of (@ 1 10:"10" 100:"xxx")) collect a).
-    (assert (c is-a array).
+    (assert (c is-an array).
     (assert 5 (c length).
     (assert 1 (c 2).
     (assert "10" (c 3).

@@ -1,18 +1,18 @@
 (define "(@ ...) - implicit literal" (= ()
   (should "(@) returns an empty array." (= ()
-    (assert ((@) is-a array).
+    (assert ((@) is-an array).
     (assert ((@) is-empty).
     (assert ((@) is-not (@).
   ).
   (should "(@ name: ...) returns an object." (= ()
-    (assert ((@ name:) is-a object).
+    (assert ((@ name:) is-an object).
     (assert ((@ name:) not-empty).
     (assert ((@ name:) is-not (@ name:).
     (assert (object owns (@ name:) "name").
     (assert null ((@ name:) "name")
   ).
   (should "(@ \"name\": ...) returns an object." (= ()
-    (assert ((@ "name": 1) is-a object).
+    (assert ((@ "name": 1) is-an object).
     (assert ((@ "name": 1) not-empty).
     (assert ((@ "name": 1) is-not (@ "name": 1).
     (assert (object owns (@ "name": 1) "name").
@@ -21,7 +21,7 @@
   (should "an implicit object supports variable as field." (= ()
     (var y 2).
     (var obj (@ x: 1 y z a:10).
-    (assert (obj is-a object).
+    (assert (obj is-an object).
     (assert (obj not-empty).
 
     (assert (object owns obj "x").
@@ -36,7 +36,7 @@
   ).
   (should "(@ offset: ...) returns a discrete or normal array." (= ()
     (var a (@ 10:).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert (a not-empty).
     (assert 11 (a length).
     (assert 1 (a count).
@@ -44,7 +44,7 @@
   ).
   (should "(@ ...) returns a normal array." (= ()
     (var a (@ (` x): 1 2). # (` x) is neither a symbol nor a string.
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert (a not-empty).
     (assert 2 (a length).
     (assert 2 (a count).
@@ -53,7 +53,7 @@
   ).
   (should "an implicit array can be a discrete array." (= ()
     (var a (@ 1 2 10:10 11 100:100).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert (a not-empty).
     (assert 101 (a length).
     (assert 5 (a count).
@@ -72,20 +72,20 @@
 
 (define "(@: ...) - explicit literal" (= ()
   (should "(@:) returns an empty object" (= ()
-    (assert ((@:) is-a object).
+    (assert ((@:) is-an object).
     (assert ((@:) is-empty).
     (assert ((@:) is-not (@:).
   ).
   (define "(@:@ ...) - compact object" (= ()
     (should "(@:@) returns an empty object" (= ()
-      (assert ((@:@) is-a object).
+      (assert ((@:@) is-an object).
       (assert ((@:@) is-empty).
       (assert ((@:@) is-not (@:@).
     ).
     (should "(@:@ ...) supports variable field." (= ()
       (var y 2)
       (var obj (@:@ x y z: 3).
-      (assert (obj is-a object).
+      (assert (obj is-an object).
       (assert (obj not-empty).
 
       (assert (object owns obj "x").
@@ -106,7 +106,7 @@
         (`y)
         (symbol of "z"): 3
       ).
-      (assert (obj is-a object).
+      (assert (obj is-an object).
       (assert (obj not-empty).
 
       (assert (object owns obj "0").
@@ -124,14 +124,14 @@
   ).
   (define "(@:object ...) - explicit object" (= ()
     (should "(@:object) returns an empty object." (= ()
-      (assert ((@:object) is-a object).
+      (assert ((@:object) is-an object).
       (assert ((@:object) is-empty).
       (assert ((@:object) is-not (@:object).
     ).
     (should "(@:object ...) supports variable field." (= ()
       (var y 2)
       (var obj (@:object x y z: 3).
-      (assert (obj is-a object).
+      (assert (obj is-an object).
       (assert (obj not-empty).
 
       (assert (object owns obj "x").
@@ -152,7 +152,7 @@
         (`y)
         (symbol of "z"): 3
       ).
-      (assert (obj is-a object).
+      (assert (obj is-an object).
       (assert (obj not-empty).
 
       (assert (object owns obj "0").
@@ -170,13 +170,13 @@
   ).
   (define "(@:* ...) - compact array" (= ()
     (should "(@:*) returns an empty array." (= ()
-      (assert ((@:*) is-a array).
+      (assert ((@:*) is-an array).
       (assert ((@:*) is-empty).
       (assert ((@:*) is-not (@:*).
     ).
     (should "(@:* ...) supports discrete array" (= ()
       (var a (@:* x:1 y:2 10:10 z:11 100:100).
-      (assert (a is-a array).
+      (assert (a is-an array).
       (assert (a not-empty).
       (assert 101 (a length).
       (assert 5 (a count).
@@ -194,13 +194,13 @@
   ).
   (define "(@:array ...) - explicit array" (= ()
     (should "(@:array) returns an empty array." (= ()
-      (assert ((@:array) is-a array).
+      (assert ((@:array) is-an array).
       (assert ((@:array) is-empty).
       (assert ((@:array) is-not (@:array).
     ).
     (should "(@:array ...) supports discrete array" (= ()
       (var a (@:array x:1 y:2 10:10 z:11 100:100).
-      (assert (a is-a array).
+      (assert (a is-an array).
       (assert (a not-empty).
       (assert 101 (a length).
       (assert 5 (a count).
@@ -311,7 +311,7 @@
       (assert true activated).
 
       (assert (kitty is-a cat).
-      (assert (kitty is-a object).
+      (assert (kitty is-an object).
       (assert (kitty is-empty).
     ).
     (should "(@:a-class ...) returns an activated instance with given properties." (=> ()
@@ -324,7 +324,7 @@
       (assert true activated).
 
       (assert (kitty is-a cat).
-      (assert (kitty is-a object).
+      (assert (kitty is-an object).
       (assert (kitty not-empty).
 
       (assert "Charles" (kitty name).
@@ -343,7 +343,7 @@
       (var y 2)
       (for t in invalid-types
         (var obj (@:t x: 1 y z).
-        (assert (obj is-a object).
+        (assert (obj is-an object).
         (assert ((obj type) is object).
         (assert (obj not-empty).
         (assert 1 (obj x).
@@ -351,7 +351,7 @@
         (assert null (obj z).
 
         (var obj (@:(t) x: 1 y z).
-        (assert (obj is-a object).
+        (assert (obj is-an object).
         (assert ((obj type) is object).
         (assert (obj not-empty).
 

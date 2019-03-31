@@ -69,7 +69,7 @@
     var t (timer of);
     assert (t is-a timer);
     assert (t is-a emitter);
-    assert (t is-a object);
+    assert (t is-an object);
     assert 1000 (t interval);
   ).
 ).
@@ -79,14 +79,14 @@
     var t (timer of);
     assert (t is-a timer);
     assert (t is-a emitter);
-    assert (t is-a object);
+    assert (t is-an object);
     assert 1000 (t interval);
   ).
   (should "(timer of interval) constructs a new timer of the interval." (=> ()
     var t (timer of 10);
     assert (t is-a timer);
     assert (t is-a emitter);
-    assert (t is-a object);
+    assert (t is-an object);
     assert 10 (t interval);
   ).
   (should "(timer of interval on-elapsed) registers the listener for event elapsed." (=> ()
@@ -94,7 +94,7 @@
     var t (timer of 10 on-elapsed);
     assert (t is-a timer)
     assert (t is-a emitter)
-    assert (t is-a object)
+    assert (t is-an object)
 
     assert 1 (t listeners:: elapsed:: length)
     assert on-elapsed (t listeners:: elapsed:: first)
@@ -102,7 +102,7 @@
   (should "a timer instance has events of 'started', 'elapsed' and 'stopped'." (=> ()
     var t (timer of);
     var events (object fields-of (t listeners);
-    assert (events is-a array);
+    assert (events is-an array);
     assert 3 (events length);
     assert (events contains "started");
     assert (events contains "elapsed");
@@ -124,10 +124,10 @@
     ).
     assert (t is-a timer);
     assert (t is-a emitter);
-    assert (t is-a object);
+    assert (t is-an object);
     assert 100 (t interval);
 
-    assert (t listeners:: is-a object);
+    assert (t listeners:: is-an object);
     assert 3 (object fields-of (t listeners):: length);
     assert 0 (t listeners:: started:: length);
     assert 0 (t listeners:: elapsed:: length);
@@ -137,10 +137,10 @@
     var t (@:timer);
     assert (t is-a timer);
     assert (t is-a emitter);
-    assert (t is-a object);
+    assert (t is-an object);
     assert 1000 (t interval);
 
-    assert (t listeners:: is-a object);
+    assert (t listeners:: is-an object);
     assert 3 (object fields-of (t listeners):: length);
     assert 0 (t listeners:: started:: length);
     assert 0 (t listeners:: elapsed:: length);

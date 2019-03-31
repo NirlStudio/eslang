@@ -95,7 +95,7 @@
   ).
   (should "(array of item ...) returns an array of items." (= ()
     (var a (array of null true 1 "a" (date of 1) (0 1) (` x) (` (x y)) (@ 1 2) (@:).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 10 (a length).
 
     (assert null (a 0).
@@ -106,8 +106,8 @@
     (assert (0 1) (a 5).
     (assert (` x) (a 6).
     (assert (`(x y)) (a 7).
-    (assert ((a 8) is-a array).
-    (assert ((a 9) is-a object).
+    (assert ((a 8) is-an array).
+    (assert ((a 9) is-an object).
   ).
 ).
 
@@ -118,7 +118,7 @@
   ).
   (should "(array from item ...) returns an array of items." (= ()
     (var a (array from null true 1 "a" (date of 1) (` x).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 6 (a length).
 
     (assert null (a 0).
@@ -130,7 +130,7 @@
   ).
   (should "(array from list ...) returns an array which consisted of items from all lists." (= ()
     (var a (array from (0 2) (` (x y)) (@ 1 2) (@ x: 1 y: 2).
-    (assert (a is-a array).
+    (assert (a is-an array).
     (assert 8 (a length).
 
     (assert 0 (a 0).
@@ -465,17 +465,17 @@
     (var iter (a iterate).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -492,17 +492,17 @@
     (var iter (a iterate).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -519,17 +519,17 @@
     (var iter (a iterate).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
@@ -540,12 +540,12 @@
     (var iter (a iterate 1).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -554,12 +554,12 @@
     (let iter (a iterate -2).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -568,31 +568,31 @@
     (let iter (a iterate -4).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate 2).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -612,12 +612,12 @@
     (var iter (a iterate 1).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -626,12 +626,12 @@
     (let iter (a iterate -10).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -640,31 +640,31 @@
     (let iter (a iterate -12).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate 10).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -684,12 +684,12 @@
     (var iter (a iterate 1).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
@@ -698,31 +698,31 @@
     (var iter (a iterate -101).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate 100).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
@@ -737,12 +737,12 @@
     (var iter (a iterate 1 3).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -751,12 +751,12 @@
     (let iter (a iterate -2 4).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -765,19 +765,19 @@
     (let iter (a iterate -4 -1).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1 3).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 10 ((iter true) 0).
     (assert 2 ((iter true) 1).
@@ -800,12 +800,12 @@
     (var iter (a iterate 1 11).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -814,7 +814,7 @@
     (let iter (a iterate -10 -1).
     (assert ($iter is-a function).
 f
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
@@ -823,19 +823,19 @@ f
     (let iter (a iterate -12 5).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1 11).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 11 ((iter true) 0).
     (assert 10 ((iter true) 1).
@@ -858,12 +858,12 @@ f
     (var iter (a iterate 1 101).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
@@ -872,19 +872,19 @@ f
     (var iter (a iterate -101 -1).
     (assert ($iter is-a function).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert null ((iter true) 0).
     (assert 0 ((iter true) 1).
 
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert true ((iter true) 0).
     (assert 1 ((iter true) 1).
     (assert null (iter).
 
     (let iter (a iterate -1 101).
-    (assert ((iter) is-a array).
+    (assert ((iter) is-an array).
     (assert 2 ((iter true) length).
     (assert 101 ((iter true) 0).
     (assert 100 ((iter true) 1).
@@ -2928,49 +2928,49 @@ f
   (should "(an-array first count filter) returns the first at most <count> matched element(s) by filter in a new array." (= ()
     (var a (@).
     (var b (a first 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 1).
     (let b (a first 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 1 2).
     (let b (a first 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
     (let b (a first 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
 
     (let a (@ 1 2 3).
     (let b (a first 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a first 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
     (let b (a first 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 2 (b 0).
     (assert 3 (b 1).
@@ -3110,13 +3110,13 @@ f
 
     (a 10 10).
     (assert (a not-sparse).
-    (assert ((a last 0) is-a array).
+    (assert ((a last 0) is-an array).
     (assert ((a last 0) is-empty).
     (assert ((a last -1) is-empty).
 
     (a 100 100).
     (assert (a is-sparse).
-    (assert ((a last 0) is-a array).
+    (assert ((a last 0) is-an array).
     (assert ((a last 0) is-empty).
     (assert ((a last -1) is-empty).
   ).
@@ -3172,49 +3172,49 @@ f
   (should "(an-array last count filter) returns the last at most <count> matched element(s) by filter in a new array." (= ()
     (var a (@).
     (var b (a last 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 1).
     (let b (a last 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 2 1).
     (let b (a last 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
     (let b (a last 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
 
     (let a (@ 3 2 1).
     (let b (a last 0 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
     (let b (a last 1 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
     (let b (a last 2 (= x (x > 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 3 (b 0).
     (assert 2 (b 1).
@@ -4248,35 +4248,35 @@ f
   (should "(an-array pop count) returns the last <count> element(s) and removes them from the array." (= ()
     (var a (@).
     (var b (a pop 0).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let b (a pop 1).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let b (a pop 2).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 1).
     (let b (a pop 0).
     (assert 0 (a length).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 1 (b 0).
 
     (let a (@ 1).
     (let b (a pop 1).
     (assert 0 (a length).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 1 (b 0).
 
     (let a (@ 1).
     (let b (a pop 2).
     (assert 0 (a length).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 1 (b 0).
 
@@ -4284,7 +4284,7 @@ f
     (let b (a pop -1).
     (assert 1 (a length).
     (assert 1 (a 0).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
 
@@ -4292,7 +4292,7 @@ f
     (let b (a pop 0).
     (assert 1 (a length).
     (assert 1 (a 0).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
 
@@ -4300,14 +4300,14 @@ f
     (let b (a pop 1).
     (assert 1 (a length).
     (assert 1 (a 0).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 2 (b 0).
 
     (let a (@ 1 2).
     (let b (a pop 2).
     (assert 0 (a length).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 1 (b 0).
     (assert 2 (b 1).
@@ -4321,7 +4321,7 @@ f
     (let b (a pop 1).
     (assert 11 (a length).
     (assert 3 (a count).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 1 (b length).
     (assert 1 (b count).
     (assert 11 (b 0).
@@ -4335,7 +4335,7 @@ f
     (let b (a pop 3).
     (assert 99 (a length).
     (assert 2 (a count).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 2 (b count).
     (assert null (b 0).
@@ -4766,12 +4766,12 @@ f
   (should "(an-array find) returns indices of all existing elements." (= ()
     (var a (@).
     (var b (a find).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 0 (b length).
 
     (let a (@ 1 2).
     (let b (a find).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 2 (b count).
     (assert 0 (b 0).
@@ -4781,7 +4781,7 @@ f
     (a 10 10)
     (assert (a not-sparse).
     (let b (a find).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 0 (b 0).
@@ -4792,7 +4792,7 @@ f
     (a 100 100)
     (assert (a is-sparse).
     (let b (a find).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 0 (b 0).
@@ -4803,13 +4803,13 @@ f
     (var matched (= x (x >= 3).
     (var a (@).
     (var b (a find).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 0 (b length).
 
     (let a (@ 4 2 3 1).
     (let b (a find matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 2 (b count).
     (assert 0 (b 0).
@@ -4819,7 +4819,7 @@ f
     (a 10 10)
     (assert (a not-sparse).
     (let b (a find matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 0 (b 0).
@@ -4830,7 +4830,7 @@ f
     (a 100 100)
     (assert (a is-sparse).
     (let b (a find matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 0 (b 0).
@@ -4843,13 +4843,13 @@ f
   (should "(an-array select) returns indices of all existing elements." (= ()
     (var a (@).
     (var b (a select).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 0 (b length).
 
     (let a (@ 1 2).
     (let b (a select).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 2 (b length).
     (assert 2 (b count).
@@ -4860,7 +4860,7 @@ f
     (a 10 10)
     (assert (a not-sparse).
     (let b (a select).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 3 (b length).
     (assert 3 (b count).
@@ -4872,7 +4872,7 @@ f
     (a 100 100)
     (assert (a is-sparse).
     (let b (a select).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 3 (b length).
     (assert 3 (b count).
@@ -4884,13 +4884,13 @@ f
     (var matched (= x (x >= 3).
     (var a (@).
     (var b (a select matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 0 (b length).
 
     (let a (@ 4 2 3 1).
     (let b (a select matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 2 (b length).
     (assert 2 (b count).
     (assert 4 (b 0).
@@ -4900,7 +4900,7 @@ f
     (a 10 10)
     (assert (a not-sparse).
     (let b (a select matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 4 (b 0).
@@ -4911,7 +4911,7 @@ f
     (a 100 100)
     (assert (a is-sparse).
     (let b (a select matched).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert 3 (b length).
     (assert 3 (b count).
     (assert 4 (b 0).
@@ -4924,13 +4924,13 @@ f
   (should "(an-array map) returns returns a shallow copy of the original array." (= ()
     (var a (@).
     (var b (a map).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 0 (b length).
 
     (let a (@ 1 2).
     (let b (a map).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-not a).
     (assert 2 (b length).
     (assert 2 (b count).
@@ -4939,7 +4939,7 @@ f
     (a 10 10)
     (assert (a not-sparse).
     (let b (a map).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b not-sparse).
     (assert (b is-not a).
     (assert 11 (b length).
@@ -4952,7 +4952,7 @@ f
     (a 100 100)
     (assert (a is-sparse).
     (let b (a map).
-    (assert (b is-a array).
+    (assert (b is-an array).
     (assert (b is-sparse).
     (assert (b is-not a).
     (assert 101 (b length).
@@ -5128,7 +5128,7 @@ f
     (assert "(@ 1 2 10: 10)" (code to-string).
 
     (let arr (code).
-    (assert (arr is-a array).
+    (assert (arr is-an array).
     (assert (arr not-sparse).
     (assert 11 (arr length).
     (assert 3 (arr count).
@@ -5145,7 +5145,7 @@ f
     (assert "(@ 1 2 100: 100)" (code to-string).
 
     (let arr (code).
-    (assert (arr is-a array).
+    (assert (arr is-an array).
     (assert (arr is-sparse).
     (assert 101 (arr length).
     (assert 3 (arr count).

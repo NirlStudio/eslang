@@ -512,7 +512,7 @@ var * (load "share/type" (@ the-type: promise);
     (should "(promise of-all (@)) returns a promise resolved to (@ null)." (= ()
       var p (promise of-all (@);
       (p then (=> waiting
-        assert (waiting result:: is-a array);
+        assert (waiting result:: is-an array);
         assert 1 (waiting result:: length);
         assert null (waiting result:: 0);
       ).
@@ -520,7 +520,7 @@ var * (load "share/type" (@ the-type: promise);
     (should "(promise of-all (@ null)) returns a promise resolved to (@ null)." (= ()
       var p (promise of-all (@ null);
       (p then (=> waiting
-        assert (waiting result:: is-a array);
+        assert (waiting result:: is-an array);
         assert 1 (waiting result:: length);
         assert null (waiting result:: 0);
       ).
@@ -528,7 +528,7 @@ var * (load "share/type" (@ the-type: promise);
     (should "(promise of-all (@ value)) returns a promise resolved to (@ value)." (= ()
       var p (promise of-all (@ 100);
       (p then (=> waiting
-        assert (waiting result:: is-a array);
+        assert (waiting result:: is-an array);
         assert 1 (waiting result:: length);
         assert 100 (waiting result:: 0);
       ).
@@ -536,7 +536,7 @@ var * (load "share/type" (@ the-type: promise);
     (should "(promise of-all (@ value null)) returns a promise resolved to (@ value)." (= ()
       var p (promise of-all (@ 100 null);
       (p then (=> waiting
-        assert (waiting result:: is-a array);
+        assert (waiting result:: is-an array);
         assert 1 (waiting result:: length);
         assert 100 (waiting result:: 0);
       ).
@@ -552,7 +552,7 @@ var * (load "share/type" (@ the-type: promise);
         ).
       ).
       (p then (=> waiting
-        assert (waiting result:: is-a array);
+        assert (waiting result:: is-an array);
         assert 1 (waiting result:: length);
         assert 99 (waiting result:: 0);
       ).
@@ -601,7 +601,7 @@ var * (load "share/type" (@ the-type: promise);
       (should "resolve to the result of the promising." (= ()
         var p (promise all (@ (@ 100);
         (p then (=> waiting
-          assert (waiting result:: is-a array);
+          assert (waiting result:: is-an array);
           assert 1 (waiting result:: length);
           assert 100 (waiting result:: 0);
         ).

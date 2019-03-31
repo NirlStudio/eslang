@@ -247,7 +247,7 @@
     (var obj (cat default).
     (for value in values
       (var args (obj ($value) value 1).
-      (assert (args is-a array).
+      (assert (args is-an array).
       (assert 3 (args length).
       (assert value (args 0).
       (assert value (args 1).
@@ -505,7 +505,7 @@
     (var obj (cat default).
     (for value in values
       (var args ($obj ($value) value 1).
-      (assert (args is-a array).
+      (assert (args is-an array).
       (assert 3 (args length).
       (assert value (args 0).
       (assert value (args 1).

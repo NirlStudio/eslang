@@ -14,8 +14,8 @@
   (should "(emitter default) constructs a default emitter instance." (=> ()
     var device (emitter default);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
 
     var events (object fields-of (device listeners);
     assert 0 (events length);
@@ -27,8 +27,8 @@
     var device (emitter of);
     assert (device is-a driver);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
 
     var events (object fields-of (device listeners);
     assert 0 (events length);
@@ -36,16 +36,16 @@
     let device (driver of);
     assert (device is-a driver);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
     assert 3 (object fields-of (device listeners):: length);
   ).
   (should "(emitter of events ...) constructs a new emitter instance which allows given events." (=> ()
     var device (emitter of "a" "b" "c");
     assert (device is-a driver);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
 
     var events (object fields-of (device listeners);
     assert 3 (events length);
@@ -66,8 +66,8 @@
     ).
     assert (device is-a driver);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
     assert 3 (object fields-of (device listeners):: length);
     assert 0 (device listeners:: ready:: length);
     assert 0 (device listeners:: data:: length);
@@ -77,8 +77,8 @@
     var device (@:driver);
     assert (device is-a driver);
     assert (device is-a emitter);
-    assert (device is-a object);
-    assert (device listeners:: is-a object);
+    assert (device is-an object);
+    assert (device listeners:: is-an object);
     assert 3 (object fields-of (device listeners):: length);
     assert 0 (device listeners:: ready:: length);
     assert 0 (device listeners:: data:: length);
@@ -90,7 +90,7 @@
   (should "(an-emitter on) returns event list." (=> ()
     var device (driver default);
     var events (device on);
-    assert (events is-a array);
+    assert (events is-an array);
     assert 3 (events length);
     assert "ready" (events 0);
     assert "data" (events 1);
@@ -99,34 +99,34 @@
   (should "(an-emitter on event) returns registered listeners for this event." (=> ()
     var device (driver default);
     var listeners (device on "ready");
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 0 (listeners length);
 
     device listeners:: ready:: push (=);
     let listeners (device on "ready");
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 1 (listeners length);
   ).
   (should "(an-emitter on event listener) registers a listener for this event." (=> ()
     var device (driver default);
     let listeners (device on "ready" (=);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 1 (listeners length);
 
     let listeners (device on "ready" (->);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 2 (listeners length);
 
     let listeners (device on "ready" (=>);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 3 (listeners length);
 
     let listeners (device on "ready" (=?);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 3 (listeners length);
 
     let listeners (device on "ready" true);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 3 (listeners length);
   ).
 ).
@@ -139,7 +139,7 @@
     assert 1 (device on "closed" (=>):: length);
 
     var events (device off);
-    assert (events is-a array);
+    assert (events is-an array);
     assert "ready" (events 0);
     assert "data" (events 1);
     assert "closed" (events 2);
@@ -155,7 +155,7 @@
     assert 1 (device on "closed" (=>):: length);
 
     var listeners (device off "ready");
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert (listeners is-empty);
   ).
   (should "(an-emitter off event listener) removes a listener for the event." (=> ()
@@ -166,11 +166,11 @@
     assert 1 (device on "closed" listener:: length);
 
     var listeners (device off "ready" (=));
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 1 (listeners length);
 
     var listeners (device off "ready" listener);
-    assert (listeners is-a array);
+    assert (listeners is-an array);
     assert 0 (listeners length);
   ).
 ).

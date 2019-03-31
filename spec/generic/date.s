@@ -312,7 +312,7 @@
   (should "(a-date date-fields) returns year, month and day in month." (= ()
     (var fields ((date of 2017 6 29 1 1 1) date-fields).
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 3 (fields length).
 
     (assert 2017 (fields 0).
@@ -322,7 +322,7 @@
   (should "(a-date date-fields as-utc) returns year, month and day in month in UTC." (= ()
     (var fields ((date of-utc 2017 6 29 1 1 1) date-fields "utc").
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 3 (fields length).
 
     (assert 2017 (fields 0).
@@ -339,7 +339,7 @@
   (should "(a-date time-fields) returns hours, minutes, seconds and milliseconds at the date." (= ()
     (var fields ((date of 2017 6 29 1 2 3 4) time-fields).
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 4 (fields length).
 
     (assert 1 (fields 0).
@@ -350,7 +350,7 @@
   (should "(a-date time-fields as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
     (var fields ((date of-utc 2017 6 29 1 2 3 4) time-fields "utc").
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 4 (fields length).
 
     (assert 1 (fields 0).
@@ -368,7 +368,7 @@
   (should "(a-date all-fields) returns hours, minutes, seconds and milliseconds at the date." (= ()
     (var fields ((date of 2017 6 29 1 2 3 4) all-fields).
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 7 (fields length).
 
     (assert 2017 (fields 0).
@@ -382,7 +382,7 @@
   (should "(a-date all-fields as-utc) returns hours, minutes, seconds and milliseconds at the date in UTC." (= ()
     (var fields ((date of-utc 2017 6 29 1 2 3 4) all-fields "utc").
 
-    (assert (fields is-a array).
+    (assert (fields is-an array).
     (assert 7 (fields length).
 
     (assert 2017 (fields 0).

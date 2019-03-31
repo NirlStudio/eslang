@@ -18,12 +18,12 @@ blue " version"; gray ",";
 
 blue " describe"; gray " and";
 (export describe (=> it
-  (if ($it is-a object)
+  (if ($it is-an object)
     (object fields-of it:: sort:: for-each (=> p
       print '$p # $(type of ($it:p))';
     ).
   else
-    ($it is-a array:: ? it, (@ it):: for-each (=> (v i)
+    ($it is-an array:: ? it, (@ it):: for-each (=> (v i)
       print '#($(i), $(type of v))# $v';
 ).
 

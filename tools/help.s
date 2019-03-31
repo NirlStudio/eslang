@@ -14,7 +14,7 @@
 export _library (object assign (@:) (this _library);
 
 (export set (=> (subject content)
-  (if (subject is-a string:: && (content is-a string:: || (content is-a object).
+  (if (subject is-a string:: && (content is-a string:: or (content is-an object).
     _library: subject content;
 ).
 

@@ -127,27 +127,27 @@
     (assert type (type :(`type) x).
   ).
   (should "type's proto is a descriptor object." (= ()
-    (assert ((type proto) is-a object).
+    (assert ((type proto) is-an object).
 
-    (assert ((type "proto") is-a object).
-    (assert ((type (`proto)) is-a object).
+    (assert ((type "proto") is-an object).
+    (assert ((type (`proto)) is-an object).
 
-    (assert ((type :"proto") is-a object).
-    (assert ((type :(`proto)) is-a object).
+    (assert ((type :"proto") is-an object).
+    (assert ((type :(`proto)) is-an object).
 
-    (assert ((type :"proto" x) is-a object).
-    (assert ((type :(`proto) x) is-a object).
+    (assert ((type :"proto" x) is-an object).
+    (assert ((type :(`proto) x) is-an object).
   ).
   (should "type's proto returns the objectified type." (= ()
     (var t (type proto).
-    (assert (t is-a object).
-    (assert ((t type) is-a object).
+    (assert (t is-an object).
+    (assert ((t type) is-an object).
     (assert ((type of t) is object).
 
     (assert 1 ((object fields-of t) length).
 
     (var s (object get t "type").
-    (assert (s is-a object).
+    (assert (s is-an object).
     (assert ((s type) is object).
     (assert ((s proto) is null).
 
@@ -329,8 +329,8 @@
   ).
   (should "(type reflect) returns the object representation of type." (= ()
     (var t (type reflect).
-    (assert (t is-a object).
-    (assert ((t type) is-a object).
+    (assert (t is-an object).
+    (assert ((t type) is-an object).
     (assert ((type of t) is object).
     (assert 1 ((object fields-of t) length).
 
@@ -344,7 +344,7 @@
     ).
 
     (var s (object get t "type").
-    (assert (s is-a object).
+    (assert (s is-an object).
     (assert ((s type) is object).
     (assert ((s proto) is null).
     (assert 7 ((object fields-of s) length).
@@ -360,7 +360,7 @@
   ).
   (should "(type reflect null) returns all common operations defined on null." (= ()
     (var t (type reflect null).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert null (t type).
     (assert ((type of t) is object).
 
@@ -387,32 +387,32 @@
   ).
   (should "(type reflect value) returns all common operations bound with value." (= ()
     (var t (type reflect).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert 1 (object fields-of t:: length).
     (assert "type" (t type:: name).
 
     (let t (type reflect string).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert 1 (object fields-of t:: length).
     (assert "type" (t type:: name).
 
     (let t (string reflect).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert "string" (t type:: name).
     (assert 0 (t length).
 
     (let t (string reflect "abc").
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert "string" (t type:: name).
     (assert 3 (t length).
 
     (let t (string reflect 123).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert "string" (t type:: name).
     (assert 0 (t length).
 
     (let t (string reflect null).
-    (assert (t is-a object).
+    (assert (t is-an object).
     (assert "string" (t type:: name).
     (assert 0 (t length).
   ).

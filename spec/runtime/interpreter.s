@@ -60,7 +60,7 @@
     (var shell (=> (fb) (let feedback fb).
     (var interpret (interpreter shell (@ x:1).
     (interpret "arguments\n").
-    (assert (feedback is-a array).
+    (assert (feedback is-an array).
     (assert (feedback is-empty).
   ).
   (should "only accept atomic values as argument value." (= ()
@@ -74,7 +74,7 @@
     (var interpret (interpreter shell args).
     (interpret "arguments\n").
 
-    (assert (feedback is-a array).
+    (assert (feedback is-an array).
     (assert (args length) (feedback length).
 
     (assert null (feedback 0).
