@@ -34,7 +34,6 @@ module.exports = function ($void) {
   $export($, '}', sharedSymbolOf('}'))
 
   // other pure symbols
-  $export($, 'in', sharedSymbolOf('in'))
   $export($, 'else', sharedSymbolOf('else'))
 
   // global enum value.

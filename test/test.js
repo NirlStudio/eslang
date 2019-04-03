@@ -109,7 +109,7 @@ module.exports = function ($void) {
     checkStaticOperators('[void / operators] ', [
       '`', 'quote', 'unquote',
       'export', 'var', 'let', 'const', 'local', 'locon',
-      '?', 'if', 'while', 'for', 'break', 'continue',
+      '?', 'if', 'while', 'in', 'for', 'break', 'continue',
       '+', '++', '--', '!', 'not', '~',
       '@', '=?', '=', '->', '=>', 'redo', 'return', 'exit',
       'import', 'load', 'fetch',

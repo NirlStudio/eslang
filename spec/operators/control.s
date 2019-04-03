@@ -133,6 +133,95 @@
   ).
 ).
 
+(define "(in ...)" (= ()
+  (should "(in) returns (iterator empty)." (=> ()
+    (assert (iterator empty) (in).
+  ).
+  (should "(in null) returns (iterator empty)." (=> ()
+    (assert (iterator empty) (in null).
+    (assert (iterator empty) (in null null).
+    (assert (iterator empty) (in null (1, 10).
+  ).
+  (should "(in a-range) returns an iterator for the range." (=> ()
+    (var iter (in (0, 3).
+    (assert (iter is-an iterator).
+
+    (var values (iter collect).
+    (assert (values is-an array).
+    (assert 3 (values length).
+    (assert 0 (values 0).
+    (assert 1 (values 1).
+    (assert 2 (values 2).
+  ).
+  (should "(in a-tuple) returns an iterator for the tuple." (=> ()
+    (var iter (in (quote 10, true, x).
+    (assert (iter is-an iterator).
+
+    (var values (iter collect).
+    (assert (values is-an array).
+    (assert 3 (values length).
+    (assert 10 (values 0).
+    (assert true (values 1).
+    (assert (`x) (values 2).
+  ).
+  (should "(in an-array) returns an iterator for the array." (=> ()
+    (var iter (in (@ 6, 4, 2).
+    (assert (iter is-an iterator).
+
+    (var values (iter collect).
+    (assert (values is-an array).
+    (assert 3 (values length).
+    (assert 6 (values 0).
+    (assert 4 (values 1).
+    (assert 2 (values 2).
+  ).
+  (should "(in an-object) returns an iterator for the object." (=> ()
+    (var iter (in (@ x: 1, y: 2, z: 3).
+    (assert (iter is-an iterator).
+
+    (var keys (@).
+    (var values (@).
+    (iter for-each (=>(k, v) (keys push k) (values push v).
+
+    (assert (keys is-an array).
+    (assert 3 (keys length).
+    (assert "x" (keys 0).
+    (assert "y" (keys 1).
+    (assert "z" (keys 2).
+
+    (assert (values is-an array).
+    (assert 3 (values length).
+    (assert 1 (values 0).
+    (assert 2 (values 1).
+    (assert 3 (values 2).
+  ).
+  (should "(in other-value) returns (iterator empty)." (=> ()
+    (assert (iterator empty) (in type).
+    (assert (iterator empty) (in bool).
+    (assert (iterator empty) (in string).
+    (assert (iterator empty) (in number).
+    (assert (iterator empty) (in date).
+    (assert (iterator empty) (in symbol).
+    (assert (iterator empty) (in tuple).
+    (assert (iterator empty) (in function).
+    (assert (iterator empty) (in lambda).
+    (assert (iterator empty) (in operator).
+    (assert (iterator empty) (in iterator).
+    (assert (iterator empty) (in array).
+    (assert (iterator empty) (in object).
+
+    (assert (iterator empty) (in true).
+    (assert (iterator empty) (in false).
+    (assert (iterator empty) (in 0).
+    (assert (iterator empty) (in 1).
+    (assert (iterator empty) (in "").
+    (assert (iterator empty) (in "1234").
+    (assert (iterator empty) (in (date of 1).
+    (assert (iterator empty) (in (`x).
+    (assert (iterator empty) (in (operator empty).
+  ).
+).
+
 (define "(for ... in ...)" (= ()
   (should "(for) returns null." (=> ()
     (assert null (for).

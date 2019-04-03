@@ -1,6 +1,6 @@
 'use strict'
 
-var MaxLines = 4800
+var MaxLines = 2400
 var DrainBatch = 300
 
 var KeyEnter = 0x0D
@@ -18,8 +18,8 @@ var spooling = false
 var panel, input, enter
 
 function enqueue (todo) {
-  if (pool.length > MaxLines) {
-    pool = pool.slice(MaxLines / 2)
+  if (pool.length > (MaxLines * 2)) {
+    pool = pool.slice(MaxLines)
   }
   pool.push(todo)
 }

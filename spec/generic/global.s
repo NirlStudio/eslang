@@ -71,9 +71,6 @@
   (should "(symbol of \"else\") is resolved to itself." (= ()
     (assert else (else).
   ).
-  (should "(symbol of \"in\") is resolved to itself." (= ()
-    (assert in (in).
-  ).
 ).
 
 (define "Global enum values." (= ()

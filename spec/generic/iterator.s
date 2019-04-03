@@ -100,13 +100,13 @@
   ).
   (should "(iterator of iterable) returns non-empty iterator." (= ()
     (var iter (iterator of (@).
-    (assert (iter is-a iterator).
+    (assert (iter is-an iterator).
     (assert (iter is-not (iterator empty).
     (assert ($(iter iterate) is-a function).
     (assert null ((iter iterate)).
 
     (let iter (iterator of (@ 100).
-    (assert (iter is-a iterator).
+    (assert (iter is-an iterator).
     (assert (iter is-not (iterator empty).
     (assert ($(iter iterate) is-a function).
     (assert 100 (((iter iterate)) 0).
@@ -120,13 +120,13 @@
   ).
   (should "(iterator of-unsafe iterable) returns non-empty iterator." (= ()
     (var iter (iterator of-unsafe (@).
-    (assert (iter is-a iterator).
+    (assert (iter is-an iterator).
     (assert (iter is-not (iterator empty).
     (assert ($(iter iterate) is-a function).
     (assert null ((iter iterate)).
 
     (let iter (iterator of-unsafe (@ 100).
-    (assert (iter is-a iterator).
+    (assert (iter is-an iterator).
     (assert (iter is-not (iterator empty).
     (assert ($(iter iterate) is-a function).
     (assert 100 (((iter iterate)) 0).
@@ -135,7 +135,7 @@
   (should "(iterator of-unsafe iterable) can stop when a repeated element detected." (= ()
     (var v 3)
     (var iter (iterator of-unsafe (=>() ((v > 0) ? (v --) v).
-    (assert (iter is-a iterator).
+    (assert (iter is-an iterator).
     (assert (iter is-not (iterator empty).
     (assert ($(iter iterate) is-a function).
     (assert 3 ((iter iterate)).

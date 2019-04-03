@@ -1,14 +1,17 @@
 'use strict'
 
 module.exports = function control ($void) {
+  var $ = $void.$
   var Tuple$ = $void.Tuple
   var Signal$ = $void.Signal
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
   var signalOf = $void.signalOf
   var iterateOf = $void.iterateOf
+  var iteratorOf = $.iterator.of
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
+
   var symbolElse = sharedSymbolOf('else')
   var symbolIn = sharedSymbolOf('in')
 
@@ -128,6 +131,12 @@ module.exports = function control ($void) {
       }
     }
     return result
+  })
+
+  // a shortcut operator of (iterator of ...)
+  staticOperator('in', function (space, clause) {
+    var clist = clause.$
+    return iteratorOf(clist.length > 1 ? evaluate(clist[1], space) : null)
   })
 
   // (for value in iterable body) OR
