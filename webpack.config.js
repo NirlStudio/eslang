@@ -23,6 +23,7 @@ const prepareDevWebSite = new HooksPlugin({
     shell.cp('dist/sugly.js', 'dist/www/')
     shell.cp('dist/sugly.map', 'dist/www/')
     shell.cp('web/index.html', 'dist/www/')
+    shell.cp('web/favicon.*', 'dist/www/')
     shell.cp('web/index.css', 'dist/www/')
     shell.cp('web/*.s', 'dist/www/')
     shell.cp('modules/*.s', 'dist/www/modules/')
