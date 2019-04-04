@@ -58,7 +58,8 @@ module.exports = (env, options) => {
       port: 6501,
       publicPath: '/',
       contentBase: 'dist/www',
-      hot: true
+      hot: true,
+      open: true
     }
   }
 }

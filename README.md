@@ -1,5 +1,5 @@
 # Sugly-Lang
-A simple &amp; ugly script language
+### A simple &amp; ugly script language, which is mostly inspired by Lisp, Python and JavaScript.
 ```python
 print "Hello, world!";
 
@@ -8,7 +8,7 @@ print "Hello, world!";
 ```
 
 # Try it online
-## [Sugly.DEV](https://sugly.dev)
+### [Sugly.DEV](https://sugly.dev)
 ```python
 help; # for help.
 
@@ -58,16 +58,16 @@ npm i -g sugly
 sugly selftest # optional
 ```
 
-## run an example:
+### run an example, or your own code:
 ```shell
 sugly examples/qsort1
 ```
 
-## REPL in terminal:
+### REPL in terminal:
 ```shell
 sugly
 ```
-You can do [almost the same things](#try-it-online) after calling
+### You can do [almost the same things](#try-it-online) after calling
 ```python
 fetch "https://sugly.dev/@";
 
@@ -76,18 +76,18 @@ fetch "https://sugly.dev/@":: finally (=>() (.loader list:: for-each print);
 ```
 
 # Use it in your JS project
-add it
+### add it
 ```shell
 npm i --save sugly
 ```
 
-call it
+### use it
 ```javascript
 var $void = require('sugly')
 $void.$run('path-to-your-app.s')
 ```
 
-call it in web page
+### use it in web page
 ```javascript
 var $void = require('sugly/web')
 $void.$run('path-to-your-app.s')
@@ -103,13 +103,29 @@ npm test
 
 bin/sugly
 
+# or, start the local web shell
+npm run build-dev & npm run start
 ```
 
 # IDE Support
-## Atom Plugin
+### VS Code Extension
+In Extensions sidebar, search for **Sugly**
+
+### Atom Plugin
 [*language-sugly*](https://github.com/NirlStudio/language-sugly)
 ```shell
 apm install language-sugly
 ```
+
+# You can help to
+### - Test it in various OSes and browsers.
+### - Use it in your projects.
+### - Recommend it to your friends.
+### - Create documentation & tools.
+### - Report bugs and help to fix.
+### - Request for features.
+### - Create interpreters in other native languages
+  - Java, Go, Rust, Python, C#, C, etc
+### - ...
 
 **Enjoy the sugliness.**
