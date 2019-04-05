@@ -5,7 +5,7 @@
     "email": "leevi@nirlstudio.com",
     "name": "Leevi Li"
   },
-  "license": "GPL-3.0",
+  "license": "MIT",
   "repository": "nirlstudio/sugly-lang",
   "description": "A conceptual implementation of Sugly programming language.",
   "main": "index.js",
