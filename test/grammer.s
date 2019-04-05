@@ -429,7 +429,7 @@ join((iter join) join)
 collect((iter collect) collect)
 finish((iter finish) finish)
 
-# meta.funtion-global-promise-sugly
+# meta.function-global-promise-sugly
 commit((commit)commit)
 commit*((commit*)commit*)
 commit?((commit?)commit?)

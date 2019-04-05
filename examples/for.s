@@ -1,9 +1,9 @@
 (let counter 0)
-(for (let i 10) (i < 20) (i ++)
+(for (10, 20, 5)
   (counter ++)
 ).
-(print "i from 10 after loop of 10 times is" i (i == 20).
-(print "counter is" counter (counter == 10).
+(print "_ from 10 after loop of 2 times by 5 is" _ (_ == 15).
+(print "counter is" counter (counter == 2).
 
 (let counter 0)
 (for i in (10 20)

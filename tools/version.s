@@ -5,3 +5,5 @@
   version: (env "runtime-version"),
   released\ by: "Nirl Studio, 2016 - 2019"
 ).
+
+env "runtime-version";

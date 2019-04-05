@@ -44,7 +44,7 @@ module.exports = function () {
   $.null = null
 
   // The logical noumenon of null is not accessible directly, otherwise it will
-  // cause some confusion in evalution process.
+  // cause some confusion in evaluation process.
   // P.S, so is our fate too?
 
   /* A placeholder constructor to test a type. */
@@ -87,7 +87,7 @@ module.exports = function () {
   create('date')
   $void.Date = Date
 
-  // A range value represents a descrete sequence of numbers in the interval of
+  // A range value represents a discrete sequence of numbers in the interval of
   // [begin, end) and a step value.
   create('range')
   var Range$ = $void.Range = function (begin, end, step) {
@@ -99,11 +99,11 @@ module.exports = function () {
 
   /* Expression Types */
   /* An expression entity may produce another entity after evaluation. */
-  /* An expression value can be fully encoded and recevered. */
+  /* An expression value can be fully encoded and recovered. */
   /* A static value can also be a part of an expression. */
 
   // A symbol is an identifer of a semantic element, so the string value of its
-  // key must comply with some fundamental exical rules.
+  // key must comply with some fundamental lexical rules.
   // A symbol will be resolved to the associated value under current context or
   // null by the evaluation function.
   create('symbol')
@@ -140,7 +140,7 @@ module.exports = function () {
     return impl
   }
 
-  // the contaier for static operators. Static operators are taken as an
+  // the container for static operators. Static operators are taken as an
   // essential part of the language itself. They cannot be overridden.
   $void.staticOperators = Object.create(null)
 
@@ -172,7 +172,7 @@ module.exports = function () {
     return impl
   }
 
-  // A function is an operation which works like a Closure. Its behaviour depends
+  // A function is an operation which works like a Closure. Its behavior depends
   // on both the values of arguments and current values in its outer context.
   // A function is not explicitly alterable but its implicit context is dynamic
   // and persistent in running. So its overall state is mutable.
@@ -202,12 +202,12 @@ module.exports = function () {
 
   // A special type to wrap the transient state of an ongoing action.
   create('promise')
-  // TODO: to be polyfilled ?
+  // If it's missing, app layer should provide the polyfill.
   $void.Promise = Promise
 
   /* Compound Types */
   /* By default, compound entities are mutable. */
-  /* All compound entities are also fixed points of evaluation funtion. */
+  /* All compound entities are also fixed points of evaluation function. */
 
   // A collection of values indexed by zero-based integers.
   create('array')
@@ -222,7 +222,7 @@ module.exports = function () {
   Object$.prototype = $.object.proto
 
   /*
-    The Evoluation.
+    The Evolution.
   */
   // Class is a meta type to create more types.
   var $Class = naming(Object.create(Type), 'class')

@@ -222,7 +222,7 @@
   ).
 ).
 
-(define "(for ... in ...)" (= ()
+(define "(for ... ...)" (= ()
   (should "(for) returns null." (=> ()
     (assert null (for).
   ).
@@ -231,6 +231,33 @@
     (assert null (for (x y).
     (assert null (for (x y z).
   ).
+  (should "(for an-iterable statements ...) puts current value into default variable: _." (=> ()
+    (var a 0)
+    (assert 1 (for (1, 2) _).
+    (assert 2 (for (quote 2) _).
+    (assert 3 (for (@ 3) _).
+    (assert "x" (for (@ x: 4) _).
+  ).
+  (should "(for a-range statements ...) traverses all values in the range and returns final result." (=> ()
+    (assert null (for (0, 0) (++ a).
+    (assert 1 (for (0, 1) (++ b).
+    (assert 10 (for (0, 5) (++ c) (++ c).
+  ).
+  (should "(for an-array statements ...) traverses all values in the array and returns final result." (=> ()
+    (assert null (for (@) (++ a).
+    (assert 1 (for (@ 1) (++ b).
+    (assert 2 (for (@ 1, 2) (++ c).
+    (assert 3 (for (@ 1, 2, 3) (++ d).
+  ).
+  (should "(for an-object statements ...) traverses all fields in the object and returns final result." (=> ()
+    (assert null (for (@:) (++ a).
+    (assert 1 (for (@ x: 1) (++ b).
+    (assert 2 (for (@ x: 1, y: 2) (++ c).
+    (assert 3 (for (@ x: 1, y: 2, z: 3) (++ d).
+  ).
+).
+
+(define "(for ... in ...)" (= ()
   (should "(for value in) returns null." (=> ()
     (assert null (for x in).
     (assert null (for (x y) in).

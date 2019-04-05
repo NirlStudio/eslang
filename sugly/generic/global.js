@@ -33,6 +33,12 @@ module.exports = function ($void) {
   $export($, '{', sharedSymbolOf('{'))
   $export($, '}', sharedSymbolOf('}'))
 
+  // logical operators
+  $export($, '&&', sharedSymbolOf('&&'))
+  $export($, 'and', sharedSymbolOf('and'))
+  $export($, '||', sharedSymbolOf('||'))
+  $export($, 'or', sharedSymbolOf('or'))
+
   // other pure symbols
   $export($, 'else', sharedSymbolOf('else'))
 
@@ -47,7 +53,7 @@ module.exports = function ($void) {
     'bool', 'string', 'number', 'date', 'range',
     'symbol', 'tuple',
     'operator', 'lambda', 'function',
-    'array', 'iterator', 'object', 'class'
+    'array', 'iterator', 'promise', 'object', 'class'
   ]
   for (var i = 0; i < typeNames.length; i++) {
     sharedSymbolOf(typeNames[i])

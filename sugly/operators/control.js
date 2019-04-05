@@ -14,6 +14,7 @@ module.exports = function control ($void) {
 
   var symbolElse = sharedSymbolOf('else')
   var symbolIn = sharedSymbolOf('in')
+  var symbolUnderscore = sharedSymbolOf('_')
 
   // (? sym) - resolve in global scope or original scope (in operator only).
   // (? cond true-branch false-branch)
@@ -92,6 +93,7 @@ module.exports = function control ($void) {
     return cond === false || cond === null || cond === 0
   }
 
+  // condition-based loop
   // (while cond ... )
   staticOperator('while', function (space, clause) {
     var clist = clause.$
@@ -139,15 +141,31 @@ module.exports = function control ($void) {
     return iteratorOf(clist.length > 1 ? evaluate(clist[1], space) : null)
   })
 
+  // iterator-based loop
+  // (for iterable body) - in this case, a variable name '_' is used.
+  // (for i in iterable body)
+  // (for (i, j) in iterable body)
+  staticOperator('for', function (space, clause) {
+    var clist = clause.$
+    var length = clist.length
+    if (length < 3) {
+      return null // short circuit - no loop body
+    }
+    var test = clist[2]
+    return test === symbolIn
+      ? length < 5 ? null // short circuit - no loop body
+        : forEach(space, clause, clist[1], evaluate(clist[3], space), 4)
+      : forEach(space, clause, symbolUnderscore, evaluate(clist[1], space), 2)
+  })
+
   // (for value in iterable body) OR
   // (for (value) in iterable body) OR
   // (for (key value) in iterable body)
-  function forEach (space, clause) {
+  function forEach (space, clause, fields, next, offset) {
     var clist = clause.$
     var length = clist.length
     // find out vars
     var vars
-    var fields = clist[1]
     if (fields instanceof Symbol$) {
       vars = [fields.key]
     } else if (fields instanceof Tuple$) {
@@ -163,7 +181,6 @@ module.exports = function control ($void) {
       vars = [] // the value is not being caught.
     }
     // evaluate the iterator
-    var next = evaluate(clist[3], space)
     next = iterateOf(next)
     if (!next) {
       return null // no iterator.
@@ -179,7 +196,7 @@ module.exports = function control ($void) {
         space.var(vars[i], i < values.length ? values[i] : null)
       }
       try {
-        for (var j = 4; j < length; j++) {
+        for (var j = offset; j < length; j++) {
           result = evaluate(clist[j], space)
         }
       } catch (signal) {
@@ -200,63 +217,4 @@ module.exports = function control ($void) {
     }
     return result
   }
-
-  // (for init test incremental body)
-  staticOperator('for', function (space, clause) {
-    var clist = clause.$
-    var length = clist.length
-    if (length < 5) {
-      return null // short circuit - no loop body
-    }
-    // prepare test
-    var test = clist[2]
-    if (test === symbolIn) {
-      return forEach(space, clause)
-    }
-    test = loopTest(space, test)
-    var staticCond = typeof test !== 'function'
-    // prepare incremental
-    var step = clist[3]
-    // execute init expression
-    var result = evaluate(clist[1], space)
-    var cflag
-    while (true) {
-      try { // test condition
-        cflag = false
-        if (staticCond) {
-          if (test) { return result }
-        } else { // break/continue can be used in condition expression.
-          var cond = test()
-          if (cond === false || typeof cond === 'undefined' || cond === null || cond === 0) {
-            break
-          }
-        }
-        // body
-        for (var i = 4; i < length; i++) {
-          result = evaluate(clist[i], space)
-        }
-        // incremental
-        cflag = true
-        evaluate(step, space)
-      } catch (signal) {
-        if (signal instanceof Signal$) {
-          if (signal.id === 'continue') {
-            result = signal.value
-            if (!cflag) {
-              // continue can be used in step and incremental. But it will not
-              // trigger incremental again even the loop indeed continues.
-              evaluate(step, space)
-            }
-            continue
-          }
-          if (signal.id === 'break') {
-            result = signal.value
-            break
-          }
-        }
-        throw signal
-      }
-    }
-    return result
-  })
 }
