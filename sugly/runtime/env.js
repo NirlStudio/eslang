@@ -1,5 +1,7 @@
 'use strict'
 
+var packageInfo = require('../../package.json')
+
 module.exports = function runtime ($void) {
   var $ = $void.$
   var $export = $void.export
@@ -8,7 +10,7 @@ module.exports = function runtime ($void) {
   var environment = Object.assign(Object.create(null), {
     'runtime-core': 'js',
     'runtime-host': $void.isNativeHost ? 'native' : 'browser',
-    'runtime-version': '1.0.1',
+    'runtime-version': packageInfo.version,
     'is-debugging': true,
     'logging-level': 3
   })
