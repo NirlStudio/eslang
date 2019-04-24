@@ -1,3 +1,28 @@
+(define "(- ...)" (= ()
+  (should "(- ) returns -0." (=> ()
+    (assert ((-) is -0).
+    (assert ((-) is-not 0).
+  ).
+  (should "(- 0) returns -0." (=> ()
+    (assert ((- 0) is -0).
+    (assert ((- 0) is-not 0).
+  ).
+  (should "(- -0) returns 0." (=> ()
+    (assert ((- -0) is 0).
+    (assert ((- -0) is-not -0).
+  ).
+  (should "(- a-number) returns the number's opposite number." (=> ()
+    (assert ((- 1) is -1).
+    (assert ((- -1) is 1).
+
+    (assert ((- 0.5) is -0.5).
+    (assert ((- -0.5) is 0.5).
+
+    (assert ((- 1.5) is -1.5).
+    (assert ((- -1.5) is 1.5).
+  ).
+).
+
 (define "(++ ...)" (= ()
   (should "(++ ) returns 1." (=> ()
     (assert 1 (++).

@@ -11,6 +11,11 @@ module.exports = function arithmetic ($void) {
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
 
+  staticOperator('-', function (space, clause) {
+    var value = evaluate(clause.$[1], space)
+    return typeof value === 'number' ? (-value) : -0
+  })
+
   staticOperator('++', function (space, clause) {
     var clist = clause.$
     var length = clist.length
