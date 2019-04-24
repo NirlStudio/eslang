@@ -26,7 +26,7 @@ function createIntValueOf ($void, parse) {
     if (typeof input === 'string') {
       result = parse(input)
     } else if (typeof input === 'number') {
-      result = Math.trunc(input)
+      result = input === 0 ? 0 : Math.trunc(input)
     } else if (typeof input === 'boolean') {
       return input ? 1 : 0
     }

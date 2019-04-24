@@ -619,9 +619,11 @@
   (should "(number of-int null) returns 0." (= ()
     (assert ((number of-int null) is 0).
   ).
+  (should "(number of-int -0) returns 0." (= ()
+    (assert ((number of-int -0) is 0).
+  ).
   (should "(number of-int a-number) returns a-number's integer part." (= ()
     (assert 0 (number of-int 0).
-    (assert ((number of-int -0) is -0).
 
     (assert 1 (number of-int 1.5).
     (assert -1 (number of-int -1.5).
