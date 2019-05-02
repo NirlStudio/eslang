@@ -20,7 +20,7 @@
     "start": "webpack-dev-server --mode development"
   },
   "bin": {
-    "sugly": "./bin/sugly"
+    "sugly": "bin/sugly"
   },
   "dependencies": {
     "axios": "^0.18.0",

@@ -656,7 +656,7 @@ module.exports = function ($void) {
     this.unshift.apply(this, arguments)
     return this
   })
-  proto.dequeue = proto.pop
+  proto.dequeue = proto.pop // dequeue is only an alias of pop.
 
   // reverse the order of all elements
   link(proto, 'reverse', function () {

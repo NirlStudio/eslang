@@ -21,7 +21,7 @@ module.exports = function (uri) {
       return module_
     }
   }
-  throw new Error('Undefine native module: ' + uri)
+  throw new Error('Undefined native module: ' + uri)
 }
 
 module.exports.register = function (loader) {
