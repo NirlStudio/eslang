@@ -3,6 +3,7 @@
 module.exports = function logical ($void) {
   var $ = $void.$
   var $Type = $.type
+  var $Bool = $.bool
   var Null = $void.null
   var link = $void.link
   var Space$ = $void.Space
@@ -144,8 +145,17 @@ module.exports = function logical ($void) {
     }
     return null
   }))
+
   // (non-null ?? ...) return non-null.
   link($Type.proto, '??', operator(function (space, clause, that) {
     return that
+  }))
+
+  // Boolean value verification helpers.
+  link($Bool.proto, 'fails', operator(function (space, clause, that) {
+    return typeof that === 'boolean' ? !that : false
+  }))
+  link($Bool.proto, 'succeeds', operator(function (space, clause, that) {
+    return typeof that === 'boolean' ? that : false
   }))
 }

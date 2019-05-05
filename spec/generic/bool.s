@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: bool).
 
-(define "String Common Behaviours" (= ()
+(define "Bool Common Behaviours" (= ()
   (define "Identity" (=> ()
     (should "true is true." (= ()
       (assert (true is true).
@@ -112,7 +112,7 @@
 ).
 
 (define "Logical Operations" (= ()
-  (define "AND: &&" (= ()
+  (define "Operator AND: &&" (= ()
     (should "true and true is true" (= ()
       (assert (true && true).
     ).
@@ -126,7 +126,13 @@
       (assert false (false && false).
     ).
   ).
-  (define "OR: ||" (= ()
+  (define "Operator AND: and" (= ()
+    (should "operator 'and' is an alias of '&&'." (= ()
+      (assert (true "and":: is (true "&&").
+      (assert (false "and":: is (false "&&").
+    ).
+  ).
+  (define "Operator OR: ||" (= ()
     (should "true or true is true" (= ()
       (assert (true || true).
     ).
@@ -140,17 +146,50 @@
       (assert false (false || false).
     ).
   ).
-  (define "NOT: not / !" (= ()
-    (should "the empty not operator is defined as false" (= ()
-      (assert ((not) is false).
+  (define "Operator OR: or" (= ()
+    (should "operator 'or' is an alias of '||'." (= ()
+      (assert (true "or":: is (true "||").
+      (assert (false "or":: is (false "||").
+    ).
+  ).
+  (define "Operator NOT: !" (= ()
+    (should "the operator returns false without input." (= ()
       (assert ((!) is false).
     ).
     (should "the not value of true is false" (= ()
-      (assert false (not true).
       (assert false (! true).
     ).
     (should "the not value of false is true" (= ()
-      (assert (not false).
       (assert (! false).
     ).
+  ).
+  (define "Operator NOT: not" (= ()
+    (should "the operator returns false without input." (= ()
+      (assert ((not) is false).
+    ).
+    (should "the NOT value of true is false" (= ()
+      (assert false (not true).
+    ).
+    (should "the NOT value of false is true" (= ()
+      (assert (not false).
+    ).
+  ).
+).
+
+(define "(a-bool fails)" (= ()
+  (should "(true fails) returns false." (= ()
+    (assert ((true fails) is false).
+  ).
+  (should "(false fails) returns true." (= ()
+    (assert ((false fails) is true).
+  ).
+).
+
+(define "(a-bool succeeds)" (= ()
+  (should "(true succeeds) returns true." (= ()
+    (assert ((true succeeds) is true).
+  ).
+  (should "(false succeeds) returns false." (= ()
+    (assert ((false succeeds) is false).
+  ).
 ).
