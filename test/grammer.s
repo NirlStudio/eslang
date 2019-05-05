@@ -130,12 +130,6 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 not
 (not)
 (not(not not not))
-or
-(or)
-(or(or or or))
-and
-(and)
-(and(and and and))
 
 # keyword.operator.double.sugly
 ++
@@ -152,10 +146,22 @@ and
 ((1 + 1)?* t f)
 (x ?? t f)
 ((1 + 1)?? t f)
-(x && t f)
-((1 + 1)&& t f)
 (x || t f)
 ((1 + 1)|| t f)
+and
+(x and t f)
+((1 + 1) and t f)
+or
+(x or t f)
+((1 + 1) or t f)
+
+# keyword.operator.bool.sugly
+fails
+(x fails)
+((a is b) fails)
+succeeds
+(x succeeds)
+((a is b) succeeds)
 
 # meta.operator.arithmetic.sugly
 +((1 + 2)+ 3)

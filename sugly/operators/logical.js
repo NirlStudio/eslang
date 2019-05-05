@@ -153,9 +153,9 @@ module.exports = function logical ($void) {
 
   // Boolean value verification helpers.
   link($Bool.proto, 'fails', operator(function (space, clause, that) {
-    return typeof that === 'boolean' ? !that : false
+    return !that
   }))
   link($Bool.proto, 'succeeds', operator(function (space, clause, that) {
-    return typeof that === 'boolean' ? that : false
+    return !!that
   }))
 }

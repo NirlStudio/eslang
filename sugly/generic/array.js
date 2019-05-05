@@ -396,7 +396,7 @@ module.exports = function ($void) {
     return result
   })
 
-  // replace all occurances of a value to another value or reset them.
+  // replace all occurrences of a value to another value or reset them.
   var replace = function (value, newValue) {
     var i, current
     if (typeof newValue === 'undefined') {
@@ -433,7 +433,7 @@ module.exports = function ($void) {
     return this
   })
 
-  // check the existence of an elememt by a filter function
+  // check the existence of an element by a filter function
   link(proto, 'has', function (filter) {
     if (!isApplicable(filter)) { // as an index number
       return typeof this[offsetOf(this.length, filter)] !== 'undefined'
@@ -470,7 +470,7 @@ module.exports = function ($void) {
     return found
   })
 
-  // sawp two value by offsets.
+  // swap two value by offsets.
   link(proto, 'swap', function (i, j) {
     var length = this.length
     i = offsetOf(length, i)
@@ -516,7 +516,7 @@ module.exports = function ($void) {
     }
     return result
   })
-  // find the index of first occurance of a value.
+  // find the index of first occurrence of a value.
   var firstOf = function (value) {
     for (var i = 0; i < this.length; i++) {
       var v = this[i]
@@ -573,7 +573,7 @@ module.exports = function ($void) {
     }
     return result
   })
-  // find the index of the last occurance of a value.
+  // find the index of the last occurrence of a value.
   var lastOf = function (value) {
     for (var i = this.length - 1; i >= 0; i--) {
       var v = this[i]
