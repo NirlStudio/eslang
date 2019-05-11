@@ -3,8 +3,8 @@
     assert "null" (json of);
   ).
   (should "(json of value) returns the JSON string of the value" (= ()
-    assert "[1,2,3]" (json of (@1 2 3);
-    (assert '{"x":1,"y":2}' (json of (@ x: 1, y: 2).
+    assert "[\n  1,\n  2,\n  3\n]" (json of (@1 2 3);
+    (assert '{\n  "x": 1,\n  "y": 2\n}' (json of (@ x: 1, y: 2).
   ).
   (should "(json of value) returns null if the value is not valid for JSON." (= ()
     var obj (@ x: 1);

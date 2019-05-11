@@ -8,28 +8,20 @@ module.exports = function ($void) {
 
   var json = $Object.empty()
   link(json, 'of', function (value, defaultJson) {
-    if (typeof value === 'undefined') {
-      return 'null'
-    }
-    if (typeof defaultJson === 'undefined') {
-      return JSON.stringify(value)
-    }
     try {
-      return JSON.stringify(value)
+      return typeof value === 'undefined' ? 'null'
+        : JSON.stringify(value, null, '  ')
     } catch (err) {
-      return defaultJson
+      return typeof defaultJson === 'undefined' ? null : defaultJson
     }
   })
 
   link(json, 'parse', function (json, defaultValue) {
-    if (typeof json !== 'string') {
-      return typeof defaultValue === 'undefined' ? null : defaultValue
-    }
     if (typeof defaultValue === 'undefined') {
-      return JSON.parse(json)
+      defaultValue = null
     }
     try {
-      return JSON.parse(json)
+      return typeof json === 'string' ? JSON.parse(json) : defaultValue
     } catch (err) {
       return defaultValue
     }
