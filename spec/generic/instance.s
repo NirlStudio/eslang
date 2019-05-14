@@ -236,7 +236,7 @@
       (assert false (inst1 not-equals inst2).
       (assert false (inst2 not-equals inst1).
     ).
-    (should "Different instances may be defined as inequivalent." (=> ()
+    (should "Different instances may be defined as nonequivalent." (=> ()
       (assert (inst1 is-not inst3).
       (assert (inst3 is-not inst1).
       (assert false (inst1 is inst3).

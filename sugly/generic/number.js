@@ -228,6 +228,12 @@ module.exports = function ($void) {
     return this >> 0
   })
 
+  // helpers of zero-based indexing.
+  link(proto, ['st', 'nd', 'th'], function () {
+    var index = this >> 0
+    return index >= 0 ? (index - 1) : index
+  })
+
   // support basic arithmetic operations
   link(proto, ['+', 'plus'], numberAnd(valueOf))
   link(proto, ['-', 'minus'], numberSubtract(valueOf))
@@ -271,8 +277,8 @@ module.exports = function ($void) {
   })
 
   // support ordering logic - comparable
-  // For uncomparable entities, comparison result is consistent with the Equivalence.
-  // Uncomparable state is indicated by a null and is taken as inequivalent.
+  // For incomparable entities, comparison result is consistent with the Equivalence.
+  // incomparable state is indicated by a null and is taken as nonequivalent.
   var compare = link(proto, 'compare', function (another) {
     return typeof another !== 'number' ? null
       : this === another ? 0 // two same valid values.

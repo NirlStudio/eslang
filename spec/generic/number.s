@@ -1133,6 +1133,48 @@
   ).
 ).
 
+(define "(a-number th)" (= ()
+  (should "(a-number th) always return an integer." (= ()
+    (assert -1 (0.1 th).
+    (assert -1 (-0 th).
+    (assert -1 (-0.1 th).
+
+    (assert -1 ((number smallest) th).
+    (assert -1 ((number min) th).
+    (assert -1 ((number max) th).
+    (assert -1 ((number -infinite) th).
+    (assert -1 ((number infinite) th).
+  ).
+  (should "(0 th) returns -1." (= ()
+    (assert -1 (0 th).
+    (assert -1 (-0 th).
+  ).
+  (should "(a-number th) returns (a-number - 1) if the number is positive." (= ()
+    (assert 0 (1 th).
+    (assert 1 (2 th).
+    (assert 2 (3 th).
+    (assert 9 (10 th).
+    (assert 99 (100 th).
+  ).
+  (should "(a-number th) returns the original number if it's negative." (= ()
+    (assert -1 (-1 th).
+    (assert -2 (-2 th).
+    (assert -3 (-3 th).
+    (assert -10 (-10 th).
+    (assert -100 (-100 th).
+  ).
+).
+
+(define "(a-number st)" (= ()
+  (should "(a-number \"st\") is an alias of (a-number \"th\")." (= ()
+    (assert (1 "st":: is (1 "th").
+).
+
+(define "(a-number nd)" (= ()
+  (should "(a-number \"nd\") is another alias of (a-number \"th\")." (= ()
+    (assert (1 "nd":: is (1 "th").
+).
+
 (define "(++ a-number)" (= ()
   (should "(++ num) increments the value of num by 1 and returns the incremented value." (= ()
     (assert 1 (++ 0).
