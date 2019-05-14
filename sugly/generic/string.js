@@ -18,7 +18,7 @@ module.exports = function ($void) {
     if (typeof value === 'undefined') {
       return ''
     }
-    // concat the trimed values of strings and to-string results of non-strings.
+    // concat the trimmed values of strings and to-string results of non-strings.
     var result = []
     for (var i = 0; i < arguments.length; i++) {
       var str = arguments[i]
@@ -59,7 +59,7 @@ module.exports = function ($void) {
       ? this.length > 0 ? this.charAt(0) : null
       : this.substr(0, count >> 0)
   })
-  // try to find the index of the first occurence of value.
+  // try to find the index of the first occurrence of value.
   link(proto, 'first-of', function (value, from) {
     from >>= 0
     return this.indexOf(value, from < 0 ? from + this.length : from)
@@ -70,7 +70,7 @@ module.exports = function ($void) {
       ? this.length > 0 ? this.charAt(this.length - 1) : null
       : this.substr(Math.max(0, this.length - (count >>= 0)), count)
   })
-  // retrieve the last char or the index of the last occurence of value.
+  // retrieve the last char or the index of the last occurrence of value.
   link(proto, 'last-of', function (value, from) {
     return typeof value === 'undefined' ? -1
       : typeof value !== 'string' || !value ? this.length
@@ -137,11 +137,11 @@ module.exports = function ($void) {
         typeof newValue === 'string' ? newValue : ''
       )
   })
-  link(proto, 'to-upper', function (localed) {
-    return localed === true ? this.toLocaleUpperCase() : this.toUpperCase()
+  link(proto, 'to-upper', function (localized) {
+    return localized === true ? this.toLocaleUpperCase() : this.toUpperCase()
   })
-  link(proto, 'to-lower', function (localed) {
-    return localed === true ? this.toLocaleLowerCase() : this.toLowerCase()
+  link(proto, 'to-lower', function (localized) {
+    return localized === true ? this.toLocaleLowerCase() : this.toLowerCase()
   })
 
   // combination and splitting of strings

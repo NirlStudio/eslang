@@ -277,7 +277,7 @@ module.exports = function ($void) {
       return this.code || emptyCode
     })
 
-    // Desccription
+    // Description
     link(proto, 'to-string', function () {
       return (this.code || emptyCode)['to-string']()
     })
