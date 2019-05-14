@@ -635,10 +635,10 @@
     (assert 0 (number of-int (number invalid).
   ).
   (should "(number of-int (number infinite)) returns 0." (= ()
-    (assert 0 (number of-int (number infinite).
+    (assert (number max-int) (number of-int (number infinite).
   ).
   (should "(number of-int (number -infinite)) returns 0." (= ()
-    (assert 0 (number of-int (number -infinite).
+    (assert (number min-int) (number of-int (number -infinite).
   ).
   (should "(number of-int false) returns 0." (= ()
     (assert ((number of-int false) is 0).
@@ -747,61 +747,61 @@
     (assert 1 (number of-bits 1.5).
     (assert -1 (number of-bits -1.5).
 
-    (assert 0 (number of-int (number invalid).
-    (assert 0 (number of-int (number infinite).
-    (assert 0 (number of-int (number -infinite).
+    (assert 0 (number of-bits (number invalid).
+    (assert -1 (number of-bits (number infinite).
+    (assert 1 (number of-bits (number -infinite).
 
     (assert ((number of-bits false) is 0).
     (assert 1 (number of-bits true).
 
-    (assert 0 (number of-int "0").
-    (assert ((number of-int "-0") is 0).
+    (assert 0 (number of-bits "0").
+    (assert ((number of-bits "-0") is 0).
 
-    (assert 1 (number of-int "1.5").
-    (assert -1 (number of-int "-1.5").
+    (assert 1 (number of-bits "1.5").
+    (assert -1 (number of-bits "-1.5").
 
-    (assert 2 (number of-int "2").
-    (assert -2 (number of-int "-2").
+    (assert 2 (number of-bits "2").
+    (assert -2 (number of-bits "-2").
 
-    (assert 17 (number of-int "0x11").
-    (assert 3 (number of-int "0b11").
+    (assert 17 (number of-bits "0x11").
+    (assert 3 (number of-bits "0b11").
 
-    (assert 0 (number of-int "(number invalid)").
-    (assert 0 (number of-int "(number infinite)").
-    (assert 0 (number of-int "(number -infinite)").
+    (assert 0 (number of-bits "(number invalid)").
+    (assert 0 (number of-bits "(number infinite)").
+    (assert 0 (number of-bits "(number -infinite)").
 
-    (assert 0 (number of-int "").
-    (assert 0 (number of-int "ABC").
-    (assert 0 (number of-int "XYZ").
+    (assert 0 (number of-bits "").
+    (assert 0 (number of-bits "ABC").
+    (assert 0 (number of-bits "XYZ").
 
-    (assert 0 (number of-int "0xG").
-    (assert 0 (number of-int "0b2").
+    (assert 0 (number of-bits "0xG").
+    (assert 0 (number of-bits "0b2").
 
-    (assert 0 (number of-int type).
-    (assert 0 (number of-int bool).
-    (assert 0 (number of-int string).
-    (assert 0 (number of-int number).
-    (assert 0 (number of-int date).
-    (assert 0 (number of-int range).
-    (assert 0 (number of-int symbol).
-    (assert 0 (number of-int tuple).
-    (assert 0 (number of-int operator).
-    (assert 0 (number of-int lambda).
-    (assert 0 (number of-int function).
-    (assert 0 (number of-int array).
-    (assert 0 (number of-int object).
-    (assert 0 (number of-int class).
+    (assert 0 (number of-bits type).
+    (assert 0 (number of-bits bool).
+    (assert 0 (number of-bits string).
+    (assert 0 (number of-bits number).
+    (assert 0 (number of-bits date).
+    (assert 0 (number of-bits range).
+    (assert 0 (number of-bits symbol).
+    (assert 0 (number of-bits tuple).
+    (assert 0 (number of-bits operator).
+    (assert 0 (number of-bits lambda).
+    (assert 0 (number of-bits function).
+    (assert 0 (number of-bits array).
+    (assert 0 (number of-bits object).
+    (assert 0 (number of-bits class).
 
-    (assert 0 (number of-int (date empty).
-    (assert 0 (number of-int (range empty).
-    (assert 0 (number of-int (symbol empty).
-    (assert 0 (number of-int (tuple empty).
-    (assert 0 (number of-int (operator empty).
-    (assert 0 (number of-int (lambda empty).
-    (assert 0 (number of-int (function empty).
-    (assert 0 (number of-int (array empty).
-    (assert 0 (number of-int (object empty).
-    (assert 0 (number of-int (class empty).
+    (assert 0 (number of-bits (date empty).
+    (assert 0 (number of-bits (range empty).
+    (assert 0 (number of-bits (symbol empty).
+    (assert 0 (number of-bits (tuple empty).
+    (assert 0 (number of-bits (operator empty).
+    (assert 0 (number of-bits (lambda empty).
+    (assert 0 (number of-bits (function empty).
+    (assert 0 (number of-bits (array empty).
+    (assert 0 (number of-bits (object empty).
+    (assert 0 (number of-bits (class empty).
   ).
   (should "an integer exceeding (number bits) is truncated to a signed value." (= ()
     (assert (number max-bits) (number of-bits ((number min-bits) - 1).
@@ -1134,16 +1134,21 @@
 ).
 
 (define "(a-number th)" (= ()
-  (should "(a-number th) always return an integer." (= ()
+  (should "(a-number th) always returns a safe integer." (= ()
     (assert -1 (0.1 th).
     (assert -1 (-0 th).
     (assert -1 (-0.1 th).
 
     (assert -1 ((number smallest) th).
-    (assert -1 ((number min) th).
-    (assert -1 ((number max) th).
-    (assert -1 ((number -infinite) th).
-    (assert -1 ((number infinite) th).
+
+    (assert (number min-int) ((number min) th).
+    (assert (number max-int:: - 1) ((number max) th).
+
+    (assert (number min-int) ((number min-int) th).
+    (assert (number max-int:: - 1) ((number max-int) th).
+
+    (assert (number min-int) ((number -infinite) th).
+    (assert (number max-int:: - 1) ((number infinite) th).
   ).
   (should "(0 th) returns -1." (= ()
     (assert -1 (0 th).
@@ -1168,11 +1173,19 @@
 (define "(a-number st)" (= ()
   (should "(a-number \"st\") is an alias of (a-number \"th\")." (= ()
     (assert (1 "st":: is (1 "th").
+  ).
 ).
 
 (define "(a-number nd)" (= ()
   (should "(a-number \"nd\") is another alias of (a-number \"th\")." (= ()
     (assert (1 "nd":: is (1 "th").
+  ).
+).
+
+(define "(a-number rd)" (= ()
+  (should "(a-number \"rd\") is another alias of (a-number \"th\")." (= ()
+    (assert (1 "rd":: is (1 "th").
+  ).
 ).
 
 (define "(++ a-number)" (= ()

@@ -20,6 +20,15 @@ function createValueOf ($void, parse, parseInteger) {
   }
 }
 
+function safeIntValueOf (number) {
+  var intValue = Number.isSafeInteger(number) ? number
+    : isNaN(number) ? 0
+      : number >= Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER
+        : number <= Number.MIN_SAFE_INTEGER ? Number.MIN_SAFE_INTEGER
+          : Math.trunc(number)
+  return intValue === 0 ? 0 : intValue
+}
+
 function createIntValueOf ($void, parse) {
   return function (input, defaultValue) {
     var result
@@ -31,7 +40,8 @@ function createIntValueOf ($void, parse) {
       return input ? 1 : 0
     }
     return Number.isSafeInteger(result) ? result
-      : Number.isSafeInteger(defaultValue) ? defaultValue : 0
+      : Number.isSafeInteger(defaultValue) ? defaultValue
+        : safeIntValueOf(result)
   }
 }
 
@@ -171,8 +181,8 @@ module.exports = function ($void) {
   var parseInteger = link(Type, 'parse-int', createIntParser($void), true)
 
   // get a number value from the input
-  var valueOf = link(
-    Type, 'of', createValueOf($void, parse, parseInteger), true
+  var valueOf = link(Type, 'of',
+    createValueOf($void, parse, parseInteger), true
   )
 
   // get an integer value from the input
@@ -217,20 +227,15 @@ module.exports = function ($void) {
 
   // convert to special sub-types
   link(proto, 'as-int', function () {
-    var intValue = Number.isSafeInteger(this) ? this
-      : isNaN(this) ? 0
-        : this >= Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER
-          : this <= Number.MIN_SAFE_INTEGER ? Number.MIN_SAFE_INTEGER
-            : Math.trunc(this)
-    return intValue === 0 ? 0 : intValue
+    return safeIntValueOf(this)
   })
   link(proto, 'as-bits', function () {
     return this >> 0
   })
 
   // helpers of zero-based indexing.
-  link(proto, ['st', 'nd', 'th'], function () {
-    var index = this >> 0
+  link(proto, ['th', 'st', 'nd', 'rd'], function () {
+    var index = safeIntValueOf(this)
     return index >= 0 ? (index - 1) : index
   })
 
