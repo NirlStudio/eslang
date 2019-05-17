@@ -191,7 +191,18 @@ module.exports = function ($void) {
     return result
   })
   link(proto, 'split', function (value) {
-    return typeof value !== 'string' || value.length < 1 ? [this] : this.split(value)
+    // the original string.split('') logic is disabled here and
+    // it will behave like string.split().
+    return typeof value !== 'string' || value.length < 1 ? [this]
+      : this.split(value)
+  })
+
+  // explicitly and safely convert a string to an array of chars
+  link(proto, 'as-chars', typeof Array.from === 'function' ? function () {
+    return Array.from(this)
+  } : function () {
+    // polyfill from Babel.
+    return this.split(/(?=(?:[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/)
   })
 
   // get a character's unicode value by its offset in this string.

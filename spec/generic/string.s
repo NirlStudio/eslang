@@ -962,6 +962,42 @@
   ).
 ).
 
+(define "(a-string as-chars)" (= ()
+  (should "((string empty) as-chars) returns an empty array." (= ()
+    (var chars ((string empty) as-chars).
+    (assert (chars is-an array).
+    (assert 0 (chars length).
+  ).
+  (should "(str as-chars) returns an array of characters." (= ()
+    (var chars ("a" as-chars).
+    (assert (chars is-an array).
+    (assert 1 (chars length).
+    (assert "a" (chars 0).
+
+    (let chars ("aB" as-chars).
+    (assert (chars is-an array).
+    (assert 2 (chars length).
+    (assert "a" (chars 0).
+    (assert "B" (chars 1).
+
+    (let chars ("aBc" as-chars).
+    (assert (chars is-an array).
+    (assert 3 (chars length).
+    (assert "a" (chars 0).
+    (assert "B" (chars 1).
+    (assert "c" (chars 2).
+  ).
+  (should "(a-unicode-str as-chars) returns an array of unicode characters." (= ()
+    (var chars ("𝟘𝟙𝟚𝟛" as-chars).
+    (assert (chars is-an array).
+    (assert 4 (chars length).
+    (assert "𝟘" (chars 0).
+    (assert "𝟙" (chars 1).
+    (assert "𝟚" (chars 2).
+    (assert "𝟛" (chars 3).
+  ).
+).
+
 (define "(a-string char-at)" (= ()
   (should "(\"\" char-at ...) always returns null" (= ()
     (assert null ("" char-at).
