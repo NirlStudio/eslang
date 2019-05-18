@@ -292,6 +292,7 @@ replace((replace replace) replace)replace
 to-upper((to-upper to-upper) to-upper)to-upper
 to-lower((to-lower to-lower) to-lower)to-lower
 split((split split) split)split
+as-chars((as-chars as-chars) as-chars)as-chars
 char-at((char-at char-at) char-at)char-at
 
 # meta.constant-number-sugly
@@ -322,6 +323,10 @@ is-finite((n is-finite) is-finite)
 is-infinite((n is-infinite) is-infinite)
 as-int((n as-int) as-int)
 as-bits((n as-bits) as-bits)
+st((n st) st)
+nd((n nd) nd)
+rd((n rd) rd)
+th((n th) th)
 plus((n plus) plus)
 minus((n minus) minus)
 times((n times) times)
