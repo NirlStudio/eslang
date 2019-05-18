@@ -48,7 +48,7 @@ module.exports = function (term, stdout, loader) {
     return typeof context === 'function'
       ? context // a customized initializer function.
       : typeof context === 'string'
-        ? executor.bind(null, context) // an initializatoin profile.
+        ? executor.bind(null, context) // an initialization profile.
         : Array.isArray(context) ? function () {
           // a list of dependency modules
           return bootstrap.$fetch(context)
