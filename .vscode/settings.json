@@ -6,6 +6,7 @@
     "clist",
     "constambda",
     "polyfill",
+    "selftest",
     "stambda",
     "sugly"
   ]

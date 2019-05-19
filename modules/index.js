@@ -1,9 +1,10 @@
 'use strict'
 
+// a loader can fully control the importing process of a native module.
 var loaders = []
 
-module.exports = function (uri) {
-  switch (uri) {
+function loadDefault (moduleUri) {
+  switch (moduleUri) {
     case 'restful':
       return require('./restful')
     case 'shell':
@@ -13,25 +14,39 @@ module.exports = function (uri) {
     case 'web':
       return require('./web')
     default:
-      break
+      return null
   }
+}
+
+module.exports = function (moduleUri) {
+  var importing = loadDefault(moduleUri)
+  if (importing) {
+    return importing
+  }
+  // latest loader has higher priority.
   for (var i = loaders.length - 1; i >= 0; i--) {
-    var module_ = loaders[i](uri)
-    if (module_) {
-      return module_
+    importing = loaders[i](moduleUri)
+    if (typeof importing === 'function') {
+      return importing
     }
   }
-  throw new Error('Undefined native module: ' + uri)
+  return null
 }
 
 module.exports.register = function (loader) {
-  loaders.unshift(loader)
+  if (typeof loader === 'function') {
+    loaders.unshift(loader)
+    return loader
+  }
+  return null
 }
 
 module.exports.unregister = function (loader) {
   for (var i = loaders.length - 1; i >= 0; i--) {
     if (loaders[i] === loader) {
       loaders.splice(i, 1)
+      return loader
     }
   }
+  return null
 }
