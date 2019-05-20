@@ -50,3 +50,19 @@ module.exports.unregister = function (loader) {
   }
   return null
 }
+
+module.exports.copy = function (exporting, source, context, $void) {
+  context._native = source // mostly reserved for future.
+  for (var key in source) {
+    if ($void.ownsProperty(source, key)) {
+      var value = source[key]
+      exporting[key] = typeof value === 'function' ? value.bind(source) : value
+    }
+  }
+  if (typeof source === 'function') {
+    // If the module is exporting a 'do' function, it will be just overridden.
+    // This behavior can be changed if it's really worthy in future.
+    exporting.do = source.bind(null)
+  }
+  return exporting
+}
