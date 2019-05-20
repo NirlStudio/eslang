@@ -202,7 +202,7 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      var importing = $void.require(uri)
+      var importing = $void.require(uri, moduleUri, $void)
       if (typeof importing !== 'function') {
         module_.status = 400
         warn('import', 'invalid native module', source, 'at', uri)

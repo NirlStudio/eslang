@@ -18,14 +18,14 @@ function loadDefault (moduleUri) {
   }
 }
 
-module.exports = function (moduleUri) {
+module.exports = function (moduleUri, baseUri, $void) {
   var importing = loadDefault(moduleUri)
   if (importing) {
     return importing
   }
   // latest loader has higher priority.
   for (var i = loaders.length - 1; i >= 0; i--) {
-    importing = loaders[i](moduleUri)
+    importing = loaders[i](moduleUri, baseUri, $void)
     if (typeof importing === 'function') {
       return importing
     }
