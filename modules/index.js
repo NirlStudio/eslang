@@ -56,13 +56,15 @@ module.exports.copy = function (exporting, source, context, $void) {
   for (var key in source) {
     if ($void.ownsProperty(source, key)) {
       var value = source[key]
-      exporting[key] = typeof value === 'function' ? value.bind(source) : value
+      exporting[key] = typeof value !== 'function' ? value
+        : $void.safelyBind(value, source)
     }
   }
   if (typeof source === 'function') {
     // If the module is exporting a 'do' function, it will be just overridden.
     // This behavior can be changed if it's really worthy in future.
-    exporting.do = source.bind(null)
+    exporting.do = $void.safelyBind(source, null)
+    exporting.new = $void.newInstance.bind(null, source)
   }
   return exporting
 }

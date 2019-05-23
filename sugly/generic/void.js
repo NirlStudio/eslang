@@ -37,6 +37,37 @@ module.exports = function ($void) {
   )
   $void.ownsProperty = ownsProperty
 
+  // ensure the runtime bind can be safely called
+  var safelyBind = Function.prototype.call.bind(
+    Function.prototype.bind
+  )
+  $void.safelyBind = safelyBind
+
+  // support native new operator on a constructor function
+  var newInstance = function (A, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) {
+    switch (arguments.length) {
+      case 0: return null
+      case 1: return new A()
+      case 2: return new A(b)
+      case 3: return new A(b, c)
+      case 4: return new A(b, c, d)
+      case 5: return new A(b, c, d, e)
+      case 6: return new A(b, c, d, e, f)
+      case 7: return new A(b, c, d, e, f, g)
+      case 8: return new A(b, c, d, e, f, g, h)
+      case 9: return new A(b, c, d, e, f, g, h, i)
+      case 10: return new A(b, c, d, e, f, g, h, i, j)
+      case 11: return new A(b, c, d, e, f, g, h, i, j, k)
+      case 12: return new A(b, c, d, e, f, g, h, i, j, k, l)
+      case 13: return new A(b, c, d, e, f, g, h, i, j, k, l, m)
+      case 14: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n)
+      case 15: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o)
+      case 16: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
+      default: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
+    }
+  }
+  $void.newInstance = newInstance
+
   // make sure a file uri has correct sugly extension
   $void.appendExt = function (path) {
     return !path || typeof path !== 'string' ? path
@@ -167,7 +198,7 @@ module.exports = function ($void) {
       // a this-bound static lambda may not be bound.
       return func
     }
-    var binding = func.bind($this)
+    var binding = safelyBind(func, $this)
     binding.this = $this
     binding.bound = func
     typeof func.code !== 'undefined' && (
@@ -219,7 +250,7 @@ module.exports = function ($void) {
       var name = names[i]
       var entity = src[name]
       if (typeof entity === 'function') {
-        entity = entity.bind(src)
+        entity = safelyBind(entity, src)
         entity.type = $Lambda
         entity.$name = mapping[name]
       }
@@ -260,6 +291,17 @@ module.exports = function ($void) {
     })
     link(proto, 'not-generic', function () {
       return this.code instanceof Tuple$
+    })
+
+    // retrieve generic members of a native function.
+    link(proto, ['$', 'generic'], function () {
+      if (this.code instanceof Tuple$) {
+        return null
+      }
+      var obj = Object.assign($Object.empty(), this)
+      obj.do = safelyBind(this, null)
+      obj.new = newInstance.bind(null, this)
+      return obj
     })
 
     // Emptiness: a managed operation without a body.
