@@ -329,7 +329,7 @@
   ).
 ).
 
-(define "(a-func apply ...)" (= ()
+(define "($a-func apply ...)" (= ()
   (should "($a-func apply) call the function with null as this and an empty argument list." (= ()
     (var f (=> x
       (assert ($do is-a function).
@@ -433,6 +433,29 @@
     (assert l ($l bind s2).
     (assert s1 ($l this).
     (assert s1 (s2 ($l).
+  ).
+).
+
+(define "($a-func generic)" (= ()
+  (should "($a-func generic) returns null if it's not a generic function." (= ()
+    (var f (=> x (+ 1 x).
+    (assert null ($f generic).
+  ).
+  (should "($a-func generic) returns an object if it's a generic function." (= ()
+    (assert ($print is-a function).
+    (assert ($print is-generic).
+
+    (var obj ($print generic).
+    (assert (obj is-an object).
+    (assert (obj "do":: is-an function).
+    (assert (obj "new":: is-an function).
+  ).
+).
+
+(define "($a-func $)" (= ()
+  (should "($a-func $) is an alias of ($a-func generic)." (= ()
+    (var f (=> x (+ 1 x).
+    (assert ($f "$") ($f "generic").
   ).
 ).
 

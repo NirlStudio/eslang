@@ -52,19 +52,7 @@ module.exports.unregister = function (loader) {
 }
 
 module.exports.copy = function (exporting, source, context, $void) {
-  context._native = source // mostly reserved for future.
-  for (var key in source) {
-    if ($void.ownsProperty(source, key)) {
-      var value = source[key]
-      exporting[key] = typeof value !== 'function' ? value
-        : $void.safelyBind(value, source)
-    }
-  }
-  if (typeof source === 'function') {
-    // If the module is exporting a 'do' function, it will be just overridden.
-    // This behavior can be changed if it's really worthy in future.
-    exporting.do = $void.safelyBind(source, null)
-    exporting.new = $void.newInstance.bind(null, source)
-  }
+  context._generic = source // mostly reserved for future.
+  $void.safelyAssign(exporting, source, true)
   return exporting
 }

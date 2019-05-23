@@ -10,9 +10,9 @@ module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
   var $Tuple = $.tuple
+  var $Object = $.object
   var $Lambda = $.lambda
   var $Function = $.function
-  var $Object = $.object
   var Null = $void.null
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
@@ -67,6 +67,26 @@ module.exports = function ($void) {
     }
   }
   $void.newInstance = newInstance
+
+  // safe copy all members from a source object or function to a target object.
+  // generate do and new operation for a native function source.
+  var safelyAssign = function (target, source, isGeneric) {
+    for (var key in source) {
+      if (ownsProperty(source, key)) {
+        var value = source[key]
+        target[key] = typeof value !== 'function' ? value
+          : safelyBind(value, source)
+      }
+    }
+    if (isGeneric && typeof source === 'function') {
+      // If the source have a 'do' or 'new' function, it will be just overridden.
+      // This behavior can be changed if it's really worthy in future.
+      target.do = safelyBind(source, null)
+      target.new = newInstance.bind(null, source)
+    }
+    return target
+  }
+  $void.safelyAssign = safelyAssign
 
   // make sure a file uri has correct sugly extension
   $void.appendExt = function (path) {
@@ -291,17 +311,6 @@ module.exports = function ($void) {
     })
     link(proto, 'not-generic', function () {
       return this.code instanceof Tuple$
-    })
-
-    // retrieve generic members of a native function.
-    link(proto, ['$', 'generic'], function () {
-      if (this.code instanceof Tuple$) {
-        return null
-      }
-      var obj = Object.assign($Object.empty(), this)
-      obj.do = safelyBind(this, null)
-      obj.new = newInstance.bind(null, this)
-      return obj
     })
 
     // Emptiness: a managed operation without a body.

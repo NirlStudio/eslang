@@ -5,8 +5,11 @@ module.exports = function ($void) {
   var $ = $void.$
   var Type = $.function
   var $Tuple = $.tuple
+  var $Object = $.object
+  var Tuple$ = $void.Tuple
   var link = $void.link
   var bindThis = $void.bindThis
+  var safelyAssign = $void.safelyAssign
   var prepareOperation = $void.prepareOperation
   var prepareApplicable = $void.prepareApplicable
   var defineTypeProperty = $void.defineTypeProperty
@@ -23,6 +26,14 @@ module.exports = function ($void) {
   // bind a function to a fixed subject.
   link(proto, 'bind', function ($this) {
     return bindThis(typeof $this !== 'undefined' ? $this : null, this)
+  })
+
+  // retrieve generic members of a native function.
+  link(proto, ['generic', '$'], function () {
+    return this.code instanceof Tuple$ ? null
+      : safelyAssign($Object.empty(),
+        typeof this.bound === 'function' ? this.bound : this, true
+      )
   })
 
   // implement applicable operation features.
