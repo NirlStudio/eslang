@@ -22,14 +22,19 @@ print (.loader read "examples/qsort1");
 
 # try to list all examples
 .loader list "examples/";
+
 # use print to show a full list.
 print (.loader list "examples/");
+
 # break items into lines
 .loader list "examples/":: for-each print;
+
 # display source url only
 .loader list "examples/":: for-each (= item (print (item 0);
+
 # display item no. for counting
 .loader list "examples/":: for-each (= (item, no.) (print '#$(no.), $(item 0)');
+
  # display path only
 .loader list "examples/":: for-each (= (item, no.) (print '#$(no.),', (var url (item 0):: slice (url first-of "examples/");
 
