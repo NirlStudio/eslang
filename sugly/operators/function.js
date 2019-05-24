@@ -10,14 +10,14 @@ module.exports = function function_ ($void) {
   var signalOf = $void.signalOf
   var lambdaOf = $void.lambdaOf
   var functionOf = $void.functionOf
-  var staticLamdaOf = $void.staticLamdaOf
+  var staticLambdaOf = $void.staticLambdaOf
   var staticOperator = $void.staticOperator
 
   // create lambda operator
   staticOperator('=', createOperator(lambdaOf, $Lambda.noop))
 
   // create static lambda (pure function) operator - reserved
-  staticOperator('->', createOperator(staticLamdaOf, $Lambda.noop))
+  staticOperator('->', createOperator(staticLambdaOf, $Lambda.noop))
 
   // create function operator
   staticOperator('=>', createOperator(functionOf, $Function.noop))
@@ -31,7 +31,7 @@ module.exports = function function_ ($void) {
   // request to stop the execution of current module.
   staticOperator('exit', signalOf('exit'))
 
-  // create the implementatio
+  // create the implementation
   function createOperator (funcOf, empty) {
     return function (space, clause) {
       var clist = clause.$

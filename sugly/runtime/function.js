@@ -71,7 +71,7 @@ module.exports = function function_ ($void) {
     return $lambda
   }
 
-  $void.staticLamdaOf = function staticLamdaOf (space, clause, offset) {
+  $void.staticLambdaOf = function staticLambdaOf (space, clause, offset) {
     // compile code
     var code = [$Symbol.stambda]
     var params = formatParameters(clause.$[offset++], space, 1)
