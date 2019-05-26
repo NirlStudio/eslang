@@ -12,6 +12,7 @@ module.exports = function ($void) {
   var ClassType$ = $void.ClassType
   var ClassInst$ = $void.ClassInst
   var link = $void.link
+  var typeOf = $void.typeOf
   var bindThis = $void.bindThis
   var isObject = $void.isObject
   var thisCall = $void.thisCall
@@ -300,7 +301,7 @@ module.exports = function ($void) {
     return !equals.call(this, another)
   })
 
-  // Enable the customizaztion of Ordering.
+  // Enable the customization of Ordering.
   var compare = link(instance, 'compare', function (another) {
     var ordering
     return this === another || equals.call(this, another) ? 0
@@ -323,7 +324,7 @@ module.exports = function ($void) {
 
   // Type Verification
   var isA = link(instance, ['is-a', 'is-an'], function (t) {
-    if (t === $Object || t === this.type) {
+    if (t === $Object || (this.type instanceof ClassType$ && t === this.type)) {
       return true
     }
     var overriding = this['is-a']
@@ -358,7 +359,7 @@ module.exports = function ($void) {
       ctx = new EncodingContext$(this)
     }
     var code = overriding.call(this)
-    return $Type.of(code) === $Object
+    return typeOf(code) === $Object
       ? ctx.end(this, this.type, objectToCode.call(code))
       : code instanceof Tuple$ && code.plain !== true
         ? ctx.end(this, $Object, code) // app handle its type information.
@@ -373,7 +374,6 @@ module.exports = function ($void) {
       : overriding.apply(this, arguments)
   })
 
-  var typeOf = $.type.of
   var indexer = link(instance, ':', function (index, value) {
     var overriding
     if (typeof index === 'string') {

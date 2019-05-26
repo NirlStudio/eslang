@@ -28,7 +28,7 @@
   ).
 ).
 
-(define "Punctuations are pure symbols, which is resolved to itself by default" (= ()
+(define "Punctuation are pure symbols, which is resolved to itself by default" (= ()
   (should "(symbol of \"\\\") is resolved to itself." (= ()
     (var sym (symbol of "\\").
     (assert sym (sym).

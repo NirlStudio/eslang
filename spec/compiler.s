@@ -210,7 +210,7 @@
 
     (assert "compiler" (warning 0).
   ).
-  (should "(compile code) allows but warns extra ending punctuations." (= ()
+  (should "(compile code) allows but warns extra ending punctuation." (= ()
     (warn *)
     (var statements (compile "(x))").
     (var warning (warn).

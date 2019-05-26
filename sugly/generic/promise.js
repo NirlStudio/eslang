@@ -1,6 +1,6 @@
 'use strict'
 
-function ingoreUnhandledRejectionsBy (filter) {
+function ignoreUnhandledRejectionsBy (filter) {
   if (typeof window !== 'undefined') {
     window.addEventListener('unhandledrejection', function (event) {
       var detail = event.promise ? event
@@ -29,7 +29,6 @@ module.exports = function ($void) {
   var isApplicable = $void.isApplicable
   var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
-  var defineTypeProperty = $void.defineTypeProperty
 
   function hasExcuse (excuse) {
     return typeof excuse !== 'undefined' && excuse !== null
@@ -155,7 +154,7 @@ module.exports = function ($void) {
     return function (waiting) {
       return waiting && hasExcuse(waiting.excuse)
         // the overall promise will reject immediately if found an tolerated
-        // rejection, since a parallelizing promise cannot react to it.
+        // rejection, since a parallel promise cannot react to it.
         ? rejectWith(waiting.excuse)
         // otherwise, the current promise's result will be taken into account in turn.
         : awaitFor(promise, next)
@@ -194,8 +193,8 @@ module.exports = function ($void) {
   // the empty value which has been resolved to null.
   var empty = link(Type, 'empty', Promise$.resolve(null))
 
-  // guard sugly promises to ingore unhandled rejections.
-  ingoreUnhandledRejectionsBy(function (promise, excuse) {
+  // guard sugly promises to ignore unhandled rejections.
+  ignoreUnhandledRejectionsBy(function (promise, excuse) {
     // create warnings
     return promise.excusable === true
   })
@@ -243,12 +242,12 @@ module.exports = function ($void) {
     return promises.length > 0 ? assemble(Promise$.all(promises)) : empty
   }, true))
 
-  // the array argument version of (promise of-all promisings)
-  link(Type, 'all', function (promisings) {
-    if (!Array.isArray(promisings)) {
+  // the array argument version of (promise of-all promising, ...)
+  link(Type, 'all', function (promisingList) {
+    if (!Array.isArray(promisingList)) {
       return empty
     }
-    var promises = makePromises(promisings)
+    var promises = makePromises(promisingList)
     return promises.length > 0 ? assemble(Promise$.all(promises)) : empty
   }, true)
 
@@ -260,12 +259,12 @@ module.exports = function ($void) {
       : promises.length > 0 ? promises[0] : nothing
   }, true))
 
-  // the array argument version of (promise of-any promisings)
-  link(Type, 'any', function (promisings) {
-    if (!Array.isArray(promisings)) {
+  // the array argument version of (promise of-any promising, ...)
+  link(Type, 'any', function (promisingList) {
+    if (!Array.isArray(promisingList)) {
       return nothing
     }
-    var promises = makePromises(promisings)
+    var promises = makePromises(promisingList)
     return promises.length > 1 ? assemble(Promise$.race(promises))
       : promises.length > 0 ? promises[0] : nothing
   }, true)
@@ -335,7 +334,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject function as the default type for native functions.
-  defineTypeProperty(Promise$.prototype, Type)
 }

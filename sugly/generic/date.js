@@ -25,7 +25,6 @@ module.exports = function ($void) {
   var protoValueOf = $void.protoValueOf
   var numberCompare = $.number.proto.compare
   var numberToString = $.number.proto['to-string']
-  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value
   var empty = link(Type, 'empty', new Date(0))
@@ -228,7 +227,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(Date.prototype, Type)
 }

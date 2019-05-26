@@ -76,7 +76,7 @@ module.exports = function ($void) {
       return value
     }
     warn('string:unescape', '[JSON] invalid string input: ',
-      (error && error.message) || 'unknow error.', '\n', source)
+      (error && error.message) || 'unknown error.', '\n', source)
     return source.substring(1, source.length - 1)
   }, true)
 
@@ -122,7 +122,7 @@ module.exports = function ($void) {
         offset = counter
       }
       if (typeof offset !== 'number') {
-        warn('string:format', 'invalid offset value gets ingored',
+        warn('string:format', 'invalid offset value gets ignored',
           pattern, i, placeholder.substring(0, end))
         offset = counter
       } else if (offset >= args.length) {

@@ -22,10 +22,10 @@ module.exports = function ($void) {
   // the empty value.
   var empty = link(Type, 'empty', sharedSymbolOf(''))
 
-  // a sepcial symbol to indicate "etc." or "more" for parser and operator
+  // a special symbol to indicate "etc." or "more" for parser and operator
   link(Type, 'etc', sharedSymbolOf('...'))
 
-  // a sepcial symbol to indicate "all" or "any" for parser and operator
+  // a special symbol to indicate "all" or "any" for parser and operator
   link(Type, 'all', sharedSymbolOf('*'))
   link(Type, 'any', sharedSymbolOf('?'))
 
@@ -43,7 +43,7 @@ module.exports = function ($void) {
   link(Type, 'local', sharedSymbolOf('local'))
   link(Type, 'locon', sharedSymbolOf('locon'))
 
-  // symbols for common punctuations
+  // symbols for common punctuation
   link(Type, 'escape', sharedSymbolOf('\\'))
   link(Type, 'begin', sharedSymbolOf('('))
   link(Type, 'end', sharedSymbolOf(')'))

@@ -32,7 +32,7 @@ module.exports = function ($void) {
       srcUri = ''
     }
 
-    var stack, sourceStack, waiter, lastToken, openningLine, openningOffset
+    var stack, sourceStack, waiter, lastToken, openingLine, openingOffset
     resetContext()
 
     function resetContext () {
@@ -40,8 +40,8 @@ module.exports = function ($void) {
       sourceStack = [[[[0, 0, 0]]]]
       waiter = null
       lastToken = ['space', '', [0, 0, 0]]
-      openningLine = -1
-      openningOffset = 0
+      openingLine = -1
+      openingOffset = 0
     }
 
     var tokenizing = tokenizer(compileToken, srcUri)
@@ -64,9 +64,9 @@ module.exports = function ($void) {
 
     function compileToken (type, value, source) {
       var endingLine = source[source.length - 2]
-      if (endingLine !== openningLine) {
-        openningLine = endingLine
-        openningOffset = stack[stack.length - 1].length
+      if (endingLine !== openingLine) {
+        openingLine = endingLine
+        openingOffset = stack[stack.length - 1].length
       }
       if (!waiter || !waiter(type, value, source)) {
         parseToken(type, value, source)
@@ -143,7 +143,7 @@ module.exports = function ($void) {
           // wait for next token to decide
           waiter = endingWaiter
           break
-        default: // just skip unknow punctuations as some placeholders.
+        default: // just skip unknown punctuation as some placeholders.
           break
       }
     }
@@ -199,7 +199,7 @@ module.exports = function ($void) {
       var sourceMap = sourceStack.pop()
       sourceMap[0].push(source || lastToken[2])
       while (statement.length > 2 &&
-        tryTofoldStatement(statement, sourceMap)
+        tryToFoldStatement(statement, sourceMap)
       );
       // push it to the end of container clause.
       sourceMap[0].unshift(srcUri || srcText)
@@ -208,7 +208,7 @@ module.exports = function ($void) {
       sourceStack[sourceStack.length - 1].push(sourceMap[0].slice(1))
     }
 
-    function tryTofoldStatement (statement, sourceMap) { // sweeter time.
+    function tryToFoldStatement (statement, sourceMap) { // sweeter time.
       var max = statement.length - 1
       for (var i = 1; i < max; i++) {
         if (statement[i] === symbolPairing && statement[i + 1] === symbolPairing) {
@@ -276,20 +276,20 @@ module.exports = function ($void) {
 
     function crossingLines () {
       var depth = sourceStack.length - 1
-      var srcOffset = openningOffset + 1
+      var srcOffset = openingOffset + 1
       var topSource = sourceStack[depth]
       return topSource.length > srcOffset &&
-        openningLine > topSource[srcOffset][1]
+        openingLine > topSource[srcOffset][1]
     }
 
     function closeLine (value, source) { // sweeter time.
       var depth = stack.length - 1
-      stack.push(stack[depth].splice(openningOffset))
-      var src = sourceStack[depth].splice(openningOffset + 1)
+      stack.push(stack[depth].splice(openingOffset))
+      var src = sourceStack[depth].splice(openingOffset + 1)
       src.length > 0 ? src.unshift(src[0]) : src.push(source)
       sourceStack.push(src)
       endTopWith(source)
-      openningOffset = stack[depth].length
+      openingOffset = stack[depth].length
     }
 
     function endIndent (value, source) { // sugar time

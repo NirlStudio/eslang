@@ -6,7 +6,6 @@ module.exports = function ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var protoValueOf = $void.protoValueOf
-  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value of bool is the false.
   link(Type, 'empty', false)
@@ -41,7 +40,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(Boolean.prototype, Type)
 }

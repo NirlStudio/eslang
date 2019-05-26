@@ -264,7 +264,6 @@ module.exports = function () {
     return value
   }
 
-  $void.defineTypeProperty = defineTypeProperty
   function defineTypeProperty (proto, type) {
     return defineProperty(proto, 'type', type)
   }

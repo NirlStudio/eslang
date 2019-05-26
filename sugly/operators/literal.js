@@ -100,7 +100,7 @@ module.exports = function literal ($void) {
           : objectCreate(space, clist,
             (type = evaluate(type, space)) instanceof ClassType$
               ? type // (@:a-class ...)
-              : $Object, // ingore type and treat it as a common object.
+              : $Object, // ignore type and treat it as a common object.
             3)
   })
 }

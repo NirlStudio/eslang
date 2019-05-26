@@ -15,7 +15,6 @@ module.exports = function ($void) {
   var protoValueOf = $void.protoValueOf
   var encodeFieldName = $void.encodeFieldName
   var EncodingContext$ = $void.EncodingContext
-  var defineTypeProperty = $void.defineTypeProperty
 
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
@@ -282,7 +281,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(Object.prototype, Type)
 }

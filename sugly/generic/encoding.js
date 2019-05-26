@@ -70,7 +70,6 @@ var createIndex = typeof Map === 'function' ? function () {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var $Type = $.type
   var $Tuple = $.tuple
   var $Array = $.array
   var $Object = $.object
@@ -78,6 +77,7 @@ module.exports = function ($void) {
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var Symbol$ = $void.Symbol
+  var typeOf = $void.typeOf
   var thisCall = $void.thisCall
   var sharedSymbolOf = $void.sharedSymbolOf
 
@@ -114,8 +114,8 @@ module.exports = function ($void) {
   }
 
   $void.EncodingContext = function (root) {
-    this.objs = createIndex()
-    this.objs.add(this.root = root, null)
+    this.objects = createIndex()
+    this.objects.add(this.root = root, null)
     this.clist = []
     this.shared = []
   }
@@ -126,15 +126,15 @@ module.exports = function ($void) {
       return ref
     },
     begin: function (obj) {
-      var offset = this.objs.get(obj)
+      var offset = this.objects.get(obj)
       if (typeof offset === 'undefined') { // first touch
-        return this.objs.add(obj, null)
+        return this.objects.add(obj, null)
       }
       var ref
       if (offset === null) { // to be recursively reused.
         offset = this.clist.length
         ref = this._createRef(offset)
-        this.objs.set(obj, offset)
+        this.objects.set(obj, offset)
         this.clist.push([ref, null, null])
         return ref
       }
@@ -152,7 +152,7 @@ module.exports = function ($void) {
     encode: function (obj) {
       return typeof obj === 'undefined' || obj === null ? null
         : typeof obj === 'number' || typeof obj === 'string' ? obj
-          : (Array.isArray(obj) || $Type.of(obj) === $Object ||
+          : (Array.isArray(obj) || typeOf(obj) === $Object ||
             obj instanceof Object$ // class instances
           ) ? thisCall(obj, 'to-code', this) : thisCall(obj, 'to-code')
     },
@@ -166,11 +166,11 @@ module.exports = function ($void) {
         }
       }
       // assert(code instanceof Tuple$)
-      var offset = this.objs.get(obj)
+      var offset = this.objects.get(obj)
       // assert(typeof offset !== 'undefined')
       if (offset === null) {
         offset = this.clist.length
-        this.objs.set(obj, offset)
+        this.objects.set(obj, offset)
         this.clist.push([null, type, code])
         return obj === this.root ? this._finalize(offset) : code
       }

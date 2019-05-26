@@ -12,7 +12,6 @@ module.exports = function ($void) {
   var safelyAssign = $void.safelyAssign
   var prepareOperation = $void.prepareOperation
   var prepareApplicable = $void.prepareApplicable
-  var defineTypeProperty = $void.defineTypeProperty
 
   // the noop function
   var noop = link(Type, 'noop', $void.function(function () {
@@ -38,7 +37,4 @@ module.exports = function ($void) {
 
   // implement applicable operation features.
   prepareApplicable(Type, $Tuple.function)
-
-  // inject function as the default type for native functions.
-  defineTypeProperty(Function.prototype, Type)
 }

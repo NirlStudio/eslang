@@ -10,13 +10,22 @@ module.exports = function ($void) {
   var $ = $void.$
   var $Type = $.type
   var $Tuple = $.tuple
+  var Type$ = $void.Type
+  var $Bool = $.bool
+  var $Date = $.date
+  var $Number = $.number
+  var $String = $.string
   var $Object = $.object
+  var $Array = $.array
   var $Lambda = $.lambda
   var $Function = $.function
+  var $Operator = $.operator
+  var $Promise = $.promise
   var Null = $void.null
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var Symbol$ = $void.Symbol
+  var Promise$ = $void.Promise
   var operator = $void.operator
   var ClassType$ = $void.ClassType
   var isApplicable = $void.isApplicable
@@ -157,12 +166,41 @@ module.exports = function ($void) {
 
   // to check if an value is a compatible object.
   $void.isObject = function (obj) {
-    return obj instanceof Object$ || (!!obj && obj.type === $Object)
+    return obj instanceof Object$ || typeOf(obj) === $Object
   }
+
+  // retrieve the real type of an entity.
+  function typeOf (entity) {
+    if (entity === null || typeof entity === 'undefined') {
+      return null
+    }
+    switch (typeof entity) {
+      case 'boolean':
+        return $Bool
+      case 'number':
+        return $Number
+      case 'string':
+        return $String
+      case 'function':
+        return entity.type === $Lambda ? $Lambda
+          : entity.type === $Operator ? $Operator
+            : $Function
+      case 'object':
+        var proto = Object.getPrototypeOf(entity)
+        return proto.type === $Type || proto.type instanceof Type$ ? proto.type
+          : Array.isArray(entity) ? $Array
+            : entity instanceof Date ? $Date
+              : entity instanceof Promise$ ? $Promise
+                : $Object
+      default:
+        return null
+    }
+  }
+  $void.typeOf = typeOf
 
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
-    var type = $Type.of(entity)
+    var type = typeOf(entity)
     return (type && type.indexer) || Null[':']
   }
 

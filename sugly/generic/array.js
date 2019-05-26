@@ -42,7 +42,6 @@ module.exports = function ($void) {
   var protoValueOf = $void.protoValueOf
   var EncodingContext$ = $void.EncodingContext
   var defineProperty = $void.defineProperty
-  var defineTypeProperty = $void.defineTypeProperty
 
   // create an empty array.
   link(Type, 'empty', function () {
@@ -838,7 +837,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(Array.prototype, Type)
 }

@@ -8,9 +8,9 @@ module.exports = function ($void) {
   var Null = $void.null
   var Symbol$ = $void.Symbol
   var link = $void.link
+  var typeOf = $void.typeOf
   var bindThis = $void.bindThis
   var isApplicable = $void.isApplicable
-  var ownsProperty = $void.ownsProperty
   var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
 
@@ -23,10 +23,10 @@ module.exports = function ($void) {
 
   // Type Verification: Any non-empty value is an instance of its type.
   link(proto, ['is-a', 'is-an'], function (type) {
-    return this.type === type
+    return typeOf(this) === type
   })
   link(proto, ['is-not-a', 'is-not-an'], function (type) {
-    return this.type !== type
+    return typeOf(this) !== type
   })
 
   // Emptiness needs to be customized by each type.
@@ -36,7 +36,7 @@ module.exports = function ($void) {
   // Representation and Description need be customized by each type.
 
   // Indexer: default readonly accessor for all types.
-  // all value types' protos must provide a customized indexer.
+  // all value types' proto must provide a customized indexer.
   var indexer = link(proto, ':', function (index) {
     var name = typeof index === 'string' ? index
       : index instanceof Symbol$ ? index.key : ''
@@ -55,14 +55,7 @@ module.exports = function ($void) {
   link(Type, 'empty', Type)
 
   // Retrieve the real type of an entity.
-  var typeOf = link(Type, 'of', function (entity) {
-    var proto
-    return entity === null || typeof entity === 'undefined' ? null
-      : typeof entity === 'object' && ownsProperty(entity, 'type')
-        ? (proto = Object.getPrototypeOf(entity)) === null
-          ? $Object : proto.type
-        : entity.type
-  }, true)
+  link(Type, 'of', typeOf, true)
 
   // Retrieve the indexer for this type's instances.
   link(Type, 'indexer', indexer)

@@ -134,7 +134,6 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var copyType = $void.copyType
   var protoValueOf = $void.protoValueOf
-  var defineTypeProperty = $void.defineTypeProperty
 
   // the value range and constant values.
   copyType(Type, Number, {
@@ -394,7 +393,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(Number.prototype, Type)
 }

@@ -181,7 +181,7 @@
     (assert 2 ((inst2 type) y).
     (assert 12 ((inst2 type) add 10).
   ).
-  (should "(class of def-objs ...) returns a new class by the definition objects." (= ()
+  (should "(class of def-objects ...) returns a new class by the definition objects." (= ()
     (var cls (class of
       (@ x: 1
         type: (@
@@ -285,7 +285,7 @@
     (assert 100 (inst activated).
     (assert 100 (inst x).
   ).
-  (should "(class attach inst objs ...) copys all fields of every obj to inst, then activates and returns it." (= ()
+  (should "(class attach inst objects ...) copys all fields of every obj to inst, then activates and returns it." (= ()
     (var inst ((class empty) empty).
     (assert inst (class attach inst (@ x: 100).
     (assert 100 (inst x).
@@ -393,7 +393,7 @@
     (assert (inst not-empty).
     (assert 2 (inst x).
   ).
-  (should "(a-class of objs ...) copys all fields of all objs into a new instance of the class if it has not a constructor." (= ()
+  (should "(a-class of objects ...) copys all fields of all objects into a new instance of the class if it has not a constructor." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
     (assert (inst is-an object).
@@ -471,7 +471,7 @@
     (assert 2 (inst a).
     (assert 1 (inst args).
   ).
-  (should "(a-class from objs ...) copys all fields of all objs into a new instance and calls activator on each." (= ()
+  (should "(a-class from objects ...) copys all fields of all objects into a new instance and calls activator on each." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
     (assert (inst is-an object).

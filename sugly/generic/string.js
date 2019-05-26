@@ -7,7 +7,6 @@ module.exports = function ($void) {
   var Symbol$ = $void.Symbol
   var thisCall = $void.thisCall
   var protoValueOf = $void.protoValueOf
-  var defineTypeProperty = $void.defineTypeProperty
 
   // the empty value
   link(Type, 'empty', '')
@@ -260,7 +259,4 @@ module.exports = function ($void) {
 
   // export type indexer.
   link(Type, 'indexer', indexer)
-
-  // inject type
-  defineTypeProperty(String.prototype, Type)
 }

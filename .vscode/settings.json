@@ -5,7 +5,10 @@
     "ching",
     "clist",
     "constambda",
+    "locon",
+    "ployfill",
     "polyfill",
+    "printf",
     "selftest",
     "stambda",
     "sugly"
