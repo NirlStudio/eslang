@@ -39,7 +39,6 @@ module.exports = function function_ ($void) {
 
   function createLambda (params, tbody, app, modules, module_) {
     var createScope = createLambdaSpace.bind(null, app, modules, module_)
-
     var $lambda = function () {
       var scope = createScope()
       // populate arguments
@@ -68,7 +67,7 @@ module.exports = function function_ ($void) {
         }
       }
     }
-    return $lambda
+    return alignedWithGeneric($lambda, params.length)
   }
 
   $void.staticLambdaOf = function staticLambdaOf (space, clause, offset) {
@@ -118,11 +117,13 @@ module.exports = function function_ ($void) {
         return null
       }
     }
-    if (key !== 'this') {
-      $stambda = $stambda.bind(null)
-      $stambda.this = null
+    if (key === 'this') {
+      // this is only a fake parameter to indicate accepting a this.
+      return alignedWithGeneric($stambda, 0)
     }
-    return $stambda
+    $stambda = $stambda.bind(null)
+    $stambda.this = null
+    return alignedWithGeneric($stambda, params.length)
   }
 
   $void.functionOf = function functionOf (space, clause, offset) {
@@ -175,7 +176,7 @@ module.exports = function function_ ($void) {
         }
       }
     }
-    return $func
+    return alignedWithGeneric($func, params.length)
   }
 
   // to prepare a new context for redo
@@ -211,5 +212,18 @@ module.exports = function function_ ($void) {
       }
     }
     return args.length > 0 ? [args, new Tuple$(code)] : [[], $Tuple.empty]
+  }
+
+  function alignedWithGeneric (func, paramNo) {
+    return paramNo > 0 ? Object.defineProperties(func, {
+      length: {
+        value: paramNo
+      },
+      name: {
+        value: undefined
+      }
+    }) : Object.defineProperty(func, 'name', {
+      value: undefined
+    })
   }
 }

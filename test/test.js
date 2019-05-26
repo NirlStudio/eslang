@@ -66,7 +66,8 @@ module.exports = function ($void) {
 
   function checkJavascript () {
     passed('JS is using the space of ' + (global ? 'global.' : 'window.'));
-    (typeof Promise === 'undefined' ? failed : passed)('Promise')
+    (typeof Promise === 'undefined' ? failed : passed)('Promise');
+    (typeof Object.defineProperty !== 'function' ? failed : passed)('Object.defineProperty')
   }
 
   function checkPolyfill () {

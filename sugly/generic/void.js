@@ -224,11 +224,11 @@ module.exports = function ($void) {
   // try to update the name of a function or a class.
   var tryToUpdateName = $void.tryToUpdateName = function (entity, name) {
     if (typeof entity === 'function') {
-      if (!entity.$name) {
-        entity.$name = name
+      if (!entity.name || typeof entity.name !== 'string') {
+        Object.defineProperty(entity, 'name', { value: name })
       }
     } else if (entity instanceof ClassType$) {
-      if (!entity.name) {
+      if (!entity.name || typeof entity.name !== 'string') {
         entity.name = name
       }
     }
@@ -262,8 +262,10 @@ module.exports = function ($void) {
     typeof func.code !== 'undefined' && (
       binding.code = func.code
     )
-    if (typeof func.$name === 'string') {
-      binding.$name = func.$name
+    if (typeof func.name === 'string') {
+      Object.defineProperty(binding, 'name', {
+        value: func.name
+      })
     }
     if (binding.type !== func.type) {
       binding.type = func.type
@@ -281,8 +283,10 @@ module.exports = function ($void) {
       if (!ownsProperty(entity, 'type')) {
         entity.type = $Lambda
       }
-      if (!entity.$name) {
-        entity.$name = typeof names === 'string' ? names : names[0]
+      if (!entity.name) {
+        Object.defineProperty(entity, 'name', {
+          value: typeof names === 'string' ? names : names[0]
+        })
       }
       if (autoBind && isApplicable(entity)) {
         entity = bindThis(owner, entity)
@@ -310,7 +314,9 @@ module.exports = function ($void) {
       if (typeof entity === 'function') {
         entity = safelyBind(entity, src)
         entity.type = $Lambda
-        entity.$name = mapping[name]
+        Object.defineProperty(entity, 'name', {
+          value: mapping[name]
+        })
       }
       target[mapping[name]] = entity
     }
@@ -319,7 +325,9 @@ module.exports = function ($void) {
 
   $void.prepareOperation = function (type, noop, emptyCode) {
     // the empty function
-    noop.$name = 'noop'
+    Object.defineProperty(noop, 'name', {
+      value: 'noop'
+    })
     var empty = link(type, 'empty', function () {
       return noop
     }, true)
@@ -330,7 +338,7 @@ module.exports = function ($void) {
     var proto = type.proto
     // return operation's name
     link(proto, 'name', function () {
-      return this.$name || ''
+      return typeof this.name === 'string' ? this.name : ''
     })
 
     // return operation's parameters
