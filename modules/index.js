@@ -53,6 +53,6 @@ module.exports.unregister = function (loader) {
 
 module.exports.copy = function (exporting, source, context, $void) {
   context._generic = source // mostly reserved for future.
-  $void.safelyAssign(exporting, source, true)
+  $void.safelyAssign(exporting, source)
   return exporting
 }

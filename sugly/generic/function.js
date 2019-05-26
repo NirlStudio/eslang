@@ -29,9 +29,9 @@ module.exports = function ($void) {
 
   // retrieve generic members of a native function.
   link(proto, ['generic', '$'], function () {
-    return this.code instanceof Tuple$ ? null
+    return this.code instanceof Tuple$ ? null // only for generic functions.
       : safelyAssign($Object.empty(),
-        typeof this.bound === 'function' ? this.bound : this, true
+        typeof this.bound === 'function' ? this.bound : this
       )
   })
 

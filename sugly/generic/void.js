@@ -77,17 +77,15 @@ module.exports = function ($void) {
   }
   $void.newInstance = newInstance
 
-  // safe copy all members from a source object or function to a target object.
-  // generate do and new operation for a native function source.
-  var safelyAssign = function (target, source, isGeneric) {
+  // safe copy all members from a generic object or function source to a target
+  // object. To generate "do" and "new" operations for a function source.
+  var safelyAssign = function (target, source) {
     for (var key in source) {
-      if (ownsProperty(source, key)) {
-        var value = source[key]
-        target[key] = typeof value !== 'function' ? value
-          : safelyBind(value, source)
-      }
+      var value = source[key]
+      target[key] = typeof value !== 'function' ? value
+        : safelyBind(value, source)
     }
-    if (isGeneric && typeof source === 'function') {
+    if (typeof source === 'function') {
       // If the source have a 'do' or 'new' function, it will be just overridden.
       // This behavior can be changed if it's really worthy in future.
       target.do = safelyBind(source, null)
