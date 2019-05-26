@@ -293,7 +293,7 @@ module.exports = function ($void) {
     check('object: generic', indexerOf({}) === $.object.proto[':'])
   }
 
-  function seval (expected, expr, desc) {
+  function eval_ (expected, expr, desc) {
     var result = $.eval(expr)
     var success = typeof expected === 'function' ? expected(result) : Object.is(result, expected)
     check(expr || desc, success, success || 'evaluated to a value of ' +
@@ -302,186 +302,186 @@ module.exports = function ($void) {
 
   function checkTypes () {
     print('\n  - Primary Types')
-    seval(null, '', '<empty>')
-    seval(null, '()')
-    seval(null, 'null')
+    eval_(null, '', '<empty>')
+    eval_(null, '()')
+    eval_(null, 'null')
 
-    seval($.type, 'type')
+    eval_($.type, 'type')
 
-    seval($.bool, 'bool')
-    seval(true, 'true')
-    seval(false, 'false')
+    eval_($.bool, 'bool')
+    eval_(true, 'true')
+    eval_(false, 'false')
 
-    seval($.string, 'string')
-    seval($.string.empty, '""')
-    seval('ABC', '"ABC"')
-    seval('ABC', '("ABC")')
-    seval(3, '("ABC" length)')
-    seval('ABCDEF', '("ABC" + "DEF")')
+    eval_($.string, 'string')
+    eval_($.string.empty, '""')
+    eval_('ABC', '"ABC"')
+    eval_('ABC', '("ABC")')
+    eval_(3, '("ABC" length)')
+    eval_('ABCDEF', '("ABC" + "DEF")')
 
-    seval($.number, 'number')
-    seval(3, '(1 + 2)')
-    seval(-1, '(1 - 2)')
-    seval(2, '(1 * 2)')
-    seval(0.5, '(1 / 2)')
+    eval_($.number, 'number')
+    eval_(3, '(1 + 2)')
+    eval_(-1, '(1 - 2)')
+    eval_(2, '(1 * 2)')
+    eval_(0.5, '(1 / 2)')
 
-    seval($.date, 'date')
-    seval(function (d) {
+    eval_($.date, 'date')
+    eval_(function (d) {
       return d instanceof Date
     }, '(date now)')
 
-    seval($.range, 'range')
-    seval(function (r) {
+    eval_($.range, 'range')
+    eval_(function (r) {
       return r.begin === 0 && r.end === 3 && r.step === 1
     }, '(0 3)')
-    seval(function (r) {
+    eval_(function (r) {
       return r.begin === 10 && r.end === 20 && r.step === 2
     }, '(10 20 2)')
 
-    seval($.symbol, 'symbol')
-    seval(function (s) {
+    eval_($.symbol, 'symbol')
+    eval_(function (s) {
       return s.key === 'x'
     }, '(` x)')
 
-    seval($.tuple, 'tuple')
-    seval(function (t) {
+    eval_($.tuple, 'tuple')
+    eval_(function (t) {
       var l = t.$
       return t instanceof $void.Tuple && l[0].key === 'x' && l[1] === 1 && l[2] === 'y' && l[3] === true
     }, '(` (x 1 "y" true))')
 
-    seval($.operator, 'operator')
-    seval(function (s) {
+    eval_($.operator, 'operator')
+    eval_(function (s) {
       return s.type === $.operator
     }, '(=? () )')
-    seval(function (s) {
+    eval_(function (s) {
       return s.type === $.operator
     }, '(=? (X Y) (+ (X) (Y).')
 
-    seval($.lambda, 'lambda')
-    seval(function (s) {
+    eval_($.lambda, 'lambda')
+    eval_(function (s) {
       return s.type === $.lambda
     }, '(= () )')
-    seval(function (s) {
+    eval_(function (s) {
       return s.type === $.lambda
     }, '(= (x y) (+ x y).')
 
-    seval($.function, 'function')
-    seval(function (s) {
+    eval_($.function, 'function')
+    eval_(function (s) {
       return s.type === $.function
     }, '(=> () )')
-    seval(function (s) {
+    eval_(function (s) {
       return s.type === $.function
     }, '(=> (x y) (+ x y).')
 
-    seval($.array, 'array')
-    seval(function (a) {
+    eval_($.array, 'array')
+    eval_(function (a) {
       return a.length === 2 && a[0] === 1 && a[1] === 2
     }, '(array of 1 2)')
-    seval(2, '((@ 10 20) length)')
-    seval(20, '((@ 10 20) 1)')
+    eval_(2, '((@ 10 20) length)')
+    eval_(20, '((@ 10 20) 1)')
 
-    seval($.object, 'object')
-    seval(function (obj) {
+    eval_($.object, 'object')
+    eval_(function (obj) {
       return obj.x === 1 && obj.y === 2
     }, '(@ x: 1 y: 2)')
-    seval(10, '((@ x: 10 y: 20) x)')
-    seval(20, '((@ x: 10 y: 20) y)')
-    seval(200, '((@ x: 10 y: 20) "y" 200)')
+    eval_(10, '((@ x: 10 y: 20) x)')
+    eval_(20, '((@ x: 10 y: 20) y)')
+    eval_(200, '((@ x: 10 y: 20) "y" 200)')
 
-    seval($.class, 'class')
-    seval(function (c) {
+    eval_($.class, 'class')
+    eval_(function (c) {
       return c.type === $.class
     }, '(@:class x: 1 y: 0)')
-    seval(function (c) {
+    eval_(function (c) {
       return c.type === $.class
     }, '(class of (@: x: 1 y: 0).')
   }
 
   function checkAssignment () {
     print('\n  - Assignment')
-    seval(1, '(let x 1)')
-    seval(2, '(let x 1) (let y 2)')
-    seval(2, '(let (x y) (@ 1 2). y')
-    seval(2, '(let (x y) (@ x: 1 y: 2). y')
-    seval(2, '(let * (@ x: 1 y: 2). y')
+    eval_(1, '(let x 1)')
+    eval_(2, '(let x 1) (let y 2)')
+    eval_(2, '(let (x y) (@ 1 2). y')
+    eval_(2, '(let (x y) (@ x: 1 y: 2). y')
+    eval_(2, '(let * (@ x: 1 y: 2). y')
 
-    seval(1, '(var x 1)')
-    seval(2, '(var x 1) (var y 2)')
-    seval(2, '(var (x y) (@ 1 2). y')
-    seval(2, '(var (x y) (@ x: 1 y: 2). y')
-    seval(2, '(var * (@ x: 1 y: 2). y')
+    eval_(1, '(var x 1)')
+    eval_(2, '(var x 1) (var y 2)')
+    eval_(2, '(var (x y) (@ 1 2). y')
+    eval_(2, '(var (x y) (@ x: 1 y: 2). y')
+    eval_(2, '(var * (@ x: 1 y: 2). y')
 
-    seval(1, '(export x 1)')
-    seval(2, '(export x 1) (export y 2)')
-    seval(2, '(export (x y) (@ x: 1 y: 2). y')
-    seval(2, '(export * (@ x: 1 y: 2). y')
+    eval_(1, '(export x 1)')
+    eval_(2, '(export x 1) (export y 2)')
+    eval_(2, '(export (x y) (@ x: 1 y: 2). y')
+    eval_(2, '(export * (@ x: 1 y: 2). y')
   }
 
   function checkOperators () {
     print('\n  - Operators')
-    seval(1, '(? true 1 0)')
-    seval(0, '(? false 1 0)')
+    eval_(1, '(? true 1 0)')
+    eval_(0, '(? false 1 0)')
 
-    seval(110, '(+ 10 100)')
-    seval(-110, '(+ -10 -100)')
+    eval_(110, '(+ 10 100)')
+    eval_(-110, '(+ -10 -100)')
 
-    seval('10100', '(+ "10" "100")')
-    seval('-10-100', '(+ "-10" "-100")')
+    eval_('10100', '(+ "10" "100")')
+    eval_('-10-100', '(+ "-10" "-100")')
 
-    seval(1, '(++)')
-    seval(-1, '(--)')
+    eval_(1, '(++)')
+    eval_(-1, '(--)')
 
-    seval(1, '(++ null)')
-    seval(-1, '(-- null)')
+    eval_(1, '(++ null)')
+    eval_(-1, '(-- null)')
 
-    seval(1, '(++ 0)')
-    seval(-1, '(-- 0)')
+    eval_(1, '(++ 0)')
+    eval_(-1, '(-- 0)')
 
-    seval(1, '(let x 0)(++ x)x')
-    seval(-1, '(let x 0)(-- x)x')
+    eval_(1, '(let x 0)(++ x)x')
+    eval_(-1, '(let x 0)(-- x)x')
 
-    seval(true, '(1 ?)')
-    seval(false, '(0 ?)')
-    seval(false, '(null ?)')
+    eval_(true, '(1 ?)')
+    eval_(false, '(0 ?)')
+    eval_(false, '(null ?)')
 
-    seval(true, '(true ? 1)')
-    seval(1, '(false ? 1)')
+    eval_(true, '(true ? 1)')
+    eval_(1, '(false ? 1)')
 
-    seval(1, '(true ? 1 0)')
-    seval(0, '(false ? 1 0)')
+    eval_(1, '(true ? 1 0)')
+    eval_(0, '(false ? 1 0)')
 
-    seval(0, '(null ?? 0)')
-    seval(false, '(false ?? 0)')
-    seval(0, '(0 ?? 1)')
-    seval('', '("" ?? 1)')
+    eval_(0, '(null ?? 0)')
+    eval_(false, '(false ?? 0)')
+    eval_(0, '(0 ?? 1)')
+    eval_('', '("" ?? 1)')
   }
 
   function checkControl () {
     print('\n  - Control')
-    seval(0, '(if true 1 0)')
-    seval(null, '(if false 1 0)')
-    seval(1, '(if true 1 else 0)')
-    seval(0, '(if false 1 else 0)')
+    eval_(0, '(if true 1 0)')
+    eval_(null, '(if false 1 0)')
+    eval_(1, '(if true 1 else 0)')
+    eval_(0, '(if false 1 else 0)')
 
-    seval(10, '(for x in (100 110) (++ i).')
-    seval(99, '(while ((++ i) < 100) i)')
-    seval(100, '(let i 0)(while ((i ++) < 100) i)')
-    seval(100, '(while ((++ i) < 100). i')
-    seval(101, '(let i 0)(while ((i ++) < 100). i')
-    seval('done', '(while ((++ i) < 100) (if (i == 10) (break "done").')
+    eval_(10, '(for x in (100 110) (++ i).')
+    eval_(99, '(while ((++ i) < 100) i)')
+    eval_(100, '(let i 0)(while ((i ++) < 100) i)')
+    eval_(100, '(while ((++ i) < 100). i')
+    eval_(101, '(let i 0)(while ((i ++) < 100). i')
+    eval_('done', '(while ((++ i) < 100) (if (i == 10) (break "done").')
   }
 
   function checkOperations () {
     print('\n  - Operations')
-    seval(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b). (add x y)')
+    eval_(21, '(let x 1) (let y 20) (let add (=? (a b) ((a) + (b). (add x y)')
 
-    seval(21, '(let z 100) (let add (= (x y) (x + y z). (add 1 20)')
-    seval(21, '(let z 100) (= (1 20): (x y) (x + y z).')
+    eval_(21, '(let z 100) (let add (= (x y) (x + y z). (add 1 20)')
+    eval_(21, '(let z 100) (= (1 20): (x y) (x + y z).')
 
-    seval(121, '(let z 100) (let add (=> (x y) (x + y z). (add 1 20)')
-    seval(121, '(let z 100) (=> (1 20): (x y) (x + y z).')
+    eval_(121, '(let z 100) (let add (=> (x y) (x + y z). (add 1 20)')
+    eval_(121, '(let z 100) (=> (1 20): (x y) (x + y z).')
 
-    seval(11, '(let summer (@:class add: (= () ((this x) + (this y). (let s (summer of (@ x: 1 y: 10). (s add)')
-    seval(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y). (summer add 1 10)')
+    eval_(11, '(let summer (@:class add: (= () ((this x) + (this y). (let s (summer of (@ x: 1 y: 10). (s add)')
+    eval_(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y). (summer add 1 10)')
   }
 }
