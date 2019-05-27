@@ -447,7 +447,7 @@
 
     (var obj ($print generic).
     (assert (obj is-an object).
-    (assert (obj "do":: is-an function).
+    (assert (obj "call":: is-an function).
     (assert (obj "new":: is-an function).
   ).
 ).

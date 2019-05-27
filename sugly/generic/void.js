@@ -88,7 +88,7 @@ module.exports = function ($void) {
     if (typeof source === 'function') {
       // If the source have a 'do' or 'new' function, it will be just overridden.
       // This behavior can be changed if it's really worthy in future.
-      target.do = safelyBind(source, null)
+      target.call = safelyBind(source, null)
       target.new = newInstance.bind(null, source)
     }
     return target
