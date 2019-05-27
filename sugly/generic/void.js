@@ -8,9 +8,7 @@ function createEmptyOperation () {
 
 module.exports = function ($void) {
   var $ = $void.$
-  var $Type = $.type
   var $Tuple = $.tuple
-  var Type$ = $void.Type
   var $Bool = $.bool
   var $Date = $.date
   var $Number = $.number
@@ -22,6 +20,7 @@ module.exports = function ($void) {
   var $Operator = $.operator
   var $Promise = $.promise
   var Null = $void.null
+  var Type$$ = $void.Type$
   var Tuple$ = $void.Tuple
   var Object$ = $void.Object
   var Symbol$ = $void.Symbol
@@ -185,8 +184,8 @@ module.exports = function ($void) {
           : entity.type === $Operator ? $Operator
             : $Function
       case 'object':
-        var proto = Object.getPrototypeOf(entity)
-        return proto.type === $Type || proto.type instanceof Type$ ? proto.type
+        return entity instanceof Type$$
+          ? Object.getPrototypeOf(entity).type || $Object
           : Array.isArray(entity) ? $Array
             : entity instanceof Date ? $Date
               : entity instanceof Promise$ ? $Promise

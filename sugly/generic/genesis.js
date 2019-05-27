@@ -20,7 +20,7 @@ module.exports = function () {
   /* “Let there be light,” and there was light. */
   // The light is the laws, which are the foundation of all beings.
   var Prototype = Object.create(Null) /* 1. Derivation */
-  function Type$ () { /* 2. Separation & Aggregation */
+  var Type$ = $void.Type$ = function () { /* 2. Separation & Aggregation */
     // This function should be executed once, and only once.
     // The primal type is derived from the supreme prototype.
     this.proto = Prototype
