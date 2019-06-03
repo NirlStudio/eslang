@@ -1,8 +1,9 @@
 'use strict'
 
 var sugly = require('../sugly')
-var defaultTerm = require('./lib/term')
-var defaultStdout = require('./lib/stdout')
+var terminalStdin = require('./lib/stdin')
+var terminalStdout = require('./lib/stdout')
+var consoleStdout = require('../lib/stdout')
 var defaultLoader = require('../lib/loader')
 
 function ensure (factory, alternative) {
@@ -14,9 +15,12 @@ function getAppHome () {
   return href.substring(0, href.lastIndexOf('/'))
 }
 
-module.exports = function (term, stdout, loader) {
-  term = ensure(term, defaultTerm)()
-  stdout = ensure(stdout, defaultStdout)(term)
+module.exports = function (term, stdin, stdout, loader) {
+  term = typeof term === 'object' ? term
+    : null // by default, shell mode is not available.
+  stdout = typeof stdout === 'function' ? stdout
+    : term ? terminalStdout(term)
+      : consoleStdout // web console does not support printf.
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
@@ -67,9 +71,12 @@ module.exports = function (term, stdout, loader) {
   }
 
   function shell (args, context) {
+    if (typeof stdin !== 'function' && !term) {
+      throw new TypeError('An interactive shell requires a terminal to work.')
+    }
     // generate shell agent.
     return initialize(context, function () {
-      var reader = require('./lib/stdin')($void, term)
+      var reader = ensure(stdin, terminalStdin)($void, term)
       var agent = require('../lib/shell')($void, reader,
         require('./lib/process')($void)
       )

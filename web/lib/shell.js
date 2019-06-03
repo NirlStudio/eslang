@@ -1,22 +1,26 @@
 'use strict'
 
-// expose the creator function by default.
-window.$void = require('../index')
+var term = require('./term')
+var $void = require('../index')
 
+var next = typeof window.onload === 'function' ? window.onload : null
 window.onload = function () {
+  next && next()
+
   // generate and expose a default runner function.
-  window.$sugly = window.$void(/* term, stdout, loader */)
+  var sugly = $void(term()/*, stdin, stdout, loader */)
 
   // start shell and expose the shell's reader function.
-  var shell = window.$sugly(/* context, app (to run) or args (for shell) */)
-  shell instanceof Promise ? shell.then(function (sh) {
-    window.$shell = sh
-    console.info('shell is ready now.')
-  }) : (window.$shell = shell)
-
-  if (!window.$shell) {
-    console.info('waiting shell to be ready ...')
-  } else {
+  var init = sugly(/* context, app (to run) or args (for shell) */)
+  if (!(init instanceof Promise)) {
     console.info('shell is ready.')
+    return
   }
+
+  console.info('waiting shell to be ready ...')
+  init.then(function () {
+    console.info('shell is ready now.')
+  }, function (err) {
+    console.info('shell failed to be initialized for', err)
+  })
 }

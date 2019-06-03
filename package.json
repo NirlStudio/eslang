@@ -12,7 +12,6 @@
   "scripts": {
     "test": "node . selftest",
     "check": "node test/test.js",
-    "assert": "node . test examples/test",
     "build": "webpack & webpack --mode=production",
     "build-dev": "webpack",
     "build-prod": "webpack --mode=production",
