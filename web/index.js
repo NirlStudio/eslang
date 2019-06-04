@@ -10,7 +10,7 @@ function ensure (factory, alternative) {
   return typeof factory === 'function' ? factory : alternative
 }
 
-function getAppHome () {
+function getDefaultHome () {
   var href = window.location.href
   return href.substring(0, href.lastIndexOf('/'))
 }
@@ -24,16 +24,16 @@ module.exports = function (term, stdin, stdout, loader) {
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
-  var home = getAppHome()
+  var home = getDefaultHome()
   $void.env('home', home)
   $void.env('user-home', home)
   $void.env('os', window.navigator.userAgent)
 
   var bootstrap = $void.createBootstrapSpace(home + '/@')
 
-  function run (app, context) {
+  var run = function (appHome, context, args, app) {
     return initialize(context, function () {
-      return $void.$run(app)
+      return $void.$run(app || 'app', args, appHome)
     })
   }
 
@@ -70,7 +70,7 @@ module.exports = function (term, stdin, stdout, loader) {
     })
   }
 
-  function shell (args, context) {
+  function shell (context, args, profile) {
     if (typeof stdin !== 'function' && !term) {
       throw new TypeError('An interactive shell requires a terminal to work.')
     }
@@ -82,13 +82,13 @@ module.exports = function (term, stdin, stdout, loader) {
       )
       // export global shell commands
       $void.$shell['test-bootstrap'] = require('../test/test')($void)
-      agent(args, term.echo)
+      agent(args, term.echo, profile)
       return reader.open()
     })
   }
 
-  return function sugly (context, app) {
-    return typeof app === 'string' ? run(app, context)
-      : shell(Array.isArray(app) ? app : [], context)
+  return {
+    run: run,
+    shell: shell
   }
 }
