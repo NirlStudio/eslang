@@ -1,6 +1,6 @@
 {
   "name": "sugly",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi Li"
@@ -22,7 +22,7 @@
     "sugly": "bin/sugly"
   },
   "dependencies": {
-    "axios": ">=0.19.0",
+    "axios": "^0.19.0",
     "colors": "^1.3.3",
     "node-localstorage": "^1.3.1"
   },
