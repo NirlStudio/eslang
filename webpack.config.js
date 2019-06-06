@@ -16,7 +16,6 @@ const prepareDevWebSite = new HooksPlugin({
     shell.mkdir('dist/www')
     shell.mkdir('dist/www/modules')
     shell.mkdir('dist/www/test')
-    shell.mkdir('dist/www/tools')
   },
   done: () => {
     shell.cp('profile.s', 'dist/www/')
