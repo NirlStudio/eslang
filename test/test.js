@@ -141,7 +141,7 @@ module.exports = function ($void) {
     ])
 
     checkFunctions($, '[Sugly / lib / functions] ', [
-      'max', 'min'
+      'max', 'min', 'suglify'
     ])
 
     checkFunctions($void, '[Sugly / lib / IO functions] ', [

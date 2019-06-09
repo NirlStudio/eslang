@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function device ($void) {
+module.exports = function ($void) {
   var $ = $void.$
   var $Object = $.object
   var Object$ = $void.Object

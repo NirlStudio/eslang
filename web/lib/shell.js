@@ -9,7 +9,7 @@ window.onload = function () {
   var sugly = $void(term()/*, stdin, stdout, loader */)
 
   // start shell and expose the shell's reader function.
-  var initializing = sugly.shell(/* context, app (to run) or args (for shell) */)
+  var initializing = sugly.shell(/* context, args, profile */)
   if (!(initializing instanceof Promise)) {
     console.info('shell is ready.')
     return

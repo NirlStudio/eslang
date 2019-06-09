@@ -11,7 +11,7 @@ function safeDelayOf (milliseconds, defaultValue) {
       : milliseconds
 }
 
-module.exports = function timer ($void) {
+module.exports = function ($void) {
   var $ = $void.$
   var $Emitter = $.emitter
   var promiseOf = $.promise.of

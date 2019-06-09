@@ -38,6 +38,7 @@ function initializeLib ($void, stdout) {
   require('./lib/json')($void)
   require('./lib/emitter')($void)
   require('./lib/timer')($void)
+  require('./lib/suglify')($void)
 }
 
 function initializeRuntime ($void) {

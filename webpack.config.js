@@ -12,6 +12,7 @@ const ignoreNativeModules = new webpack.IgnorePlugin(
 
 const prepareDevWebSite = new HooksPlugin({
   beforeRun: () => {
+    fs.existsSync('dist') || shell.mkdir('dist')
     fs.existsSync('dist/www') && shell.rm('-r', 'dist/www')
     shell.mkdir('dist/www')
     shell.mkdir('dist/www/modules')

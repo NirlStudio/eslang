@@ -5,12 +5,14 @@
     "ching",
     "clist",
     "constambda",
+    "hyphenize",
     "locon",
     "ployfill",
     "polyfill",
     "printf",
     "selftest",
     "stambda",
+    "suglify",
     "sugly"
   ]
 }

@@ -78,11 +78,13 @@ module.exports = function ($void) {
 
   // safe copy all members from a generic object or function source to a target
   // object. To generate "do" and "new" operations for a function source.
-  var safelyAssign = function (target, source) {
+  var safelyAssign = function (target, source, ownedOnly) {
     for (var key in source) {
-      var value = source[key]
-      target[key] = typeof value !== 'function' ? value
-        : safelyBind(value, source)
+      if (!ownedOnly || ownsProperty(source, key)) {
+        var value = source[key]
+        target[key] = typeof value !== 'function' ? value
+          : safelyBind(value, source)
+      }
     }
     if (typeof source === 'function') {
       target.call = safelyBind(source, null)

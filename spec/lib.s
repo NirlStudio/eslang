@@ -4,6 +4,7 @@
     "json"
     "math"
     "stdout"
+    "suglify"
     "timer"
     "uri"
   ) (define spec (=> ()

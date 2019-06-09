@@ -419,6 +419,7 @@ is-static((f is-static) is-static)
 is-const((f is-const) is-const)
 is-generic((f is-generic) is-generic)
 not-generic((f not-generic) not-generic)
+generic((f generic) generic)
 is-bound((f is-bound) is-bound)
 not-bound((f not-bound) not-bound)
 apply((f apply) apply)
@@ -539,6 +540,7 @@ printf((printf)printf)printf
 warn((warn)warn)warn
 max((max)max)max
 min((min)min)min
+suglify((suglify)suglify)suglify
 
 # meta.operator.lib.sugly
 (debug)
