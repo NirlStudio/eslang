@@ -46,7 +46,7 @@ module.exports = function run ($void) {
       return null
     }
     try {
-      return execute(null, code, uri, args, true)[0]
+      return execute(null, code, uri, args, appHome)[0]
     } catch (signal) {
       warn('run', 'invalid call to', signal.id,
         'in', text, 'from', uri, 'with', args)

@@ -6,7 +6,6 @@
 
 (define "(run app-source)" (= ()
   (should "load and return the evaluation result of file source." (= ()
-    (print -module)
     (var result (run "spec/runtime/_app").
     (assert (result is-an array).
     (assert ((result 0) is-a string).
@@ -18,11 +17,15 @@
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
+    (assert ((result 3) ends-with "_app.s").
 
     (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
+    (assert ((result 5) is-a string).
 
-    (assert (result 3) (result 4).
+    (assert ((result 6) is-a string).
+    (assert ((result 6) ends-with "_app.s").
+
+    (assert (result 3) (result 6).
   ).
   (should "return null if the file source cannot be loaded." (= ()
     (assert null (run "_does_not_exist_app").
@@ -41,13 +44,6 @@
     (assert 1 ((result 2) 0).
     (assert 10 ((result 2) 1).
     (assert 100 ((result 2) 2).
-
-    (assert ((result 3) is-a string).
-
-    (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
-
-    (assert (result 3) (result 4).
   ).
   (should "requires args must be an array." (= ()
     (var result (run "spec/runtime/_app" (@ x: 1).
@@ -58,13 +54,6 @@
     (assert null (result 1).
     (assert ((result 2) is-an array).
     (assert ((result 2) is-empty).
-
-    (assert ((result 3) is-a string).
-
-    (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
-
-    (assert (result 3) (result 4).
   ).
   (should "only accept atomic values as argument value." (= ()
     (var args (@
@@ -81,13 +70,6 @@
     (assert null (result 1).
     (var feedback (result 2).
     (assert (feedback is-an array).
-
-    (assert ((result 3) is-a string).
-
-    (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
-
-    (assert (result 3) (result 4).
 
     (assert (feedback is-an array).
     (assert (args length) (feedback length).
@@ -134,25 +116,21 @@
     (assert ((result 3) starts-with -module-dir).
 
     (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
+    (assert ((result 4) is-a string).
 
-    (assert (result 3) (result 4).
+    (assert ((result 6) is-a string).
+    (assert ((result 6) ends-with "_app.s").
+
+    (assert (result 3) (result 6).
   ).
-  (should "use current home if it's not a string." (= ()
+  (should "use current home as -app-home if it's not a string." (= ()
     (var result (run "spec/runtime/_app" null true).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
 
     (assert null (result 1).
-    (assert ((result 2) is-an array).
-    (assert ((result 2) is-empty).
 
-    (assert ((result 3) is-a string).
-
-    (assert ((result 4) is-a string).
-    (assert ((result 4) ends-with "_app.s").
-
-    (assert (result 3) (result 4).
+    (assert (env "home") (result 5).
   ).
 ).

@@ -16,16 +16,51 @@
   (should "in an app space, -app equals -module." (= ()
     (var result (run "spec/runtime/_app").
     (assert ((result 3) is-a string).
+    (assert ((result 6) is-a string).
+    (assert (result 3) (result 6).
+  ).
+  (should "in an app space, -app-dir equals -module-dir." (= ()
+    (var result (run "spec/runtime/_app").
     (assert ((result 4) is-a string).
-    (assert (result 3) (result 4).
+    (assert ((result 7) is-a string).
+    (assert (result 4) (result 7).
+  ).
+  (should "-app-home can be the same of -app-dir." (= ()
+    (var result (run "_app", *, -module-dir).
+    (assert ((result 4) is-a string).
+    (assert ((result 5) is-a string).
+    (assert -module-dir (result 5).
+    (assert (result 4) (result 5).
+  ).
+  (should "-app-home can be different with -app-dir." (= ()
+    (var result (run "spec/runtime/_app").
+    (assert ((result 4) is-a string).
+    (assert ((result 5) is-a string).
+    (assert (env "home") (result 5).
+    (assert (result 5:: is-not (result 4).
   ).
 ).
 
 (define "module" (=> ()
-  (should "in a module space, -app does not equal -module." (=> ()
-    (var (app mod) (import "./_app").
+  (should "in a module space, -app comes from the importing app." (=> ()
+    (var (app) (import "./_app").
     (assert -app app).
-    (assert (mod not-equals app).
+  ).
+  (should "in a module space, -app-dir comes from the importing app." (=> ()
+    (var (app-dir) (import "./_app").
+    (assert -app-dir app-dir).
+  ).
+  (should "in a module space, -app-home comes from the importing app." (=> ()
+    (var (app-home) (import "./_app").
+    (assert -app-home app-home).
+  ).
+  (should "in a module space, -module does not equal -app." (=> ()
+    (var (mod) (import "./_app").
+    (assert (mod not-equals -app).
+  ).
+  (should "in a module space, -module-dir does not equal -app-dir." (=> ()
+    (var (mod-dir) (import "./_app").
+    (assert (mod-dir not-equals -app-dir).
   ).
 ).
 

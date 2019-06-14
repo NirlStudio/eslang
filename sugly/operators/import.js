@@ -33,7 +33,7 @@ module.exports = function import_ ($void) {
     var src
     if (clist.length < 4 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      src = importModule(space, space.local['-app'], space.local['-module'],
+      src = importModule(space, space.local['-app-home'], space.local['-module'],
         evaluate(clist[1], space)
       )
       // clone to protect inner exports object.
@@ -42,8 +42,9 @@ module.exports = function import_ ($void) {
     // (import field-or-fields from src)
     src = evaluate(clist[3], space)
     var imported = src instanceof Object$ ? src
-      : typeof src !== 'string' ? null
-        : importModule(space, space.local['-app'], space.local['-module'], src)
+      : typeof src !== 'string' ? null : importModule(
+        space, space.local['-app-home'], space.local['-module'], src
+      )
     if (typeof imported !== 'object') {
       return null // importing failed.
     }
@@ -74,7 +75,7 @@ module.exports = function import_ ($void) {
     return values
   })
 
-  function importModule (space, appUri, moduleUri, source) {
+  function importModule (space, appHome, moduleUri, source) {
     if (typeof source !== 'string') {
       if (source instanceof Symbol$) {
         source = source.key
@@ -90,7 +91,7 @@ module.exports = function import_ ($void) {
       source = source.substring(offset)
     }
     // try to locate the source in dirs.
-    var uri = type ? source : resolve(appUri, moduleUri, appendExt(source))
+    var uri = type ? source : resolve(appHome, moduleUri, appendExt(source))
     if (!uri) {
       return null
     }
@@ -120,7 +121,7 @@ module.exports = function import_ ($void) {
     return module_.exports
   }
 
-  function resolve (appUri, moduleUri, source) {
+  function resolve (appHome, moduleUri, source) {
     var loader = $void.loader
     var isResolved = loader.isResolved(source)
     if (!moduleUri && isResolved) {
@@ -129,7 +130,7 @@ module.exports = function import_ ($void) {
     }
     var dirs = isResolved ? [] : dirsOf(source,
       moduleUri && loader.dir(moduleUri),
-      loader.dir(appUri) + '/modules',
+      appHome + '/modules',
       $void.$env('home') + '/modules',
       $void.runtime('home') + '/modules'
     )

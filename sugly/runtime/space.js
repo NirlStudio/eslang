@@ -146,10 +146,11 @@ module.exports = function space ($void) {
     }
   })
 
-  $void.createAppSpace = function (uri) {
+  $void.createAppSpace = function (uri, home) {
     var app = Object.create($)
     app['-app'] = uri
     app['-app-dir'] = $void.loader.dir(uri)
+    app['-app-home'] = home || app['-app-dir']
     app.env = $void.$env
     app.run = $void.$run
     app.interpreter = $void.$interpreter

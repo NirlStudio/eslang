@@ -7,8 +7,8 @@ module.exports = function execute ($void) {
   var createAppSpace = $void.createAppSpace
   var createModuleSpace = $void.createModuleSpace
 
-  $void.execute = function execute (space, code, uri, args, mainApp) {
-    var scope = mainApp ? prepareAppSpace(uri) : createModuleSpace(uri, space)
+  $void.execute = function execute (space, code, uri, args, appHome) {
+    var scope = appHome ? prepareAppSpace(uri, appHome) : createModuleSpace(uri, space)
     scope.populate(args)
     try {
       return [evaluate(code, scope), scope]
@@ -26,14 +26,14 @@ module.exports = function execute ($void) {
     }
   }
 
-  function prepareAppSpace (uri) {
+  function prepareAppSpace (uri, appHome) {
     var scope = $void.bootstrap
     if (scope && scope['-app'] === uri) { // bootstrap app
       if (scope.modules[uri]) { // re-run the bootstrap app
-        scope = createAppSpace(uri)
+        scope = createAppSpace(uri, appHome)
       } // start to run bootstrap app
     } else { // a new app
-      scope = createAppSpace(uri)
+      scope = createAppSpace(uri, appHome)
     }
     scope.modules[uri] = Object.assign(Object.create(null), {
       status: 201,
