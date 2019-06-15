@@ -16,7 +16,7 @@ module.exports = function load ($void) {
   var symbolFetch = sharedSymbolOf('fetch')
   var promiseOfResolved = $Promise['of-resolved']
 
-  // fetch: asychronously load a module from source.
+  // fetch: asynchronously load a module from source.
   var operator = staticOperator('fetch', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
@@ -49,12 +49,14 @@ module.exports = function load ($void) {
         return promiseOfResolved(source)
       }
     }
-    return source.endsWith('/@.s')
+    return source.endsWith('@.s')
       ? new Promise$(function (resolve, reject) {
         loader.fetch(source).then(function () {
           var result = run(source)
           if (result instanceof Promise$) {
             result.then(resolve, reject)
+          } else {
+            resolve(result)
           }
         }, reject)
       })
