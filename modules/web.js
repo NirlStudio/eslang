@@ -2,7 +2,8 @@
 
 module.exports = function (exporting, context, $void) {
   if (typeof window === 'undefined') {
-    return 'web module is only available when hosted in web browser'
+    // web can also be mocked by application to, for example, in testing.
+    return 'web module is only available in web browser.'
   }
   $void.safelyAssign(exporting, window)
   return true

@@ -19,6 +19,6 @@ window.onload = function () {
   initializing.then(function () {
     console.info('shell is ready now.')
   }, function (err) {
-    console.info('shell failed to be initialized for', err)
+    console.error('shell failed to be initialized for', err)
   })
 }

@@ -1,9 +1,9 @@
 'use strict'
 
 var sugly = require('../sugly')
+var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')
 var terminalStdout = require('./lib/stdout')
-var consoleStdout = require('../lib/stdout')
 var defaultLoader = require('../lib/loader')
 
 function ensure (factory, alternative) {
@@ -16,11 +16,8 @@ function getDefaultHome () {
 }
 
 module.exports = function (term, stdin, stdout, loader) {
-  term = typeof term === 'object' ? term
-    : null // by default, shell mode is not available.
-  stdout = typeof stdout === 'function' ? stdout
-    : term ? terminalStdout(term)
-      : consoleStdout // web console does not support printf.
+  term = typeof term === 'object' ? term : consoleTerm()
+  stdout = typeof stdout === 'function' ? stdout : terminalStdout(term)
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
@@ -29,10 +26,12 @@ module.exports = function (term, stdin, stdout, loader) {
   $void.env('user-home', home)
   $void.env('os', window.navigator.userAgent)
 
+  var Object$ = $void.Object
   var bootstrap = $void.createBootstrapSpace(home + '/@')
 
   var run = function (appHome, context, args, app) {
     return initialize(context, function () {
+      $void.$['-enable-console'] = enableConsole
       return $void.$run(app || 'app', args, appHome)
     })
   }
@@ -70,11 +69,14 @@ module.exports = function (term, stdin, stdout, loader) {
     })
   }
 
+  function enableConsole (context, args, profile) {
+    return shell(context || ['_@', '_profile'], args,
+      profile && typeof profile === 'string' ? profile
+        : '(var * (load "_profile"))'
+    )
+  }
+
   function shell (context, args, profile) {
-    if (typeof stdin !== 'function' && !term) {
-      throw new TypeError('An interactive shell requires a terminal to work.')
-    }
-    // generate shell agent.
     return initialize(context, function () {
       var reader = ensure(stdin, terminalStdin)($void, term)
       var agent = require('../lib/shell')($void, reader,
@@ -82,6 +84,10 @@ module.exports = function (term, stdin, stdout, loader) {
       )
       // export global shell commands
       $void.$shell['test-bootstrap'] = require('../test/test')($void)
+      if (args instanceof Object$) {
+        Object.assign($void.$shell, args)
+        args = []
+      }
       agent(args, term.echo, profile)
       return reader.open()
     })
