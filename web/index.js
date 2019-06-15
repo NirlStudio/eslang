@@ -41,9 +41,7 @@ module.exports = function (term, stdin, stdout, loader) {
     var prepared = preparing(bootstrap, $void)
     return !(prepared instanceof Promise) ? main()
       : new Promise(function (resolve, reject) {
-        prepared.then(function () {
-          resolve(main())
-        }, reject)
+        prepared.then(function () { resolve(main()) }, reject)
       })
   }
 

@@ -1,8 +1,6 @@
 'use strict'
 
-function bind (type, prefix) {
-  return (console[type] || console.log).bind(console, prefix)
-}
+function nop () {}
 
 module.exports = function () {
   var term = {}
@@ -18,21 +16,27 @@ module.exports = function () {
   }
   term.printf = function (text) {
     var lines = text.split('\n')
-    buffer = lines.pop()
-    buffer && lines.push(buffer + '...')
-    console.log(lines.join('\n'))
+    var ending = lines.pop()
+    if (lines.length > 0) {
+      lines[0] = buffer + lines[0]
+      buffer = ending
+      console.log(lines.join('\n'))
+    } else {
+      buffer += ending
+    }
   }
 
   // serve stderr
-  term.verbose = bind('verbose', '#V')
-  term.info = bind('info', '#I')
-  term.warn = bind('warn', '#W')
-  term.error = bind('error', '#E')
-  term.debug = bind('debug', '#D')
+  term.verbose = nop
+  term.info = nop
+  term.warn = nop
+  term.error = nop
+  term.debug = nop
 
   // serve shell
+  var echos = []
   term.echo = function (text) {
-    console.log('=', text)
+    echos.push(text)
   }
 
   // serve stdin
@@ -43,8 +47,18 @@ module.exports = function () {
 
   term.connect = function (reader) {
     window['_$'] = function shell (line) {
-      typeof line === 'string' ? reader(line)
-        : console.log(inputPrompt, '...')
+      if (typeof line === 'string') {
+        reader(line)
+        if (echos.length > 0) {
+          var output = echos.join('\n '); echos = []
+          return output
+        }
+        if (!inputPrompt.startsWith('>')) {
+          console.info(inputPrompt)
+        }
+      } else {
+        console.error('input is not a string:', line)
+      }
     }
     return reader
   }

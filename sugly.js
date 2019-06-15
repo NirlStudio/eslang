@@ -13,7 +13,7 @@ module.exports = function sugly (stdout, loader) {
   // set the location of the runtime
   $void.runtime('home',
     typeof window === 'undefined' ? __dirname
-      : window.SUGLY_HOME || window.location.origin
+      : window.SUGLY_HOME || (window.location.origin + '/sugly')
   )
   // now we got a complete runtime.
   return $void
