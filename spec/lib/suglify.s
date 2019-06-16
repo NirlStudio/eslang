@@ -102,10 +102,20 @@
     assert (printer "call":: is-a function);
     assert (printer "new":: is-a function);
   ).
+  (should "(suglify a-generic-func) provide a set- function." (= ()
+    var printer (suglify print);
+    assert (printer "set-":: is-a function);
+  ).
+  (should "(suglify a-generic-func) provide setters for fields." (= ()
+    var printer (suglify print);
+    assert (printer native-field);
+    assert (printer "native-field":: is-a bool);
+    assert (printer "set-native-field":: is-a function);
+  ).
 ).
 
 (define "(suglify an-object)" (= ()
-  (should "(suglify an-object) returns the orginal object if its all member names are sugly." (= ()
+  (should "(suglify an-object) always returns a new object." (= ()
     (var obj (@
       x: 1,
       -x: 1,
@@ -113,7 +123,10 @@
       y-: 2,
       z-z: 3
     ).
-    assert (suglify obj:: is obj);
+    assert (suglify obj:: is-not obj);
+
+    let obj (object empty);
+    assert (suglify obj:: is-not obj);
   ).
   (should "(suglify an-object) returns a new object if any member name is not sugly." (= ()
     var obj (@ X: 1);
@@ -136,12 +149,28 @@
     assert (sobj is-not obj);
     assert 1 (sobj x-);
   ).
+  (should "(suglify an-object) provide a set- function." (= ()
+    var obj (suglify (@ x: 1);
+    assert (obj "set-":: is-a function);
+  ).
+  (should "(suglify an-object) provide setters for fields." (= ()
+    var obj (suglify (@ x: 1, y: 2);
+    assert 1 (obj x);
+    assert (obj "x":: is-a number);
+    assert (obj "set-x":: is-a function);
+    assert 2 (obj y);
+    assert (obj "y":: is-a number);
+    assert (obj "set-y":: is-a function);
+  ).
   (should "suglify accepts a class instance too." (= ()
     var inst (class empty:: empty);
     inst "x" 1;
     var sinst (suglify inst);
     assert (sinst is-an object);
-    assert (sinst is inst);
+    assert (sinst is-not inst);
+    assert 1 (sinst x);
+    assert (sinst "x":: is-a number);
+    assert (sinst "set-x":: is-a function);
 
     let inst (class empty:: empty);
     inst "X" 1;
@@ -149,6 +178,8 @@
     assert (sinst is-an object);
     assert (sinst is-not inst);
     assert 1 (sinst x);
+    assert (sinst "x":: is-a number);
+    assert (sinst "set-x":: is-a function);
   ).
 ).
 

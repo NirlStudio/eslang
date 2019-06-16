@@ -8,6 +8,9 @@ module.exports = function ($void) {
   var print = $void.$print
   var printf = $void.$printf
 
+  // provide a field to print for testing purpose
+  ;(print.bound || print).nativeField = true
+
   var printInColor = function (color) {
     return function (text) {
       printf(text + '\n', color)
@@ -141,11 +144,11 @@ module.exports = function ($void) {
     ])
 
     checkFunctions($, '[Sugly / lib / functions] ', [
-      'max', 'min', 'suglify'
+      'max', 'min'
     ])
 
-    checkFunctions($void, '[Sugly / lib / IO functions] ', [
-      '$print', '$printf', '$warn'
+    checkFunctions($void, '[Sugly / lib / app-only functions] ', [
+      '$print', '$printf', '$warn', '$suglify'
     ])
 
     checkObjects($, '[Sugly / lib / objects] ', [

@@ -51,6 +51,17 @@ function escapeCamel (segment) {
   return words.join('-')
 }
 
+function setter (key, value) {
+  if (!key || typeof key !== 'string') {
+    return null
+  }
+  if (typeof value !== 'undefined') {
+    return (this[key] = value)
+  }
+  delete this[key]
+  return null
+}
+
 module.exports = function ($void) {
   var $ = $void.$
   var $Class = $.class
@@ -58,11 +69,13 @@ module.exports = function ($void) {
   var $Function = $.function
   var typeOf = $void.typeOf
   var $export = $void.export
+  var ownsProperty = $void.ownsProperty
   var safelyAssign = $void.safelyAssign
 
   var objectOfGenericFunc = $Function.proto.generic
 
-  $export($, 'suglify', function (src) {
+  $export($void, '$suglify', function (src) {
+    // suglify only returns null, a string or an object.
     if (typeof src === 'string') {
       return hyphenize(src)
     }
@@ -70,30 +83,38 @@ module.exports = function ($void) {
     //   (suglify (func generic))
     // can be simplified to:
     //   (suglify func)
-    var bound = false
+    var proxy
     var srcType = typeOf(src)
     if (srcType === $Function) {
-      bound = true
-      src = objectOfGenericFunc.call(src)
-      srcType = src ? $Object : null
+      proxy = objectOfGenericFunc.call(src)
+      srcType = proxy ? $Object : null
+      if (src.bound) {
+        src = src.bound
+      }
     }
-    // suglify only returns null, a string or an object.
-    if (srcType !== $Object && typeOf(srcType) !== $Class) {
+    // ignore common proto members.
+    var proto
+    if (srcType === $Object) {
+      proto = $Object.proto
+    } else if (typeOf(srcType) === $Class) {
+      proto = $Class.proto.proto
+    } else {
       return null
     }
-    // make a copy, which may be discarded if no conversion really happens.
-    var target = null
-    var keys = Object.getOwnPropertyNames(src)
-    for (var i = 0, len = keys.length; i < len; i++) {
-      var key = keys[i]
-      var newKey = hyphenize(key)
-      if (newKey !== key) {
-        if (!target) {
-          target = bound ? Object.assign($Object.empty(), src)
-            : safelyAssign($Object.empty(), src, true)
+    if (!proxy) { // make sure all methods are bound to the original object
+      proxy = safelyAssign($Object.empty(), src, true)
+    }
+    // copy and supplement setters.
+    var target = $Object.empty()
+    target['set-'] = setter.bind(src) // common setter
+    for (var key in proxy) {
+      if (typeof proto[key] === 'undefined' || ownsProperty(src, key)) {
+        var newKey = hyphenize(key)
+        target[newKey] = proxy[key]
+        if (ownsProperty(src, key)) {
+          // a dedicated setter is only supplemented for a real field.
+          target['set-' + newKey] = setter.bind(src, key)
         }
-        target[newKey] = target[key]
-        delete target[key]
       }
     }
     return target || src
