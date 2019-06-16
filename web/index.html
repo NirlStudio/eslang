@@ -14,23 +14,22 @@
     <input type="text" id="stdin-input" autocomplete="off" value=""/>
     <input type="button" id="stdin-enter" value="&#x23ce;" />
   </div>
+  <script>
+  ((function () {
+    var head = document.getElementsByTagName('head')[0]
+    function insertScript (src) {
+      var node = document.createElement('script')
+      node.src = src
+      head.appendChild(node)
+    }
+
+    /MSIE \d|Trident.*rv:/.test(navigator.userAgent) && insertScript(
+      '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
+    )
+
+    var href = window.location.href
+    window.SUGLY_HOME = href.substring(0, href.lastIndexOf('/'))
+  })())
+  </script>
 </body>
-<script>
-((function () {
-  var head = document.getElementsByTagName('head')[0]
-  function insertScript (src) {
-    var node = document.createElement('script')
-    node.src = src
-    head.appendChild(node)
-  }
-
-  /MSIE \d|Trident.*rv:/.test(navigator.userAgent) && insertScript(
-    '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
-  )
-
-  var href = window.location.href
-  window.SUGLY_HOME = href.substring(0, href.lastIndexOf('/'))
-  insertScript('sugly.js')
-})())
-</script>
 </html>
