@@ -3,6 +3,7 @@
 module.exports = function ($void, stdout) {
   var Symbol$ = $void.Symbol
   var $export = $void.export
+  var thisCall = $void.thisCall
   var staticOperator = $void.staticOperator
 
   // standard output.
@@ -45,6 +46,9 @@ module.exports = function ($void, stdout) {
     return lastWarning
   })
 
+  var sourceOf = function (atomValue) {
+    return thisCall(atomValue, 'to-string')
+  }
   var evaluate = function (clause, space) {
     evaluate = $void.evaluate
     return evaluate(clause, space)
@@ -53,16 +57,15 @@ module.exports = function ($void, stdout) {
     env = $void.env
     return env(name)
   }
-
   staticOperator('debug', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2 || !space.app) {
       return null
     }
-    var args = [clause, '\n ']
+    var args = [sourceOf(clause), '\n ']
     for (var i = 1; i < clist.length; i++) {
       (i > 1) && args.push('\n ')
-      args.push(clist[i], '=', evaluate(clist[i], space))
+      args.push(sourceOf(clist[i]), '=', evaluate(clist[i], space))
     }
     if (env('is-debugging') === true) {
       stdout.debug.apply(stdout, args)
