@@ -6,7 +6,7 @@ module.exports = function assignment ($void) {
   var symbolAll = $Symbol.all
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var Object$ = $void.Object
+  var isObject = $void.isObject
   var evaluate = $void.evaluate
   var staticOperator = $void.staticOperator
   var tryToUpdateName = $void.tryToUpdateName
@@ -72,7 +72,7 @@ module.exports = function assignment ($void) {
           return space[method](sym.key, tryToUpdateName(values, sym.key))
         }
         // (var * obj)
-        if (values instanceof Object$) {
+        if (isObject(values)) {
           names = Object.getOwnPropertyNames(values)
           for (i = 0; i < names.length; i++) {
             name = names[i]
@@ -96,7 +96,7 @@ module.exports = function assignment ($void) {
             space[method](syms[i].key, i < values.length ? values[i] : null)
           }
         }
-      } else if (values instanceof Object$) { // read fields into an array.
+      } else if (isObject(values)) { // read fields into an array.
         for (i = 0; i < syms.length; i++) {
           if (syms[i] instanceof Symbol$) {
             name = syms[i].key
