@@ -77,7 +77,7 @@ module.exports = function assignment ($void) {
           for (i = 0; i < names.length; i++) {
             name = names[i]
             value = values[name]
-            space[method](name, space.var(name,
+            space[method](name, space[method](name,
               typeof value === 'undefined' ? null : value
             ))
           }
