@@ -2,4 +2,5 @@
   "restful",
   "styledout",
   "test",
+  "window"
 ).
