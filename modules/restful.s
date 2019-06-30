@@ -3,7 +3,7 @@ const restful (import "$restful");
 (const crud-only (@
   "get",   # READ one or multiple entities.
   "post",  # CREATE a new entity.
-  "put",   # CREATE an idempotent; UPDATE an existing entity.
+  "put",   # UPDATE an existing entity; or CREATE an idempotent.
   "patch", # UPDATE an existing entity with specified fields.
   "delete" # DELETE an existing entity.
 ).

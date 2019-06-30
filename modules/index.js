@@ -18,7 +18,7 @@ function loadDefault (moduleUri) {
   }
 }
 
-module.exports = function (moduleUri, baseUri, $void) {
+function $require (moduleUri, baseUri, $void) {
   var importing = loadDefault(moduleUri)
   if (importing) {
     return importing
@@ -32,8 +32,7 @@ module.exports = function (moduleUri, baseUri, $void) {
   }
   return null
 }
-
-module.exports.register = function (loader) {
+function register (loader) {
   if (typeof loader === 'function') {
     loaders.unshift(loader)
     return loader
@@ -41,7 +40,7 @@ module.exports.register = function (loader) {
   return null
 }
 
-module.exports.unregister = function (loader) {
+function unregister (loader) {
   for (var i = loaders.length - 1; i >= 0; i--) {
     if (loaders[i] === loader) {
       loaders.splice(i, 1)
@@ -51,8 +50,26 @@ module.exports.unregister = function (loader) {
   return null
 }
 
-module.exports.copy = function (exporting, source, context, $void) {
+function copy (exporting, source, context, $void) {
   context._generic = source // mostly reserved for future.
   $void.safelyAssign(exporting, source)
   return exporting
 }
+
+function use (targetUri, module_, profile) {
+  return register(function loader (moduleUri) {
+    return moduleUri !== targetUri ? null
+      // generate a default importing-all function for a native module.
+      : function importing (exporting, context, $void) {
+        copy(exporting, module_, context, $void)
+        return true
+      }
+  })
+}
+
+$require.register = register
+$require.unregister = unregister
+$require.copy = copy
+$require.use = use
+
+module.exports = $require
