@@ -11,8 +11,8 @@ function loadDefault (moduleUri) {
       return require('./shell')
     case 'symbols':
       return require('./symbols')
-    case 'web':
-      return require('./web')
+    case 'window':
+      return require('./window')
     default:
       return null
   }
