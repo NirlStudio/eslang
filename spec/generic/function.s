@@ -541,12 +541,31 @@
       (assert 0 (arguments length).
     ).
   ).
-  (should "(=:x ...) evaluates the anonymous function with null as this and no argument." (= ()
-    (=> :x
+  (should "(=:() ...) evaluates the anonymous function with null as this and no argument." (= ()
+    (=>:()
       (assert ($do is-a function).
       (assert null this)
-      (assert null x)
       (assert 0 (arguments length).
+    ).
+  ).
+  (should "(=:x ...) evaluates the anonymous function with null as this and x as an argument." (= ()
+    (var x 123)
+    (=>:x
+      (assert ($do is-a function).
+      (assert null this)
+      (assert 123 x)
+      (assert 1 (arguments length).
+    ).
+  ).
+  (should "(=:(x, y) ...) evaluates the anonymous function with null as this and both x and y as arguments." (= ()
+    (var x 100)
+    (var y 200)
+    (=>:(x, y)
+      (assert ($do is-a function).
+      (assert null this)
+      (assert 100 x)
+      (assert 200 y)
+      (assert 2 (arguments length).
     ).
   ).
   (should "(=():x ...) evaluates the anonymous function with null as this and no argument." (= ()

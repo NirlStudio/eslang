@@ -673,12 +673,31 @@
       (assert 0 (arguments length).
     ).
   ).
-  (should "(=:x ...) evaluates the anonymous lambda with null as this and no argument." (= ()
+  (should "(=:() ...) evaluates the anonymous lambda with null as this and no argument." (= ()
+    (=:()
+      (assert ($do is-a lambda).
+      (assert null this)
+      (assert 0 (arguments length).
+    ).
+  ).
+  (should "(=:x ...) evaluates the anonymous lambda with null as this and x as an argument." (= ()
+    (var x 100)
     (=:x
       (assert ($do is-a lambda).
       (assert null this)
-      (assert null x)
-      (assert 0 (arguments length).
+      (assert 100 x)
+      (assert 1 (arguments length).
+    ).
+  ).
+  (should "(=:(x, y) ...) evaluates the anonymous lambda with null as this and both x and y as arguments." (= ()
+    (var x 100)
+    (var y 200)
+    (=:(x, y)
+      (assert ($do is-a lambda).
+      (assert null this)
+      (assert 100 x)
+      (assert 200 y)
+      (assert 2 (arguments length).
     ).
   ).
   (should "(=():x ...) evaluates the anonymous lambda with null as this and no argument." (= ()

@@ -2,6 +2,7 @@
 
 module.exports = function function_ ($void) {
   var $ = $void.$
+  var $Tuple = $.tuple
   var $Symbol = $.symbol
   var $Lambda = $.lambda
   var $Function = $.function
@@ -42,6 +43,7 @@ module.exports = function function_ ($void) {
       var params
       var offset
       if (clist[1] === $Symbol.pairing) {
+        params = length > 2 ? clist[2] : $Tuple.empty
         offset = 2
       } else if (length > 2 && clist[2] === $Symbol.pairing) {
         params = clist[1]
@@ -64,8 +66,6 @@ module.exports = function function_ ($void) {
           args.push(evaluate(plist[i], space))
         }
         return func.apply(null, args)
-      } else if (typeof params === 'undefined') {
-        return func()
       } else {
         return func(evaluate(params, space))
       }
