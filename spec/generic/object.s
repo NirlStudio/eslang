@@ -243,6 +243,9 @@
     (assert false (object is-generic (function empty).
     (assert false (object is-generic (operator empty).
 
+    (assert false (object is-generic (iterator empty).
+    (assert false (object is-generic (promise empty).
+
     (assert false (object is-generic (array empty).
     (assert false (object is-generic (object empty).
     (assert false (object is-generic (class empty).
@@ -285,6 +288,9 @@
     (assert (object not-generic (lambda empty).
     (assert (object not-generic (function empty).
     (assert (object not-generic (operator empty).
+
+    (assert (object not-generic (iterator empty).
+    (assert (object not-generic (promise empty).
 
     (assert (object not-generic (array empty).
     (assert (object not-generic (object empty).
@@ -364,6 +370,9 @@
     (assert false (object is-plain (function empty).
     (assert false (object is-plain (operator empty).
 
+    (assert false (object is-plain (iterator empty).
+    (assert false (object is-plain (promise empty).
+
     (assert false (object is-plain (array empty).
     (assert false (object is-plain (object empty).
     (assert false (object is-plain (class empty).
@@ -406,6 +415,9 @@
     (assert (object not-plain (lambda empty).
     (assert (object not-plain (function empty).
     (assert (object not-plain (operator empty).
+
+    (assert (object not-plain (iterator empty).
+    (assert (object not-plain (promise empty).
 
     (assert (object not-plain (array empty).
     (assert (object not-plain (object empty).
