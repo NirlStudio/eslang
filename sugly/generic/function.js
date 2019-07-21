@@ -27,7 +27,7 @@ module.exports = function ($void) {
     return bindThis(typeof $this !== 'undefined' ? $this : null, this)
   })
 
-  // retrieve generic members of a native function.
+  // JS-InterOp: retrieve generic members of a native function.
   link(proto, ['generic', '$'], function () {
     return this.code instanceof Tuple$ ? null // only for generic functions.
       : safelyAssign($Object.empty(),

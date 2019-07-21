@@ -94,7 +94,7 @@
 
 (define "(object of ...)" (= ()
   (should "(object of) returns a new empty object." (= ()
-    (var obj (object empty).
+    (var obj (object of).
     (assert (obj is-empty).
     (assert 0 ((object fields-of obj) length).
   ).
@@ -169,6 +169,248 @@
     (assert (fields is-an array).
     (assert 1 (fields length).
     (assert "y" (fields 0).
+  ).
+).
+
+(define "(object of-generic ...)" (= ()
+  (should "(object of-generic) returns a new generic empty object." (= ()
+    (var obj (object of-generic).
+    (assert (obj is-empty).
+    (assert 0 ((object fields-of obj) length).
+  ).
+  (should "(object of-generic source ...) returns a new generic object with fields of all source objects." (= ()
+    (var obj (object of-generic (@ x: null).
+    (var x "x").
+    (assert null (obj x).
+    (assert null (obj: x).
+    (assert null (obj "x").
+    (assert null (obj: "x").
+
+    (var fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 1 (fields length).
+    (assert "x" (fields 0).
+
+    (let obj (object of-generic (@ x: 1 y: 2).
+    (let fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 2 (fields length).
+    (assert "x" (fields 0).
+    (assert "y" (fields 1).
+
+    (let obj (object of-generic (@ x: 1 y: 2), (@ z: 3).
+    (let fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 3 (fields length).
+    (assert "x" (fields 0).
+    (assert "y" (fields 1).
+    (assert "z" (fields 2).
+).
+
+(define "(object is-generic ...)" (= ()
+  (should "(object is-generic) returns false." (= ()
+    (assert false (object is-generic).
+  ).
+  (should "(object is-generic generic-obj) returns true." (= ()
+    (assert true (object is-generic (object of-generic).
+  ).
+  (should "(object is-generic plain-obj) returns true." (= ()
+    (assert false (object is-generic (object of-plain).
+  ).
+  (should "(object is-generic obj) returns false." (= ()
+    (assert false (object is-generic (@:).
+  ).
+  (should "(object is-generic non-obj) returns false." (= ()
+    (assert false (object is-generic null).
+    (assert false (object is-generic type).
+
+    (assert false (object is-generic true).
+    (assert false (object is-generic false).
+
+    (assert false (object is-generic -1).
+    (assert false (object is-generic 0).
+    (assert false (object is-generic 1).
+
+    (assert false (object is-generic (string empty).
+    (assert false (object is-generic (number empty).
+    (assert false (object is-generic (date empty).
+    (assert false (object is-generic (range empty).
+
+    (assert false (object is-generic (symbol empty).
+    (assert false (object is-generic (tuple empty).
+
+    (assert false (object is-generic (lambda empty).
+    (assert false (object is-generic (function empty).
+    (assert false (object is-generic (operator empty).
+
+    (assert false (object is-generic (array empty).
+    (assert false (object is-generic (object empty).
+    (assert false (object is-generic (class empty).
+    (assert false (object is-generic (class empty:: empty).
+  ).
+).
+
+(define "(object not-generic ...)" (= ()
+  (should "(object not-generic) returns true." (= ()
+    (assert (object not-generic).
+  ).
+  (should "(object not-generic generic-obj) returns false." (= ()
+    (assert false (object not-generic (object of-generic).
+  ).
+  (should "(object not-generic plain-obj) returns true." (= ()
+    (assert (object not-generic (object of-plain).
+  ).
+  (should "(object not-generic obj) returns true." (= ()
+    (assert (object not-generic (@:).
+  ).
+  (should "(object not-generic non-obj) returns true." (= ()
+    (assert (object not-generic null).
+    (assert (object not-generic type).
+
+    (assert (object not-generic true).
+    (assert (object not-generic false).
+
+    (assert (object not-generic -1).
+    (assert (object not-generic 0).
+    (assert (object not-generic 1).
+
+    (assert (object not-generic (string empty).
+    (assert (object not-generic (number empty).
+    (assert (object not-generic (date empty).
+    (assert (object not-generic (range empty).
+
+    (assert (object not-generic (symbol empty).
+    (assert (object not-generic (tuple empty).
+
+    (assert (object not-generic (lambda empty).
+    (assert (object not-generic (function empty).
+    (assert (object not-generic (operator empty).
+
+    (assert (object not-generic (array empty).
+    (assert (object not-generic (object empty).
+    (assert (object not-generic (class empty).
+    (assert (object not-generic (class empty:: empty).
+  ).
+).
+
+(define "(object of-plain ...)" (= ()
+  (should "(object of-plain) returns a new generic empty object with null as the prototype." (= ()
+    (var obj (object of-plain).
+    (assert (obj is-empty).
+    (assert 0 ((object fields-of obj) length).
+  ).
+  (should "(object of-plain source ...) returns a new generic object with fields of all source objects." (= ()
+    (var obj (object of-plain (@ x: null).
+    (var x "x").
+    (assert null (obj x).
+    (assert null (obj: x).
+    (assert null (obj "x").
+    (assert null (obj: "x").
+
+    (var fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 1 (fields length).
+    (assert "x" (fields 0).
+
+    (let obj (object of-plain (@ x: 1 y: 2).
+    (let fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 2 (fields length).
+    (assert "x" (fields 0).
+    (assert "y" (fields 1).
+
+    (let obj (object of-plain (@ x: 1 y: 2), (@ z: 3).
+    (let fields (object fields-of obj).
+    (assert (fields is-an array).
+    (assert 3 (fields length).
+    (assert "x" (fields 0).
+    (assert "y" (fields 1).
+    (assert "z" (fields 2).
+).
+
+(define "(object is-plain ...)" (= ()
+  (should "(object is-plain) returns false." (= ()
+    (assert false (object is-plain).
+  ).
+  (should "(object is-plain plain-obj) returns true." (= ()
+    (assert true (object is-plain (object of-plain).
+  ).
+  (should "(object is-plain generic-obj) returns false." (= ()
+    (assert false (object is-plain (object of-generic).
+  ).
+  (should "(object is-plain obj) returns false." (= ()
+    (assert false (object is-plain (@:).
+  ).
+  (should "(object is-plain non-obj) returns false." (= ()
+    (assert false (object is-plain null).
+    (assert false (object is-plain type).
+
+    (assert false (object is-plain true).
+    (assert false (object is-plain false).
+
+    (assert false (object is-plain -1).
+    (assert false (object is-plain 0).
+    (assert false (object is-plain 1).
+
+    (assert false (object is-plain (string empty).
+    (assert false (object is-plain (number empty).
+    (assert false (object is-plain (date empty).
+    (assert false (object is-plain (range empty).
+
+    (assert false (object is-plain (symbol empty).
+    (assert false (object is-plain (tuple empty).
+
+    (assert false (object is-plain (lambda empty).
+    (assert false (object is-plain (function empty).
+    (assert false (object is-plain (operator empty).
+
+    (assert false (object is-plain (array empty).
+    (assert false (object is-plain (object empty).
+    (assert false (object is-plain (class empty).
+    (assert false (object is-plain (class empty:: empty).
+  ).
+).
+
+(define "(object not-plain ...)" (= ()
+  (should "(object not-plain) returns true." (= ()
+    (assert (object not-plain).
+  ).
+  (should "(object not-plain plain-obj) returns false." (= ()
+    (assert false (object not-plain (object of-plain).
+  ).
+  (should "(object not-plain generic-obj) returns true." (= ()
+    (assert (object not-plain (object of-generic).
+  ).
+  (should "(object not-plain obj) returns true." (= ()
+    (assert (object not-plain (@:).
+  ).
+  (should "(object not-plain non-obj) returns true." (= ()
+    (assert (object not-plain null).
+    (assert (object not-plain type).
+
+    (assert (object not-plain true).
+    (assert (object not-plain false).
+
+    (assert (object not-plain -1).
+    (assert (object not-plain 0).
+    (assert (object not-plain 1).
+
+    (assert (object not-plain (string empty).
+    (assert (object not-plain (number empty).
+    (assert (object not-plain (date empty).
+    (assert (object not-plain (range empty).
+
+    (assert (object not-plain (symbol empty).
+    (assert (object not-plain (tuple empty).
+
+    (assert (object not-plain (lambda empty).
+    (assert (object not-plain (function empty).
+    (assert (object not-plain (operator empty).
+
+    (assert (object not-plain (array empty).
+    (assert (object not-plain (object empty).
+    (assert (object not-plain (class empty).
+    (assert (object not-plain (class empty:: empty).
   ).
 ).
 

@@ -21,14 +21,53 @@ module.exports = function ($void) {
 
   // create a new object and copy fields from source objects.
   link(Type, 'of', function () {
-    var obj = createObject()
-    for (var i = 0; i < arguments.length; i++) {
-      var source = arguments[i]
-      if (isObject(source)) {
-        Object.assign(obj, source)
-      }
+    var len = arguments.length
+    if (len < 1) {
+      return createObject()
     }
-    return obj
+    var args = [createObject()]
+    for (var i = 0; i < len; i++) {
+      isObject(arguments[i]) && args.push(arguments[i])
+    }
+    return Object.assign.apply(Object, args)
+  }, true)
+
+  // JS-InterOp: create a generic object and copy fields from source objects.
+  link(Type, 'of-generic', function () {
+    if (arguments.length < 1) {
+      return {}
+    }
+    // using native Object.assign; not filtering source types.
+    var args = Array.prototype.slice.call(arguments)
+    args.unshift({})
+    return Object.assign.apply(Object, args)
+  }, true)
+
+  // JS-InterOp: test if an object is a generic object.
+  link(Type, 'is-generic', function (obj) {
+    return isObject(obj) && Object.getPrototypeOf(obj) === Object.prototype
+  }, true)
+  link(Type, 'not-generic', function (obj) {
+    return !isObject(obj) || Object.getPrototypeOf(obj) !== Object.prototype
+  }, true)
+
+  // JS-InterOp:  create a generic object and copy fields from source objects.
+  link(Type, 'of-plain', function () {
+    if (arguments.length < 1) {
+      return Object.create(null)
+    }
+    // using native Object.assign, not filtering source types.
+    var args = Array.prototype.slice.call(arguments)
+    args.unshift(Object.create(null))
+    return Object.assign.apply(Object, args)
+  }, true)
+
+  // JS-InterOp: test if an object is a generic plain object.
+  link(Type, 'is-plain', function (obj) {
+    return isObject(obj) && Object.getPrototypeOf(obj) === null
+  }, true)
+  link(Type, 'not-plain', function (obj) {
+    return !isObject(obj) || Object.getPrototypeOf(obj) !== null
   }, true)
 
   // copy fields from source objects to the target object

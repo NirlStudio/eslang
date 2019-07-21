@@ -505,6 +505,12 @@ sort((a sort) sort)
 find((a find) find)
 
 # meta.function-object-type-sugly
+((object of-generic) of-generic)
+((object is-generic) is-generic)
+((object not-generic) not-generic)
+((object of-plain) of-plain)
+((object is-plain) is-plain)
+((object not-plain) not-plain)
 ((object assign) assign)
 ((object get) get)
 ((object set) set)
