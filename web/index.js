@@ -1,6 +1,7 @@
 'use strict'
 
 var sugly = require('../sugly')
+var loadIOProvider = require('./lib/io')
 var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')
 var terminalStdout = require('./lib/stdout')
@@ -21,6 +22,9 @@ module.exports = function (term, stdin, stdout, loader) {
   loader = ensure(loader, defaultLoader)
 
   var $void = sugly(stdout, loader)
+  loadIOProvider($void)
+
+  // prepare app environment.
   var home = getDefaultHome()
   $void.env('home', home)
   $void.env('user-home', home)

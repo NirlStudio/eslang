@@ -5,6 +5,8 @@ var loaders = []
 
 function loadDefault (moduleUri) {
   switch (moduleUri) {
+    case 'io':
+      return require('./io')
     case 'restful':
       return require('./restful')
     case 'shell':
