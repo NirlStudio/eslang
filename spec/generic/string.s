@@ -916,23 +916,45 @@
 ).
 
 (define "(a-string split)" (= ()
-  (should "(str split) returns an array with single element of the original string" (= ()
+  (should "(str split) returns an array with separated by an ASCII whitepace" (= ()
     (assert (("" split) is-an array).
     (assert ((("" split) length) is 1).
     (assert ((("" split) 0) is "").
 
+    (assert ((" " split) is-an array).
+    (assert (((" " split) length) is 2).
+    (assert (((" " split) 0) is "").
+    (assert (((" " split) 1) is "").
+
     (assert (("ABC" split) is-an array).
     (assert ((("ABC" split) length) is 1).
     (assert ((("ABC" split) 0) is "ABC").
+
+    (assert (("A B C" split) is-an array).
+    (assert ((("A B C" split) length) is 3).
+    (assert ((("A B C" split) 0) is "A").
+    (assert ((("A B C" split) 1) is "B").
+    (assert ((("A B C" split) 2) is "C").
   ).
-  (should "(str split \"\") returns an array with single element of the original string" (= ()
+  (should "(str split \"\") returns an array with all chars in the original string" (= ()
     (assert (("" split "") is-an array).
-    (assert ((("" split "") length) is 1).
-    (assert ((("" split "") 0) is "").
+    (assert ((("" split "") length) is 0).
+
+    (assert ((" " split "") is-an array).
+    (assert (((" " split "") length) is 1).
+    (assert (((" " split "") 0) is " ").
 
     (assert (("ABC" split "") is-an array).
-    (assert ((("ABC" split "") length) is 1).
-    (assert ((("ABC" split "") 0) is "ABC").
+    (assert ((("ABC" split "") length) is 3).
+    (assert ((("ABC" split "") 0) is "A").
+    (assert ((("ABC" split "") 1) is "B").
+    (assert ((("ABC" split "") 2) is "C").
+
+    (assert (("A B" split "") is-an array).
+    (assert ((("A B" split "") length) is 3).
+    (assert ((("A B" split "") 0) is "A").
+    (assert ((("A B" split "") 1) is " ").
+    (assert ((("A B" split "") 2) is "B").
   ).
   (should "(str split separater) returns an array splted by the separater." (= ()
     (assert (("" split "A") is-an array).
@@ -959,6 +981,31 @@
     (assert ((("ABC" split "C") length) is 2).
     (assert ((("ABC" split "C") 0) is "AB").
     (assert ((("ABC" split "C") 1) is "").
+  ).
+  (should "(str split non-str) returns an array with the original string." (= ()
+    (assert (("" split null) is-an array).
+    (assert ((("" split null) length) is 1).
+    (assert ((("" split null) 0) is "").
+
+    (assert ((" " split null) is-an array).
+    (assert (((" " split null) length) is 1).
+    (assert (((" " split null) 0) is " ").
+
+    (assert (("A" split null) is-an array).
+    (assert ((("A" split null) length) is 1).
+    (assert ((("A" split null) 0) is "A").
+
+    (assert (("" split true) is-an array).
+    (assert ((("" split false) length) is 1).
+    (assert ((("" split 1) 0) is "").
+
+    (assert ((" " split -1) is-an array).
+    (assert (((" " split type) length) is 1).
+    (assert (((" " split (range empty)) 0) is " ").
+
+    (assert (("A" split (lambda empty)) is-an array).
+    (assert ((("A" split (array empty)) length) is 1).
+    (assert ((("A" split (object empty)) 0) is "A").
   ).
 ).
 

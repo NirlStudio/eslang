@@ -189,15 +189,20 @@ module.exports = function ($void) {
     }
     return result
   })
-  link(proto, 'split', function (value) {
-    // the original string.split('') logic is disabled here and
-    // it will behave like string.split().
-    return typeof value !== 'string' || value.length < 1 ? [this]
-      : this.split(value)
+  link(proto, 'split', function (separator) {
+    // to be symmetrical with join, replace a missing separator to a whitespace.
+    return typeof separator === 'undefined' ? this.split(' ')
+      // a non-string separator is interpreted as does-not-exist.
+      : typeof separator !== 'string' ? [this]
+        // a non-empty separator will be forwarded to native code.
+        : separator ? this.split(separator)
+          // replace default split('') to the safe version of splitting chars.
+          // this is also kind of symmetrical with join.
+          : asChars.call(this)
   })
 
   // explicitly and safely convert a string to an array of chars
-  link(proto, 'as-chars', typeof Array.from === 'function' ? function () {
+  var asChars = link(proto, 'as-chars', typeof Array.from === 'function' ? function () {
     return Array.from(this)
   } : function () {
     // polyfill from Babel.
