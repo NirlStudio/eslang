@@ -1,7 +1,7 @@
 'use strict'
 
-var term = require('./term')
 var $void = require('../index')
+var term = require('./term')
 
 var sugly = $void(term()/*, stdin, stdout, loader */)
 // start shell and expose the shell's reader function.

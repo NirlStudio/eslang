@@ -197,7 +197,7 @@ module.exports = function ($void) {
         // a non-empty separator will be forwarded to native code.
         : separator ? this.split(separator)
           // replace default split('') to the safe version of splitting chars.
-          // this is also kind of symmetrical with join.
+          // this is also kind of symmetry with join.
           : asChars.call(this)
   })
 
