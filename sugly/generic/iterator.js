@@ -55,12 +55,12 @@ module.exports = function iterate ($void) {
   }, true)
 
   var proto = Type.proto
-  // an iterator objecct is also iterable.
+  // an iterator object is also iterable.
   link(proto, 'iterate', function () {
     return this.next
   })
 
-  // an iterator objecct is also iterable.
+  // an iterator object is also iterable.
   link(proto, 'skip', function (count) {
     count >>= 0
     if (!this.next || count <= 0) {
@@ -88,7 +88,7 @@ module.exports = function iterate ($void) {
     return this
   })
 
-  // an iterator objecct is also iterable.
+  // an iterator object is also iterable.
   link(proto, 'keep', function (count) {
     if (!this.next) {
       return this
