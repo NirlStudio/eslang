@@ -59,3 +59,28 @@ export (document, navigator, location) window;
   else
     if ($by is-a string) ($from querySelectorAll by);
 ).
+
+# functions to simplify className operations.
+(export add-class (=> (el, name)
+  var names (el className:: split);
+  (for name in (arguments slice 1)
+    if (name is-a string:: and (not (names contains name). (names push name);
+  ).
+  el "className" (names join); el
+).
+
+(export remove-class (=> (el, name)
+  var names (el className:: split);
+  names "clear":: apply *, (arguments slice 1);
+  el "className" (names join); el
+).
+
+(export replace-class (=> (el, name, new)
+  el "className" (el className:: split:: replace name, new:: join); el
+).
+
+(export toggle-class (=> (el, name)
+  var names (el className:: split);
+  (names contains name) ? (names clear name), (names push name);
+  el "className" (names join); el
+).
