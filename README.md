@@ -1,5 +1,5 @@
 # Espresso Language
-### A simple &amp; expressive script language, which is mostly inspired by Lisp, Python and JavaScript.
+### A simple &amp; expressive script language, which is inspired by Lisp, Python, JavaScript and many other great languages.
 ```python
 print "Hello, world!";
 
@@ -109,12 +109,12 @@ npm test
 bin/es
 
 # or, start the local web shell
-npm run build-dev & npm run start
+npm run build & npm start
 ```
 
 # IDE Support
 ### VS Code Extension
-In Extensions sidebar, search for **Espresso**
+In Extensions sidebar, search for **eslang**
 
 ### Atom Plugin
 [*language-espresso*](https://github.com/NirlStudio/language-espresso)
