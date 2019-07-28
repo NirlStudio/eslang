@@ -8,7 +8,7 @@ print "Hello, world!";
 ```
 
 # Try it online
-### [Espresso Web Shell](https://eslang.DEV)
+### [Espresso Web Shell](https://eslang.dev)
 ```python
 help; # for help.
 
