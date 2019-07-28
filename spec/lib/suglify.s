@@ -1,121 +1,121 @@
-(define "(suglify )" (= ()
-  (should "(suglify ) returns null." (= ()
-    assert null (suglify);
+(define "(espress )" (= ()
+  (should "(espress ) returns null." (= ()
+    assert null (espress );
   ).
 ).
 
-(define "(suglify a-string)" (= ()
-  (should "(suglify \"\") returns \"\"." (= ()
-    assert "" (suglify "");
+(define "(espress a-string)" (= ()
+  (should "(espress \"\") returns \"\"." (= ()
+    assert "" (espress "");
   ).
-  (should "(suglify \"\") replaces all upper-cased characters to locale-based lower-cased ones." (= ()
-    assert "a" (suglify "a");
-    assert "ab" (suglify "ab");
-    assert "abc" (suglify "abc");
+  (should "(espress \"\") replaces all upper-cased characters to locale-based lower-cased ones." (= ()
+    assert "a" (espress "a");
+    assert "ab" (espress "ab");
+    assert "abc" (espress "abc");
 
-    assert "a" (suglify "A");
-    assert "ab" (suglify "AB");
-    assert "abc" (suglify "ABC");
+    assert "a" (espress "A");
+    assert "ab" (espress "AB");
+    assert "abc" (espress "ABC");
   ).
-  (should "(suglify \"\") replaces a pascal or camel-cased string to a hyphen-separated string." (= ()
-    assert "a" (suglify "a");
-    assert "a-b" (suglify "aB");
-    assert "a-bc" (suglify "aBc");
-    assert "a-bcd" (suglify "aBcd");
-    assert "a-bcd-e" (suglify "aBcdE");
-    assert "a-bcd-ef" (suglify "aBcdEf");
+  (should "(espress \"\") replaces a pascal or camel-cased string to a hyphen-separated string." (= ()
+    assert "a" (espress "a");
+    assert "a-b" (espress "aB");
+    assert "a-bc" (espress "aBc");
+    assert "a-bcd" (espress "aBcd");
+    assert "a-bcd-e" (espress "aBcdE");
+    assert "a-bcd-ef" (espress "aBcdEf");
 
-    assert "a" (suglify "A");
-    assert "aa-b" (suglify "AaB");
-    assert "aa-bc" (suglify "AaBc");
-    assert "aa-bcd" (suglify "AaBcd");
-    assert "aa-bcd-e" (suglify "AaBcdE");
-    assert "aaa-bcd-ef" (suglify "AaaBcdEf");
+    assert "a" (espress "A");
+    assert "aa-b" (espress "AaB");
+    assert "aa-bc" (espress "AaBc");
+    assert "aa-bcd" (espress "AaBcd");
+    assert "aa-bcd-e" (espress "AaBcdE");
+    assert "aaa-bcd-ef" (espress "AaaBcdEf");
   ).
-  (should "(suglify \"\") recognizes an all-capital abbreviation as a single word." (= ()
-    assert "io" (suglify "IO");
-    assert "iot" (suglify "IOT");
-    assert "io-read" (suglify "IORead");
+  (should "(espress \"\") recognizes an all-capital abbreviation as a single word." (= ()
+    assert "io" (espress "IO");
+    assert "iot" (espress "IOT");
+    assert "io-read" (espress "IORead");
 
-    assert "file-io" (suglify "FileIO");
-    assert "file-io-read" (suglify "FileIORead");
+    assert "file-io" (espress "FileIO");
+    assert "file-io-read" (espress "FileIORead");
   ).
-  (should "(suglify a-string) replaces a breaking (one or more underscore, hyphen
+  (should "(espress a-string) replaces a breaking (one or more underscore, hyphen
            and/or spaces) to a single hyphen."
     (= ()
-      assert "-" (suglify "_");
-      assert "-" (suglify "__");
+      assert "-" (espress "_");
+      assert "-" (espress "__");
 
-      assert "-a" (suglify "__a");
-      assert "-a-" (suglify "__a__");
+      assert "-a" (espress "__a");
+      assert "-a-" (espress "__a__");
 
-      assert "-" (suglify "-");
-      assert "-" (suglify "--");
+      assert "-" (espress "-");
+      assert "-" (espress "--");
 
-      assert "-a" (suglify "-a");
-      assert "-a-" (suglify "--a--");
+      assert "-a" (espress "-a");
+      assert "-a-" (espress "--a--");
 
-      assert "-" (suglify " ");
-      assert "-" (suglify "  ");
-      assert "-" (suglify " \t\n");
+      assert "-" (espress " ");
+      assert "-" (espress "  ");
+      assert "-" (espress " \t\n");
 
-      assert "-a" (suglify " a");
-      assert "-a-" (suglify "  a  ");
+      assert "-a" (espress " a");
+      assert "-a-" (espress "  a  ");
 
-      assert "-" (suglify "-_ ");
-      assert "-" (suglify "- _");
-      assert "-" (suglify " _-");
-      assert "-" (suglify " -_");
-      assert "-" (suglify "_- ");
-      assert "-" (suglify "_ -");
+      assert "-" (espress "-_ ");
+      assert "-" (espress "- _");
+      assert "-" (espress " _-");
+      assert "-" (espress " -_");
+      assert "-" (espress "_- ");
+      assert "-" (espress "_ -");
 
-      assert "-a" (suglify "-_ a");
-      assert "-a" (suglify "- _a");
-      assert "-a" (suglify " _-a");
-      assert "-a" (suglify " -_a");
-      assert "-a" (suglify "_- a");
-      assert "-a" (suglify "_ -a");
+      assert "-a" (espress "-_ a");
+      assert "-a" (espress "- _a");
+      assert "-a" (espress " _-a");
+      assert "-a" (espress " -_a");
+      assert "-a" (espress "_- a");
+      assert "-a" (espress "_ -a");
 
-      assert "a-" (suglify "a-_ ");
-      assert "a-" (suglify "a- _");
-      assert "a-" (suglify "a _-");
-      assert "a-" (suglify "a -_");
-      assert "a-" (suglify "a_- ");
-      assert "a-" (suglify "a_ -");
+      assert "a-" (espress "a-_ ");
+      assert "a-" (espress "a- _");
+      assert "a-" (espress "a _-");
+      assert "a-" (espress "a -_");
+      assert "a-" (espress "a_- ");
+      assert "a-" (espress "a_ -");
 
-      assert "aa-bc-def-g" (suglify "aa_BC-Def G");
-      assert "aa-bc-def-g" (suglify "Aa_bc-def g");
+      assert "aa-bc-def-g" (espress "aa_BC-Def G");
+      assert "aa-bc-def-g" (espress "Aa_bc-def g");
     ).
 ).
 
-(define "(suglify a-func)" (= ()
-  (should "(suglify a-lambda) returns null." (= ()
-    assert null (suglify (lambda empty);
+(define "(espress a-func)" (= ()
+  (should "(espress a-lambda) returns null." (= ()
+    assert null (espress (lambda empty);
   ).
-  (should "(suglify a-function) returns null." (= ()
-    assert null (suglify (function empty);
+  (should "(espress a-function) returns null." (= ()
+    assert null (espress (function empty);
   ).
-  (should "(suglify a-generic-func) returns an object." (= ()
-    var printer (suglify print);
+  (should "(espress a-generic-func) returns an object." (= ()
+    var printer (espress print);
     assert (printer is-an object);
 
     assert (printer "call":: is-a function);
     assert (printer "new":: is-a function);
   ).
-  (should "(suglify a-generic-func) provide a set- function." (= ()
-    var printer (suglify print);
+  (should "(espress a-generic-func) provide a set- function." (= ()
+    var printer (espress print);
     assert (printer "set-":: is-a function);
   ).
-  (should "(suglify a-generic-func) provide setters for fields." (= ()
-    var printer (suglify print);
+  (should "(espress a-generic-func) provide setters for fields." (= ()
+    var printer (espress print);
     assert (printer native-field);
     assert (printer "native-field":: is-a bool);
     assert (printer "set-native-field":: is-a function);
   ).
 ).
 
-(define "(suglify an-object)" (= ()
-  (should "(suglify an-object) always returns a new object." (= ()
+(define "(espress an-object)" (= ()
+  (should "(espress an-object) always returns a new object." (= ()
     (var obj (@
       x: 1,
       -x: 1,
@@ -123,38 +123,38 @@
       y-: 2,
       z-z: 3
     ).
-    assert (suglify obj:: is-not obj);
+    assert (espress obj:: is-not obj);
 
     let obj (object empty);
-    assert (suglify obj:: is-not obj);
+    assert (espress obj:: is-not obj);
   ).
-  (should "(suglify an-object) returns a new object if any member name is not sugly." (= ()
+  (should "(espress an-object) returns a new object if any member name is not Espresso style." (= ()
     var obj (@ X: 1);
-    var sobj (suglify obj);
+    var sobj (espress obj);
     assert (sobj is-not obj);
     assert 1 (sobj x);
 
     let obj (@ Xx: 1);
-    let sobj (suglify obj);
+    let sobj (espress obj);
     assert (sobj is-not obj);
     assert 1 (sobj xx);
 
     let obj (@ --x: 1);
-    let sobj (suglify obj);
+    let sobj (espress obj);
     assert (sobj is-not obj);
     assert 1 (sobj -x);
 
     let obj (@ x--: 1);
-    let sobj (suglify obj);
+    let sobj (espress obj);
     assert (sobj is-not obj);
     assert 1 (sobj x-);
   ).
-  (should "(suglify an-object) provide a set- function." (= ()
-    var obj (suglify (@ x: 1);
+  (should "(espress an-object) provide a set- function." (= ()
+    var obj (espress (@ x: 1);
     assert (obj "set-":: is-a function);
   ).
-  (should "(suglify an-object) provide setters for fields." (= ()
-    var obj (suglify (@ x: 1, y: 2);
+  (should "(espress an-object) provide setters for fields." (= ()
+    var obj (espress (@ x: 1, y: 2);
     assert 1 (obj x);
     assert (obj "x":: is-a number);
     assert (obj "set-x":: is-a function);
@@ -162,10 +162,10 @@
     assert (obj "y":: is-a number);
     assert (obj "set-y":: is-a function);
   ).
-  (should "suglify accepts a class instance too." (= ()
+  (should "espress accepts a class instance too." (= ()
     var inst (class empty:: empty);
     inst "x" 1;
-    var sinst (suglify inst);
+    var sinst (espress inst);
     assert (sinst is-an object);
     assert (sinst is-not inst);
     assert 1 (sinst x);
@@ -174,7 +174,7 @@
 
     let inst (class empty:: empty);
     inst "X" 1;
-    let sinst (suglify inst);
+    let sinst (espress inst);
     assert (sinst is-an object);
     assert (sinst is-not inst);
     assert 1 (sinst x);
@@ -183,51 +183,51 @@
   ).
 ).
 
-(define "(suglify other-value)" (= ()
-  (should "(suglify null) returns null." (= ()
-    assert null (suglify null);
+(define "(espress other-value)" (= ()
+  (should "(espress null) returns null." (= ()
+    assert null (espress null);
   ).
-  (should "(suglify value) returns null." (= ()
-    assert null (suglify type);
+  (should "(espress value) returns null." (= ()
+    assert null (espress type);
 
-    assert null (suglify number);
-    assert null (suglify 0);
-    assert null (suglify 1);
+    assert null (espress number);
+    assert null (espress 0);
+    assert null (espress 1);
 
-    assert null (suglify bool);
-    assert null (suglify true);
-    assert null (suglify false);
+    assert null (espress bool);
+    assert null (espress true);
+    assert null (espress false);
 
-    assert null (suglify string);
+    assert null (espress string);
 
-    assert null (suglify date);
-    assert null (suglify (date empty);
+    assert null (espress date);
+    assert null (espress (date empty);
 
-    assert null (suglify range);
-    assert null (suglify (range empty);
+    assert null (espress range);
+    assert null (espress (range empty);
 
-    assert null (suglify symbol);
-    assert null (suglify (symbol empty);
+    assert null (espress symbol);
+    assert null (espress (symbol empty);
 
-    assert null (suglify tuple);
-    assert null (suglify (tuple empty);
+    assert null (espress tuple);
+    assert null (espress (tuple empty);
 
-    assert null (suglify lambda);
-    assert null (suglify function);
+    assert null (espress lambda);
+    assert null (espress function);
 
-    assert null (suglify operator);
-    assert null (suglify (operator empty);
+    assert null (espress operator);
+    assert null (espress (operator empty);
 
-    assert null (suglify iterator);
-    assert null (suglify (iterator empty);
+    assert null (espress iterator);
+    assert null (espress (iterator empty);
 
-    assert null (suglify promise);
-    assert null (suglify (promise empty);
+    assert null (espress promise);
+    assert null (espress (promise empty);
 
-    assert null (suglify array);
-    assert null (suglify (array empty);
+    assert null (espress array);
+    assert null (espress (array empty);
 
-    assert null (suglify class);
-    assert null (suglify (class empty);
+    assert null (espress class);
+    assert null (espress (class empty);
   ).
 ).
