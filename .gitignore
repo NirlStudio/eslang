@@ -36,3 +36,4 @@ node_modules
 # Temporary files
 todo
 temp
+*.DS_Store
