@@ -8,7 +8,7 @@ var KeyUpArrow = 0x26
 var KeyDownArrow = 0x28
 
 // the key to be used in localStorage
-var InputHistoryKey = '~/.sugly_history'
+var InputHistoryKey = '~/.es_history'
 
 // Firefox, IE and Edge require a non-zero timeout to refresh UI.
 var MinimalDelay = 20 // milliseconds

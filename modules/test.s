@@ -250,7 +250,7 @@ var ++assertions (=>() (++ assertions);
   for suite in arguments (load suite);
   if (cases is-empty) (return);
 
-  print "  Start to run sugly test suites ...\n";
+  print "  Start to run Espresso test suites ...\n";
   var t1 (date now);
   for case in cases (test-a case);
   (if (pending-actions is-empty)

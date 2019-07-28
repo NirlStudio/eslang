@@ -1,1 +1,1 @@
-node.exe %~dp0\sugly %*
+node.exe %~dp0\es %*

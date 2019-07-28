@@ -1,13 +1,13 @@
 {
-  "name": "sugly",
+  "name": "eslang",
   "version": "1.0.3",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi Li"
   },
   "license": "MIT",
-  "repository": "nirlstudio/sugly-lang",
-  "description": "A conceptual implementation of Sugly programming language.",
+  "repository": "nirlstudio/eslang",
+  "description": "A simple & expressive script language, like Espresso.",
   "main": "index.js",
   "scripts": {
     "test": "node . selftest",
@@ -21,7 +21,7 @@
     "prod": "webpack-dev-server --mode production"
   },
   "bin": {
-    "sugly": "bin/sugly"
+    "es": "bin/es"
   },
   "dependencies": {
     "axios": "^0.19.0",

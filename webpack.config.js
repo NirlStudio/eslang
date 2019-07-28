@@ -12,7 +12,7 @@ const ignoreNativeModules = new webpack.IgnorePlugin(
   /^(\.\/loader-fs|node-localstorage|colors\/safe)$/
 )
 
-const suglyDirs = [
+const langDirs = [
   'examples/',
   'modules/',
   'spec/',
@@ -31,7 +31,7 @@ const updateWebSite = new HooksPlugin({
   },
   'beforeCompile@': (params, callback) => {
     var dependencies = params.compilationDependencies
-    if (dependencies.includeSuglyFiles) {
+    if (dependencies.includeEspressoFiles) {
       return callback()
     }
     var files = readCachedFiles()
@@ -41,7 +41,7 @@ const updateWebSite = new HooksPlugin({
       )
     } else {
       dependencies.add('profile.s')
-      suglyDirs.forEach(dir => {
+      langDirs.forEach(dir => {
         files = []
         readDir(dir, file => {
           if (file.endsWith('.s')) {
@@ -52,7 +52,7 @@ const updateWebSite = new HooksPlugin({
         updateCachedFiles(dir, files)
       })
     }
-    dependencies.includeSuglyFiles = true
+    dependencies.includeEspressoFiles = true
     callback()
   },
   done: () => {
@@ -74,7 +74,7 @@ const injectJavaScript = new HtmlWebpackPlugin({
 
 module.exports = (env, options) => {
   const mode = options.mode === MODE_PROD ? MODE_PROD : MODE_DEV
-  const name = mode === MODE_PROD ? 'sugly.min' : 'sugly'
+  const name = mode === MODE_PROD ? 'eslang.min' : 'eslang'
   return {
     mode,
     entry: './web/lib/shell.js',

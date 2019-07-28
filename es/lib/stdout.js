@@ -19,7 +19,7 @@ module.exports = function ($void, stdout) {
     )
   })
 
-  // standard error, but only warning exists in sugly space.
+  // standard error, but only warning exists in espresso space.
   var lastWarning = null // save to make it testable.
   function generateWarningId () {
     var ts = Date.now()

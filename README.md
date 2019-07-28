@@ -1,5 +1,5 @@
-# Sugly-Lang
-### A simple &amp; ugly script language, which is mostly inspired by Lisp, Python and JavaScript.
+# Espresso Language
+### A simple &amp; expressive script language, which is mostly inspired by Lisp, Python and JavaScript.
 ```python
 print "Hello, world!";
 
@@ -8,7 +8,7 @@ print "Hello, world!";
 ```
 
 # Try it online
-### [Sugly.DEV](https://sugly.dev)
+### [Espresso Web Shell](https://eslang.DEV)
 ```python
 help; # for help.
 
@@ -52,61 +52,61 @@ var print-examples (=>:() (var examples (.loader list "examples/")) (=> pattern 
 # You may also want to check
 print print-examples;
 
-# Finally, the Y-combinator in Sugly
+# Finally, the Y-combinator in Espresso
 print (.loader read "yc");
 ```
 
 # Install it
 ```shell
-npm i -g sugly
+npm i -g eslang
 
-sugly selftest # optional
+es selftest # optional
 ```
 
 ### run an example, or your own code:
 ```shell
-sugly examples/qsort1
+es examples/qsort1
 ```
 
 ### REPL in terminal:
 ```shell
-sugly
+es
 ```
 ### You can do [almost the same things](#try-it-online) after calling
 ```python
-fetch "https://sugly.dev/@";
+fetch "https://eslang.dev/@";
 
 # or try
-fetch "https://sugly.dev/@":: finally (=>() (.loader list:: for-each print);
+fetch "https://eslang.dev/@":: finally (=>() (.loader list:: for-each print);
 ```
 
 # Use it in your JS project
 ### add it
 ```shell
-npm i --save sugly
+npm i --save eslang
 ```
 
 ### use it
 ```javascript
-var $void = require('sugly')
+var $void = require('eslang')
 $void.$run('path-to-your-app.s')
 ```
 
 ### use it in web page
 ```javascript
-var $void = require('sugly/web')
+var $void = require('eslang/web')
 $void.$run('path-to-your-app.s')
 ```
 
 # Check the source code
 ```shell
-git clone https://github.com/NirlStudio/sugly-lang.git
-cd sugly-lang
+git clone https://github.com/NirlStudio/eslang.git
+cd eslang
 
 npm install
 npm test
 
-bin/sugly
+bin/es
 
 # or, start the local web shell
 npm run build-dev & npm run start
@@ -114,12 +114,12 @@ npm run build-dev & npm run start
 
 # IDE Support
 ### VS Code Extension
-In Extensions sidebar, search for **Sugly**
+In Extensions sidebar, search for **Espresso**
 
 ### Atom Plugin
-[*language-sugly*](https://github.com/NirlStudio/language-sugly)
+[*language-espresso*](https://github.com/NirlStudio/language-espresso)
 ```shell
-apm install language-sugly
+apm install language-espresso
 ```
 
 # You can help to
@@ -133,4 +133,4 @@ apm install language-sugly
   - Java, Go, Rust, Python, C#, C, etc
 ### - ...
 
-**Enjoy the sugliness.**
+**Enjoy the Espresso.**

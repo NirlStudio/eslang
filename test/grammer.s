@@ -1,7 +1,7 @@
 ###############################################################################
-# comment.line.number-sign.sugly
+# comment.line.number-sign.espresso
 
-# keyword.other.punctuation.sugly
+# keyword.other.punctuation.espresso
 : @ ` $
 @ ` $ :
 ` $ : @
@@ -12,13 +12,13 @@ $($ a$ $ $b $)$
 `(` a` ` `b `)`
 ;(; a; ; ;b ;);
 
-# keyword.operator.quote.sugly
+# keyword.operator.quote.espresso
 quote
 quote(quote -quote quote quote- quote)quote
 unquote
 unquote(unquote -unquote unquote unquote- unquote)unquote
 
-# keyword.operator.assignment.sugly
+# keyword.operator.assignment.espresso
 let(let -let let let- let)let
 var(var -var var var- var)var
 const(const -const const const- const)const
@@ -29,7 +29,7 @@ import(import -import import import- import)import
 load(load -load load load- load)load
 fetch(fetch -fetch fetch fetch- fetch)fetch
 
-# keyword.control.flow.sugly
+# keyword.control.flow.espresso
 if
 if(if -if if if- if)if
 for
@@ -41,13 +41,13 @@ break(break -break break break- break)break
 continue
 continue(continue -continue continue continue- continue)continue
 
-# keyword.control.preposition.sugly
+# keyword.control.preposition.espresso
 else
 else(else -else else else- else)else
 in
 in(in -in in in- in)in
 
-# keyword.control.procedure.sugly
+# keyword.control.procedure.espresso
 redo
 redo(redo -redo redo redo- redo)redo
 return
@@ -55,11 +55,11 @@ return(return -return return return- return)return
 exit
 exit(exit -exit exit exit- exit)exit
 
-# suport.function.self.sugly
+# suport.function.self.espresso
 do
 do(do -do do do- do)do
 
-# variable.language.sugly
+# variable.language.espresso
 this
 this(this -this this this- this)this
 arguments
@@ -71,7 +71,7 @@ operation(operation -operation operation operation- operation)operation
 operand
 operand(operand -operand operand operand- operand)operand
 
-# storage.type.generic.sugly
+# storage.type.generic.espresso
 (type type "bool")
 (bool bool "bool")
 (string string "string")
@@ -89,7 +89,7 @@ operand(operand -operand operand operand- operand)operand
 (class class "class")
 (object object "object")
 
-# constant.language.sugly
+# constant.language.espresso
 null
 null(null null null: null :null null@ null @null null)null
 true
@@ -103,10 +103,10 @@ equivalent(equivalent equivalent equivalent: equivalent :equivalent equivalent@ 
 ascending
 ascending(ascending ascending ascending: ascending :ascending ascending@ ascending @ascending ascending)ascending
 
-# meta.operator.operator-decl.sugly
+# meta.operator.operator-decl.espresso
 =?(=?(=? x )=? )
 
-# meta.operator.lambda-decl.sugly
+# meta.operator.lambda-decl.espresso
 =(=(= x )= )
 =(=(=: x )=: )
 ->(->(-> x )-> )
@@ -114,7 +114,7 @@ ascending(ascending ascending ascending: ascending :ascending ascending@ ascendi
 =>(=>(=> x )=> )
 =>(=>(=> x : x )=> y : y)
 
-# keyword.operator.global.sugly
+# keyword.operator.global.espresso
 +
 (+)
 (+(+ + +)
@@ -131,7 +131,7 @@ not
 (not)
 (not(not not not))
 
-# keyword.operator.double.sugly
+# keyword.operator.double.espresso
 ++
 (++)
 (++(++ ++ ++))
@@ -139,7 +139,7 @@ not
 (--)
 (--(-- -- --))
 
-# keyword.operator.general.sugly
+# keyword.operator.general.espresso
 (x ? t f)
 ((1 + 1)? t f)
 (x ?* t f)
@@ -155,7 +155,7 @@ or
 (x or t f)
 ((1 + 1) or t f)
 
-# keyword.operator.bool.sugly
+# keyword.operator.bool.espresso
 fails
 (x fails)
 ((a is b) fails)
@@ -163,7 +163,7 @@ succeeds
 (x succeeds)
 ((a is b) succeeds)
 
-# meta.operator.arithmetic.sugly
+# meta.operator.arithmetic.espresso
 +((1 + 2)+ 3)
 ++((1 ++ 2)++ 3)
 +=((1 += 2)+= 3)
@@ -181,7 +181,7 @@ succeeds
 %(% (1 % 2)% 3)
 %=((1 %= 2)%= 3)
 
-# meta.operator.bitwise.sugly
+# meta.operator.bitwise.espresso
 &(& (a & b)& c)
 &=(&= (a &= b)&= c)
 
@@ -200,7 +200,7 @@ succeeds
 >>>(>>> (a >>> b)>>> c)
 >>>=(>>>= (a >>>= b)>>>= c)
 
-# meta.operator.comparison.sugly
+# meta.operator.comparison.espresso
 ==(== (a == b)== c)
 !=(!= (a != b)!= c)
 
@@ -213,7 +213,7 @@ succeeds
 <(< (a < b)< c)
 <=(<= (a <= b)<= c)
 
-# meta.function.entity.sugly (null)
+# meta.function.entity.espresso (null)
 (((empty is) is) is x)
 (((is-not is-not) is-not) is-not x)
 (((equals equals) equals) equals x)
@@ -228,13 +228,13 @@ succeeds
 (((to-code to-code) to-code) to-code x)
 (((to-string to-string) to-string) to-string x)
 
-# meta.function.type.sugly (type)
+# meta.function.type.espresso (type)
 (((of of) of) of x)
 (((reflect reflect) reflect) reflect x)
 (((seal seal) seal) seal x)
 (((is-sealed is-sealed) is-sealed) is-sealed x)
 
-# meta.constant.empty.sugly
+# meta.constant.empty.espresso
 (type empty)
 (bool empty)
 (string empty)
@@ -244,7 +244,7 @@ succeeds
 (symbol empty)
 (tuple empty)
 
-# meta.function.empty.sugly
+# meta.function.empty.espresso
 (operator empty)
 (lambda empty)
 (function empty)
@@ -254,20 +254,20 @@ succeeds
 (object empty)
 (class empty)
 
-# meta.function.other.empty.sugly
+# meta.function.other.empty.espresso
 (((empty empty) empty) empty y)
 
-# meta.operator.noop.sugly
+# meta.operator.noop.espresso
 (operator noop)
 
-# meta.lambda.noop.sugly
+# meta.lambda.noop.espresso
 (lambda noop)
 (function noop)
 
-# meta.lambda.static.sugly
+# meta.lambda.static.espresso
 (lambda static)
 
-# meta.function-collection-sugly: string, tuple, array
+# meta.function-collection-espresso: string, tuple, array
 length((length length) length)length
 first((first first) first)first
 first-of((first-of first-of) first-of)first-of
@@ -277,12 +277,12 @@ copy((copy copy) copy)copy
 slice((slice slice) slice)slice
 concat((concat concat) concat)concat
 
-# meta.function-string-type-sugly
+# meta.function-string-type-espresso
 ((string of-chars) of-chars)
 ((string of-code) of-code)
 ((string unescape) unescape)
 ((string format) format)
-# meta.function-string-sugly
+# meta.function-string-espresso
 starts-with((starts-with starts-with) starts-with)starts-with
 ends-with((ends-with ends-with) ends-with)ends-with
 trim((trim trim) trim)trim
@@ -295,7 +295,7 @@ split((split split) split)split
 as-chars((as-chars as-chars) as-chars)as-chars
 char-at((char-at char-at) char-at)char-at
 
-# meta.constant-number-sugly
+# meta.constant-number-espresso
 max((number max) max)
 min((number min) min)
 smallest((number smallest) smallest)
@@ -307,12 +307,12 @@ bits((number bits) bits)
 max-bits((number max-bits) max-bits)
 min-bits((number min-bits) min-bits)
 invalid((number invalid) invalid)
-# meta.function-number-type-sugly
+# meta.function-number-type-espresso
 parse((number parse) parse)
 parse-int((number parse-int) parse-int)
 of-int((number of-int) of-int)
 of-bits((number of-bits) of-bits)
-# meta.function-number-sugly
+# meta.function-number-espresso
 is-valid((n is-valid) is-valid)
 is-invalid((n is-invalid) is-invalid)
 is-int((n is-int) is-int)
@@ -336,15 +336,15 @@ floor((n floor) floor)
 round((n round) round)
 trunc((n trunc) trunc)
 
-# meta.constant-date-sugly
+# meta.constant-date-espresso
 invalid((date invalid) invalid)
-# meta.function-date-type-sugly
+# meta.function-date-type-espresso
 parse((date parse) parse)
 of-utc((date of-utc) of-utc)
 now((date now) now)
 timestamp((date timestamp) timestamp)
 timezone((date timezone) timezone)
-# meta.function-date-sugly
+# meta.function-date-espresso
 is-valid((d is-valid) is-valid)
 is-invalid((d is-invalid) is-invalid)
 date-fields((d date-fields) date-fields)
@@ -353,7 +353,7 @@ all-fields((d all-fields) all-fields)
 week-day((d week-day) week-day)
 timestamp((d timestamp) timestamp)
 
-# meta.constant-symbol-sugly
+# meta.constant-symbol-espresso
 etc((symbol etc) etc)
 all((symbol all) all)
 any((symbol any) any)
@@ -380,16 +380,16 @@ comment((symbol comment) comment)
 in((symbol in) in)
 else((symbol else) else)
 
-# meta.function-symbol-type-sugly
+# meta.function-symbol-type-espresso
 ((symbol of-shared) of-shared)
 ((symbol is-safe) is-safe)
 
-# meta.function-symbol-sugly
+# meta.function-symbol-espresso
 key((sym key) key)
 is-safe((sym is-safe) is-safe)
 is-unsafe((sym is-unsafe) is-unsafe)
 
-# meta.constant-tuple-sugly
+# meta.constant-tuple-espresso
 ((tuple blank) blank)
 ((tuple unknown) unknown)
 ((tuple lambda) lambda)
@@ -398,13 +398,13 @@ is-unsafe((sym is-unsafe) is-unsafe)
 ((tuple operator) operator)
 ((tuple array) array)
 ((tuple object) object)
-# meta.function-tuple-type-sugly
+# meta.function-tuple-type-espresso
 ((tuple accepts) accepts)
 ((tuple atom-of) atom-of)
 ((tuple of-plain) of-plain)
 ((tuple from) from)
 ((tuple from-plain) from-plain)
-# meta.function-tuple-sugly
+# meta.function-tuple-espresso
 is-plain((t is-plain) is-plain)
 not-plain((t not-plain) not-plain)
 source-map((t source-map) source-map)
@@ -412,7 +412,7 @@ iterate((t iterate) iterate)
 merge((t merge) merge)
 to-array((t to-array) to-array)
 
-# meta.function-operation-sugly
+# meta.function-operation-espresso
 parameters((f parameters) parameters)
 body((f body) body)
 is-static((f is-static) is-static)
@@ -425,9 +425,9 @@ not-bound((f not-bound) not-bound)
 apply((f apply) apply)
 bind((f bind) bind)
 
-# meta.function-iterator-type-sugly
+# meta.function-iterator-type-espresso
 ((iterator of-unsafe) of-unsafe)
-# meta.function-iterator-sugly
+# meta.function-iterator-espresso
 skip((iter skip) skip)
 keep((iter keep) keep)
 select((iter select) select)
@@ -441,27 +441,27 @@ join((iter join) join)
 collect((iter collect) collect)
 finish((iter finish) finish)
 
-# meta.function-global-promise-sugly
+# meta.function-global-promise-espresso
 commit((commit)commit)
 commit*((commit*)commit*)
 commit?((commit?)commit?)
 
-# meta.object-promise-sugly
+# meta.object-promise-espresso
 waiting((waiting)waiting)waiting
 async((async)async)async
 
-# meta.constants-waiting-promise-sugly
+# meta.constants-waiting-promise-espresso
 result((waiting result) result)result
 excuse((waiting excuse) excuse)excuse
 
-# meta.function-async-promise-sugly
+# meta.function-async-promise-espresso
 resolve((async resolve) resolve)resolve
 reject((async reject) reject)reject
 
-# meta.constant-promise-sugly
+# meta.constant-promise-espresso
 nothing((promise nothing) nothing)
 
-# meta.function-promise-type-sugly
+# meta.function-promise-type-espresso
 ((promise of-resolved) of-resolved)
 ((promise of-rejected) of-rejected)
 ((promise of-all) of-all)
@@ -469,15 +469,15 @@ nothing((promise nothing) nothing)
 ((promise of-any) of-any)
 ((promise any) any)
 
-# meta.function-promise-sugly
+# meta.function-promise-espresso
 is-cancellable((prom is-cancellable) is-cancellable)
 cancel((prom cancel) cancel)
 then((prom then) then)
 finally((prom finally) finally)
 
-# meta.function-array-type-sugly
+# meta.function-array-type-espresso
 ((array from) from)
-# meta.function-array-sugly
+# meta.function-array-espresso
 is-sparse((a is-sparse) is-sparse)
 not-sparse((a not-sparse) not-sparse)
 as-sparse((a as-sparse) as-sparse)
@@ -504,7 +504,7 @@ reverse((a reverse) reverse)
 sort((a sort) sort)
 find((a find) find)
 
-# meta.function-object-type-sugly
+# meta.function-object-type-espresso
 ((object of-generic) of-generic)
 ((object is-generic) is-generic)
 ((object not-generic) not-generic)
@@ -520,9 +520,9 @@ find((a find) find)
 ((object owns) owns)
 object fields-of ((object fields-of) fields-of)
 
-# meta.function-class-type-sugly
+# meta.function-class-type-espresso
 ((class attach) attach)
-# meta.function-class-sugly
+# meta.function-class-espresso
 default((c default) default)
 as((c as) as)
 from((c from) from)
@@ -530,7 +530,7 @@ to-object((c to-object) to-object)
 constructor((i constructor) constructor)
 activator((i activator) activator)
 
-# meta.function.runtime.sugly
+# meta.function.runtime.espresso
 compile((compile)compile)compile
 compiler((compiler)compiler)compiler
 tokenize((tokenize)tokenize)tokenize
@@ -540,15 +540,15 @@ eval((eval)eval)eval
 run((run)run)run
 env((env)env)env
 
-# meta.function.lib.sugly
+# meta.function.lib.espresso
 print((print)print)print
 printf((printf)printf)printf
 warn((warn)warn)warn
 max((max)max)max
 min((min)min)min
-suglify((suglify)suglify)suglify
+espress((espress)espress)espress
 
-# meta.operator.lib.sugly
+# meta.operator.lib.espresso
 (debug)
 (log)
 (log v)
@@ -565,17 +565,17 @@ suglify((suglify)suglify)suglify
 (log d d)
 (log debug debug)
 
-# meta.function-uri-lib-sugly
+# meta.function-uri-lib-espresso
 ((uri encode) encode)
 ((uri decode) decode)
 ((uri escape) escape)
 uri unescape ((uri unescape) unescape)
 
-# meta.function-json-lib-sugly
+# meta.function-json-lib-espresso
 ((json of) of)
 ((json parse) parse)
 
-# meta.constant-math-lib-sugly
+# meta.constant-math-lib-espresso
 ((math e) e)
 ((math pi) pi)
 ((math ln2) ln2)
@@ -585,7 +585,7 @@ uri unescape ((uri unescape) unescape)
 ((math sqrt-2) sqrt-2)
 ((math sqrt-1/2) sqrt-1/2)
 
-# meta.function-math-lib-sugly
+# meta.function-math-lib-espresso
 ((math sin) sin)
 ((math cos) cos)
 ((math tan) tan)
@@ -604,7 +604,7 @@ uri unescape ((uri unescape) unescape)
 ((math min) min)
 ((math random) random)
 
-# support.variable.object.lib.sugly
+# support.variable.object.lib.espresso
 uri
 uri(uri uri uri)uri
 json
@@ -612,32 +612,32 @@ json(json json json)json
 math
 math(math math math)math
 
-# support.class.lib.sugly
+# support.class.lib.espresso
 emitter
 emitter(emitter emitter emitter)emitter
 timer
 timer(timer timer timer)timer
 
-# meta.function-emitter-sugly
+# meta.function-emitter-espresso
 on((e on) on)
 off((e off) off)
 emit((e emit) emit)
 
-# meta.function-timer-class-sugly
+# meta.function-timer-class-espresso
 ((timer timeout) timeout)
 ((timer countdown) countdown)
 
-# meta.function-timer-sugly
+# meta.function-timer-espresso
 ((t start) start)
 ((t is-elapsing) is-elapsing)
 ((t stop) stop)
 
-# meta.function.test.sugly
+# meta.function.test.espresso
 (define define)(define define)
 (should should) (should should)
 (test test) (test test)
 
-# meta.operator.test.sugly
+# meta.operator.test.espresso
 (assert assert) (assert assert)
 
 # numbers
@@ -656,17 +656,17 @@ emit((e emit) emit)
 -1.03e+12
 -1.03E-12
 
-# string.quoted.double.sugly
+# string.quoted.double.espresso
 "123$bcd\"''$\t xyz" 123
 
-# string.format.single.sugly
+# string.format.single.espresso
 '" 123 $() xyz'
 
-# comment.line.hash.sugly
+# comment.line.hash.espresso
 # single line comment
 123 # single line comment
 
-# comment.block.hash.sugly
+# comment.block.hash.espresso
 #( block comment )#
 123 true#( block comment )#123
 #( multiple lines comment

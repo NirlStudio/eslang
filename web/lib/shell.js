@@ -3,9 +3,9 @@
 var $void = require('../index')
 var term = require('./term')
 
-var sugly = $void(term()/*, stdin, stdout, loader */)
+var espresso = $void(term()/*, stdin, stdout, loader */)
 // start shell and expose the shell's reader function.
-var initializing = sugly.shell(/* context, args, profile */)
+var initializing = espresso.shell(/* context, args, profile */)
 if (!(initializing instanceof Promise)) {
   console.info('shell is ready.')
 } else {

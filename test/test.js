@@ -37,19 +37,19 @@ module.exports = function ($void) {
     checkJavascript()
     checkPolyfill()
 
-    // check sugly runtime.
-    checkSuglyRuntime()
+    // check espresso runtime.
+    checkRuntime()
 
     // start to report result
     green('\n  passing: ' + passing)
     if (failing.length < 1) {
-      green('\n  Sugly is ready to run.\n')
+      green('\n  Espresso is ready to run.\n')
       return true
     }
 
     // print failures
     red('  failing: ' + failing.length)
-    print('\n  There might be some issues to prevent running sugly')
+    print('\n  There might be some issues to prevent running Espresso')
     for (var i = 0; i < failing.length; i++) {
       red('  - ' + failing[i])
     }
@@ -76,16 +76,16 @@ module.exports = function ($void) {
   function checkPolyfill () {
     var polyfill = require('../lib/polyfill')
     if (polyfill.length > 0) {
-      passed('Sugly is using some polyfill functions:')
+      passed('Espresso is using some polyfill functions:')
       var padding = '      - '
       gray(padding + polyfill.join('\n' + padding))
     } else {
-      green('      Congratulations! Sugly does not need any polyfill.')
+      green('      Congratulations! Espresso does not need any polyfill.')
     }
   }
 
-  function checkSuglyRuntime () {
-    print('\n  Checking Sugly Runtime ...')
+  function checkRuntime () {
+    print('\n  Checking Espresso Runtime ...')
     checkObjects($void, '[Void / Null] ', [
       'null'
     ])
@@ -120,7 +120,7 @@ module.exports = function ($void) {
       'debug', 'log'
     ])
 
-    checkObjects($, '[Sugly / types] ', [
+    checkObjects($, '[Espresso / types] ', [
       'type',
       'bool', 'string', 'number', 'date', 'range',
       'symbol', 'tuple',
@@ -129,7 +129,7 @@ module.exports = function ($void) {
       'array', 'object', 'class'
     ])
 
-    checkFunctions($, '[Sugly / functions] ', [
+    checkFunctions($, '[Espresso / functions] ', [
       // generic
       'commit', 'commit*', 'commit?',
       // runtime
@@ -138,28 +138,28 @@ module.exports = function ($void) {
       'tokenizer', 'tokenize', 'compiler', 'compile'
     ])
 
-    checkFunctions($void, '[Sugly / functions] ', [
+    checkFunctions($void, '[Espresso / functions] ', [
       // runtime
       '$env', '$run', '$interpreter'
     ])
 
-    checkFunctions($, '[Sugly / lib / functions] ', [
+    checkFunctions($, '[Espresso / lib / functions] ', [
       'max', 'min'
     ])
 
-    checkFunctions($void, '[Sugly / lib / app-only functions] ', [
-      '$print', '$printf', '$warn', '$suglify'
+    checkFunctions($void, '[Espresso / lib / app-only functions] ', [
+      '$print', '$printf', '$warn', '$espress'
     ])
 
-    checkObjects($, '[Sugly / lib / objects] ', [
+    checkObjects($, '[Espresso / lib / objects] ', [
       'uri', 'math', 'json'
     ])
 
-    checkObjects($, '[Sugly / lib / classes] ', [
+    checkObjects($, '[Espresso / lib / classes] ', [
       'emitter'
     ])
 
-    checkObjects($void, '[Sugly / lib / classes] ', [
+    checkObjects($void, '[Espresso / lib / classes] ', [
       '$timer'
     ])
 

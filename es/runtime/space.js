@@ -157,7 +157,7 @@ module.exports = function space ($void) {
     app.warn = $void.$warn
     app.print = $void.$print
     app.printf = $void.$printf
-    app.suglify = $void.$suglify
+    app.espress = $void.$espress
     app.timer = $void.$timer
 
     var local = Object.create(app)

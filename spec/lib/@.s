@@ -4,7 +4,7 @@
   "json",
   "math",
   "stdout",
-  "suglify",
+  "espress",
   "timer",
   "uri",
 ).

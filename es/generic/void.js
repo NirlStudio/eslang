@@ -97,10 +97,10 @@ module.exports = function ($void) {
   }
   $void.safelyAssign = safelyAssign
 
-  // make sure a file uri has correct sugly extension
+  // make sure a file uri has correct espresso extension
   $void.appendExt = function (path) {
     return !path || typeof path !== 'string' ? path
-      : path.endsWith('.s') || path.endsWith('.sugly') ? path
+      : path.endsWith('.s') || path.endsWith('.es') ? path
         : path + '.s'
   }
 

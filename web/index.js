@@ -1,6 +1,6 @@
 'use strict'
 
-var sugly = require('../sugly')
+var espresso = require('../es')
 var loadIOProvider = require('./lib/io')
 var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')
@@ -21,7 +21,7 @@ module.exports = function (term, stdin, stdout, loader) {
   stdout = typeof stdout === 'function' ? stdout : terminalStdout(term)
   loader = ensure(loader, defaultLoader)
 
-  var $void = sugly(stdout, loader)
+  var $void = espresso(stdout, loader)
   loadIOProvider($void)
 
   // prepare app environment.

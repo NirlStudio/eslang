@@ -193,7 +193,7 @@ module.exports = function ($void) {
   // the empty value which has been resolved to null.
   var empty = link(Type, 'empty', Promise$.resolve(null))
 
-  // guard sugly promises to ignore unhandled rejections.
+  // guard espresso promises to ignore unhandled rejections.
   ignoreUnhandledRejectionsBy(function (promise, excuse) {
     // create warnings
     return promise.excusable === true

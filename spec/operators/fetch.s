@@ -31,7 +31,7 @@
   (should "(fetch remote-module) returns a promise resolved to (@ remote-module)." (=> ()
     (const remote-mod (env "runtime-host":: == "browser":: ?
       (env "runtime-home":: + "/test/test")
-      "https://github.com/NirlStudio/sugly-lang/tree/master/modules/test"
+      "https://github.com/NirlStudio/eslang/tree/master/modules/test"
     ).
     (fetch remote-mod:: then (=> waiting
       assert (waiting result:: is-an array);

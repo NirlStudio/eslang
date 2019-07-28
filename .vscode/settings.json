@@ -12,7 +12,7 @@
     "printf",
     "selftest",
     "stambda",
-    "suglify",
-    "sugly"
+    "espress",
+    "eslang"
   ]
 }

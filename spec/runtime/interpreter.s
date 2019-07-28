@@ -109,10 +109,10 @@
     (var app-home)
     (var mod-home)
     (var shell (=> (fb) (let (app-home mod-home) fb).
-    (var interpret (interpreter shell (@ 1 10 100) "/var/tmp/sugly").
+    (var interpret (interpreter shell (@ 1 10 100) "/var/tmp/es").
     (interpret "(@ -app -module)\n").
-    (assert "/var/tmp/sugly/." app-home)
-    (assert "/var/tmp/sugly/." mod-home)
+    (assert "/var/tmp/es/." app-home)
+    (assert "/var/tmp/es/." mod-home)
 
     (let interpret (interpreter shell (@ 1 10 100) "").
     (interpret "(@ -app -module)\n").
