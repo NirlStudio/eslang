@@ -74,15 +74,15 @@ module.exports = function ($void) {
 
   var objectOfGenericFunc = $Function.proto.generic
 
-  $export($void, '$suglify', function (src) {
-    // suglify only returns null, a string or an object.
+  $export($void, '$espress', function (src) {
+    // espress only returns null, a string or an object.
     if (typeof src === 'string') {
       return hyphenize(src)
     }
     // accepts a generic function so that an expression like:
-    //   (suglify (func generic))
+    //   (espress (func generic))
     // can be simplified to:
-    //   (suglify func)
+    //   (espress func)
     var proxy
     var srcType = typeOf(src)
     if (srcType === $Function) {
