@@ -1,5 +1,5 @@
 (fetch
-  "_app.s",
+  "_app",
   "env",
   "eval",
   "evaluate",

@@ -40,11 +40,11 @@ const updateWebSite = new HooksPlugin({
         !dependencies.has(file) && dependencies.add(file)
       )
     } else {
-      dependencies.add('profile.s')
+      dependencies.add('profile.es')
       langDirs.forEach(dir => {
         files = []
         readDir(dir, file => {
-          if (file.endsWith('.s')) {
+          if (file.endsWith('.es')) {
             files.push(file)
             !dependencies.has(file) && dependencies.add(file)
           }
@@ -58,10 +58,10 @@ const updateWebSite = new HooksPlugin({
   done: () => {
     shell.cp('web/favicon.*', 'dist/www/')
     shell.cp('web/index.css', 'dist/www/')
-    shell.cp('profile.s', 'dist/www/')
-    shell.cp('web/*.s', 'dist/www/')
-    shell.cp('modules/*.s', 'dist/www/modules/')
-    shell.cp('test/test.s', 'dist/www/test/')
+    shell.cp('profile.es', 'dist/www/')
+    shell.cp('web/*.es', 'dist/www/')
+    shell.cp('modules/*.es', 'dist/www/modules/')
+    shell.cp('test/test.es', 'dist/www/test/')
     shell.cp('-r', 'examples/', 'dist/www/')
     shell.cp('-r', 'spec/', 'dist/www/')
     shell.cp('-r', 'tools/', 'dist/www/')

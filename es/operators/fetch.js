@@ -49,7 +49,7 @@ module.exports = function load ($void) {
         return promiseOfResolved(source)
       }
     }
-    return source.endsWith('@.s')
+    return source.endsWith('@.es')
       ? new Promise$(function (resolve, reject) {
         loader.fetch(source).then(function () {
           var result = run(source)

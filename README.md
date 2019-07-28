@@ -89,13 +89,13 @@ npm i --save eslang
 ### use it
 ```javascript
 var $void = require('eslang')
-$void.$run('path-to-your-app.s')
+$void.$run('path-to-your-app.es')
 ```
 
 ### use it in web page
 ```javascript
 var $void = require('eslang/web')
-$void.$run('path-to-your-app.s')
+$void.$run('path-to-your-app.es')
 ```
 
 # Check the source code

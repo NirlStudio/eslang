@@ -20,8 +20,8 @@ module.exports = function run ($void) {
     if (typeof appHome !== 'string' || appHome.length < 1) {
       appHome = $void.$env('home')
     }
-    if (!appSource.endsWith('.s')) {
-      appSource += '.s'
+    if (!appSource.endsWith('.es')) {
+      appSource += '.es'
     }
     // try to resolve the uri for source
     var loader = $void.loader

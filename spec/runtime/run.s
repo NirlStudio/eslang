@@ -17,13 +17,13 @@
     (assert ((result 2) is-empty).
 
     (assert ((result 3) is-a string).
-    (assert ((result 3) ends-with "_app.s").
+    (assert ((result 3) ends-with "_app.es").
 
     (assert ((result 4) is-a string).
     (assert ((result 5) is-a string).
 
     (assert ((result 6) is-a string).
-    (assert ((result 6) ends-with "_app.s").
+    (assert ((result 6) ends-with "_app.es").
 
     (assert (result 3) (result 6).
   ).
@@ -119,7 +119,7 @@
     (assert ((result 4) is-a string).
 
     (assert ((result 6) is-a string).
-    (assert ((result 6) ends-with "_app.s").
+    (assert ((result 6) ends-with "_app.es").
 
     (assert (result 3) (result 6).
   ).

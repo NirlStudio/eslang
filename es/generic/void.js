@@ -100,8 +100,8 @@ module.exports = function ($void) {
   // make sure a file uri has correct espresso extension
   $void.appendExt = function (path) {
     return !path || typeof path !== 'string' ? path
-      : path.endsWith('.s') || path.endsWith('.es') ? path
-        : path + '.s'
+      : path.endsWith('.es') ? path
+        : path + '.es'
   }
 
   // to retrieve or create a shared symbol.
