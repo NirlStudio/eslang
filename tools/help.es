@@ -2,7 +2,7 @@
 
 (if (-app is -module)
   (print "Usage:\tes\t\t\t\tuse Espresso interactively.\
-    \tes app[.s] [options ...]\texecute an Espresso file.\
+    \tes app[.es] [options ...]\texecute an Espresso file.\
     \tes test [[test-file] ...]\trun one or more test suites.\
     \tes selftest [[spec] ...]\trun all or given spec cases.\
     \tes version\t\t\tdisplay Espresso version.\

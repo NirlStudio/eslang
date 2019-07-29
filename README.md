@@ -1,4 +1,4 @@
-# Espresso Language
+# Espresso Script Language - eslang
 ### A simple &amp; expressive script language, which is inspired by Lisp, Python, JavaScript and many other great languages.
 ```python
 print "Hello, world!";
