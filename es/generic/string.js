@@ -205,8 +205,9 @@ module.exports = function ($void) {
   var asChars = link(proto, 'as-chars', typeof Array.from === 'function' ? function () {
     return Array.from(this)
   } : function () {
-    // polyfill from Babel.
-    return this.split(/(?=(?:[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/)
+    return this.length < 1 ? []
+      // polyfill from Babel.
+      : this.split(/(?=(?:[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))/)
   })
 
   // get a character's unicode value by its offset in this string.
