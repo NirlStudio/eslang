@@ -743,11 +743,11 @@
     (assert "A" ("A" to-upper true).
     (assert "ABC" ("ABC" to-upper true).
 
-    (assert "Ä" ("ä" to-upper).
-    (assert "SS" ("ß" to-upper).
-    (assert "GESÄSS" ("gesäß" to-upper).
+    (assert "Ä" ("ä" to-upper true).
+    (assert "SS" ("ß" to-upper true).
+    (assert "GESÄSS" ("gesäß" to-upper true).
     (assert "Ä" ("Ä" to-upper).
-    (assert "GESÄSS" ("GESÄSS" to-upper).
+    (assert "GESÄSS" ("GESÄSS" to-upper) true.
   ).
 ).
 
