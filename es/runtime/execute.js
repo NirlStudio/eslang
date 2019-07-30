@@ -2,7 +2,7 @@
 
 module.exports = function execute ($void) {
   var Signal$ = $void.Signal
-  var warn = $void.$.warn
+  var warn = $void.$warn
   var evaluate = $void.evaluate
   var createAppSpace = $void.createAppSpace
   var createModuleSpace = $void.createModuleSpace

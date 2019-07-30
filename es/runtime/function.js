@@ -17,6 +17,10 @@ module.exports = function function_ ($void) {
   var createFunctionSpace = $void.createFunctionSpace
   var createEmptyOperation = $void.createEmptyOperation
 
+  var alignWithGeneric = isFunctionLengthWritable()
+    ? alignWithGenericDefault
+    : alignWithGenericFallback
+
   $void.lambdaOf = function lambdaOf (space, clause, offset) {
     // compile code
     var code = [$Symbol.lambda]
@@ -67,7 +71,7 @@ module.exports = function function_ ($void) {
         }
       }
     }
-    return alignedWithGeneric($lambda, params.length)
+    return alignWithGeneric($lambda, params.length)
   }
 
   $void.staticLambdaOf = function staticLambdaOf (space, clause, offset) {
@@ -119,11 +123,11 @@ module.exports = function function_ ($void) {
     }
     if (key === 'this') {
       // this is only a fake parameter to indicate accepting a this.
-      return alignedWithGeneric($stambda, 0)
+      return alignWithGeneric($stambda, 0)
     }
     $stambda = $stambda.bind(null)
     $stambda.this = null
-    return alignedWithGeneric($stambda, params.length)
+    return alignWithGeneric($stambda, params.length)
   }
 
   $void.functionOf = function functionOf (space, clause, offset) {
@@ -176,7 +180,7 @@ module.exports = function function_ ($void) {
         }
       }
     }
-    return alignedWithGeneric($func, params.length)
+    return alignWithGeneric($func, params.length)
   }
 
   // to prepare a new context for redo
@@ -214,7 +218,19 @@ module.exports = function function_ ($void) {
     return args.length > 0 ? [args, new Tuple$(code)] : [[], $Tuple.empty]
   }
 
-  function alignedWithGeneric (func, paramNo) {
+  function isFunctionLengthWritable () {
+    var func = function () {}
+    try {
+      Object.defineProperty(func, 'length', { value: 2 })
+      return true
+    } catch (err) {
+      // fortunately, this should only happen in IE.
+      warn('runtime/function', 'function\'s length is not writable.', err)
+      return false
+    }
+  }
+
+  function alignWithGenericDefault (func, paramNo) {
     return paramNo > 0 ? Object.defineProperties(func, {
       length: {
         value: paramNo
@@ -225,5 +241,61 @@ module.exports = function function_ ($void) {
     }) : Object.defineProperty(func, 'name', {
       value: undefined
     })
+  }
+
+  function alignWithGenericFallback (func, paramNo) {
+    func = alignParamNumber(func)
+    return !func.name ? func : Object.defineProperty(func, 'name', {
+      value: undefined
+    })
+  }
+
+  function alignParamNumber (func, paramNo) {
+    switch (paramNo) {
+      case 1: return function (a) { return func.apply(this, arguments) }
+      case 2: return function (a, b) { return func.apply(this, arguments) }
+      case 3: return function (a, b, c) { return func.apply(this, arguments) }
+      case 4: return function (a, b, c, d) {
+        return func.apply(this, arguments)
+      }
+      case 5: return function (a, b, c, d, e) {
+        return func.apply(this, arguments)
+      }
+      case 6: return function (a, b, c, d, e, f) {
+        return func.apply(this, arguments)
+      }
+      case 7: return function (a, b, c, d, e, f, g) {
+        return func.apply(this, arguments)
+      }
+      case 8: return function (a, b, c, d, e, f, g, h) {
+        return func.apply(this, arguments)
+      }
+      case 9: return function (a, b, c, d, e, f, g, h, i) {
+        return func.apply(this, arguments)
+      }
+      case 10: return function (a, b, c, d, e, f, g, h, i, j) {
+        return func.apply(this, arguments)
+      }
+      case 11: return function (a, b, c, d, e, f, g, h, i, j, k) {
+        return func.apply(this, arguments)
+      }
+      case 12: return function (a, b, c, d, e, f, g, h, i, j, k, l) {
+        return func.apply(this, arguments)
+      }
+      case 13: return function (a, b, c, d, e, f, g, h, i, j, k, l, m) {
+        return func.apply(this, arguments)
+      }
+      case 14: return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n) {
+        return func.apply(this, arguments)
+      }
+      case 15: return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) {
+        return func.apply(this, arguments)
+      }
+      case 16: return function (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
+        return func.apply(this, arguments)
+      }
+      default:
+        return func
+    }
   }
 }
