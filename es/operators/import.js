@@ -170,7 +170,7 @@ module.exports = function import_ ($void) {
       var doc = $void.loader.load(uri)
       var text = doc[0]
       if (typeof text !== 'string') {
-        module_.status = 415 // unspported media type
+        module_.status = 415 // unsupported media type
         warn('import', 'failed to read', source, 'for', doc[1])
         return null
       }
