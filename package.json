@@ -8,6 +8,16 @@
   "license": "MIT",
   "repository": "nirlstudio/eslang",
   "description": "A simple & expressive script language, like Espresso.",
+  "keywords": [
+    "es",
+    "eslang",
+    "espresso",
+    "espressolang",
+    "espresso-lang",
+    "script language",
+    "programming lang",
+    "programming language"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "node . selftest",

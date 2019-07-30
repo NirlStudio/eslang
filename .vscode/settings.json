@@ -13,6 +13,7 @@
     "selftest",
     "stambda",
     "espress",
-    "eslang"
+    "eslang",
+    "espressolang"
   ]
 }
