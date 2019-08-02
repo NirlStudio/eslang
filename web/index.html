@@ -23,9 +23,11 @@
       head.appendChild(node)
     }
 
-    /MSIE \d|Trident.*rv:/.test(navigator.userAgent) && insertScript(
-      '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
-    )
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+      insertScript(
+        '//cdn.jsdelivr.net/npm/bluebird@3.5.3/js/browser/bluebird.min.js'
+      )
+    }
 
     var href = window.location.href
     window.ES_HOME = href.substring(0, href.lastIndexOf('/'))
