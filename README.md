@@ -92,10 +92,10 @@ var $void = require('eslang')()
 $void.$run('path-to-your-app.es')
 ```
 
-### use it in web page
-```javascript
-var web = require('eslang/web')()
-web.run('path-to-your-app.es')
+### use [es-npm](https://www.npmjs.com/package/@eslang/es-npm) to create projects
+```shell
+npm i -g @eslang/es-npm
+es-npm
 ```
 
 # Check the source code
