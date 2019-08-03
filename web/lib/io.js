@@ -16,6 +16,7 @@ function storeOf (storage) {
 
 module.exports = function ($void) {
   var warn = $void.$warn
+  var thisCall = $void.thisCall
   var stringOf = $void.$.string.of
 
   var $io = $void.$io = {}
@@ -27,41 +28,51 @@ module.exports = function ($void) {
     return path.startsWith('~/') ? session : storage
   }
 
-  function checkPath (method, path) {
+  function formatPath (method, path) {
     if (path && typeof path === 'string') {
-      return true
+      return path
     }
-    warn('io:' + method, 'argument path is not a string.', [path])
-    return false
+    if (!Array.isArray(path)) {
+      warn('io:' + method, 'argument path is not a string or strings.', [path])
+      return null
+    }
+    path = path.slice()
+    for (var i = 0, len = path.length; i < len; i++) {
+      if (typeof path[i] !== 'string') {
+        path[i] = thisCall(path[i], 'to-string')
+      }
+    }
+    return path.join('/')
   }
 
   $io.read = function read (path) {
-    return checkPath('read', path) ? chooseStoreBy(path).getItem(path) : null
+    path = formatPath('read', path)
+    return path ? chooseStoreBy(path).getItem(path) : null
   }
 
   $io.write = function write (path, value) {
-    if (!checkPath('write', path)) {
+    path = formatPath('write', path)
+    if (!path) {
       return null
     }
-    chooseStoreBy(path).setItem(path,
-      (value = typeof value === 'undefined' ? stringOf() : stringOf(value))
-    )
+    value = typeof value === 'undefined' ? stringOf() : stringOf(value)
+    chooseStoreBy(path).setItem(path, value)
     return value
   }
 
   $io['to-read'] = function read_ (path) {
-    return checkPath('to-read', path)
-      ? Promise.resolve(chooseStoreBy(path).getItem(path))
-      : Promise.reject(warn())
+    path = formatPath('to-read', path)
+    return !path ? Promise.reject(warn())
+      : Promise.resolve(chooseStoreBy(path).getItem(path))
   }
 
   $io['to-write'] = function write_ (path, value) {
-    if (!checkPath('to-write', path)) {
+    path = formatPath('to-write', path)
+    if (!path) {
       return Promise.reject(warn())
     }
-    chooseStoreBy(path).setItem(path,
-      (value = typeof value === 'undefined' ? stringOf() : stringOf(value))
-    )
+    value = typeof value === 'undefined' ? stringOf() : stringOf(value)
+    chooseStoreBy(path).setItem(path, value)
     return Promise.resolve(value)
   }
 }

@@ -4,16 +4,21 @@
     "booleanized",
     "ching",
     "clist",
+    "com",
     "constambda",
+    "eslang",
+    "espress",
+    "espressolang",
     "hyphenize",
+    "leevi",
     "locon",
+    "nirls",
+    "nirlstudio",
     "ployfill",
     "polyfill",
     "printf",
     "selftest",
     "stambda",
-    "espress",
-    "eslang",
-    "espressolang"
+    "wasm"
   ]
 }
