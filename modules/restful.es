@@ -25,4 +25,4 @@ const restful (import "$restful");
 export (get, post, put, patch, delete) (wrap restful);
 
 # create an agent with a particular configuration set.
-(export of (=> config (wrap (service of config);
+(export of (=> config (wrap (restful of config);
