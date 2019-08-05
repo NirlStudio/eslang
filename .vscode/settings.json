@@ -18,6 +18,7 @@
     "ployfill",
     "polyfill",
     "printf",
+    "retval",
     "selftest",
     "stambda",
     "wasm"

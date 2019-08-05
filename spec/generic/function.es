@@ -833,6 +833,45 @@
   ).
 ).
 
+(define "(local retval ...)" (= ()
+  (should "(local retval) defines the default return value as null." (= ()
+    (assert null (=>:() (local retval) 200).
+  ).
+  (should "(local retval value) defines the default return value as value." (= ()
+    (assert null (=>:() (local retval null) 200).
+    (assert 200 (=>:() (var retval null) 200).
+
+    (assert type (=>:() (local retval type) 200).
+    (assert 200 (=>:() (var retval type) 200).
+
+    (assert true (=>:() (local retval true) 200).
+    (assert 200 (=>:() (var retval true) 200).
+
+    (assert false (=>:() (local retval false) 200).
+    (assert 200 (=>:() (var retval false) 200).
+
+    (assert 1 (=>:() (local retval 1) 200).
+    (assert 200 (=>:() (var retval 1) 200).
+
+    (assert 0 (=>:() (local retval 0) 200).
+    (assert 200 (=>:() (var retval 0) 200).
+
+    (assert -1 (=>:() (local retval -1) 200).
+    (assert 200 (=>:() (var retval -1) 200).
+  ).
+  (should "default return value can be overridden by an explicit (return value)." (= ()
+    (assert 200 (=>:() (local retval null) (return 200).
+    (assert 200 (=>:() (local retval type) (return 200).
+
+    (assert 200 (=>:() (local retval true) (return 200).
+    (assert 200 (=>:() (local retval false) (return 200).
+
+    (assert 200 (=>:() (local retval 1) (return 200).
+    (assert 200 (=>:() (local retval 0) (return 200).
+    (assert 200 (=>:() (local retval -1) (return 200).
+  ).
+).
+
 (define "y-combinator" (= ()
   (should "y-combinator can implement recusive call for anonymous functions." (= ()
     (var Y (= f

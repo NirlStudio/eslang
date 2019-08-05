@@ -11,8 +11,9 @@ module.exports = function function_ ($void) {
   var lambda = $void.lambda
   var stambda = $void.stambda
   var constambda = $void.constambda
-  var evaluate = $void.evaluate
+  var evaluate_ = $void.evaluate
   var function_ = $void.function
+  var ownsProperty = $void.ownsProperty
   var createLambdaSpace = $void.createLambdaSpace
   var createFunctionSpace = $void.createFunctionSpace
   var createEmptyOperation = $void.createEmptyOperation
@@ -20,6 +21,11 @@ module.exports = function function_ ($void) {
   var alignWithGeneric = isFunctionLengthWritable()
     ? alignWithGenericDefault
     : alignWithGenericFallback
+
+  function evaluate (tbody, scope) {
+    var retval = evaluate_(tbody, scope)
+    return ownsProperty(scope.context, 'retval') ? scope.context.retval : retval
+  }
 
   $void.lambdaOf = function lambdaOf (space, clause, offset) {
     // compile code
