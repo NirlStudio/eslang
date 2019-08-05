@@ -22,12 +22,13 @@ const restful (import "$restful");
   ).
 ).
 
-# inner helper functions.
-(const is-espresso (=> response
-  var content-type (response headers:: content-type);
+# check if an http message has the content-type of Espresso code/data.
+(export is-espresso (=> message
+  var content-type (message headers:: content-type);
   mime-types has (=> t (content-type starts-with t);
 ).
 
+#( inner helper functions. )#
 # an interceptor function to parse Espresso response data.
 (const proxy-of (=> (service, method) (=> ()
   (service: method:: apply * arguments:: then (=> waiting
