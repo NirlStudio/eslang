@@ -77,7 +77,7 @@ export content-type '$(mime-types first);charset=utf-8';
 ).
 
 (const copy (=> config
-  local retval (object of default-config, config)
+  local retval (object of default-config, config);
   retval "headers" (object of (default-config headers), (config headers);
 ).
 
