@@ -111,7 +111,7 @@ module.exports = function function_ ($void) {
       if (key) {
         key === 'this'
           ? (scope.context.this = this)
-          : (scope.local[key] = 
+          : (scope.local[key] =
             typeof arguments[0] === 'undefined' ? null : arguments[0]
           )
       }
