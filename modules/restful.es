@@ -49,6 +49,7 @@ export content-type '$(mime-types first);charset=utf-8';
   var header (@ Content-Type: content-type);
   (=:(proxy, header) (=> (url, data, config)
     (if (config headers:: Content-Type:: is-empty)
+      let data (data to-code:: to-string);
       let config (object of config);
       config "headers" (object of (config headers), header);
     ).
