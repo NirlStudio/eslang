@@ -25,7 +25,9 @@ export mime-espresso (mime-types first);
 # check if an http message has the content-type of Espresso code/data.
 (export is-espresso (=> message
   var content-type (message headers:: content-type);
-  mime-types has (=> t (content-type starts-with t);
+  (content-type is-a string :: and
+    mime-types has (=> t (content-type starts-with t);
+  ).
 ).
 
 #( inner helper functions. )#
