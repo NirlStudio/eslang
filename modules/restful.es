@@ -7,7 +7,7 @@ const restful (import "$restful");
 ).
 
 # use the first mime type as the default content type.
-export content-type (mime-types first);
+export default-mime-type (mime-types first);
 
 # default config for an Espresso RESTful client.
 (export default-config (@
@@ -42,9 +42,9 @@ export content-type (mime-types first);
 
 (const sender-of (=> (service, method)
   var proxy (proxy-of service, method);
-  var header (@ Content-Type: content-type);
+  var header (@ content-type: default-mime-type);
   (=:(proxy, header) (=> (url, data, config)
-    (if (config headers:: Content-Type:: is-empty)
+    (if (config headers:: content-type:: is-empty)
       let data ($data to-code:: to-string);
       let config (object of config);
       config "headers" (object of (config headers), header);
