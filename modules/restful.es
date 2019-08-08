@@ -3,13 +3,11 @@ const restful (import "$restful");
 # export recommended MIME types for Content-Type.
 (export mime-types (@
   "application/x-espresso",
-  "application/espresso",
-  "text/x-espresso",
-  "text/espresso",
+  "application/espresso"
 ).
 
 # use the first mime type as the default content type.
-export content-type '$(mime-types first);charset=utf-8';
+export content-type (mime-types first);
 
 # default config for an Espresso RESTful client.
 (export default-config (@
@@ -18,8 +16,6 @@ export content-type '$(mime-types first);charset=utf-8';
   headers: (@ Accept:
     "application/x-espresso;q=0.9,
      application/espresso;q=0.8,
-     text/x-espresso;q=0.7,
-     text/espresso;q=0.6,
      application/json;q=0.5,
      */*;q=0.4"
   ).
@@ -49,7 +45,7 @@ export content-type '$(mime-types first);charset=utf-8';
   var header (@ Content-Type: content-type);
   (=:(proxy, header) (=> (url, data, config)
     (if (config headers:: Content-Type:: is-empty)
-      let data (data to-code:: to-string);
+      let data ($data to-code:: to-string);
       let config (object of config);
       config "headers" (object of (config headers), header);
     ).
