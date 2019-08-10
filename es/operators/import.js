@@ -95,7 +95,7 @@ module.exports = function import_ ($void) {
       : resolve(appHome, moduleUri, appendExt(source)) || (
         // try to load native Espresso modules.
         $void.require.resolve && $void.require.resolve(source,
-          space.local['-app-dir'], $void.$env('user-home'))
+          space.local['-app-dir'], $void.$env('user-home')), $void
       )
     if (!uri) {
       return null
