@@ -91,7 +91,12 @@ module.exports = function import_ ($void) {
       source = source.substring(offset)
     }
     // try to locate the source in dirs.
-    var uri = type ? source : resolve(appHome, moduleUri, appendExt(source))
+    var uri = type ? source // native module
+      : resolve(appHome, moduleUri, appendExt(source)) || (
+        // try to load native Espresso modules.
+        $void.require.resolve && $void.require.resolve(source,
+          space.local['-app-dir'], $void.$env('user-home'))
+      )
     if (!uri) {
       return null
     }
@@ -131,7 +136,8 @@ module.exports = function import_ ($void) {
     var dirs = isResolved ? [] : dirsOf(source,
       moduleUri && loader.dir(moduleUri),
       appHome + '/modules',
-      $void.$env('home') + '/modules',
+      $void.$env('user-home') + '/.es/modules',
+      $void.$env('home') + '/modules', // working dir
       $void.runtime('home') + '/modules'
     )
     var uri = loader.resolve(source, dirs)
@@ -142,11 +148,11 @@ module.exports = function import_ ($void) {
     return null
   }
 
-  function dirsOf (source, moduleDir, appDir, homeDir, runtimeDir) {
+  function dirsOf (source, moduleDir, appDir, userDir, homeDir, runtimeDir) {
     return moduleDir
       ? source.startsWith('./') || source.startsWith('../')
         ? [ moduleDir ]
-        : [ appDir, homeDir, runtimeDir, moduleDir ]
+        : [ runtimeDir, appDir, userDir, homeDir ]
       : [ runtimeDir ] // for dynamic or unknown-source code.
   }
 

@@ -1,4 +1,4 @@
-const (get-help, set-help) (import (get set) from "tools/help");
+const (get-help, set-help) (import (get set) from "./tools/help");
 
 const gray (= text (printf text, "gray");
 const blue (= text (printf text, "blue");

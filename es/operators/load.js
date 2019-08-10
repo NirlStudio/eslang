@@ -24,19 +24,19 @@ module.exports = function load ($void) {
       return null
     }
     // look into current space to have the base uri.
-    return loadData(space, space.local['-app'], space.local['-module'],
+    return loadData(space, space.local['-app-dir'], space.local['-module'],
       evaluate(clist[1], space),
       clist.length > 2 ? evaluate(clist[2], space) : null
     )
   })
 
-  function loadData (space, appUri, moduleUri, source, args) {
+  function loadData (space, appDir, moduleUri, source, args) {
     if (!source || typeof source !== 'string') {
       warn('load', 'invalid source:', source)
       return null
     }
-    // try to locate the sourcevar uri
-    var uri = resolve(appUri, moduleUri, appendExt(source))
+    // try to locate the source uri
+    var uri = resolve(appDir, moduleUri, appendExt(source))
     if (typeof uri !== 'string') {
       return null
     }
@@ -67,17 +67,14 @@ module.exports = function load ($void) {
     }
   }
 
-  function resolve (appUri, moduleUri, source) {
+  function resolve (appDir, moduleUri, source) {
     if (!moduleUri) {
       warn('load', "It's forbidden to load a module", 'from an anonymous module.')
       return null
     }
     var loader = $void.loader
-    var dirs = loader.isResolved(source) ? [] : dirsOf(source,
-      loader.dir(moduleUri),
-      loader.dir(appUri),
-      $void.$env('home')
-    )
+    var dirs = loader.isResolved(source) ? []
+      : dirsOf(source, loader.dir(moduleUri), appDir)
     var uri = loader.resolve(source, dirs)
     if (typeof uri !== 'string') {
       warn('load', 'failed to resolve', source, 'in', dirs)
@@ -90,10 +87,10 @@ module.exports = function load ($void) {
     return null
   }
 
-  function dirsOf (source, moduleDir, appDir, homeDir) {
+  function dirsOf (source, moduleDir, appDir) {
     return source.startsWith('./') || source.startsWith('../')
       ? [ moduleDir ]
-      : [ moduleDir, appDir, homeDir, $void.runtime('home') ]
+      : [ moduleDir, appDir, $void.$env('home'), $void.runtime('home') ]
   }
 
   $void.bindOperatorLoad = function (space) {

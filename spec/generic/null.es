@@ -1,4 +1,4 @@
-(var (types) (import (samples) from "samples/types").
+(var (types) (import (samples) from "./samples/types").
 
 (define "Identity" (=> ()
   (should "null is and only is itself." (=> ()

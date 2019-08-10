@@ -1,6 +1,6 @@
 {
   "name": "eslang",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi Li"
@@ -14,6 +14,7 @@
     "espresso",
     "espressolang",
     "espresso-lang",
+    "s-expression",
     "script language",
     "programming lang",
     "programming language"
