@@ -92,7 +92,7 @@ module.exports = function import_ ($void) {
     }
     // try to locate the source in dirs.
     var uri = type ? source // native module
-      : resolve(appHome, moduleUri, appendExt(source))
+      : resolve(space, appHome, moduleUri, appendExt(source))
     if (!uri) {
       return null
     }
@@ -122,7 +122,7 @@ module.exports = function import_ ($void) {
     return module_.exports
   }
 
-  function resolve (appHome, moduleUri, source) {
+  function resolve (space, appHome, moduleUri, source) {
     var loader = $void.loader
     var isResolved = loader.isResolved(source)
     if (!moduleUri && isResolved) {
