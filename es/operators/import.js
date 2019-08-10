@@ -92,12 +92,7 @@ module.exports = function import_ ($void) {
     }
     // try to locate the source in dirs.
     var uri = type ? source // native module
-      : resolve(appHome, moduleUri, appendExt(source)) || (
-        // try to load native Espresso modules.
-        $void.require.resolve && $void.require.resolve(source,
-          space.local['-app-dir'], $void.$env('user-home'), $void
-        )
-      )
+      : resolve(appHome, moduleUri, appendExt(source))
     if (!uri) {
       return null
     }
@@ -144,6 +139,12 @@ module.exports = function import_ ($void) {
     var uri = loader.resolve(source, dirs)
     if (typeof uri === 'string') {
       return uri
+    }
+    // try to load native Espresso modules.
+    if ($void.require.resolve) {
+      return $void.require.resolve(source,
+        space.local['-app-dir'], $void.$env('user-home'), $void
+      )
     }
     warn('import', 'failed to resolve', source, 'in', dirs)
     return null
