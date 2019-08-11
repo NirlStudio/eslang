@@ -10,7 +10,7 @@ module.exports = function import_ ($void) {
   var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
-  var appendExt = $void.appendExt
+  var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
@@ -76,13 +76,9 @@ module.exports = function import_ ($void) {
   })
 
   function importModule (space, appHome, moduleUri, source) {
-    if (typeof source !== 'string') {
-      if (source instanceof Symbol$) {
-        source = source.key
-      } else {
-        warn('import', 'invalid module source:', source)
-        return null
-      }
+    if (typeof source !== 'string' || !source) {
+      warn('import', 'invalid module source:', source)
+      return null
     }
     var type
     var offset = source.indexOf('$')
@@ -92,7 +88,7 @@ module.exports = function import_ ($void) {
     }
     // try to locate the source in dirs.
     var uri = type ? source // native module
-      : resolve(space, appHome, moduleUri, appendExt(source))
+      : resolve(space, appHome, moduleUri, source)
     if (!uri) {
       return null
     }
@@ -136,23 +132,30 @@ module.exports = function import_ ($void) {
       $void.$env('home') + '/modules', // working dir
       $void.runtime('home') + '/modules'
     )
-    var uri = loader.resolve(source, dirs)
+    var uri = loader.resolve(completeFile(source), dirs)
     if (typeof uri === 'string') {
       return uri
     }
     // try to load native Espresso modules.
-    if ($void.require.resolve) {
-      return $void.require.resolve(source,
+    if ($void.require.resolve && !isRelative(source)) {
+      uri = $void.require.resolve(source, appHome,
         space.local['-app-dir'], $void.$env('user-home'), $void
       )
+      if (typeof uri === 'string') {
+        return uri
+      } // else, make sure to display both warnings.
     }
     warn('import', 'failed to resolve', source, 'in', dirs)
     return null
   }
 
+  function isRelative (source) {
+    return source.startsWith('./') || source.startsWith('../')
+  }
+
   function dirsOf (source, moduleDir, appDir, userDir, homeDir, runtimeDir) {
     return moduleDir
-      ? source.startsWith('./') || source.startsWith('../')
+      ? isRelative(source)
         ? [ moduleDir ]
         : [ runtimeDir, appDir, userDir, homeDir ]
       : [ runtimeDir ] // for dynamic or unknown-source code.

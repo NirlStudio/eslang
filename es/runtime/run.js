@@ -7,7 +7,7 @@ module.exports = function run ($void) {
   var warn = $void.$warn
   var $export = $void.export
   var execute = $void.execute
-  var appendExt = $void.appendExt
+  var completeFile = $void.completeFile
   var atomicArrayOf = $void.atomicArrayOf
 
   // run a module from source as an application.
@@ -23,7 +23,7 @@ module.exports = function run ($void) {
     }
     // try to resolve the uri for source
     var loader = $void.loader
-    appSource = appendExt(appSource)
+    appSource = completeFile(appSource)
     var uri = loader.resolve(appSource, [
       appHome, $void.runtime('home')
     ])

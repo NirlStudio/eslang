@@ -98,10 +98,22 @@ module.exports = function ($void) {
   $void.safelyAssign = safelyAssign
 
   // make sure a file uri has correct espresso extension
-  $void.appendExt = function (path) {
-    return !path || typeof path !== 'string' ? path
-      : path.endsWith('.es') ? path
-        : path + '.es'
+  $void.completeFile = function (path) {
+    if (!path || typeof path !== 'string') {
+      path = ''
+    } else if (path.endsWith('/')) {
+      while (path.endsWith('/')) {
+        path = path.substring(0, path.length - 1)
+      }
+      if (path) {
+        var offset = path.length - 2
+        while (offset >= 0 && path[offset] !== '/') {
+          offset--
+        }
+        path += '/' + (offset >= 0 ? path.substring(offset + 1) : path)
+      }
+    }
+    return path.endsWith('.es') ? path : path + '.es'
   }
 
   // to retrieve or create a shared symbol.

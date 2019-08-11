@@ -7,7 +7,7 @@ module.exports = function load ($void) {
   var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
-  var appendExt = $void.appendExt
+  var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
@@ -36,7 +36,7 @@ module.exports = function load ($void) {
       return null
     }
     // try to locate the source uri
-    var uri = resolve(appDir, moduleUri, appendExt(source))
+    var uri = resolve(appDir, moduleUri, completeFile(source))
     if (typeof uri !== 'string') {
       return null
     }

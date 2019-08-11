@@ -8,7 +8,7 @@ module.exports = function load ($void) {
   var Tuple$ = $void.Tuple
   var Promise$ = $void.Promise
   var evaluate = $void.evaluate
-  var appendExt = $void.appendExt
+  var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
@@ -41,7 +41,7 @@ module.exports = function load ($void) {
       warn('fetch', 'invalid resource uri to fetch.', source)
       return promiseOfResolved(source)
     }
-    source = appendExt(source)
+    source = completeFile(source)
     if (!loader.isResolved(source)) {
       source = loader.resolve(source, dirs)
       if (typeof source !== 'string') {

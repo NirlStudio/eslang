@@ -3,7 +3,7 @@
     (assert null (import).
   ).
   (should "(import \"module\") returns an object with all exports." (=> ()
-    (var mod (import "_module").
+    (var mod (import "./_module").
     (assert 1 (mod x).
     (assert 2 (mod y).
     (assert 3 (mod z).
@@ -22,17 +22,17 @@
     (assert null (mod _b).
   ).
   (should "(import field from \"module\") returns the value of field." (=> ()
-    (var y (import y from "_module").
+    (var y (import y from "./_module").
     (assert 2 y)
 
-    (var p (import p from "_module").
+    (var p (import p from "./_module").
     (assert 10 p)
 
-    (var b (import b from "_module").
+    (var b (import b from "./_module").
     (assert 102 b)
   ).
   (should "(import (fields ...) from \"module\") returns the values of fields as an array." (=> ()
-    (var (y p b) (import (y p b) from "_module").
+    (var (y p b) (import (y p b) from "./_module").
     (assert 2 y)
     (assert 10 p)
     (assert 102 b)
