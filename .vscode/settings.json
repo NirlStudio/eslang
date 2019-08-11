@@ -3,7 +3,6 @@
     "booleanize",
     "booleanized",
     "ching",
-    "clist",
     "com",
     "constambda",
     "eslang",
@@ -16,11 +15,14 @@
     "nirls",
     "nirlstudio",
     "ployfill",
-    "polyfill",
     "printf",
     "retval",
     "selftest",
     "stambda",
     "wasm"
+  ],
+  "cSpell.ignoreWords": [
+    "clist",
+    "flist"
   ]
 }
