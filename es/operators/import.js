@@ -84,16 +84,15 @@ module.exports = function import_ ($void) {
     var offset = source.indexOf('$')
     if (offset >= 0) {
       type = source.substring(0, ++offset)
-      source = source.substring(offset)
     }
     // try to locate the source in dirs.
-    var uri = type ? source // native module
+    var uri = type ? source.substring(offset) // native module
       : resolve(space, appHome, moduleUri, source)
     if (!uri) {
       return null
     }
     // look up it in cache.
-    var module_ = lookupInCache(space.modules, uri, moduleUri)
+    var module_ = lookupInCache(space.modules, type ? source : uri, moduleUri)
     if (module_.status) {
       return module_.exports
     }
