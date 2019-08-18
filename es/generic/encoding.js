@@ -75,9 +75,8 @@ module.exports = function ($void) {
   var $Object = $.object
   var $Symbol = $.symbol
   var Tuple$ = $void.Tuple
-  var Object$ = $void.Object
   var Symbol$ = $void.Symbol
-  var typeOf = $void.typeOf
+  var isObject = $void.isObject
   var thisCall = $void.thisCall
   var sharedSymbolOf = $void.sharedSymbolOf
 
@@ -152,9 +151,9 @@ module.exports = function ($void) {
     encode: function (obj) {
       return typeof obj === 'undefined' || obj === null ? null
         : typeof obj === 'number' || typeof obj === 'string' ? obj
-          : (Array.isArray(obj) || typeOf(obj) === $Object ||
-            obj instanceof Object$ // class instances
-          ) ? thisCall(obj, 'to-code', this) : thisCall(obj, 'to-code')
+          : (Array.isArray(obj) || isObject(obj))
+            ? thisCall(obj, 'to-code', this)
+            : thisCall(obj, 'to-code')
     },
     end: function (obj, type, code) {
       // try to supplement type to code

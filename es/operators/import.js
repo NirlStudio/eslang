@@ -6,10 +6,10 @@ module.exports = function import_ ($void) {
   var $Object = $.object
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var Object$ = $void.Object
   var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
+  var isObject = $void.isObject
   var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
@@ -31,22 +31,33 @@ module.exports = function import_ ($void) {
       return null
     }
     var src
-    if (clist.length < 4 || clist[2] !== symbolFrom) {
+    if (clist.length < 3 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      src = importModule(space, space.local['-app-home'], space.local['-module'],
+      src = importModule(space,
+        space.local['-app-home'],
+        space.local['-module'],
         evaluate(clist[1], space)
       )
-      // clone to protect inner exports object.
-      return Object.assign($Object.empty(), src)
+      // clone to protect inner exporting object.
+      return src && Object.assign($Object.empty(), src)
     }
     // (import field-or-fields from src)
     src = evaluate(clist[3], space)
-    var imported = src instanceof Object$ ? src
-      : typeof src !== 'string' ? null : importModule(
-        space, space.local['-app-home'], space.local['-module'], src
+    var imported
+    if (isObject(src)) {
+      imported = src
+    } else if (typeof src !== 'string') {
+      warn('import', 'invalid source object or path:', src)
+      return null
+    } else {
+      imported = importModule(space,
+        space.local['-app-home'],
+        space.local['-module'],
+        src
       )
-    if (typeof imported !== 'object') {
-      return null // importing failed.
+      if (!imported) {
+        return null // importing failed.
+      }
     }
 
     // find out fields
@@ -94,27 +105,14 @@ module.exports = function import_ ($void) {
     // look up it in cache.
     var module_ = lookupInCache(space.modules, type ? source : uri, moduleUri)
     if (module_.status) {
-      return module_.exports
+      return module_.exporting
     }
 
     module_.status = 100 // indicate loading
-    var exporting = (type ? loadNativeModule : loadModule)(
+    module_.exporting = (type ? loadNativeModule : loadModule)(
       space, uri, module_, source, moduleUri
     )
-    if (!exporting || exporting === module_.exporting) {
-      return module_.exports
-    }
-    module_.exporting = exporting
-    var keys = Object.getOwnPropertyNames(exporting)
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i]
-      if (!/^[-_]/.test(key)) {
-        // only expose public fields.
-        // private fields are allowed to support hot-reloading
-        module_.exports[key] = exporting[key]
-      }
-    }
-    return module_.exports
+    return Object.assign(module_.exporting, module_.props)
   }
 
   function resolve (space, appHome, moduleUri, source) {
@@ -138,7 +136,7 @@ module.exports = function import_ ($void) {
     // try to load native Espresso modules.
     if ($void.require.resolve && !isRelative(source)) {
       uri = $void.require.resolve(source, appHome,
-        space.local['-app-dir'], $void.$env('user-home'), $void
+        space.local['-app-dir'], $void.$env('user-home')
       )
       if (typeof uri === 'string') {
         return uri
@@ -161,21 +159,25 @@ module.exports = function import_ ($void) {
   }
 
   function lookupInCache (modules, uri, moduleUri) {
-    var module = modules[uri]
-    if (!module) {
-      module = modules[uri] = Object.assign(Object.create(null), {
-        status: 0, // loading
-        exports: $Object.empty(),
+    var module_ = modules[uri]
+    if (!module_) {
+      module_ = modules[uri] = Object.assign(Object.create(null), {
+        status: 0, // an empty module.
+        props: Object.assign($Object.empty(), {
+          '-module': uri
+        }),
         timestamp: Date.now()
       })
-    } else if (module.status === 100) {
+    } else if (module_.status === 100) {
       warn('import', 'loop dependency when loading', uri, 'from', moduleUri)
     }
-    return module
+    return module_
   }
 
   function loadModule (space, uri, module_, source, moduleUri) {
     try {
+      // -module-dir is only meaningful for an Espresso module.
+      module_.props['-module-dir'] = $void.loader.dir(uri)
       // try to load file
       var doc = $void.loader.load(uri)
       var text = doc[0]
@@ -193,10 +195,10 @@ module.exports = function import_ ($void) {
       }
       // to load module
       var scope = execute(space, code, uri, {
-        this: module_.exporting // TODO: reserved to support hot-reloading
+        // in reloading, the old exporting is accessible for module code.
+        this: module_.exporting || null
       })[1]
       if (scope) {
-        // TODO: register monitoring tasks for hot-reloading.
         module_.status = 200
         return scope.exporting
       }
@@ -213,7 +215,7 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      var importing = $void.require(uri, moduleUri, $void)
+      var importing = $void.require(uri, moduleUri)
       if (typeof importing !== 'function') {
         module_.status = 400
         warn('import', 'invalid native module', source, 'at', uri)
@@ -221,11 +223,10 @@ module.exports = function import_ ($void) {
       }
       var scope = $void.createModuleSpace(uri, space)
       var status = importing.call(
-        module_.exporting, // TODO: reserved to support hot reloading.
+        module_.exporting || null, // to serve reloading.
         scope.exporting, scope.context, $void
       )
       if (status === true) { // the loader can report error details
-        // TODO?: register monitoring tasks for hot-reloading.
         module_.status = 200
         return scope.exporting
       }

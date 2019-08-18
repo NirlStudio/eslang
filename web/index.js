@@ -30,7 +30,7 @@ module.exports = function (term, stdin, stdout, loader) {
   $void.env('user-home', home)
   $void.env('os', window.navigator.userAgent)
 
-  var Object$ = $void.Object
+  var isObject = $void.isObject
   var bootstrap = $void.createBootstrapSpace(home + '/@')
 
   var run = function (appHome, context, args, app) {
@@ -86,7 +86,7 @@ module.exports = function (term, stdin, stdout, loader) {
       )
       // export global shell commands
       $void.$shell['test-bootstrap'] = require('../test/test')($void)
-      if (args instanceof Object$) {
+      if (isObject(args)) {
         Object.assign($void.$shell, args)
         args = []
       }

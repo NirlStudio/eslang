@@ -3,9 +3,9 @@
 module.exports = function ($void) {
   var $ = $void.$
   var $Object = $.object
-  var Object$ = $void.Object
   var link = $void.link
   var $export = $void.export
+  var isObject = $void.isObject
   var thisCall = $void.thisCall
   var createClass = $void.createClass
   var isApplicable = $void.isApplicable
@@ -27,7 +27,7 @@ module.exports = function ($void) {
 
   // clear legacy event handler on activation.
   link(proto, 'activator', function () {
-    if (!(this.listeners instanceof Object$)) {
+    if (!isObject(this.listeners)) {
       this.listeners = $Object.empty()
       return
     }
@@ -48,7 +48,7 @@ module.exports = function ($void) {
   // (an-emitter on event) queries all listeners for an event
   // (an-emitter on event listener) registers a listener for the event.
   link(proto, 'on', function (event, listener) {
-    if (!(this.listeners instanceof Object$)) {
+    if (!isObject(this.listeners)) {
       return null // invalid emitter instance.
     }
     // query events
@@ -72,7 +72,7 @@ module.exports = function ($void) {
   // (an-emitter off event) clears all listeners for the event.
   // (an-emitter on event listener) clears a listener for the event.
   link(proto, 'off', function (event, listener) {
-    if (!(this.listeners instanceof Object$)) {
+    if (!isObject(this.listeners)) {
       return null
     }
     var i, listeners
@@ -107,7 +107,7 @@ module.exports = function ($void) {
   })
 
   link(proto, 'emit', function (event, args) {
-    if (!(this.listeners instanceof Object$) || typeof event !== 'string') {
+    if (!isObject(this.listeners) || typeof event !== 'string') {
       return null // invalid emitter instance.
     }
     var listeners = this.listeners[event]
