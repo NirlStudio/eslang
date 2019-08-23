@@ -82,11 +82,29 @@ module.exports = function ($void) {
   link(proto, 'contains', function (str) {
     return typeof str === 'string' && (this.indexOf(str) >= 0)
   })
-  link(proto, 'starts-with', function (prefix) {
-    return typeof prefix === 'string' && this.startsWith(prefix)
+  link(proto, 'starts-with', function (prefix/*, ... */) {
+    if (typeof prefix === 'string' && this.startsWith(prefix)) {
+      return true
+    }
+    for (var i = 1, len = arguments.length; i < len; i++) {
+      prefix = arguments[i]
+      if (typeof prefix === 'string' && this.startsWith(prefix)) {
+        return true
+      }
+    }
+    return false
   })
-  link(proto, 'ends-with', function (suffix) {
-    return typeof suffix === 'string' && this.endsWith(suffix)
+  link(proto, 'ends-with', function (suffix/*, ... */) {
+    if (typeof suffix === 'string' && this.endsWith(suffix)) {
+      return true
+    }
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      suffix = arguments[i]
+      if (typeof suffix === 'string' && this.endsWith(suffix)) {
+        return true
+      }
+    }
+    return false
   })
 
   // Converting
