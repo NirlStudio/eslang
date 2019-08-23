@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: number).
 
-(define "Number Common Behaviours" (=> ()
+(define "Number Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "-0 is not 0." (= ()
       (assert false (0 is -0).
@@ -134,7 +134,7 @@
   ).
 
   (define "Representation" (=> ()
-    (should "common nubmers are represented as decimal strings." (=> ()
+    (should "common numbers are represented as decimal strings." (=> ()
       (assert "0" (0 to-string).
       (assert "-0" (-0 to-string).
 
@@ -144,7 +144,7 @@
       (assert "1" (1 to-string).
       (assert "-1" (-1 to-string).
     ).
-    (should "some special nubmers are represented as decimal strings." (=> ()
+    (should "some special numbers are represented as decimal strings." (=> ()
       (assert (((number smallest) to-string) is-a string).
 
       (assert (((number max) to-string) is-a string).

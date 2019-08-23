@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: class).
 
-(define "Class (Type) Common Behaviours" (=> ()
+(define "Class (Type) Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "an empty class is identified by its instance." (= ()
       (assert ((@:class) is-not (@:class).
@@ -271,7 +271,7 @@
     (assert null (class attach (@:array 1: 2).
     (assert null (class attach (@:class x: 1).
   ).
-  (should "(class attach inst obj) copys all fields of obj to inst, then activates and returns it." (= ()
+  (should "(class attach inst obj) copies all fields of obj to inst, then activates and returns it." (= ()
     (var inst ((class empty) empty).
     (assert inst (class attach inst (@ x: 100).
     (assert 100 (inst x).
@@ -285,7 +285,7 @@
     (assert 100 (inst activated).
     (assert 100 (inst x).
   ).
-  (should "(class attach inst objects ...) copys all fields of every obj to inst, then activates and returns it." (= ()
+  (should "(class attach inst objects ...) copies all fields of every obj to inst, then activates and returns it." (= ()
     (var inst ((class empty) empty).
     (assert inst (class attach inst (@ x: 100).
     (assert 100 (inst x).
@@ -378,7 +378,7 @@
 
     (assert (inst1 is-not inst2).
   ).
-  (should "(a-class of obj) copys all fields of obj into a new instance of the class if it has not a constructor." (= ()
+  (should "(a-class of obj) copies all fields of obj into a new instance of the class if it has not a constructor." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1).
     (assert (inst is-an object).
@@ -393,7 +393,7 @@
     (assert (inst not-empty).
     (assert 2 (inst x).
   ).
-  (should "(a-class of objects ...) copys all fields of all objects into a new instance of the class if it has not a constructor." (= ()
+  (should "(a-class of objects ...) copies all fields of all objects into a new instance of the class if it has not a constructor." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
     (assert (inst is-an object).
@@ -448,7 +448,7 @@
 
     (assert (inst1 is-not inst2).
   ).
-  (should "(a-class from obj) copys all fields of obj into a new empty instance and calls the activator on obj." (= ()
+  (should "(a-class from obj) copies all fields of obj into a new empty instance and calls the activator on obj." (= ()
     (var cls (class empty).
     (var inst (cls from (@ x: 1).
     (assert (inst is-an object).
@@ -471,7 +471,7 @@
     (assert 2 (inst a).
     (assert 1 (inst args).
   ).
-  (should "(a-class from objects ...) copys all fields of all objects into a new instance and calls activator on each." (= ()
+  (should "(a-class from objects ...) copies all fields of all objects into a new instance and calls activator on each." (= ()
     (var cls (class empty).
     (var inst (cls of (@ x: 1) (@ y: 2).
     (assert (inst is-an object).
@@ -568,7 +568,7 @@
 ).
 
 (define "(a-class is-sealed)" (= ()
-  (should "(a-class is-sealed) returns true if the class is readonly." (= ()
+  (should "(a-class is-sealed) returns true if the class is read-only." (= ()
     (var cat (@:class name: "Tom").
     (assert false (cat is-sealed).
     (cat seal)
@@ -577,7 +577,7 @@
 ).
 
 (define "(a-class seal)" (= ()
-  (should "(a-class seals) makes the class readonly and returns it." (= ()
+  (should "(a-class seals) makes the class read-only and returns it." (= ()
     (var cat (@:class name: "Tom").
     (assert null (cat breed).
     (assert null (cat default:: age).

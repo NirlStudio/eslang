@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: array).
 
-(define "Array Common Behaviours" (=> ()
+(define "Array Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "an empty array is also identified by its instance." (= ()
       (assert ((@) is-not (@).
@@ -292,7 +292,7 @@
 ).
 
 (define "(an-array is-sealed)" (= ()
-  (should "(an-array is-sealed) returns true if the array is readonly." (= ()
+  (should "(an-array is-sealed) returns true if the array is read-only." (= ()
     (var a (@ 1 2).
     (assert false (a is-sealed).
     (a seal)
@@ -301,7 +301,7 @@
 ).
 
 (define "(an-array seal)" (= ()
-  (should "(an-array seal) makes the array as readonly and returns it." (= ()
+  (should "(an-array seal) makes the array as read-only and returns it." (= ()
     (var a (@ 1 2).
     (assert false (a is-sealed).
 
@@ -460,7 +460,7 @@
 ).
 
 (define "(an-array iterate ...)" (= ()
-  (should "(an-array iterate) returns an interator function to traverse all its items." (= ()
+  (should "(an-array iterate) returns an iterator function to traverse all its items." (= ()
     (var a (array of null true 10).
     (var iter (a iterate).
     (assert ($iter is-a function).
@@ -481,7 +481,7 @@
     (assert 2 ((iter true) 1).
     (assert null (iter).
   ).
-  (should "(a-discrete-array iterate) returns an interator function to traverse all its items." (= ()
+  (should "(a-discrete-array iterate) returns an iterator function to traverse all its items." (= ()
     (var a (@ null true).
     (a 10 11).
     (assert 11 (a length).
@@ -508,7 +508,7 @@
     (assert 10 ((iter true) 1).
     (assert null (iter).
   ).
-  (should "(a-sparse-array iterate) returns an interator function to traverse all its items." (= ()
+  (should "(a-sparse-array iterate) returns an iterator function to traverse all its items." (= ()
     (var a (@ null true).
     (a 100 101).
     (assert 101 (a length).
@@ -535,7 +535,7 @@
     (assert 100 ((iter true) 1).
     (assert null (iter).
   ).
-  (should "(an-array iterate begin) returns an interator function to traverse all items from the position of begin." (= ()
+  (should "(an-array iterate begin) returns an iterator function to traverse all items from the position of begin." (= ()
     (var a (array of null true 10).
     (var iter (a iterate 1).
     (assert ($iter is-a function).
@@ -601,7 +601,7 @@
     (let iter (a iterate 3).
     (assert null (iter).
   ).
-  (should "(a-discrete-array iterate begin) returns an interator function to traverse all items from the position of begin." (= ()
+  (should "(a-discrete-array iterate begin) returns an iterator function to traverse all items from the position of begin." (= ()
     (var a (@ null true).
     (a 10 11).
     (assert 11 (a length).
@@ -673,7 +673,7 @@
     (let iter (a iterate 11).
     (assert null (iter).
   ).
-  (should "(a-sparse-array iterate begin) returns an interator function to traverse all items from the position of begin." (= ()
+  (should "(a-sparse-array iterate begin) returns an iterator function to traverse all items from the position of begin." (= ()
     (var a (@ null true).
     (a 100 101).
     (assert 101 (a length).
@@ -732,7 +732,7 @@
     (assert null (iter).
   ).
 
-  (should "(an-array iterate begin end) returns an interator function to traverse all items between begin and end." (= ()
+  (should "(an-array iterate begin end) returns an iterator function to traverse all items between begin and end." (= ()
     (var a (array of null true 10).
     (var iter (a iterate 1 3).
     (assert ($iter is-a function).
@@ -789,7 +789,7 @@
     (let iter (a iterate 3).
     (assert null (iter).
   ).
-  (should "(a-discrete-array iterate begin end) returns an interator function to traverse all items between begin and end." (= ()
+  (should "(a-discrete-array iterate begin end) returns an iterator function to traverse all items between begin and end." (= ()
     (var a (@ null true).
     (a 10 11).
     (assert 11 (a length).
@@ -847,7 +847,7 @@ f
     (let iter (a iterate 11).
     (assert null (iter).
   ).
-  (should "(a-sparse-array iterate begin end) returns an interator function to traverse all items between begin and end." (= ()
+  (should "(a-sparse-array iterate begin end) returns an iterator function to traverse all items between begin and end." (= ()
     (var a (@ null true).
     (a 100 101).
     (assert 101 (a length).
@@ -2247,7 +2247,7 @@ f
     (assert 0 (a length).
     (assert 0 (a count).
   ).
-  (should "(an-array clear value) remove all occurances of value in this array." (= ()
+  (should "(an-array clear value) remove all occurrences of value in this array." (= ()
     (var a (@ 1 2 3 1 2 3).
     (assert a (a clear 2).
     (assert 4 (a length).
@@ -2287,7 +2287,7 @@ f
     (assert 100 (a length).
     (assert 7 (a count).
   ).
-  (should "(an-array clear value ...) remove all occurances of any value in this array." (= ()
+  (should "(an-array clear value ...) remove all occurrences of any value in this array." (= ()
     (var a (@ 1 2 3 4 1 2 3).
     (assert a (a clear 2 4).
     (assert 4 (a length).
@@ -2358,7 +2358,7 @@ f
     (assert 101 (b length).
     (assert 5 (b count).
   ).
-  (should "(an-array remove value) returns a shallow copy by removing all occurances of value in this array." (= ()
+  (should "(an-array remove value) returns a shallow copy by removing all occurrences of value in this array." (= ()
     (var a (@ 1 2 3 1 2 3).
     (var b (a remove 2).
     (assert 6 (a length).
@@ -2397,7 +2397,7 @@ f
     (assert 102 (b length).
     (assert 6 (b count).
   ).
-  (should "(an-array remove value ...) returns a shallow copy by removing all occurances of any value in this array." (= ()
+  (should "(an-array remove value ...) returns a shallow copy by removing all occurrences of any value in this array." (= ()
     (var a (@ 1 2 3 4 1 2 3).
     (var b (a remove 2 4).
     (assert 7 (a length).
@@ -2464,7 +2464,7 @@ f
     (assert a (a replace).
     (assert 101 (a length).
   ).
-  (should "(an-array replace value) reset all occurances of value and returns the subject array." (= ()
+  (should "(an-array replace value) reset all occurrences of value and returns the subject array." (= ()
     (var a (@).
     (assert a (a replace 2).
     (assert 0 (a length).
@@ -2497,7 +2497,7 @@ f
     (assert 1.5 (a 2).
     (assert 100 (a 100).
   ).
-  (should "(an-array replace value new-value) replace all occurances of value to new-value and returns the subject array." (= ()
+  (should "(an-array replace value new-value) replace all occurrences of value to new-value and returns the subject array." (= ()
     (var a (@).
     (assert a (a replace 2 3).
     (assert 0 (a length).
@@ -2715,7 +2715,7 @@ f
     (assert (a is-sparse).
     (assert false (a swap).
   ).
-  (should "(an-array swap i) always trys to swap the elements at i with the first one." (= ()
+  (should "(an-array swap i) always tries to swap the elements at i with the first one." (= ()
     (var a (@).
     (assert false (a swap 0).
     (assert false (a swap 1).
@@ -2751,7 +2751,7 @@ f
     (assert 100 (a 0).
     (assert 1 (a 100).
   ).
-  (should "(an-array swap i j) returns true if the elements at i and j have been swaped." (= ()
+  (should "(an-array swap i j) returns true if the elements at i and j have been swapped." (= ()
     (var a (@ 1 2).
     (assert true (a swap 0 1).
     (assert 2 (a 0).
@@ -3014,7 +3014,7 @@ f
     (assert (a is-sparse).
     (assert null (a first-of).
   ).
-  (should "(an-array first-of value) returns the offset of the first occurance of value." (= ()
+  (should "(an-array first-of value) returns the offset of the first occurrence of value." (= ()
     (var a (@ 1 2 3 null 3 2 1).
     (assert 0 (a first-of 1).
     (assert 1 (a first-of 2).
@@ -3260,7 +3260,7 @@ f
     (assert (a is-sparse).
     (assert null (a last-of).
   ).
-  (should "(an-array last-of value) returns the offset of the last occurance of value." (= ()
+  (should "(an-array last-of value) returns the offset of the last occurrence of value." (= ()
     (var a (@ 1 2 3 null 3 2 1).
     (assert 6 (a last-of 1).
     (assert 5 (a last-of 2).
@@ -3814,7 +3814,7 @@ f
 ).
 
 (define "(an-array splice ...)" (= ()
-  (should "(an-array splice) returns an emtpy array." (= ()
+  (should "(an-array splice) returns an empty array." (= ()
     (var a (@).
     (var b (a splice).
     (assert (b is-not a).
@@ -4199,7 +4199,7 @@ f
 ).
 
 (define "(an-array pop ...)" (= ()
-  (should "(an-array pop) returns the last elememt, and removes it from the array." (= ()
+  (should "(an-array pop) returns the last element, and removes it from the array." (= ()
     (var a (@).
     (assert null (a pop).
     (assert 0 (a length).
@@ -5223,7 +5223,7 @@ f
 ).
 
 (define "(an-array: ...)" (= ()
-  (should "(an-array: field value) returns the offset of the first occurance of value which is not number, string or symbol." (= ()
+  (should "(an-array: field value) returns the offset of the first occurrence of value which is not number, string or symbol." (= ()
     (var r (1 10).
     (var t (`(1 2).
     (var l (= x x).

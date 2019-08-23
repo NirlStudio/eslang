@@ -55,7 +55,7 @@ return(return -return return return- return)return
 exit
 exit(exit -exit exit exit- exit)exit
 
-# suport.function.self.espresso
+# support.function.self.espresso
 do
 do(do -do do do- do)do
 

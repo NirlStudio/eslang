@@ -70,7 +70,7 @@
     ).
   ).
   (should "(tokenizer non-applicable) returns the global function tokenize." (= ()
-    (var non-applicables (@
+    (var non-applicable (@
       null type
       bool true false
       number -1 -0 0 1 1.1
@@ -86,7 +86,7 @@
       object (object empty)
       class (class empty) ((class empty) default)
     ).
-    (for nona in non-applicables
+    (for nona in non-applicable
       (var tokenizing (tokenizer nona).
       (assert ($tokenizing is-a function).
       (assert ($tokenizing is tokenize).
@@ -416,7 +416,7 @@
       (assert-space " " (tokens 1).
       (assert-sym "cde" (tokens 2).
     ).
-    (should "(tokenize code) supports multiline-comment enclosed in #(...\\n...)#." (=> ()
+    (should "(tokenize code) supports multi-line-comment enclosed in #(...\\n...)#." (=> ()
       (var tokens (tokenize "#( abc \n \n\t cde\nefg)#ghi ijk").
       (assert (tokens is-an array).
       (assert 4 (tokens length).

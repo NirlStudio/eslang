@@ -42,7 +42,7 @@ module.exports = function ($void) {
     'random': 'random'
   })
 
-  // hotfix for Firefox, in which Math.exp(1) does not returns Math.E.
+  // hot-fix for Firefox, in which Math.exp(1) does not returns Math.E.
   isFirefox && link(math, 'exp', function exp (x) {
     return x === 1 ? Math.E : Math.exp(x)
   }, true)

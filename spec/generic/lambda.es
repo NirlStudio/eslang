@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: lambda).
 
-(define "Lambda Common Behaviours" (=> ()
+(define "Lambda Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "an empty lambda without parameters is always the same." (= ()
       (var l1 (=).
@@ -331,11 +331,11 @@
     (assert (mod is null).
   ).
   (should "a stambda has no access to (env)." (= ()
-    (var envs (=:() (env).
-    (assert (envs is-an object).
+    (var values (=:() (env).
+    (assert (values is-an object).
 
-    (let envs (->:() (env).
-    (assert (envs is null).
+    (let values (->:() (env).
+    (assert (values is null).
   ).
   (should "a stambda can choose to require for this instead of an argument." (= ()
     (var self (-> this this).
@@ -761,7 +761,7 @@
   ).
 ).
 
-(define "(do ...): recusive call" (= ()
+(define "(do ...): recursive call" (= ()
   (should "variable 'do' refers to current callee function." (= ()
     (var l (= ()
       (assert ($do is-a lambda).
@@ -784,7 +784,7 @@
   ).
 ).
 
-(define "(redo ...): tail recusion elimination" (= ()
+(define "(redo ...): tail recursion elimination" (= ()
   (should "'redo' is a special global operator, so is a pure symbol." (= ()
     (var f (= ()
       (assert ($redo is redo).
@@ -793,7 +793,7 @@
     ).
     (f)
   ).
-  (should "'redo' can be used to elminate tail recursion call." (= ()
+  (should "'redo' can be used to eliminate tail recursion call." (= ()
     (assert 50005000 (= 10000: (x base)
       ((x <= 1) ? (x + base)
         (redo (x - 1) (x + base).

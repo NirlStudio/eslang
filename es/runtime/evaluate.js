@@ -64,7 +64,7 @@ module.exports = function evaluate ($void) {
       subject = evaluate(subject, space)
     } // else, the subject is a common value.
 
-    // switch subject to predicate if it's apppliable.
+    // switch subject to predicate if it's applicable.
     var predicate
     if (typeof subject === 'function' && implicitSubject) {
       if (subject.type === $Operator) {

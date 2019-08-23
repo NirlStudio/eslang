@@ -216,7 +216,7 @@
       (assert ($(the-type ":") is-a lambda).
       (assert ($(the-type ":") equals (type ":").
     ).
-    (should "the indexer is a readonly accessor." (=> ()
+    (should "the indexer is a read-only accessor." (=> ()
       (assert null (the-type :"__new_prop" 1).
       (assert ((the-type "__new_prop") is null).
 
@@ -433,7 +433,7 @@
     ).
   ).
 
-  (define "General Behaviours" (=> ()
+  (define "General Behaviors" (=> ()
     (should "(a-type empty) returns an empty value." (=> ()
       (assert ($(the-type empty) is-not null).
       (assert false ($(the-type empty) is null).

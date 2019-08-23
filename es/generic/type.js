@@ -35,7 +35,7 @@ module.exports = function ($void) {
 
   // Representation and Description need be customized by each type.
 
-  // Indexer: default readonly accessor for all types.
+  // Indexer: default read-only accessor for all types.
   // all value types' proto must provide a customized indexer.
   var indexer = link(proto, ':', function (index) {
     var name = typeof index === 'string' ? index

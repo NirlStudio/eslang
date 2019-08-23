@@ -13,7 +13,7 @@
 
 # 5!
 printf (factorial 5);
-(print " =", # the annonymous version in full lisp style.
+(print " =", # the anonymous version in full lisp style.
   (((= f ((= x (x x)) (=> x (f (=> y ((x x) y)))))) (= f (=> n ((n == 0) ? 1 (n * (f (n - 1))))))) 5)
 ).
 

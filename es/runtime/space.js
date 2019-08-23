@@ -228,7 +228,7 @@ module.exports = function space ($void) {
     return space
   }
 
-  // customized the behaviour of the space of an operator
+  // customized the behavior of the space of an operator
   $void.OperatorSpace = OperatorSpace$
   function OperatorSpace$ (parent, origin) {
     // the original context is preferred over global.

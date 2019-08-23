@@ -1,8 +1,8 @@
 (var * (load "share/type" (@ the-type: symbol).
 
-(define "Symbol Common Behaviours" (=> ()
+(define "Symbol Common Behaviors" (=> ()
   (define "Identity" (= ()
-    (should "a symbol is indentified by its string value." (= ()
+    (should "a symbol is identified by its string value." (= ()
       (assert ((symbol of "x") is (` x).
       (assert ((` x) is (symbol of "x").
 

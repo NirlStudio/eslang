@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: range).
 
-(define "Range Common Behaviours" (=> ()
+(define "Range Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "a range is identified by its number values of fields: begin, end, step" (= ()
       (assert ((range of 0) is (range of -0).

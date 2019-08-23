@@ -34,7 +34,7 @@
   ).
 ).
 
-(define "Class Instance Default Behaviours" (=> ()
+(define "Class Instance Default Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "an empty instance is also identified by itself." (=> ()
       (assert ((@:cat) is-not (@:cat).
@@ -170,7 +170,7 @@
   ).
 ).
 
-(define "Customize Object Behaviours" (=> ()
+(define "Customize Object Behaviors" (=> ()
   (define "Identity" (= ()
     (var cls (@:class
       is: (=(another) (name == (another name).
@@ -496,7 +496,7 @@
     ).
   ).
   (define "Static Type Members" (=> ()
-    (should "All type members are readonly, so they should be initialized in definition." (=> ()
+    (should "All type members are read-only, so they should be initialized in definition." (=> ()
       (var cls (@:class type: (@
         x: 1
         y: 2
@@ -512,7 +512,7 @@
       (assert 3 (cls add).
       (assert 6 (cls add 3).
     ).
-    (should "A readonly static member are still be mutable if it's type is a mutable type." (=> ()
+    (should "A read-only static member are still be mutable if it's type is a mutable type." (=> ()
       (var cls (@:class type: (@
         x: (@)
         y: (@:)

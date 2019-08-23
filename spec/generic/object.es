@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: object).
 
-(define "Object Common Behaviours" (=> ()
+(define "Object Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "an empty object is also identified by its instance." (= ()
       (assert ((@:) is-not (@:).
@@ -741,13 +741,13 @@
     (assert (tom is-an object).
     (assert null (tom cloned).
 
-    (var tomm (object copy tom).
-    (assert (tomm is-not tom).
-    (assert (tomm is-an object).
+    (var copied-tom (object copy tom).
+    (assert (copied-tom is-not tom).
+    (assert (copied-tom is-an object).
 
-    (assert (tomm is-a cat).
-    (assert "Tom" (tomm name).
-    (assert (tomm cloned).
+    (assert (copied-tom is-a cat).
+    (assert "Tom" (copied-tom name).
+    (assert (copied-tom cloned).
   ).
   (should "(object copy src fields ...) returns a copy of src by copying given fields." (= ()
     (var src (@ x:1 y:null z: 3).
@@ -775,22 +775,22 @@
     (assert (tom is-an object).
     (assert null (tom cloned).
 
-    (var tomm (object copy tom "name" "hate").
-    (assert (tomm is-not tom).
-    (assert (tomm is-an object).
+    (var copied-tom (object copy tom "name" "hate").
+    (assert (copied-tom is-not tom).
+    (assert (copied-tom is-an object).
 
-    (assert (tomm is-a cat).
-    (assert (object owns tomm "name").
-    (assert (object has tomm "name").
-    (assert "Tom" (tomm name).
+    (assert (copied-tom is-a cat).
+    (assert (object owns copied-tom "name").
+    (assert (object has copied-tom "name").
+    (assert "Tom" (copied-tom name).
 
-    (assert (object owns tomm "hate").
-    (assert (object has tomm "hate").
-    (assert "dog" (tomm hate).
+    (assert (object owns copied-tom "hate").
+    (assert (object has copied-tom "hate").
+    (assert "dog" (copied-tom hate).
 
-    (assert (object owns tomm "cloned").
-    (assert (object has tomm "cloned").
-    (assert (tomm cloned).
+    (assert (object owns copied-tom "cloned").
+    (assert (object has copied-tom "cloned").
+    (assert (copied-tom cloned).
   ).
 ).
 
@@ -941,13 +941,13 @@
     (assert (tom is-an object).
     (assert null (tom cloned).
 
-    (var tomm (object remove tom).
-    (assert (tomm is-not tom).
-    (assert (tomm is-an object).
+    (var copied-tom (object remove tom).
+    (assert (copied-tom is-not tom).
+    (assert (copied-tom is-an object).
 
-    (assert (tomm is-a cat).
-    (assert "Tom" (tomm name).
-    (assert (tomm cloned).
+    (assert (copied-tom is-a cat).
+    (assert "Tom" (copied-tom name).
+    (assert (copied-tom cloned).
   ).
   (should "(object remove src fields ...) returns a copy of src by copying given fields." (= ()
     (var src (@ x:1 y:null z: 3).
@@ -977,22 +977,22 @@
     (assert (tom is-an object).
     (assert null (tom cloned).
 
-    (var tomm (object remove tom "name" "hate").
-    (assert (tomm is-not tom).
-    (assert (tomm is-an object).
+    (var copied-tom (object remove tom "name" "hate").
+    (assert (copied-tom is-not tom).
+    (assert (copied-tom is-an object).
 
-    (assert (tomm is-a cat).
-    (assert false (object owns tomm "name").
-    (assert (object has tomm "name").
-    (assert "kitty" (tomm name).
+    (assert (copied-tom is-a cat).
+    (assert false (object owns copied-tom "name").
+    (assert (object has copied-tom "name").
+    (assert "kitty" (copied-tom name).
 
-    (assert false (object owns tomm "hate").
-    (assert (object has tomm "hate").
-    (assert "dog" (tomm hate).
+    (assert false (object owns copied-tom "hate").
+    (assert (object has copied-tom "hate").
+    (assert "dog" (copied-tom hate).
 
-    (assert (object owns tomm "cloned").
-    (assert (object has tomm "cloned").
-    (assert (tomm cloned).
+    (assert (object owns copied-tom "cloned").
+    (assert (object has copied-tom "cloned").
+    (assert (copied-tom cloned).
   ).
 ).
 
@@ -1416,7 +1416,7 @@
   ).
 ).
 
-(define "Behaviour Completeness" (= ()
+(define "Behavior Completeness" (= ()
   (should "Any valid symbol can be used in field setting syntax)." (= ()
     (var obj (@:).
     (assert 1 (obj "is" 1).

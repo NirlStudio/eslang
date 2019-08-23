@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: operator).
 
-(define "Operator Common Behaviours" (=> ()
+(define "Operator Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "an empty operator without parameters is always the same." (= ()
       (var op1 (=?).
@@ -289,23 +289,31 @@
       (assert true (X))
       (assert (`op) (-operation 0).
 
-      (var "oprds" (=(operation operand) :(c o)
+      (var "operands" (=(operation operand) :(c o)
         (=> i (c: (o + i).
       ).
-      (assert true ((oprds 0).
-      (assert null ((oprds 1).
-      (assert 1 ((oprds 2).
-      (assert "x" ((oprds 3).
-      (assert (range empty) ((oprds 4).
-      (assert (symbol empty) ((oprds 5).
-      (assert (tuple empty) ((oprds 6).
-      (assert (operator empty) ((oprds 7).
-      (assert (lambda empty) ((oprds 8).
-      (assert (function empty) ((oprds 9).
-      (assert 100 ((oprds 10).
+      (assert true ((operands 0).
+      (assert null ((operands 1).
+      (assert 1 ((operands 2).
+      (assert "x" ((operands 3).
+      (assert (range empty) ((operands 4).
+      (assert (symbol empty) ((operands 5).
+      (assert (tuple empty) ((operands 6).
+      (assert (operator empty) ((operands 7).
+      (assert (lambda empty) ((operands 8).
+      (assert (function empty) ((operands 9).
+      (assert 100 ((operands 10).
     ).
     (var z 100).
-    (op true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z).
+    (op true, null, 1, "x",
+      (range empty),
+      (symbol empty),
+      (tuple empty),
+      (operator empty),
+      (lambda empty),
+      (function empty),
+      z
+    ).
   ).
   (should "(s ($an-operator) value ...) evaluates the operator with s as subject and all argument symbols." (= ()
     (var obj (@ x: 1).
@@ -324,22 +332,30 @@
       (assert (`obj) (-operation 0).
       (assert (`($op)) (-operation 1).
 
-      (var "oprds" (=(operation operand) :(c o)
+      (var "operands" (=(operation operand) :(c o)
         (=> i (c: (o + i).
       ).
-      (assert true ((oprds 0).
-      (assert null ((oprds 1).
-      (assert 1 ((oprds 2).
-      (assert "x" ((oprds 3).
-      (assert (range empty) ((oprds 4).
-      (assert (symbol empty) ((oprds 5).
-      (assert (tuple empty) ((oprds 6).
-      (assert (operator empty) ((oprds 7).
-      (assert (lambda empty) ((oprds 8).
-      (assert (function empty) ((oprds 9).
-      (assert 100 ((oprds 10).
+      (assert true ((operands 0).
+      (assert null ((operands 1).
+      (assert 1 ((operands 2).
+      (assert "x" ((operands 3).
+      (assert (range empty) ((operands 4).
+      (assert (symbol empty) ((operands 5).
+      (assert (tuple empty) ((operands 6).
+      (assert (operator empty) ((operands 7).
+      (assert (lambda empty) ((operands 8).
+      (assert (function empty) ((operands 9).
+      (assert 100 ((operands 10).
     ).
-    (obj ($op) true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z).
+    (obj ($op) true, null, 1, "x",
+      (range empty),
+      (symbol empty),
+      (tuple empty),
+      (operator empty),
+      (lambda empty),
+      (function empty),
+      z
+    ).
   ).
   (should "(s (= ...) value ...) evaluates the anonymous operator with s as subject and all argument symbols." (= ()
     (var obj (@ x: 1).
@@ -360,22 +376,29 @@
         (assert ((-operation 1) is-a tuple).
         (assert (symbol operator) ((-operation 1) 0).
 
-        (var "oprds" (=(operation operand) :(c o)
+        (var "operands" (=(operation operand) :(c o)
           (=> i (c: (o + i).
         ).
-        (assert true ((oprds 0).
-        (assert null ((oprds 1).
-        (assert 1 ((oprds 2).
-        (assert "x" ((oprds 3).
-        (assert (range empty) ((oprds 4).
-        (assert (symbol empty) ((oprds 5).
-        (assert (tuple empty) ((oprds 6).
-        (assert (operator empty) ((oprds 7).
-        (assert (lambda empty) ((oprds 8).
-        (assert (function empty) ((oprds 9).
-        (assert 100 ((oprds 10).
+        (assert true ((operands 0).
+        (assert null ((operands 1).
+        (assert 1 ((operands 2).
+        (assert "x" ((operands 3).
+        (assert (range empty) ((operands 4).
+        (assert (symbol empty) ((operands 5).
+        (assert (tuple empty) ((operands 6).
+        (assert (operator empty) ((operands 7).
+        (assert (lambda empty) ((operands 8).
+        (assert (function empty) ((operands 9).
+        (assert 100 ((operands 10).
       ).
-      true null 1 "x" (range empty) (symbol empty) (tuple empty) (operator empty) (lambda empty) (function empty) z
+      true, null, 1, "x",
+      (range empty),
+      (symbol empty),
+      (tuple empty),
+      (operator empty),
+      (lambda empty),
+      (function empty),
+      z
     ).
   ).
 ).

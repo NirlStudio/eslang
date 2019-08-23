@@ -1,6 +1,6 @@
 var * (load "share/type" (@ the-type: promise);
 
-(define "Promise Common Behaviours" (=> ()
+(define "Promise Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "all empty promises are the same instance." (= ()
       assert ((promise empty) is (promise empty);
@@ -607,7 +607,7 @@ var * (load "share/type" (@ the-type: promise);
         ).
       ).
     ).
-    (define "when there are multiple promisings," (= ()
+    (define "when there are multiple promising," (= ()
       (should "resolve to a list of all resolved values." (= ()
         var p (promise all (@ (@ 100) (@ 101);
         (p then (= waiting
@@ -742,7 +742,7 @@ var * (load "share/type" (@ the-type: promise);
         (p then (async resolve 100).
       ).
     ).
-    (define "when there are multiple promisings," (= ()
+    (define "when there are multiple promising," (= ()
       (should "resolve to the first resolved value." (= async
         var p (promise any (@ (@ 100) (@ 101);
         p then (async resolve 100);

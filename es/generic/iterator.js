@@ -373,7 +373,7 @@ module.exports = function iterate ($void) {
       : nil.length > 0 ? nil[0] : null
   })
 
-  // all interators will be encoded to an empty iterator.
+  // all iterators will be encoded to an empty iterator.
   var arrayProto = $Array.proto
   var symbolOf = sharedSymbolOf('of')
   var symbolIterator = sharedSymbolOf('iterator')

@@ -72,16 +72,17 @@ module.exports = function operators$operator ($void) {
     if (!(params instanceof Tuple$) || params.$.length < 1) {
       return [[], $Tuple.empty]
     }
-    var oprs = []
+    var operands = []
     var code = []
     params = params.$
     for (var i = 0; i < params.length; i++) {
       var param = params[i]
       if (param instanceof Symbol$) {
-        oprs.push(param.key)
+        operands.push(param.key)
         code.push(param)
       }
     }
-    return oprs.length < 1 ? [[], $Tuple.empty] : [oprs, new Tuple$(code)]
+    return operands.length > 0 ? [operands, new Tuple$(code)]
+      : [[], $Tuple.empty]
   }
 }

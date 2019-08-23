@@ -107,7 +107,7 @@
   (should "the indexer is a lambda." (= ()
     (assert ($(type ":") is-a lambda).
   ).
-  (should "the indexer is a readonly accessor." (= ()
+  (should "the indexer is a read-only accessor." (= ()
     (assert null (type :"__new_prop" 1).
     (assert ((type "__new_prop") is null).
 

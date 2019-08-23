@@ -142,7 +142,7 @@ module.exports = function ($void) {
       ? s.length >= this.$.length ? this : new Tuple$(s, this.plain)
       : this.plain ? blank : empty
   })
-  // find the first occurance of a value.
+  // find the first occurrence of a value.
   link(proto, 'first-of', function (value) {
     return array['first-of'].call(this.$, value)
   })
@@ -156,12 +156,12 @@ module.exports = function ($void) {
       ? s.length >= this.$.length ? this : new Tuple$(s, this.plain)
       : this.plain ? blank : empty
   })
-  // find the last occurance of a value.
+  // find the last occurrence of a value.
   link(proto, 'last-of', function (value) {
     return array['last-of'].call(this.$, value)
   })
 
-  // merge this tuple's items and argument values to create a new one.
+  // merge the items of this tuple and argument values to create a new one.
   link(proto, 'concat', function () {
     var list = append.apply(this.$.slice(0), arguments)
     return list.length > this.$.length ? new Tuple$(list, this.plain) : this
