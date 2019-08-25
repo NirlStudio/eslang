@@ -63,7 +63,7 @@ module.exports = function ($void, stdout) {
       return null
     }
     var args = [sourceOf(clause), '\n ']
-    for (var i = 1; i < clist.length; i++) {
+    for (var i = 1, len = clist.length; i < len; i++) {
       (i > 1) && args.push('\n ')
       args.push(sourceOf(clist[i]), '=', evaluate(clist[i], space))
     }
@@ -97,7 +97,7 @@ module.exports = function ($void, stdout) {
     }
 
     var args = []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       args.push(evaluate(clist[i], space))
     }
     log.apply(stdout, args)

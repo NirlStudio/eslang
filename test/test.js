@@ -422,8 +422,8 @@ module.exports = function ($void) {
 
   function checkOperators () {
     print('\n  - Operators')
-    eval_(1, '(? true 1 0)')
-    eval_(0, '(? false 1 0)')
+    eval_(1, '(if true 1 else 0)')
+    eval_(0, '(if false 1 else 0)')
 
     eval_(110, '(+ 10 100)')
     eval_(-110, '(+ -10 -100)')

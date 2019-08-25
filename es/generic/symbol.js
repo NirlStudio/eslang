@@ -25,7 +25,7 @@ module.exports = function ($void) {
   // a special symbol to indicate "etc." or "more" for parser and operator
   link(Type, 'etc', sharedSymbolOf('...'))
 
-  // a special symbol to indicate "all" or "any" for parser and operator
+  // special symbols to indicate "all" and "any" for parsers and operators
   link(Type, 'all', sharedSymbolOf('*'))
   link(Type, 'any', sharedSymbolOf('?'))
 

@@ -132,6 +132,7 @@ module.exports = function ($void) {
   var $Range = $.range
   var link = $void.link
   var Symbol$ = $void.Symbol
+  var bindThis = $void.bindThis
   var copyType = $void.copyType
   var protoValueOf = $void.protoValueOf
 
@@ -180,9 +181,8 @@ module.exports = function ($void) {
   var parseInteger = link(Type, 'parse-int', createIntParser($void), true)
 
   // get a number value from the input
-  var valueOf = link(Type, 'of',
-    createValueOf($void, parse, parseInteger), true
-  )
+  $void.numberValueOf = createValueOf($void, parse, parseInteger)
+  var valueOf = link(Type, 'of', bindThis(Type, $void.numberValueOf), true)
 
   // get an integer value from the input
   var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger), true)

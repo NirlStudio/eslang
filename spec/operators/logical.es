@@ -277,26 +277,43 @@
   ).
 ).
 
-(define "(value ?? ...) - null fallback" (=> ()
-  (should "(null ??) returns null." (= ()
-    (assert ((null ??) is null).
-    (assert (((null null) ??) is null).
-  ).
-  (should "(null ?? values ...) returns the first non-null value." (= ()
-    (assert ((null ?? null) is null).
-    (assert ((null ?? null null) is null).
-
-    (for value in (truthy-values concat 0 -0 false)
-      (assert ($(null ?? value) is value).
-      (assert ($(null ?? null value) is value).
-      (assert ($(null ?? null null value) is value).
+(define "(value ?? ...) - Null Test" (=> ()
+  (define "Booleanize Null: (value ??)" (= ()
+    (should "(null ??) returns false." (= ()
+      (assert ((null ??) is false).
+      (assert (((null null) ??) is false).
     ).
   ).
-  (should "(value ?? ...) always returns the value if value is not null." (=> ()
-    (for value in (truthy-values concat 0 -0 false)
-      (assert ($($value ??) is value).
-      (assert ($($value ?? true) is value).
-      (assert ($($value ?? true false) is value).
+  (define "Null Fallback: (value ?? another-value)" (=> ()
+    (should "(null ?? value) returns value." (=> ()
+      (for value in (truthy-values concat null, 0, -0, false)
+        (assert ($(null ?? value) is value).
+      ).
+    ).
+    (should "(value ?? another-value) returns value if value is not null." (=> ()
+      (for a in (truthy-values concat 0, -0, false)
+        (for b in (truthy-values concat null, 0, -0, false)
+          (assert ($($a ?? b) is a).
+        ).
+      ).
+    ).
+  ).
+  (define "Null Switch: (value ?? truthy, falsy)" (=> ()
+    (should "(null ?? truthy, falsy) returns falsy." (=> ()
+      (for a in (truthy-values concat null, 0, -0, false)
+        (for b in (truthy-values concat null, 0, -0, false)
+          (assert ($(null ?? a, b) is b).
+        ).
+      ).
+    ).
+    (should "(value ?? truthy, falsy) returns truthy if value is not null." (=> ()
+      (for value in (truthy-values concat 0 -0 false)
+        (for a in (truthy-values concat null, 0, -0, false)
+          (for b in (truthy-values concat null, 0, -0, false)
+            (assert ($($value ?? a, b) is a).
+          ).
+        ).
+      ).
     ).
   ).
 ).

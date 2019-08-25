@@ -7,12 +7,12 @@ module.exports = function iterate ($void) {
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var Iterator$ = $void.Iterator
-  var numberOf = $.number.of
   var link = $void.link
   var thisCall = $void.thisCall
   var boolValueOf = $void.boolValueOf
   var isApplicable = $void.isApplicable
   var protoValueOf = $void.protoValueOf
+  var numberValueOf = $void.numberValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
 
   // try to get an iterator function for an entity
@@ -227,13 +227,13 @@ module.exports = function iterate ($void) {
 
   // sum the values of all iterations.
   link(proto, 'sum', function (base) {
-    var sum = typeof base === 'number' ? base : numberOf(base)
+    var sum = typeof base === 'number' ? base : numberValueOf(base)
     var value = this.next && this.next()
     while (typeof value !== 'undefined' && value != null) {
       if (Array.isArray(value)) {
         value = value.length > 0 ? value[0] : 0
       }
-      sum += typeof value === 'number' ? value : numberOf(value)
+      sum += typeof value === 'number' ? value : numberValueOf(value)
       value = this.next()
     }
     this.next = null
@@ -250,7 +250,7 @@ module.exports = function iterate ($void) {
       if (Array.isArray(value)) {
         value = value.length > 0 ? value[0] : 0
       }
-      sum += typeof value === 'number' ? value : numberOf(value)
+      sum += typeof value === 'number' ? value : numberValueOf(value)
       value = this.next()
     }
     this.next = null

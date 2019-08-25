@@ -276,29 +276,34 @@
 ).
 
 (define "Global Operators" (=> ()
-  (define "Null fallback: (type ?? ...)" (=> ()
-    (should "(type ??) returns type." (=> ()
-      (assert type (type ??).
-      (var x type)
-      (assert type (x ??).
+  (define "Booleanize Null: (type ??)" (=> ()
+    (should "(type ??) returns true." (=> ()
+      (assert true (type ??).
+
+      (var t type)
+      (assert true (t ??).
     ).
-    (should "(type ?? x) returns type." (=> ()
+  ).
+  (define "Null fallback: (type ?? value)" (=> ()
+    (should "(type ?? value) returns type." (=> ()
       (var c 0)
       (assert type (type ?? 1).
       (assert type (type ?? (++ c).
       (assert 0 c)
 
-      (var x type)
-      (assert type (x ?? 1).
-      (assert type (x ?? (++ c).
+      (var t type)
+      (assert type (t ?? 1).
+      (assert type (t ?? (++ c).
       (assert 0 c)
     ).
-    (should "(type ?? x y) returns type." (=> ()
+  ).
+  (define "Null Switch: (type ?? truthy, falsy)" (=> ()
+    (should "(type ?? truthy, falsy) returns truthy." (=> ()
       (let x 1)
       (let y -1)
-      (assert type (type ?? x y).
-      (assert type (type ?? (++ x) (-- y).
-      (assert 1 x)
+      (assert 1 (type ?? x y).
+      (assert 2 (type ?? (++ x) (-- y).
+      (assert 2 x)
       (assert -1 y)
     ).
   ).

@@ -9,7 +9,7 @@ module.exports = function general ($void) {
   var operator = $void.operator
   var thisCall = $void.thisCall
   var evaluate = $void.evaluate
-  var numberValueOf = $.number.of
+  var numberValueOf = $void.numberValueOf
   var staticOperator = $void.staticOperator
 
   staticOperator('+', function (space, clause) {
@@ -22,6 +22,13 @@ module.exports = function general ($void) {
         : concat(space, base, clist)
     }
     return 0
+  }, function (a, b) {
+    if (typeof a === 'number') {
+      return a + (typeof b === 'number' ? b : numberValueOf(b))
+    }
+    return (typeof a === 'string' ? a : thisCall(a, 'to-string')) + (
+      typeof b === 'string' ? b : thisCall(b, 'to-string')
+    )
   })
 
   function concat (space, str, clist) {
@@ -40,11 +47,7 @@ module.exports = function general ($void) {
     var length = clist.length
     for (var i = 2; i < length; i++) {
       var value = evaluate(clist[i], space)
-      if (typeof value === 'number') {
-        num += value
-      } else {
-        num += numberValueOf(value)
-      }
+      num += typeof value === 'number' ? value : numberValueOf(value)
     }
     return num
   }
@@ -58,13 +61,9 @@ module.exports = function general ($void) {
       that = ''
     }
     var clist = clause && clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
-      if (typeof value === 'string') {
-        that += value
-      } else {
-        that += thisCall(value, 'to-string')
-      }
+      that += typeof value === 'string' ? value : thisCall(value, 'to-string')
     }
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -85,7 +84,7 @@ module.exports = function general ($void) {
       return that
     }
     var clist = clause && clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
         if (that.endsWith(value)) {

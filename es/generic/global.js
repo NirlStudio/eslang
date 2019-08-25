@@ -9,8 +9,9 @@ module.exports = function ($void) {
   $export($, '', null)
 
   // special empty symbols
-  $export($, '*', null)
   $export($, '...', null)
+  // a readable alias of '...'
+  $export($, 'etc', null)
 
   // constant values
   $export($, 'null', null)
@@ -32,12 +33,6 @@ module.exports = function ($void) {
   $export($, ']', sharedSymbolOf(']'))
   $export($, '{', sharedSymbolOf('{'))
   $export($, '}', sharedSymbolOf('}'))
-
-  // logical operators
-  $export($, '&&', sharedSymbolOf('&&'))
-  $export($, 'and', sharedSymbolOf('and'))
-  $export($, '||', sharedSymbolOf('||'))
-  $export($, 'or', sharedSymbolOf('or'))
 
   // other pure symbols
   $export($, 'else', sharedSymbolOf('else'))

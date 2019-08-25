@@ -31,7 +31,7 @@ gray " operators";
 blue " help"; gray ",";
 (export help (=? (subject, topic)
   "try '(help)' or 'help;' to ask for help."
-  local "content" ((? get-help) (subject key) (topic key);
+  local "content" ((. get-help) (subject key) (topic key);
   (if (content is-empty)
     "not available."; false
   else

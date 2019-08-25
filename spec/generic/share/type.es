@@ -405,29 +405,34 @@
   ).
 
   (define "Global Operators" (=> ()
-    (define "Null fallback: (the-type ?? ...)" (=> ()
-      (should "(the-type ??) returns the-type." (=> ()
-        (assert the-type (the-type ??).
-        (var x the-type)
-        (assert the-type (x ??).
+    (define "Booleanize Null: (the-type ??)" (=> ()
+      (should "(the-type ??) returns true." (=> ()
+        (assert true (the-type ??).
+
+        (var t the-type)
+        (assert true (t ??).
       ).
-      (should "(the-type ?? x) returns the-type." (=> ()
+    ).
+    (define "Null fallback: (the-type ?? value)" (=> ()
+      (should "(the-type ?? value) returns the-type." (=> ()
         (var c 0)
         (assert the-type (the-type ?? 1).
         (assert the-type (the-type ?? (++ c).
         (assert 0 c)
 
-        (var x the-type)
-        (assert the-type (x ?? 1).
-        (assert the-type (x ?? (++ c).
+        (var t the-type)
+        (assert the-type (t ?? 1).
+        (assert the-type (t ?? (++ c).
         (assert 0 c)
       ).
-      (should "(the-type ?? x y) returns the-type." (=> ()
+    ).
+    (define "Null Switch: (the-type ?? truthy, falsy)" (=> ()
+      (should "(the-type ?? truthy, falsy) returns truthy." (=> ()
         (let x 1)
         (let y -1)
-        (assert the-type (the-type ?? x y).
-        (assert the-type (the-type ?? (++ x) (-- y).
-        (assert 1 x)
+        (assert 1 (the-type ?? x y).
+        (assert 2 (the-type ?? (++ x) (-- y).
+        (assert 2 x)
         (assert -1 y)
       ).
     ).

@@ -14,6 +14,8 @@ module.exports = function arithmetic ($void) {
   staticOperator('-', function (space, clause) {
     var value = evaluate(clause.$[1], space)
     return typeof value === 'number' ? (-value) : -0
+  }, function (value) {
+    return typeof value === 'number' ? (-value) : -0
   })
 
   staticOperator('++', function (space, clause) {
@@ -30,6 +32,8 @@ module.exports = function arithmetic ($void) {
     // as a normal plus-one operation
     sym = evaluate(sym, space)
     return typeof sym === 'number' ? sym + 1 : 1
+  }, function (value) {
+    return typeof value === 'number' ? (value + 1) : 1
   })
 
   staticOperator('--', function (space, clause) {
@@ -46,6 +50,8 @@ module.exports = function arithmetic ($void) {
     // as a normal minus-one operation
     sym = evaluate(sym, space)
     return typeof sym === 'number' ? sym - 1 : -1
+  }, function (value) {
+    return typeof value === 'number' ? (value - 1) : -1
   })
 
   // increment a value by one and assign it back to the same variable
@@ -87,7 +93,7 @@ module.exports = function arithmetic ($void) {
       that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that += value
@@ -109,7 +115,7 @@ module.exports = function arithmetic ($void) {
       that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that -= value
@@ -131,7 +137,7 @@ module.exports = function arithmetic ($void) {
       that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that *= value
@@ -153,7 +159,7 @@ module.exports = function arithmetic ($void) {
       that = 0
     }
     var clist = clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+    for (var i = 2, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that /= value

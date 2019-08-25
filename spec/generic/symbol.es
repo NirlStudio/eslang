@@ -167,9 +167,6 @@
       (assert "?" ((symbol any) to-string).
       (assert ((symbol of "?") is (symbol any).
     ).
-    (should "it is evaluated to itself." (= ()
-      (assert ((symbol any) :: is (symbol any).
-    ).
     (should "it is taken as safe." (= ()
       (assert ((symbol any) is-safe).
       (assert false ((symbol any) is-unsafe).

@@ -105,7 +105,7 @@ var failures (@);
     (promise of (=> async # a wrapper promise which always resolves to null.
       (result finally (=> waiting
         const excuse (waiting "excuse");
-        finalize record (? (type of excuse:: is fault) excuse);
+        finalize record (if (type of excuse:: is fault) excuse);
         async resolve;
       ).
   ).
@@ -140,32 +140,34 @@ var ++assertions (=>() (++ assertions);
     local "&expr" &expected;
     local "&expected" true;
   ).
-  (? ++assertions); # increment global counter
+  (. ++assertions); # increment global counter
   ++ &asserting-step; # counter in container scope.
   # evaluate operands
   locon "expected" (&expected);
   locon "value" (&expr);
   # by default, use equivalence to verify result.
   (if ($value != expected) # break current case.
-    (return (? fault:: of
+    (return (. fault:: of
       &asserting-step, expected, value, &expr, (&note)
 ).
 
 # the async testing context with helper functions to assert promise results.
 (var async (object seal (@
-  resolve: (=> (value, note) (? (arguments not-empty)
+  resolve: (=> (value, note) (if (arguments not-empty)
     (=> waiting # (async resolve value ) or (async resolve value note)
       assert (waiting "excuse":: is null);
       assert value (waiting "result") note;
     ).
+  else
     (=> waiting # (async resolve) - resolved to any value.
       assert (waiting "excuse":: is null);
     ).
   ).
-  reject: (=> (value, note) (? (arguments not-empty)
+  reject: (=> (value, note) (if (arguments not-empty)
     (=> waiting  # (async reject value ) or (async reject value note)
       assert value (waiting "excuse") note;
     ).
+  else
     (=> waiting # (async rejected) - rejected to any value except a fault.
       const excuse (waiting "excuse");
       ($excuse is-a fault:: ? excuse # failed already, returns the original fault.

@@ -247,33 +247,58 @@
 ).
 
 (define "Global Operators" (=> ()
-  (define "Null fallback: (null ?? ...)" (=> ()
-    (should "(null ??) returns null." (=> ()
-      (assert null (null ??).
+  (define "Booleanize Null: (null ??)" (=> ()
+    (should "(null ??) returns false." (=> ()
+      (assert false (null ??).
+
       (var n null)
-      (assert null (n ??).
+      (assert false (n ??).
     ).
-    (should "(null ?? x) returns x." (=> ()
+  ).
+  (define "Null Fallback: (null ?? value)" (=> ()
+    (should "(null ?? null) returns null." (=> ()
+      (assert null (null ?? null).
+    ).
+    (should "(null ?? value) returns value." (=> ()
       (assert 1 (null ?? 1).
       (assert 2 (null ?? (++ 1).
+
       (var n null)
       (assert 1 (n ?? 1).
       (assert 2 (n ?? (++ 1).
     ).
-    (should "(null ?? x y) returns x." (=> ()
-      (let x 1)
-      (let y -1)
-      (assert 1 (null ?? x y).
-      (assert 2 (null ?? (++ x) (-- y).
-      (assert 2 x)
-      (assert -1 y)
+  ).
+  (define "Null Switch: (null ?? truthy, falsy)" (=> ()
+    (should "(null ?? any-value null) returns null." (=> ()
+      (assert null (null ?? null null).
+      (assert null (null ?? 0 null).
+      (assert null (null ?? 1 null).
+      (assert null (null ?? false null).
+      (assert null (null ?? true null).
+
+      (var n null)
+      (assert null (n ?? null null).
+      (assert null (n ?? 0 null).
+      (assert null (n ?? 1 null).
+      (assert null (n ?? false null).
+      (assert null (n ?? true null).
     ).
-    (should "(null ?? null x) returns x." (=> ()
+    (should "(null ?? null value) returns value." (=> ()
       (assert 2 (null ?? null 2).
       (assert 2 (null ?? (null) (2).
+
       (var n null)
       (assert 2 (n ?? n 2).
       (assert 2 (n ?? (n) (2).
+    ).
+    (should "(null ?? truthy falsy) returns falsy." (=> ()
+      (let x 1)
+      (let y -1)
+      (assert -1 (null ?? x y).
+      (assert -2 (null ?? (++ x) (-- y).
+
+      (assert 1 x)
+      (assert -2 y)
     ).
   ).
 ).

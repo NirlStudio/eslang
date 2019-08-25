@@ -125,9 +125,10 @@ module.exports = function ($void) {
 
   // generic operators cannot be overridden in program. They are interpreted
   // directly in core evaluation function.
-  function staticOperator (name, impl) {
-    // make the symbol a pure symbol.
-    $[name] = sharedSymbolOf(name)
+  function staticOperator (name, impl, entity) {
+    // export an alternative entity or make it a pure symbol.
+    typeof entity !== 'undefined' ? $export($, name, entity)
+      : ($[name] = sharedSymbolOf(name))
     // export the implementation.
     $void.staticOperators[name] = operator(impl, $Tuple.operator)
     return impl
@@ -210,6 +211,15 @@ module.exports = function ($void) {
   }
   $void.typeOf = typeOf
 
+  // test a boolean value of any value.
+  $void.isTruthy = function (v) {
+    return v !== false && v !== null && v !== 0 && typeof v !== 'undefined'
+  }
+
+  $void.isFalsy = function (v) {
+    return v === false || v === null || v === 0 || typeof v === 'undefined'
+  }
+
   // retrieve the system indexer of an entity.
   var indexerOf = $void.indexerOf = function (entity) {
     var type = typeOf(entity)
@@ -248,7 +258,7 @@ module.exports = function ($void) {
   }
 
   // to export an entity to a space.
-  $void.export = function (space, name, entity) {
+  function $export (space, name, entity) {
     // ensure exported names are shared.
     sharedSymbolOf(name)
     // automatically bind null for static methods
@@ -261,6 +271,7 @@ module.exports = function ($void) {
     }
     return (space[name] = entity)
   }
+  $void.export = $export
 
   // create a bound function from the original function or lambda.
   function bindThis ($this, func) {

@@ -1,38 +1,3 @@
-(define "(? ...) - bool switch)" (= ()
-  (should "(?) returns null." (=> ()
-    (assert null (?).
-  ).
-  (should "(? cond) returns null." (=> ()
-    (assert null (? null).
-    (assert null (? 0).
-    (assert null (? 1).
-    (assert null (? true).
-    (assert null (? false).
-  ).
-  (should "(? cond x) returns x if condition is evaluated to true." (=> ()
-    (assert 10 (? true 10).
-    (assert 10 (? (1 === 1) 10).
-    (assert 10 (? 1 10).
-    (assert 10 (? (1 + 1) 10).
-    (assert 10 (? "" 10).
-    (assert 10 (? ("x" + "y") 10).
-  ).
-  (should "(? cond x) returns null if condition is evaluated to false." (=> ()
-    (assert null (? null 10).
-    (assert null (? false 10).
-    (assert null (? (1 == 0) 10).
-    (assert null (? 0 10).
-    (assert null (? (1 - 1) 10).
-  ).
-  (should "(? cond x y) returns y if condition is evaluated to false." (=> ()
-    (assert 100 (? null 10 100).
-    (assert 100 (? false 10 100).
-    (assert 100 (? (1 == 0) 10 100).
-    (assert 100 (? 0 10 100).
-    (assert 100 (? (1 - 1) 10 100).
-  ).
-).
-
 (define "(if ...)" (= ()
   (should "(if) returns null." (=> ()
     (assert null (if).
@@ -120,12 +85,12 @@
   ).
   (should "(break value) applies value as the result of while loop." (=> ()
     (var i 0)
-    (assert 10 (while (i < 10) (++ i) (? (i > 5) (break 10).
+    (assert 10 (while (i < 10) (++ i) (if (i > 5) (break 10).
     (assert 6 i)
   ).
   (should "(break values ...) applies the array of values as the result of while loop." (=> ()
     (var i 0)
-    (var result (while (i < 10) (++ i) (? (i > 5) (break 10 100).
+    (var result (while (i < 10) (++ i) (if (i > 5) (break 10 100).
     (assert 6 i)
     (assert (result is-an array).
     (assert 10 (result 0).
@@ -292,7 +257,7 @@
     (var iter (=:()
       (var pairs (@ (@ "x" 1) (@ "y" 2) (@ "z" 3).
       (var offset 0)
-      (=>() (? (offset < 3) (pairs (offset ++).
+      (=>() (if (offset < 3) (pairs (offset ++).
     ).
     (var a "")
     (assert "xyz" (for name in iter (a += name).
@@ -302,7 +267,7 @@
     (var iter (=:()
       (var pairs (@ (@) (@ "x") (@ "y" 2) (@ "z" 3 4).
       (var offset 0)
-      (=>() (? (offset < 4) (pairs (offset ++).
+      (=>() (if (offset < 4) (pairs (offset ++).
     ).
     (var a (@).
     (assert 12 (for (x y z) in iter (a push x y z) (a length).
@@ -324,12 +289,12 @@
   ).
   (should "(break value) applies value as the result of for loop." (=> ()
     (var i 0)
-    (assert 10 (for i in (1 10) (++ i) (? (i > 5) (break 10).
+    (assert 10 (for i in (1 10) (++ i) (if (i > 5) (break 10).
     (assert 6 i)
   ).
   (should "(break values ...) applies the array of values as the result of for loop." (=> ()
     (var i 0)
-    (var result (for i in (1 10) (++ i) (? (i > 5) (break 10 100).
+    (var result (for i in (1 10) (++ i) (if (i > 5) (break 10 100).
     (assert 6 i)
     (assert (result is-an array).
     (assert 10 (result 0).

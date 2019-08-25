@@ -2,17 +2,11 @@
   (should "(symbol empty) is resolved to null." (= ()
     (assert null ((symbol empty).
   ).
-  (should "(symbol invalid) is resolved to null." (= ()
-    (assert null ((symbol invalid).
-  ).
-  (should "(symbol all) is resolved to null." (= ()
-    (assert null ((symbol all).
-  ).
-  (should "(symbol any) is resolved to itself." (= ()
-    (assert ((symbol any) :: is (symbol any).
-  ).
   (should "(symbol etc) is resolved to null." (= ()
     (assert null ((symbol etc).
+  ).
+  (should "symbol 'etc' is resolved to null." (= ()
+    (assert null etc).
   ).
 ).
 

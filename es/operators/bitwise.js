@@ -16,6 +16,8 @@ module.exports = function bitwise ($void) {
       return typeof value === 'number' ? ~value : ~0
     }
     return ~0
+  }, function (value) {
+    return typeof value === 'number' ? ~value : ~0
   })
 
   // bitwise AND and assign it back to the same variable

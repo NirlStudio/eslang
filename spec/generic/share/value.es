@@ -206,29 +206,34 @@
 ).
 
 (define "Global Operators" (=> ()
-  (define "Null fallback: (the-value ?? ...)" (=> ()
-    (should "(the-value ??) returns the-value." (=> ()
-      (assert the-value ($the-value ??).
-      (var x the-value)
-      (assert the-value ($x ??).
+  (define "Booleanize Null: (the-value ??)" (=> ()
+    (should "(the-value ??) returns true." (=> ()
+      (assert true ($the-value ??).
+
+      (var v the-value)
+      (assert true ($v ??).
     ).
-    (should "(the-value ?? x) returns the-value." (=> ()
+  ).
+  (define "Null fallback: (the-value ?? value)" (=> ()
+    (should "(the-value ?? value) returns the-value." (=> ()
       (var c 0)
       (assert the-value ($the-value ?? 1).
       (assert the-value ($the-value ?? (++ c).
       (assert 0 c)
 
-      (var x the-value)
-      (assert the-value ($x ?? 1).
-      (assert the-value ($x ?? (++ c).
+      (var v the-value)
+      (assert the-value ($v ?? 1).
+      (assert the-value ($v ?? (++ c).
       (assert 0 c)
     ).
-    (should "(the-value ?? x y) returns the-value." (=> ()
+  ).
+  (define "Null Switch: (the-value ?? truthy, falsy)" (=> ()
+    (should "(the-value ?? truthy, falsy) returns truthy." (=> ()
       (let x 1)
       (let y -1)
-      (assert the-value ($the-value ?? x y).
-      (assert the-value ($the-value ?? (++ x) (-- y).
-      (assert 1 x)
+      (assert 1 ($the-value ?? x y).
+      (assert 2 ($the-value ?? (++ x) (-- y).
+      (assert 2 x)
       (assert -1 y)
     ).
   ).

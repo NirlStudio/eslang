@@ -16,8 +16,6 @@ module.exports = function control ($void) {
   var symbolIn = sharedSymbolOf('in')
   var symbolUnderscore = sharedSymbolOf('_')
 
-  // (? sym) - resolve in global scope or original scope (in operator only).
-  // (? cond true-branch false-branch)
   staticOperator('?', function (space, clause) {
     var clist = clause.$
     var length = clist.length
@@ -33,7 +31,7 @@ module.exports = function control ($void) {
       return evaluate(clist[2], space)
     }
     return length > 3 ? evaluate(clist[3], space) : null
-  })
+  }, $void.isTruthy) // operator "?"'s entity value is to booleanize a value.
 
   // (if cond true-branch else false-branch)
   staticOperator('if', function (space, clause) {

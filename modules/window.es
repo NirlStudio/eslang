@@ -6,7 +6,7 @@ export (document, navigator, location) window;
 # bind elements to their ids.
 (export bind (=? ()
   (for &el in (operation slice operand) (if (&el is-a symbol)
-    (var &el (? document:: getElementById (&el key);
+    (var &el (. document:: getElementById (&el key);
 ).
 
 #(
@@ -19,12 +19,13 @@ export (document, navigator, location) window;
 ).
 
 # add an event listener and return it.
-(export on (? (document "addEventListener":: is-a function)
+(export on (if (document "addEventListener":: is-a function)
   (=> (target, event, listener, options)
     let (target, offset) (prepare-by target);
     target "addEventListener":: apply target, (arguments slice offset);
     arguments: (offset + 1);
   ).
+else
   (=> (target, event, listener)
     let (target, offset) (prepare-by target);
     target attachEvent 'on$(arguments: offset)', listener;
@@ -33,11 +34,12 @@ export (document, navigator, location) window;
 ).
 
 # remove an event listener and return the target.
-(export off (? (document "removeEventListener":: is-a function)
+(export off (if (document "removeEventListener":: is-a function)
   (=> (target, event, listener, options)
     let (target, offset) (prepare-by target);
     target "removeEventListener":: apply target, (arguments slice offset); target
   ).
+else
   (=> (target, event, listener)
     let (target, offset) (prepare-by target);
     target detachEvent 'on$(arguments: offset)', listener; target
