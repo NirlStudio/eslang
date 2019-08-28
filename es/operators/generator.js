@@ -20,7 +20,7 @@ module.exports = function generator ($void) {
   }
 
   function generatorOf (op, impl, defaultOp) {
-    impl || (impl = function (space, clause) {
+    impl || (impl = noop(function (space, clause) {
       var clist = clause.$
       switch (clist.length) {
         case 1:
@@ -41,14 +41,14 @@ module.exports = function generator ($void) {
       return function (this_) {
         return thisCall.apply(null, [this_, op].concat(args))
       }
-    })
+    }))
 
-    defaultOp || (defaultOp = function (this_) {
+    defaultOp || (defaultOp = noop(function (this_) {
       return arguments.length < 2 ? thisCall(this_, op)
         : thisCall.apply(null, [this_, op].concat(
           Array.prototype.slice.call(arguments, 1)
         ))
-    })
+    }))
 
     return staticOperator(op, impl, defaultOp)
   }
