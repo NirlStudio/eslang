@@ -2,8 +2,10 @@
 
 module.exports = function operator ($void) {
   var $ = $void.$
+  var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var $Operator = $.operator
+  var evaluate = $void.evaluate
   var operatorOf = $void.operatorOf
   var staticOperator = $void.staticOperator
 
@@ -18,6 +20,9 @@ module.exports = function operator ($void) {
     var clist = clause.$
     if (clist.length > 1) {
       var sym = clist[1]
+      if (sym instanceof Tuple$) {
+        sym = evaluate(sym, space)
+      }
       if (sym instanceof Symbol$) {
         return space.$resolve(sym.key)
       }
