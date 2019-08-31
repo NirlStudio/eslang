@@ -54,25 +54,19 @@ module.exports = function generator ($void) {
   }
 
   // universal operations
-  generatorOf('is')
-  generatorOf('===')
-  generatorOf('is-not')
-  generatorOf('!==')
+  staticOperator('===', generatorOf('is'), $['is'])
+  staticOperator('!==', generatorOf('is-not'), $['is-not'])
 
-  generatorOf('equals')
-  generatorOf('==')
-  generatorOf('not-equals')
-  generatorOf('!=')
+  staticOperator('==', generatorOf('equals'), $['equals'])
+  staticOperator('!=', generatorOf('not-equals'), $['not-equals'])
 
   generatorOf('compare')
 
   generatorOf('is-empty')
   generatorOf('not-empty')
 
-  generatorOf('is-a')
-  generatorOf('is-an')
-  generatorOf('is-not-a')
-  generatorOf('is-not-an')
+  staticOperator('is-an', generatorOf('is-a'), $['is-a'])
+  staticOperator('is-not-an', generatorOf('is-not-a'), $['is-not-a'])
 
   generatorOf('to-code')
   generatorOf('to-string')
@@ -210,7 +204,7 @@ module.exports = function generator ($void) {
 
   // general: +, (str +=), (str -=)
 
-  // logical operators: not, ...
+  // logical operators: not, !, ...
   var logicalAnd = bindThis(null, function (a, b) {
     return isFalsy(a) || arguments.length < 2 ? a : b
   })

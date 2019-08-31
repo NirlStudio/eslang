@@ -14,9 +14,9 @@ module.exports = function operator ($void) {
     return clause.$.length < 2 ? $Operator.noop : operatorOf(space, clause)
   })
 
-  // resolve a symbol from the original declaration space of an operator.
-  // fall back to the result of applying operator ".." if it's called in
-  // a non-operator space.
+  // To resolve a symbol from the original declaration space of an operator.
+  // It's designed to be used in an operator, but it falls back to the result of
+  // applying operator ".." if it's called in a non-operator space.
   staticOperator('.', function (space, clause) {
     var clist = clause.$
     if (clist.length > 1) {
