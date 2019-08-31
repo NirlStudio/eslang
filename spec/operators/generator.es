@@ -1,5 +1,10 @@
 const (samples) (import "../generic/samples/types");
+
 const nobody (@);
+(const flat-samples (samples reduce (@ null, type), (=> (values, sample)
+  values push (sample the-type), (sample "empty");
+  values merge (sample values);
+).
 
 (define "universal operations", (=> ()
   (define "is", (=> ()
@@ -525,7 +530,9 @@ const nobody (@);
           assert ($value to-string) (:to-string value);
         ).
   ).
+).
 
+(define "comparison operations", (=> ()
   (define "comparer: >", (=> ()
     (should "((>) one) works like (one >).", (=> ()
       var *> (>);
@@ -746,5 +753,317 @@ const nobody (@);
           let last value;
         ).
   ).
+).
 
+(define "arithmetic operations", (=> ()
+  (define "global: -", (=> ()
+    (should "'-' is resolved to a function.", (=> ()
+      assert ($- is-a function);
+      var -_ -;
+      assert ($-_ is-a function);
+      assert ($-_ is -);
+    ).
+    (should "(:-) returns -0.", (=> ()
+      assert (:-:: is -0);
+    ).
+    (should "(:- num) returns the opposite value of num.", (=> ()
+      assert (:- 0:: is -0);
+      assert (:- -0:: is 0);
+
+      assert (:- 1:: is -1);
+      assert (:- -1:: is 1);
+
+      assert (:- 1.5:: is -1.5);
+      assert (:- -1.5:: is 1.5);
+
+      assert (:- (number infinite):: is (number -infinite);
+      assert (:- (number -infinite):: is (number infinite));
+    ).
+    (should "(:- not-a-num) returns -0.", (=> ()
+      assert (:- null:: is -0);
+      assert (:- type:: is -0);
+      (for sample in samples
+        assert (:- (sample the-type):: is -0);
+        (if (sample the-type:: is-not number)
+          assert (:- (sample "empty"):: is -0);
+          (for value in (sample values)
+            assert (:- value:: is -0);
+            assert (:- value:: is -0);
+          ).
+      ).
+    ).
+  ).
+  (define "global: ++", (=> ()
+    (should "'++' is resolved to a function.", (=> ()
+      assert ($++ is-a function);
+      var ++_ ++;
+      assert ($++_ is-a function);
+      assert ($++_ is ++);
+    ).
+    (should "(:++) returns 1.", (=> ()
+      assert 1 (:++);
+    ).
+    (should "(:++ num) returns (num + 1).", (=> ()
+      assert 1 (:++ 0);
+      assert -1 (:++ -2);
+      assert 0 (:++ -1);
+      assert 2 (:++ 1);
+
+      assert 2.5 (:++ 1.5);
+      assert -0.5 (:++ -1.5);
+
+      assert (number infinite) (:++ (number infinite);
+      assert (number -infinite) (:++ (number -infinite);
+    ).
+    (should "(:++ not-a-num) returns 1.", (=> ()
+      assert 1 (:++ null);
+      assert 1 (:++ type);
+      (for sample in samples
+        assert 1 (:++ (sample the-type);
+        (if (sample the-type:: is-not number)
+          assert 1 (:++ (sample "empty");
+          (for value in (sample values)
+            assert 1 (:++ value);
+          ).
+      ).
+    ).
+  ).
+  (define "global: --", (=> ()
+    (should "'--' is resolved to a function.", (=> ()
+      assert ($-- is-a function);
+      var --_ --;
+      assert ($--_ is-a function);
+      assert ($--_ is --);
+    ).
+    (should "(:--) returns -1.", (=> ()
+      assert -1 (:--);
+    ).
+    (should "(:-- num) returns (num - 1).", (=> ()
+      assert -1 (:-- 0);
+      assert -2 (:-- -1);
+      assert 0 (:-- 1);
+      assert 1 (:-- 2);
+
+      assert 0.5 (:-- 1.5);
+      assert -2.5 (:-- -1.5);
+
+      assert (number infinite) (:-- (number infinite);
+      assert (number -infinite) (:-- (number -infinite);
+    ).
+    (should "(:-- not-a-num) returns -1.", (=> ()
+      assert -1 (:-- null);
+      assert -1 (:-- type);
+      (for sample in samples
+        assert -1 (:-- (sample the-type);
+        (if (sample the-type:: is-not number)
+          assert -1 (:-- (sample "empty");
+          (for value in (sample values)
+            assert -1 (:-- value);
+          ).
+  ).
+  (define "global: +=", (=> ()
+    (should "'+=' is resolved to a function.", (=> ()
+      assert ($+= is-a function);
+      var +=_ +=;
+      assert ($+=_ is-a function);
+      assert ($+=_ is +=);
+    ).
+    (should "((+=) value) works like (value +).", (=> ()
+      var *+= (+=);
+      assert ($*+= is-a function);
+
+      assert (null +) (*+= null);
+      assert (type +) (*+= type);
+      (for sample in samples
+        assert ((sample the-type) +) (*+= (sample the-type);
+        (if (sample the-type:: is array)
+          assert ((sample "empty") +:: length) (*+= (sample "empty":: length);
+          (for value in (sample values)
+            assert (value +:: length) (*+= value:: length);
+          ).
+        else
+          assert ($(sample "empty") +) (*+= (sample "empty");
+          (for value in (sample values)
+            assert ($value +) (*+= value);
+          ).
+    ).
+    (var is-safe (all
+      (is-not-a lambda), (is-not-a function) and (is-not-a iterator)
+    ).
+    (should "((+= another) one) works like (one + another).", (=> ()
+      (for another in flat-samples
+        var +another (+= another);
+        assert ($+another is-a function);
+
+        (for one in flat-samples
+          (if ($one is-a array)
+            (if (is-safe another)
+              assert (one + another:: length) (+another one:: length);
+            ).
+          else
+            assert ($one + another) (+another one);
+          ).
+    ).
+    (should "(:+= one another extra) works like (one + another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          (if ($one is-a array)
+            (if (is-safe another)
+              assert ($one +:: length) (:+= one:: length);
+              assert (one + another:: length) (:+= one another:: length);
+              assert (one + another:: length) (:+= one another another:: length);
+            ).
+          else
+            assert ($one +) (:+= one);
+            assert ($one + another) (:+= one another);
+            assert ($one + another) (:+= one another another);
+          ).
+  ).
+  (define "global: -=", (=> ()
+    (should "'-=' is resolved to a function.", (=> ()
+      assert ($-= is-a function);
+      var -=_ -=;
+      assert ($-=_ is-a function);
+      assert ($-=_ is -=);
+    ).
+    (should "((-=) value) works like (value -).", (=> ()
+      var *-= (-=);
+      assert ($*-= is-a function);
+
+      assert (null -) (*-= null);
+      assert (type -) (*-= type);
+      (for sample in samples
+        assert ((sample the-type) -) (*-= (sample the-type);
+        assert ((sample "empty") -) (*-= (sample "empty");
+        (for value in (sample values)
+          assert ($value -) (*-= value);
+        ).
+    ).
+    (should "((-= another) one) works like (one - another)).", (=> ()
+      (for another in flat-samples
+        var -another (-= another);
+        assert ($-another is-a function);
+        (for one in flat-samples
+          assert ($one - another) (-another one);
+        ).
+      ).
+    ).
+    (should "(:-= one another extra) works like (one - another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert ($one -) (:-= one);
+          assert ($one - another) (:-= one another);
+          assert ($one - another) (:-= one another another);
+        ).
+  ).
+  (define "global: *=", (=> ()
+    (should "'*=' is resolved to a function.", (=> ()
+      assert ($*= is-a function);
+      var *=_ *=;
+      assert ($*=_ is-a function);
+      assert ($*=_ is *=);
+    ).
+    (should "((*=) value) works like (value *).", (=> ()
+      var **= (*=);
+      assert ($**= is-a function);
+
+      assert (null *) (**= null);
+      assert (type *) (**= type);
+      (for sample in samples
+        assert ((sample the-type) *) (**= (sample the-type);
+        assert ((sample "empty") *) (**= (sample "empty");
+        (for value in (sample values)
+          assert ($value *) (:**= value);
+        ).
+    ).
+    (should "((*= another) one) works like (one * another)).", (=> ()
+      (for another in flat-samples
+        var *another (*= another);
+        assert ($*another is-a function);
+        (for one in flat-samples
+          assert ($one * another) (*another one);
+        ).
+      ).
+    ).
+    (should "(:*= one another extra) works like (one * another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert ($one *) (:*= one);
+          assert ($one * another) (:*= one another);
+          assert ($one * another) (:*= one another another);
+        ).
+  ).
+  (define "global: /=", (=> ()
+    (should "'/=' is resolved to a function.", (=> ()
+      assert ($/= is-a function);
+      var /=_ /=;
+      assert ($/=_ is-a function);
+      assert ($/=_ is /=);
+    ).
+    (should "((/=) value) works like (value /).", (=> ()
+      var */= (/=);
+      assert ($*/= is-a function);
+
+      assert (null /) (*/= null);
+      assert (type /) (*/= type);
+      (for sample in samples
+        assert ((sample the-type) /) (*/= (sample the-type);
+        assert ((sample "empty") /) (*/= (sample "empty");
+        (for value in (sample values)
+          assert ($value /) (:*/= value);
+        ).
+    ).
+    (should "((/= another) one) works like (one / another)).", (=> ()
+      (for another in flat-samples
+        var /another (/= another);
+        assert ($/another is-a function);
+        (for one in flat-samples
+          assert ($one / another) (/another one);
+        ).
+      ).
+    ).
+    (should "(:/= one another extra) works like (one / another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert ($one /) (:/= one);
+          assert ($one / another) (:/= one another);
+          assert ($one / another) (:/= one another another);
+        ).
+  ).
+  (define "global: %=", (=> ()
+    (should "'%=' is resolved to a function.", (=> ()
+      assert ($%= is-a function);
+      var %=_ %=;
+      assert ($%=_ is-a function);
+      assert ($%=_ is %=);
+    ).
+    (should "((%=) value) works like (value %).", (=> ()
+      var *%= (%=);
+      assert ($*%= is-a function);
+
+      assert (null %) (*%= null);
+      assert (type %) (*%= type);
+      (for sample in samples
+        assert ((sample the-type) %) (*%= (sample the-type);
+        assert ((sample "empty") %) (*%= (sample "empty");
+        (for value in (sample values)
+          assert ($value %) (:*%= value);
+        ).
+    ).
+    (should "((%= another) one) works like (one % another)).", (=> ()
+      (for another in flat-samples
+        var %another (%= another);
+        assert ($%another is-a function);
+        (for one in flat-samples
+          assert ($one % another) (%another one);
+        ).
+      ).
+    ).
+    (should "(:%= one another extra) works like (one % another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert ($one %) (:/= one);
+          assert ($one % another) (:%= one another);
+          assert ($one % another) (:%= one another another);
+        ).
 ).

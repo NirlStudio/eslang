@@ -13,7 +13,7 @@ module.exports = function generator ($void) {
   var isApplicable = $void.isApplicable
   var numberValueOf = $void.numberValueOf
   var staticOperator = $void.staticOperator
-  var staticCombine = $void.staticOperators['+']
+  var tryToUpdateName = $void.tryToUpdateName
 
   function noop (this_) {
     return this_
@@ -77,93 +77,36 @@ module.exports = function generator ($void) {
   generatorOf('<')
   generatorOf('<=')
 
-  // global arithmetic operators: -, ++, --, ...
-  var numberOrString = noop(function (this_) {
-    return typeof this_ === 'number' ? this_ : thisCall(this_, 'to-string')
-  })
+  // arithmetic operators: -, ++, --, ...
+  function arithmeticGeneratorOf (op) {
+    var defaultOp = tryToUpdateName(function (this_) {
+      return thisCall(this_, op)
+    }, '*' + op)
 
-  staticOperator('+=', function (space, clause) {
-    var value = staticCombine(space, clause)
-    return typeof value === 'number' ? function (this_) {
-      return (typeof this_ === 'number' ? this_ : numberValueOf(this_)) + value
-    } : function (this_) {
-      return (typeof this_ === 'string' ? this_
-        : thisCall(this_, 'to-string')
-      ) + value
-    }
-  }, bindThis(null, numberOrString))
-
-  staticOperator('-=', function (space, clause) {
-    var value = staticCombine(space, clause)
-    return typeof value === 'number' ? function (this_) {
-      return (typeof this_ === 'number' ? this_ : numberValueOf(this_)) - value
-    } : function (this_) {
-      if (typeof this_ !== 'string') {
-        this_ = thisCall(this_, 'to-string')
+    return staticOperator(op + '=', function (space, clause) {
+      var clist = clause.$
+      var length = clist.length
+      if (length < 2) {
+        return defaultOp
       }
-      return this_.endsWith(value)
-        ? this_.substring(0, this_.length - value.length) : this_
-    }
-  }, bindThis(null, numberOrString))
+      var args = []
+      for (var i = 1; i < length; i++) {
+        args.push(evaluate(clist[i], space))
+      }
+      return function (this_) {
+        return thisCall.apply(null, [this_, op].concat(args))
+      }
+    }, function (a, b) {
+      return typeof a === 'undefined' ? null
+        : typeof b === 'undefined' ? thisCall(a, op) : thisCall(a, op, b)
+    })
+  }
 
-  var defaultMultiply = bindThis(null, numberValueOf)
-  staticOperator('*=', function (space, clause) {
-    var clist = clause.$
-    var len = clist.length
-    if (len < 2) {
-      return defaultMultiply
-    }
-    var value = evaluate(clist[1], space)
-    if (typeof value !== 'number') {
-      value = numberValueOf(value)
-    }
-    for (var i = 2; i < len; i++) {
-      var factor = evaluate(clist[i], space)
-      value *= (typeof factor === 'number' ? factor : numberValueOf(factor))
-    }
-    return value === 1 ? defaultMultiply : function (this_) {
-      return (typeof this_ === 'number' ? this_
-        : numberValueOf(this_)
-      ) * value
-    }
-  }, defaultMultiply)
-
-  var defaultDivide = bindThis(null, numberValueOf)
-  staticOperator('/=', function (space, clause) {
-    var clist = clause.$
-    var len = clist.length
-    if (len < 2) {
-      return defaultDivide
-    }
-    var value = evaluate(clist[1], space)
-    if (typeof value !== 'number') {
-      value = numberValueOf(value)
-    }
-    for (var i = 2; i < len; i++) {
-      var factor = evaluate(clist[i], space)
-      value *= (typeof factor === 'number' ? factor : numberValueOf(factor))
-    }
-    return value === 1 ? defaultDivide : function (this_) {
-      return (typeof this_ === 'number' ? this_
-        : numberValueOf(this_)
-      ) / value
-    }
-  }, defaultDivide)
-
-  var mod = $.number.proto['%']
-  var defaultMod = bindThis(null, numberValueOf)
-  staticOperator('%=', function (space, clause) {
-    var clist = clause.$
-    if (clist.length < 2) {
-      return defaultMod
-    }
-    var value = evaluate(clist[1], space)
-    return function (this_) {
-      return mod.call(typeof this_ === 'number' ? this_
-        : numberValueOf(this_), value
-      )
-    }
-  }, defaultMod)
+  arithmeticGeneratorOf('+')
+  arithmeticGeneratorOf('-')
+  arithmeticGeneratorOf('*')
+  arithmeticGeneratorOf('/')
+  arithmeticGeneratorOf('%')
 
   // bitwise: ~, ...
   function safeBitwiseOpOf (op) {
@@ -175,14 +118,16 @@ module.exports = function generator ($void) {
   function bitwiseGeneratorOf (key) {
     var op = $.number.proto[key]
 
+    var defaultOp = tryToUpdateName(function (this_) {
+      return op.call(typeof this_ === 'number' ? this_
+        : numberValueOf(this_)
+      )
+    }, '*' + key)
+
     return staticOperator(key + '=', function (space, clause) {
       var clist = clause.$
       if (clist.length < 2) {
-        return function (this_) {
-          return op.call(typeof this_ === 'number' ? this_
-            : numberValueOf(this_)
-          )
-        }
+        return defaultOp
       }
       var value = evaluate(clist[1], space)
       return function (this_) {

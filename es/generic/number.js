@@ -247,7 +247,7 @@ module.exports = function ($void) {
   // remainder / modulus
   link(proto, '%', function (base) {
     return typeof base === 'undefined' ? this
-      : isNaN(base) || typeof base !== 'number' ? NaN
+      : typeof base !== 'number' || isNaN(base) ? NaN
         : isFinite(base) ? this % valueOf(base) : this
   })
 

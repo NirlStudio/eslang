@@ -22,13 +22,24 @@ module.exports = function general ($void) {
         : concat(space, base, clist)
     }
     return 0
-  }, function (a, b) {
-    if (typeof a === 'number') {
-      return a + (typeof b === 'number' ? b : numberValueOf(b))
+  }, function (base, value) {
+    var i = 1
+    var len = arguments.length
+    if (typeof base === 'number') {
+      for (; i < len; i++) {
+        value = arguments[i]
+        base += typeof value === 'number' ? value : numberValueOf(value)
+      }
+    } else {
+      if (typeof base !== 'string') {
+        base = thisCall(base, 'to-string')
+      }
+      for (; i < len; i++) {
+        value = arguments[i]
+        base += typeof value === 'string' ? value : thisCall(value, 'to-string')
+      }
     }
-    return (typeof a === 'string' ? a : thisCall(a, 'to-string')) + (
-      typeof b === 'string' ? b : thisCall(b, 'to-string')
-    )
+    return base
   })
 
   function concat (space, str, clist) {
