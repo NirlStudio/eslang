@@ -213,11 +213,15 @@ module.exports = function ($void) {
 
   // test a boolean value of any value.
   $void.isTruthy = function (v) {
-    return v !== false && v !== null && v !== 0 && typeof v !== 'undefined'
+    return arguments.length < 0 || (
+      v !== false && v !== null && v !== 0 && typeof v !== 'undefined'
+    )
   }
 
   $void.isFalsy = function (v) {
-    return v === false || v === null || v === 0 || typeof v === 'undefined'
+    return arguments.length > 0 && (
+      v === false || v === null || v === 0 || typeof v === 'undefined'
+    )
   }
 
   // retrieve the system indexer of an entity.

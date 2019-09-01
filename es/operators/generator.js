@@ -145,19 +145,18 @@ module.exports = function generator ($void) {
   bitwiseGeneratorOf('>>')
   bitwiseGeneratorOf('>>>')
 
-  // control: ?
-
   // general: +, (str +=), (str -=)
 
   // logical operators: not, !, ...
-  var logicalAnd = bindThis(null, function (a, b) {
+  var defaultAnd = tryToUpdateName(function (this_) { return this_ }, '*&&')
+  var logicalAnd = noop(function (a, b) {
     return isFalsy(a) || arguments.length < 2 ? a : b
   })
 
   staticOperator('and', staticOperator('&&', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
-      return logicalAnd
+      return defaultAnd
     }
     var value
     for (var i = 1, len = clist.length; i < len; i++) {
@@ -171,6 +170,7 @@ module.exports = function generator ($void) {
     }
   }, logicalAnd), logicalAnd)
 
+  var defaultOr = tryToUpdateName(function (this_) { return this_ }, '*||')
   var logicalOr = bindThis(null, function (a, b) {
     return isTruthy(a) || arguments.length < 2 ? a : b
   })
@@ -178,7 +178,7 @@ module.exports = function generator ($void) {
   staticOperator('or', staticOperator('||', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
-      return logicalOr
+      return defaultOr
     }
     var value
     for (var i = 1, len = clist.length; i < len; i++) {

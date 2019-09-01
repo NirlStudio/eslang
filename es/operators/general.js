@@ -25,6 +25,9 @@ module.exports = function general ($void) {
   }, function (base, value) {
     var i = 1
     var len = arguments.length
+    if (len < 1) {
+      return 0
+    }
     if (typeof base === 'number') {
       for (; i < len; i++) {
         value = arguments[i]

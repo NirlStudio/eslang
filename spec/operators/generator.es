@@ -949,8 +949,9 @@ const nobody (@);
     ).
     (should "(:-= one another extra) works like (one - another).", (=> ()
       (for another in flat-samples
+        assert ($another -) (:-= another);
+
         (for one in flat-samples
-          assert ($one -) (:-= one);
           assert ($one - another) (:-= one another);
           assert ($one - another) (:-= one another another);
         ).
@@ -986,8 +987,8 @@ const nobody (@);
     ).
     (should "(:*= one another extra) works like (one * another).", (=> ()
       (for another in flat-samples
+        assert ($another *) (:*= another);
         (for one in flat-samples
-          assert ($one *) (:*= one);
           assert ($one * another) (:*= one another);
           assert ($one * another) (:*= one another another);
         ).
@@ -1023,8 +1024,8 @@ const nobody (@);
     ).
     (should "(:/= one another extra) works like (one / another).", (=> ()
       (for another in flat-samples
+        assert ($another /) (:/= another);
         (for one in flat-samples
-          assert ($one /) (:/= one);
           assert ($one / another) (:/= one another);
           assert ($one / another) (:/= one another another);
         ).
@@ -1060,8 +1061,8 @@ const nobody (@);
     ).
     (should "(:%= one another extra) works like (one % another).", (=> ()
       (for another in flat-samples
+        assert ($another %) (:%= another);
         (for one in flat-samples
-          assert ($one %) (:/= one);
           assert ($one % another) (:%= one another);
           assert ($one % another) (:%= one another another);
         ).
@@ -1145,8 +1146,8 @@ const nobody (@);
     ).
     (should "(:&= one another extra) works like (number of one:: & another).", (=> ()
       (for another in flat-samples
+        assert (number of another:: &) (:&= another);
         (for one in flat-samples
-          assert (number of one:: &) (:&= one);
           assert (number of one:: & another) (:&= one another);
           assert (number of one:: & another) (:&= one another another);
         ).
@@ -1229,8 +1230,8 @@ const nobody (@);
     ).
     (should "(:^= one another extra) works like (number of one:: ^ another).", (=> ()
       (for another in flat-samples
+        assert (number of another:: ^) (:^= another);
         (for one in flat-samples
-          assert (number of one:: ^) (:^= one);
           assert (number of one:: ^ another) (:^= one another);
           assert (number of one:: ^ another) (:^= one another another);
         ).
@@ -1271,8 +1272,8 @@ const nobody (@);
     ).
     (should "(:<<= one another extra) works like (number of one:: << another).", (=> ()
       (for another in flat-samples
+        assert (number of another:: <<) (:<<= another);
         (for one in flat-samples
-          assert (number of one:: <<) (:<<= one);
           assert (number of one:: << another) (:<<= one another);
           assert (number of one:: << another) (:<<= one another another);
         ).
@@ -1313,8 +1314,8 @@ const nobody (@);
     ).
     (should "(:>>= one another extra) works like (number of one:: >> another).", (=> ()
       (for another in flat-samples
+        assert (number of another:: >>) (:>>= another);
         (for one in flat-samples
-          assert (number of one:: >>) (:>>= one);
           assert (number of one:: >> another) (:>>= one another);
           assert (number of one:: >> another) (:>>= one another another);
         ).
@@ -1355,10 +1356,194 @@ const nobody (@);
     ).
     (should "(:>>>= one another extra) works like (number of one:: >>> another).", (=> ()
       (for another in flat-samples
+        assert (number of another:: >>>) (:>>>= another);
         (for one in flat-samples
-          assert (number of one:: >>>) (:>>>= one);
           assert (number of one:: >>> another) (:>>>= one another);
           assert (number of one:: >>> another) (:>>>= one another another);
         ).
+  ).
+).
+
+(define "general operations", (=> ()
+  (define "global: +", (=> ()
+    (should "'+' is resolved to a function.", (=> ()
+      assert ($+ is-a function);
+      var +_ +;
+      assert ($+_ is-a function);
+      assert ($+_ is +);
+    ).
+    (should "(:+) returns 0.", (=> ()
+      assert (:+:: is 0);
+    ).
+    (should "(:+ num) returns the original value of num.", (=> ()
+      assert (:+ 0:: is 0);
+      assert (:+ -0:: is -0);
+
+      assert (:+ 1:: is 1);
+      assert (:+ -1:: is -1);
+
+      assert (:+ 1.5:: is 1.5);
+      assert (:+ -1.5:: is -1.5);
+
+      assert (:+ (number infinite):: is (number infinite);
+      assert (:+ (number -infinite):: is (number -infinite));
+    ).
+    (should "(:+ num1, num2, ...) returns the summed value of numbers.", (=> ()
+      assert (:+ 0 0:: is 0);
+      assert (:+ -0 -0:: is -0);
+
+      assert 3 (:+ 1 2);
+      assert -3 (:+ -1 -2);
+
+      assert 6 (:+ 1 2 3);
+      assert -6 (:+ -1 -2 -3);
+
+      assert 4 (:+ 1.5 2.5);
+      assert -4 (:+ -1.5 -2.5);
+
+      assert 7.5 (:+ 1.5, 2.5, 3.5);
+      assert -7.5 (:+ -1.5, -2.5, -3.5);
+
+      assert (number infinite) (:+ (number infinite) (number infinite);
+      assert (number -infinite) (:+ (number -infinite) (number -infinite));
+      assert (number invalid) (:+ (number infinite) (number -infinite));
+    ).
+    (should "(:+ value1, value2, ...) works like (+ value1, value2, ...).", (=> ()
+      assert (+ null) (:+ null);
+      assert (+ type) (:+ type);
+      (for sample in samples
+        assert (+ (sample the-type)) (:+ (sample the-type);
+        (if (sample the-type:: is-not number)
+          assert (+ (sample "empty") (sample the-type)) (:+ (sample "empty") (sample the-type);
+          (for value in (sample values)
+            assert (+ value (sample "empty") (sample the-type)) (:+ value (sample "empty") (sample the-type);
+          ).
+).
+
+(define "logical operations", (=> ()
+  (define "!", (=> ()
+    (should "'!' is resolved to a function.", (=> ()
+      assert ($! is-a function);
+      var !_ !;
+      assert ($!_ is-a function);
+      assert ($!_ is !);
+    ).
+    (should "(:!) returns false.", (=> ()
+      assert false (:!);
+    ).
+    (should "(:! value) works like (! value).", (=> ()
+      assert (! null) (:! null);
+      assert (! type) (:! type);
+      (for sample in samples
+        assert (! (sample the-type)) (:! (sample the-type);
+        (if (sample the-type:: is-not number)
+          assert (! (sample "empty")) (:! (sample "empty");
+          (for value in (sample values)
+            assert (! value) (:! value);
+          ).
+  ).
+  (define "not", (=> ()
+    (should "'not' is an alias of '!'.", (=> ()
+      assert ($! is not);
+      assert ($not is !);
+    ).
+  ).
+  (define "&&", (=> ()
+    (should "'&&' is resolved to a function.", (=> ()
+      assert ($&& is-a function);
+      var &&_ &&;
+      assert ($&&_ is-a function);
+      assert ($&&_ is &&);
+    ).
+    (should "((&&) value) works like (value &&).", (=> ()
+      var *&& (&&);
+      assert ($*&& is-a function);
+
+      assert (null &&) (*&& null);
+      assert (type &&) (*&& type);
+      (for sample in samples
+        assert (sample the-type:: &&) (*&& (sample the-type);
+        assert (sample "empty":: &&) (*&& (sample "empty");
+        (for value in (sample values)
+          assert ($value &&) (:*&& value);
+        ).
+    ).
+    (should "((&& another extra) one) works like (one && another extra).", (=> ()
+      (for another in flat-samples
+        var &&another1 (&& another);
+        assert ($&&another1 is-a function);
+
+        (for one in flat-samples
+          var &&another2 (&& another one);
+          assert ($&&another2 is-a function);
+
+          assert ($one && another) (&&another1 one);
+          assert ($one && another one) (&&another2 one);
+        ).
+      ).
+    ).
+    (should "(:&& one another extra) works like (one && another).", (=> ()
+      (for another in flat-samples
+        assert ($another &&) (:&& another);
+
+        (for one in flat-samples
+          assert ($one && another) (:&& one another);
+          assert ($one && another) (:&& one another one);
+        ).
+  ).
+  (define "and", (=> ()
+    (should "'and' is an alias of '&&'.", (=> ()
+      assert ($&& is and);
+      assert ($and is &&);
+    ).
+  ).
+  (define "||", (=> ()
+    (should "'||' is resolved to a function.", (=> ()
+      assert ($|| is-a function);
+      var ||_ ||;
+      assert ($||_ is-a function);
+      assert ($||_ is ||);
+    ).
+    (should "((||) value) works like (value ||).", (=> ()
+      var *|| (||);
+      assert ($*|| is-a function);
+
+      assert (null ||) (*|| null);
+      assert (type ||) (*|| type);
+      (for sample in samples
+        assert (sample the-type:: ||) (*|| (sample the-type);
+        assert (sample "empty":: ||) (*|| (sample "empty");
+        (for value in (sample values)
+          assert ($value ||) (:*|| value);
+        ).
+    ).
+    (should "((|| another extra) one) works like (one || another extra).", (=> ()
+      (for another in flat-samples
+        var ||another1 (|| another);
+        assert ($||another1 is-a function);
+
+        (for one in flat-samples
+          var ||another2 (|| another one);
+          assert ($||another2 is-a function);
+
+          assert ($one || another) (||another1 one);
+          assert ($one || another one) (||another2 one);
+        ).
+      ).
+    ).
+    (should "(:|| one another extra) works like (one || another).", (=> ()
+      (for another in flat-samples
+        assert ($another ||) (:|| another);
+
+        (for one in flat-samples
+          assert ($one || another) (:|| one another);
+          assert ($one || another) (:|| one another one);
+        ).
+  ).
+  (define "or", (=> ()
+    (should "'or' is an alias of '||'.", (=> ()
+      assert ($|| is or);
+      assert ($or is ||);
+    ).
   ).
 ).

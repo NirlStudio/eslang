@@ -560,6 +560,7 @@ module.exports = function ($void) {
     checkAlias('is-a', 'is-an')
     checkAlias('is-not-a', 'is-not-an')
 
+    checkAlias('not', '!')
     checkAlias('and', '&&')
     checkAlias('or', 'or')
   }
