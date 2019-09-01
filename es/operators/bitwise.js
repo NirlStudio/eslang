@@ -8,16 +8,18 @@ module.exports = function bitwise ($void) {
   var Symbol$ = $void.Symbol
   var evaluate = $void.evaluate
   var operator = $void.operator
+  var intValueOf = $void.intValueOf
+  var numberValueOf = $void.numberValueOf
   var staticOperator = $void.staticOperator
 
   staticOperator('~', function (space, clause) {
     if (clause.$.length > 1) {
       var value = evaluate(clause.$[1], space)
-      return typeof value === 'number' ? ~value : ~0
+      return typeof value === 'number' ? ~value : -1
     }
-    return ~0
+    return -1
   }, function (value) {
-    return typeof value === 'number' ? ~value : ~0
+    return typeof value === 'number' ? ~value : -1
   })
 
   // bitwise AND and assign it back to the same variable
@@ -30,7 +32,7 @@ module.exports = function bitwise ($void) {
       return 0 // The value of this operator is defined as 0.
     }
     var value = evaluate(clist[2], space)
-    that &= typeof value === 'number' ? value : 0
+    that &= typeof value === 'number' ? value : numberValueOf(value)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -50,7 +52,7 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var value = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    that |= typeof value === 'number' ? value : 0
+    that |= typeof value === 'number' ? value : numberValueOf(value)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -70,7 +72,7 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var value = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    that ^= typeof value === 'number' ? value : 0
+    that ^= typeof value === 'number' ? value : numberValueOf(value)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -90,7 +92,7 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    that <<= typeof offset === 'number' ? offset : 0
+    that <<= typeof offset === 'number' ? offset : intValueOf(offset)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -110,7 +112,7 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    that >>= typeof offset === 'number' ? offset : 0
+    that >>= typeof offset === 'number' ? offset : intValueOf(offset)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {
@@ -130,7 +132,7 @@ module.exports = function bitwise ($void) {
     var clist = clause && clause.$
     var offset = clist && clist.length && clist.length > 2
       ? evaluate(clist[2], space) : 0
-    that >>>= typeof offset === 'number' ? offset : 0
+    that >>>= typeof offset === 'number' ? offset : intValueOf(offset)
     // try to save back
     var sym = clist[0]
     if (sym instanceof Symbol$) {

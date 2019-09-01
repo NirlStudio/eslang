@@ -788,7 +788,6 @@ const nobody (@);
           assert (:- (sample "empty"):: is -0);
           (for value in (sample values)
             assert (:- value:: is -0);
-            assert (:- value:: is -0);
           ).
       ).
     ).
@@ -1066,4 +1065,300 @@ const nobody (@);
           assert ($one % another) (:%= one another);
           assert ($one % another) (:%= one another another);
         ).
+).
+
+(define "bitwise operations", (=> ()
+  (define "global: ~", (=> ()
+    (should "'~' is resolved to a function.", (=> ()
+      assert ($~ is-a function);
+      var ~_ ~;
+      assert ($~_ is-a function);
+      assert ($~_ is ~);
+    ).
+    (should "(:~) returns -1.", (=> ()
+      assert -1 (:~);
+    ).
+    (should "(:~ num) works like (~ num).", (=> ()
+      assert (~ 0) (:~ 0);
+      assert (~ -0) (:~ -0);
+
+      assert (~ 1) (:~ 1);
+      assert (~ -1) (:~ -1);
+
+      assert (~ (number min)) (:~ (number min);
+      assert (~ (number max)) (:~ (number max);
+      assert (~ (number smallest)) (:~ (number smallest);
+
+      assert (~ (number min-bits)) (:~ (number min-bits);
+      assert (~ (number max-bits)) (:~ (number max-bits);
+
+      assert (~ (number min-int)) (:~ (number min-int);
+      assert (~ (number max-int)) (:~ (number max-int);
+
+      assert (~ (number infinite)) (:~ (number infinite);
+      assert (~ (number -infinite)) (:~ (number -infinite);
+    ).
+    (should "(:~ not-a-num) returns -1.", (=> ()
+      assert -1 (:~ null);
+      assert -1 (:~ type);
+      (for sample in samples
+        assert -1 (:~ (sample the-type);
+        (if (sample the-type:: is-not number)
+          assert -1 (:~ (sample "empty");
+          (for value in (sample values)
+            assert -1 (:~ value);
+          ).
+  ).
+  (define "global: &=", (=> ()
+    (should "'&=' is resolved to a function.", (=> ()
+      assert ($&= is-a function);
+      var &=_ &=;
+      assert ($&=_ is-a function);
+      assert ($&=_ is &=);
+    ).
+    (should "((&=) value) works like (number of value:: &).", (=> ()
+      var *&= (&=);
+      assert ($*&= is-a function);
+
+      assert (number of null:: &) (*&= null);
+      assert (number of type:: &) (*&= type);
+      (for sample in samples
+        assert (number of (sample the-type):: &) (*&= (sample the-type);
+        assert (number of (sample "empty"):: &) (*&= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: &) (:*&= value);
+        ).
+    ).
+    (should "((&= another extra) one) works like (number of one:: & another)).", (=> ()
+      (for another in flat-samples
+        var &another1 (&= another);
+        assert ($&another1 is-a function);
+
+        var &another2 (&= another another);
+        assert ($&another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: & another) (&another1 one);
+          assert (number of one:: & another) (&another2 one);
+        ).
+      ).
+    ).
+    (should "(:&= one another extra) works like (number of one:: & another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: &) (:&= one);
+          assert (number of one:: & another) (:&= one another);
+          assert (number of one:: & another) (:&= one another another);
+        ).
+  ).
+  (define "global: |=", (=> ()
+    (should "'|=' is resolved to a function.", (=> ()
+      assert ($|= is-a function);
+      var |=_ |=;
+      assert ($|=_ is-a function);
+      assert ($|=_ is |=);
+    ).
+    (should "((|=) value) works like (number of value:: |).", (=> ()
+      var *|= (|=);
+      assert ($*|= is-a function);
+
+      assert (number of null:: |) (*|= null);
+      assert (number of type:: |) (*|= type);
+      (for sample in samples
+        assert (number of (sample the-type):: |) (*|= (sample the-type);
+        assert (number of (sample "empty"):: |) (*|= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: |) (:*|= value);
+        ).
+    ).
+    (should "((|= another extra) one) works like (number of one:: | another)).", (=> ()
+      (for another in flat-samples
+        var |another1 (|= another);
+        assert ($|another1 is-a function);
+
+        var |another2 (|= another another);
+        assert ($|another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: | another) (|another1 one);
+          assert (number of one:: | another) (|another2 one);
+        ).
+      ).
+    ).
+    (should "(:|= one another extra) works like (number of one:: | another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: |) (:|= one);
+          assert (number of one:: | another) (:|= one another);
+          assert (number of one:: | another) (:|= one another another);
+        ).
+  ).
+  (define "global: ^=", (=> ()
+    (should "'^=' is resolved to a function.", (=> ()
+      assert ($^= is-a function);
+      var ^=_ ^=;
+      assert ($^=_ is-a function);
+      assert ($^=_ is ^=);
+    ).
+    (should "((^=) value) works like (number of value:: ^).", (=> ()
+      var *^= (^=);
+      assert ($*^= is-a function);
+
+      assert (number of null:: ^) (*^= null);
+      assert (number of type:: ^) (*^= type);
+      (for sample in samples
+        assert (number of (sample the-type):: ^) (*^= (sample the-type);
+        assert (number of (sample "empty"):: ^) (*^= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: ^) (:*^= value);
+        ).
+    ).
+    (should "((^= another extra) one) works like (number of one:: ^ another)).", (=> ()
+      (for another in flat-samples
+        var ^another1 (^= another);
+        assert ($^another1 is-a function);
+
+        var ^another2 (^= another another);
+        assert ($^another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: ^ another) (^another1 one);
+          assert (number of one:: ^ another) (^another2 one);
+        ).
+      ).
+    ).
+    (should "(:^= one another extra) works like (number of one:: ^ another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: ^) (:^= one);
+          assert (number of one:: ^ another) (:^= one another);
+          assert (number of one:: ^ another) (:^= one another another);
+        ).
+  ).
+  (define "global: <<=", (=> ()
+    (should "'<<=' is resolved to a function.", (=> ()
+      assert ($<<= is-a function);
+      var <<=_ <<=;
+      assert ($<<=_ is-a function);
+      assert ($<<=_ is <<=);
+    ).
+    (should "((<<=) value) works like (number of value:: <<).", (=> ()
+      var *<<= (<<=);
+      assert ($*<<= is-a function);
+
+      assert (number of null:: <<) (*<<= null);
+      assert (number of type:: <<) (*<<= type);
+      (for sample in samples
+        assert (number of (sample the-type):: <<) (*<<= (sample the-type);
+        assert (number of (sample "empty"):: <<) (*<<= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: <<) (:*<<= value);
+        ).
+    ).
+    (should "((<<= another extra) one) works like (number of one:: << another)).", (=> ()
+      (for another in flat-samples
+        var <<another1 (<<= another);
+        assert ($<<another1 is-a function);
+
+        var <<another2 (<<= another another);
+        assert ($<<another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: << another) (<<another1 one);
+          assert (number of one:: << another) (<<another2 one);
+        ).
+      ).
+    ).
+    (should "(:<<= one another extra) works like (number of one:: << another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: <<) (:<<= one);
+          assert (number of one:: << another) (:<<= one another);
+          assert (number of one:: << another) (:<<= one another another);
+        ).
+  ).
+  (define "global: >>=", (=> ()
+    (should "'>>=' is resolved to a function.", (=> ()
+      assert ($>>= is-a function);
+      var >>=_ >>=;
+      assert ($>>=_ is-a function);
+      assert ($>>=_ is >>=);
+    ).
+    (should "((>>=) value) works like (number of value:: >>).", (=> ()
+      var *>>= (>>=);
+      assert ($*>>= is-a function);
+
+      assert (number of null:: >>) (*>>= null);
+      assert (number of type:: >>) (*>>= type);
+      (for sample in samples
+        assert (number of (sample the-type):: >>) (*>>= (sample the-type);
+        assert (number of (sample "empty"):: >>) (*>>= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: >>) (:*>>= value);
+        ).
+    ).
+    (should "((>>= another extra) one) works like (number of one:: >> another)).", (=> ()
+      (for another in flat-samples
+        var >>another1 (>>= another);
+        assert ($>>another1 is-a function);
+
+        var >>another2 (>>= another another);
+        assert ($>>another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: >> another) (>>another1 one);
+          assert (number of one:: >> another) (>>another2 one);
+        ).
+      ).
+    ).
+    (should "(:>>= one another extra) works like (number of one:: >> another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: >>) (:>>= one);
+          assert (number of one:: >> another) (:>>= one another);
+          assert (number of one:: >> another) (:>>= one another another);
+        ).
+  ).
+  (define "global: >>>=", (=> ()
+    (should "'>>>=' is resolved to a function.", (=> ()
+      assert ($>>>= is-a function);
+      var >>>=_ >>>=;
+      assert ($>>>=_ is-a function);
+      assert ($>>>=_ is >>>=);
+    ).
+    (should "((>>>=) value) works like (number of value:: >>>).", (=> ()
+      var *>>>= (>>>=);
+      assert ($*>>>= is-a function);
+
+      assert (number of null:: >>>) (*>>>= null);
+      assert (number of type:: >>>) (*>>>= type);
+      (for sample in samples
+        assert (number of (sample the-type):: >>>) (*>>>= (sample the-type);
+        assert (number of (sample "empty"):: >>>) (*>>>= (sample "empty");
+        (for value in (sample values)
+          assert (number of value:: >>>) (:*>>>= value);
+        ).
+    ).
+    (should "((>>>= another extra) one) works like (number of one:: >>> another)).", (=> ()
+      (for another in flat-samples
+        var >>>another1 (>>>= another);
+        assert ($>>>another1 is-a function);
+
+        var >>>another2 (>>>= another another);
+        assert ($>>>another2 is-a function);
+
+        (for one in flat-samples
+          assert (number of one:: >>> another) (>>>another1 one);
+          assert (number of one:: >>> another) (>>>another2 one);
+        ).
+      ).
+    ).
+    (should "(:>>>= one another extra) works like (number of one:: >>> another).", (=> ()
+      (for another in flat-samples
+        (for one in flat-samples
+          assert (number of one:: >>>) (:>>>= one);
+          assert (number of one:: >>> another) (:>>>= one another);
+          assert (number of one:: >>> another) (:>>>= one another another);
+        ).
+  ).
 ).
