@@ -150,7 +150,9 @@ module.exports = function generator ($void) {
   // logical operators: not, !, ...
   var defaultAnd = tryToUpdateName(function (this_) { return this_ }, '*&&')
   var logicalAnd = noop(function (a, b) {
-    return isFalsy(a) || arguments.length < 2 ? a : b
+    return typeof a === 'undefined' || (
+      isFalsy(a) || typeof b === 'undefined' ? a : b
+    )
   })
 
   staticOperator('and', staticOperator('&&', function (space, clause) {
@@ -172,7 +174,9 @@ module.exports = function generator ($void) {
 
   var defaultOr = tryToUpdateName(function (this_) { return this_ }, '*||')
   var logicalOr = bindThis(null, function (a, b) {
-    return isTruthy(a) || arguments.length < 2 ? a : b
+    return typeof a !== 'undefined' && (
+      isTruthy(a) || typeof b === 'undefined' ? a : b
+    )
   })
 
   staticOperator('or', staticOperator('||', function (space, clause) {
@@ -192,7 +196,7 @@ module.exports = function generator ($void) {
     }
   }, logicalOr), logicalOr)
 
-  var booleanize = bindThis(null, isTruthy)
+  var booleanize = tryToUpdateName(bindThis(null, isTruthy), '*?')
 
   staticOperator('?', function (space, clause) {
     var clist = clause.$
@@ -214,9 +218,9 @@ module.exports = function generator ($void) {
     }
   }, booleanize) // the entity is also the booleanize function.
 
-  var booleanizeEmptiness = bindThis(null, function (this_) {
-    return thisCall(this_, 'not-empty')
-  })
+  var booleanizeEmptiness = tryToUpdateName(function (this_) {
+    return typeof this_ === 'undefined' || thisCall(this_, 'not-empty')
+  }, '*?*')
 
   staticOperator('?*', function (space, clause) {
     var clist = clause.$
@@ -238,9 +242,9 @@ module.exports = function generator ($void) {
     }
   }, booleanizeEmptiness)
 
-  var booleanizeNull = bindThis(null, function (this_) {
-    return this_ !== null && typeof this_ !== 'undefined'
-  })
+  var booleanizeNull = tryToUpdateName(function (this_) {
+    return typeof this_ === 'undefined' || this_ !== null
+  }, '*??')
 
   staticOperator('??', function (space, clause) {
     var clist = clause.$

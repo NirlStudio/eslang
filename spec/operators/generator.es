@@ -1428,7 +1428,7 @@ const nobody (@);
       assert ($!_ is-a function);
       assert ($!_ is !);
     ).
-    (should "(:!) returns false.", (=> ()
+    (should "(:!) returns false because it's a negative operator.", (=> ()
       assert false (:!);
     ).
     (should "(:! value) works like (! value).", (=> ()
@@ -1454,6 +1454,10 @@ const nobody (@);
       var &&_ &&;
       assert ($&&_ is-a function);
       assert ($&&_ is &&);
+    ).
+    (should "(:&&) returns true because it has a virtual leading true.", (=> ()
+      assert true (:&&);
+      assert true (:and);
     ).
     (should "((&&) value) works like (value &&).", (=> ()
       var *&& (&&);
@@ -1504,6 +1508,10 @@ const nobody (@);
       assert ($||_ is-a function);
       assert ($||_ is ||);
     ).
+    (should "(:||) returns false because it has a virtual leading false.", (=> ()
+      assert false (:||);
+      assert false (:or);
+    ).
     (should "((||) value) works like (value ||).", (=> ()
       var *|| (||);
       assert ($*|| is-a function);
@@ -1545,5 +1553,125 @@ const nobody (@);
       assert ($|| is or);
       assert ($or is ||);
     ).
+  ).
+).
+
+(define "logical switch operations", (=> ()
+  (define "?", (=> ()
+    (should "'?' is resolved to a function.", (=> ()
+      assert ($? is-a function);
+      var ?_ ?;
+      assert ($?_ is-a function);
+      assert ($?_ is ?);
+    ).
+    (should "(:?) returns true because it's a positive operator.", (=> ()
+      assert true (:?);
+    ).
+    (should "(:? value) works like (value ?).", (=> ()
+      assert (null ?) (:? null);
+      assert (type ?) (:? type);
+      (for sample in samples
+        assert (sample the-type:: ?) (:? (sample the-type);
+        assert (sample "empty":: ?) (:? (sample "empty");
+        (for value in (sample values)
+          assert ($value ?) (:? value);
+        ).
+    ).
+    (should "((? fallback) value) works like (value ? fallback).", (=> ()
+      var fallback-value (@);
+      var ?fallback (? fallback-value);
+      assert ($?fallback is-a function);
+
+      (for value in flat-samples
+        assert ($value ? fallback-value) (?fallback value);
+      ).
+    ).
+    (should "((? truthy falsy) value) works like (value ? truthy falsy).", (=> ()
+      var truthy (@);
+      var falsy (@:);
+      var ?switch (? truthy, falsy);
+      assert ($?switch is-a function);
+
+      (for value in flat-samples
+        assert ($value ? truthy, falsy) (?switch value);
+      ).
+  ).
+  (define "?*", (=> ()
+    (should "'?*' is resolved to a function.", (=> ()
+      assert ($?* is-a function);
+      var ?*_ ?*;
+      assert ($?*_ is-a function);
+      assert ($?*_ is ?*);
+    ).
+    (should "(:?*) returns true because it's a positive operator", (=> ()
+      assert true (:?*);
+    ).
+    (should "(:?* value) works like (value ?*).", (=> ()
+      assert (null ?*) (:?* null);
+      assert (type ?*) (:?* type);
+      (for sample in samples
+        assert (sample the-type:: ?*) (:?* (sample the-type);
+        assert (sample "empty":: ?*) (:?* (sample "empty");
+        (for value in (sample values)
+          assert ($value ?*) (:?* value);
+        ).
+    ).
+    (should "((?* fallback) value) works like (value ?* fallback).", (=> ()
+      var fallback-value (@);
+      var ?*fallback (?* fallback-value);
+      assert ($?*fallback is-a function);
+
+      (for value in flat-samples
+        assert ($value ?* fallback-value) (?*fallback value);
+      ).
+    ).
+    (should "((?* truthy falsy) value) works like (value ?* truthy falsy).", (=> ()
+      var truthy (@);
+      var falsy (@:);
+      var ?*switch (?* truthy, falsy);
+      assert ($?*switch is-a function);
+
+      (for value in flat-samples
+        assert ($value ?* truthy, falsy) (?*switch value);
+      ).
+  ).
+  (define "??", (=> ()
+    (should "'??' is resolved to a function.", (=> ()
+      assert ($?? is-a function);
+      var ??_ ??;
+      assert ($??_ is-a function);
+      assert ($??_ is ??);
+    ).
+    (should "(:??) returns true because it's a positive operator", (=> ()
+      assert true (:??);
+    ).
+    (should "(:?? value) works like (value ??).", (=> ()
+      assert (null ??) (:?? null);
+      assert (type ??) (:?? type);
+      (for sample in samples
+        assert (sample the-type:: ??) (:?? (sample the-type);
+        assert (sample "empty":: ??) (:?? (sample "empty");
+        (for value in (sample values)
+          assert ($value ??) (:?? value);
+        ).
+    ).
+    (should "((?? fallback) value) works like (value ?? fallback).", (=> ()
+      var fallback-value (@);
+      var ??fallback (?? fallback-value);
+      assert ($??fallback is-a function);
+
+      (for value in flat-samples
+        assert ($value ?? fallback-value) (??fallback value);
+      ).
+    ).
+    (should "((?? truthy falsy) value) works like (value ?? truthy falsy).", (=> ()
+      var truthy (@);
+      var falsy (@:);
+      var ??switch (?? truthy, falsy);
+      assert ($??switch is-a function);
+
+      (for value in flat-samples
+        assert ($value ?? truthy, falsy) (??switch value);
+      ).
   ).
 ).
