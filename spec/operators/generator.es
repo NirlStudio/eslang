@@ -1469,7 +1469,7 @@ const nobody (@);
         assert (sample the-type:: &&) (*&& (sample the-type);
         assert (sample "empty":: &&) (*&& (sample "empty");
         (for value in (sample values)
-          assert ($value &&) (:*&& value);
+          assert ($value &&) (*&& value);
         ).
     ).
     (should "((&& another extra) one) works like (one && another extra).", (=> ()
@@ -1522,7 +1522,7 @@ const nobody (@);
         assert (sample the-type:: ||) (*|| (sample the-type);
         assert (sample "empty":: ||) (*|| (sample "empty");
         (for value in (sample values)
-          assert ($value ||) (:*|| value);
+          assert ($value ||) (*|| value);
         ).
     ).
     (should "((|| another extra) one) works like (one || another extra).", (=> ()
@@ -1673,5 +1673,307 @@ const nobody (@);
       (for value in flat-samples
         assert ($value ?? truthy, falsy) (??switch value);
       ).
+  ).
+).
+
+(define "logical combination", (=> ()
+  (define "all", (=> ()
+    (should "'all' is resolved to a function.", (=> ()
+      assert ($all is-a function);
+      var all_ all;
+      assert ($all_ is-a function);
+      assert ($all_ is all);
+    ).
+    (should "(:all) returns true because the condition of no condition is always met.", (=> ()
+      assert true (:all);
+    ).
+    (should "((all)) returns true for the same reason.", (=> ()
+      assert true ((all);
+    ).
+    (should "((all) value) returns true for the same reason.", (=> ()
+      var *all (all);
+      assert ($*all is-a function);
+
+      assert true (*all null);
+      assert true (*all type);
+      (for sample in samples
+        assert true (*all (sample the-type);
+        assert true (*all (sample "empty");
+        (for value in (sample values)
+          assert true (*all value);
+        ).
+    ).
+    (should "((all test1, test2, ...) value) works like (test1 value:: and (test2 value), ...).", (=> ()
+      var num-between-1-and-10  (all (is-a number), (>= 1), (< 10);
+      assert (num-between-1-and-10 1);
+      assert (num-between-1-and-10 3);
+      assert (num-between-1-and-10 5.5);
+      assert (num-between-1-and-10 7.5);
+      assert (num-between-1-and-10 9.5);
+
+      assert false (num-between-1-and-10 null);
+      assert false (num-between-1-and-10 type);
+      assert false (num-between-1-and-10 true);
+      assert false (num-between-1-and-10 false);
+
+      assert false (num-between-1-and-10 -1.5);
+      assert false (num-between-1-and-10 -1);
+      assert false (num-between-1-and-10 0);
+      assert false (num-between-1-and-10 0.9);
+      assert false (num-between-1-and-10 10);
+      assert false (num-between-1-and-10 10.0);;
+      assert false (num-between-1-and-10 10.5);
+    ).
+    (should "in the all-testing, any 'and' is ignored as a visual indicator.", (=> ()
+      var num-between-1-and-10  (all and (is-a number) and (>= 1) and (< 10) and;
+      assert (num-between-1-and-10 1);
+      assert (num-between-1-and-10 3);
+      assert (num-between-1-and-10 5.5);
+      assert (num-between-1-and-10 7.5);
+      assert (num-between-1-and-10 9.5);
+
+      assert false (num-between-1-and-10 null);
+      assert false (num-between-1-and-10 type);
+      assert false (num-between-1-and-10 true);
+      assert false (num-between-1-and-10 false);
+      assert false (num-between-1-and-10 and);
+
+      assert false (num-between-1-and-10 -1.5);
+      assert false (num-between-1-and-10 -1);
+      assert false (num-between-1-and-10 0);
+      assert false (num-between-1-and-10 0.9);
+      assert false (num-between-1-and-10 10);
+      assert false (num-between-1-and-10 10.0);
+      assert false (num-between-1-and-10 10.5);
+    ).
+    (should "in the all-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
+      var num-between-1-and-10  (all true, (>= 1) and (< 10);
+      assert (num-between-1-and-10 1);
+      assert (num-between-1-and-10 3);
+      assert (num-between-1-and-10 5.5);
+      assert (num-between-1-and-10 7.5);
+      assert (num-between-1-and-10 9.5);
+
+      assert null (num-between-1-and-10 null);
+      assert null (num-between-1-and-10 type);
+      assert null (num-between-1-and-10 true);
+      assert null (num-between-1-and-10 false);
+
+      assert false (num-between-1-and-10 -1.5);
+      assert false (num-between-1-and-10 -1);
+      assert false (num-between-1-and-10 0);
+      assert false (num-between-1-and-10 0.9);
+      assert false (num-between-1-and-10 10);
+      assert false (num-between-1-and-10 10.0);
+      assert false (num-between-1-and-10 10.5);
+    ).
+    (should "(:all value1, value2, ...) works like (value1 and value2, ...).", (=> ()
+      assert 0 (:all 0);
+      assert 0 (:all 5 0);
+      assert 0 (:all 5 3 0);
+      assert 1 (:all 5 3 1);
+    ).
+    (should "(:all value1, value2, ...) ignores 'and' too.", (=> ()
+      assert true (:all and);
+
+      assert 0 (:all and 0);
+      assert 0 (:all and 5 and 0 and);
+      assert 0 (:all and 5 and 3 and 0 and);
+      assert 1 (:all and 5 and 3 and 1 and);
+    ).
+  ).
+  (define "both", (=> ()
+    (should "'both' is only an alias of 'all'.", (=> ()
+      assert ($both is all);
+      assert ($all is both);
+    ).
+  ).
+  (define "any", (=> ()
+    (should "'any' is resolved to a function.", (=> ()
+      assert ($any is-a function);
+      var any_ any;
+      assert ($any_ is-a function);
+      assert ($any_ is any);
+    ).
+    (should "(:any) returns false because the condition of no condition is not any condition.", (=> ()
+      assert false (:any);
+    ).
+    (should "((any)) returns false for the same reason.", (=> ()
+      assert false ((any);
+    ).
+    (should "((any) value) returns false for the same reason.", (=> ()
+      var *any (any);
+      assert ($*any is-a function);
+
+      assert false (*any null);
+      assert false (*any type);
+      (for sample in samples
+        assert false (*any (sample the-type);
+        assert false (*any (sample "empty");
+        (for value in (sample values)
+          assert false (*any value);
+        ).
+    ).
+    (should "((any test1, test2, ...) value) works like (test1 value:: or (test2 value), ...).", (=> ()
+      var num-1-3-5  (any (is 1), (is 3), (is 5);
+      assert (num-1-3-5 1);
+      assert (num-1-3-5 3);
+      assert (num-1-3-5 5);
+
+      assert false (num-1-3-5 null);
+      assert false (num-1-3-5 type);
+      assert false (num-1-3-5 true);
+      assert false (num-1-3-5 false);
+
+      assert false (num-1-3-5 2);
+      assert false (num-1-3-5 4);
+      assert false (num-1-3-5 6);
+    ).
+    (should "in the any-testing, any 'or' is ignored as a visual indicator.", (=> ()
+      var num-1-3-5 (any or (is 1) or (is 3) or (is 5) or;
+      assert (num-1-3-5 1);
+      assert (num-1-3-5 3);
+      assert (num-1-3-5 5);
+
+      assert false (num-1-3-5 null);
+      assert false (num-1-3-5 type);
+      assert false (num-1-3-5 true);
+      assert false (num-1-3-5 false);
+      assert false (num-1-3-5 or);
+
+      assert false (num-1-3-5 2);
+      assert false (num-1-3-5 4);
+      assert false (num-1-3-5 6);
+    ).
+    (should "in the any-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
+      var num-1-3-5 (any (is 1), (is 3), false, (is 5);
+      assert (num-1-3-5 1);
+      assert (num-1-3-5 3);
+      assert (num-1-3-5 5);
+
+      assert false (num-1-3-5 null);
+      assert false (num-1-3-5 type);
+      assert false (num-1-3-5 true);
+      assert false (num-1-3-5 false);
+
+      assert false (num-1-3-5 2);
+      assert false (num-1-3-5 4);
+      assert false (num-1-3-5 6);
+    ).
+    (should "(:any value1, value2, ...) works like (value1 or value2, ...).", (=> ()
+      assert 0 (:any 0);
+      assert null (:any 0 null);
+      assert 5 (:any 0 null 5);
+    ).
+    (should "(:any value1, value2, ...) ignores 'or' too.", (=> ()
+      assert false (:any or);
+      assert 0 (:any 0 or);
+      assert null (:any 0 or null);
+      assert 5 (:any 0 or null or 5 or);
+    ).
+  ).
+  (define "either", (=> ()
+    (should "'either' is only an alias of 'any'.", (=> ()
+      assert ($either is any);
+      assert ($any is either);
+    ).
+  ).
+  (define "not-any", (=> ()
+    (should "'not-any' is resolved to a function.", (=> ()
+      assert ($not-any is-a function);
+      var not-any_ not-any;
+      assert ($not-any_ is-a function);
+      assert ($not-any_ is not-any);
+    ).
+    (should "(:not-any) returns true because the condition of no condition is not any condition.", (=> ()
+      assert true (:not-any);
+    ).
+    (should "((not-any)) returns true for the same reason.", (=> ()
+      assert true ((not-any);
+    ).
+    (should "((not-any) value) returns true for the same reason.", (=> ()
+      var *not-any (not-any);
+      assert ($*not-any is-a function);
+
+      assert true (*not-any);
+      assert true (*not-any null);
+      assert true (*not-any type);
+      (for sample in samples
+        assert true (*not-any (sample the-type);
+        assert true (*not-any (sample "empty");
+        (for value in (sample values)
+          assert true (*not-any value);
+        ).
+    ).
+    (should "((not-any test1, test2, ...) value) works like (not (test1 value):: and (not (test2 value)), ...).", (=> ()
+      var num-no-1-3-5  (not-any (is 1), (is 3), (is 5);
+      assert false (num-no-1-3-5 1);
+      assert false (num-no-1-3-5 3);
+      assert false (num-no-1-3-5 5);
+
+      assert (num-no-1-3-5 null);
+      assert (num-no-1-3-5 type);
+      assert (num-no-1-3-5 true);
+      assert (num-no-1-3-5 false);
+
+      assert (num-no-1-3-5 2);
+      assert (num-no-1-3-5 4);
+      assert (num-no-1-3-5 6);
+    ).
+    (should "in the not-any-testing, any 'or' or 'nor' is ignored as a visual indicator.", (=> ()
+      var num-no-1-3-5 (not-any or (is 1) nor (is 3) or (is 5) nor;
+      assert false (num-no-1-3-5 1);
+      assert false (num-no-1-3-5 3);
+      assert false (num-no-1-3-5 5);
+
+      assert (num-no-1-3-5 null);
+      assert (num-no-1-3-5 type);
+      assert (num-no-1-3-5 true);
+      assert (num-no-1-3-5 false);
+      assert (num-no-1-3-5 or);
+      assert (num-no-1-3-5 nor);
+
+      assert (num-no-1-3-5 2);
+      assert (num-no-1-3-5 4);
+      assert (num-no-1-3-5 6);
+    ).
+    (should "in the any-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
+      var num-no-1-3-5  (not-any (is 1), (is 3), false, (is 5);
+      assert false (num-no-1-3-5 1);
+      assert false (num-no-1-3-5 3);
+      assert false (num-no-1-3-5 5);
+
+      assert (num-no-1-3-5 null);
+      assert (num-no-1-3-5 type);
+      assert (num-no-1-3-5 true);
+      assert (num-no-1-3-5 false);
+
+      assert (num-no-1-3-5 2);
+      assert (num-no-1-3-5 4);
+      assert (num-no-1-3-5 6);
+    ).
+    (should "(:not-any value1, value2, ...) works like ((not value1) and (not value2), ...).", (=> ()
+      assert true (:not-any 0);
+      assert true (:not-any 0 null);
+      assert false (:not-any 0 null 5);
+    ).
+    (should "(:not-any value1, value2, ...) ignores 'or' and 'nor' too.", (=> ()
+      assert true (:not-any or);
+      assert true (:not-any 0 or);
+      assert true (:not-any or 0 nor null);
+      assert false (:not-any 0 or null nor 5 or);
+    ).
+  ).
+  (define "neither", (=> ()
+    (should "'neither' is only an alias of 'not-any'.", (=> ()
+      assert ($neither is not-any);
+      assert ($not-any is neither);
+    ).
+  ).
+  (define "nor", (=> ()
+    (should "'nor' is only an alias of 'or'.", (=> ()
+      assert ($nor is or);
+      assert ($or is nor);
+    ).
   ).
 ).

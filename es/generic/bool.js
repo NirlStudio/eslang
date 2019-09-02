@@ -5,14 +5,16 @@ module.exports = function ($void) {
   var Type = $.bool
   var link = $void.link
   var Symbol$ = $void.Symbol
-  var bindThis = $void.bindThis
   var protoValueOf = $void.protoValueOf
 
   // the empty value of bool is the false.
   link(Type, 'empty', false)
 
   // booleanize
-  $void.boolValueOf = link(Type, 'of', bindThis(Type, $void.isTruthy), true)
+  $void.boolValueOf = link(Type, 'of', function (value) {
+    return typeof value !== 'undefined' &&
+      value !== null && value !== 0 && value !== false
+  }, true)
 
   var proto = Type.proto
   // Emptiness

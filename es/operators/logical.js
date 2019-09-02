@@ -11,8 +11,9 @@ module.exports = function logical ($void) {
   var operator = $void.operator
   var evaluate = $void.evaluate
   var thisCall = $void.thisCall
-  var symbolSubject = $.symbol.subject
   var staticOperator = $void.staticOperator
+
+  var symbolSubject = $.symbol.subject
 
   staticOperator('not', staticOperator('!', function (space, clause) {
     if (clause.$.length < 2) {
@@ -24,48 +25,42 @@ module.exports = function logical ($void) {
 
   // global logical AND operator
   link(Null, ['&&', 'and'], operator(function (space, clause, that) {
-    if (!(space instanceof Space$)) {
-      return null
-    }
-    var clist = clause.$
-    if (typeof that === 'undefined') {
-      return null
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return true
     }
     if (that === false || that === null || that === 0) {
       return that
     }
-    var value = that
+
+    var clist = clause.$
     var i = clist[0] === symbolSubject ? 3 : 2
     for (var len = clist.length; i < len; i++) {
-      value = evaluate(clist[i], space)
-      if (value === false || value === null || value === 0) {
-        return value
+      that = evaluate(clist[i], space)
+      if (that === false || that === null || that === 0) {
+        return that
       }
     }
-    return value
+    return that
   }))
 
   // global logical OR operator
   link(Null, ['||', 'or'], operator(function (space, clause, that) {
-    var clist = clause && clause.$
-    if (typeof that === 'undefined') {
-      that = null
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return false
     }
     if (that !== false && that !== null && that !== 0) {
       return that
     }
-    if (!(space instanceof Space$)) {
-      return null
-    }
-    var value = that
+
+    var clist = clause && clause.$
     var i = clist[0] === symbolSubject ? 3 : 2
     for (var len = clist.length; i < len; i++) {
-      value = evaluate(clist[i], space)
-      if (value !== false && value !== null && value !== 0) {
-        return value
+      that = evaluate(clist[i], space)
+      if (that !== false && that !== null && that !== 0) {
+        return that
       }
     }
-    return value
+    return that
   }))
 
   // Boolean Test.
@@ -73,28 +68,33 @@ module.exports = function logical ($void) {
   // (x ? y) - boolean fallback, returns x itself or returns y if x is equivalent to false.
   // (x ? y z) - boolean switch, returns y if x is equivalent to true, returns z otherwise.
   link(Null, '?', operator(function (space, clause, that) {
-    var clist = clause && clause.$
-    if (!clist || !clist.length || clist.length < 2) {
-      return null // invalid call
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return true // defined as true.
     }
+    var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
-    if (typeof that !== 'undefined' && that !== false && that !== null && that !== 0) {
+    if (clist.length < base) {
+      return true // defined as true
+    }
+
+    if (that !== false && that !== null && that !== 0) {
       switch (clist.length - base) { // true logic
         case 0:
           return true
         case 1:
           return that
         default:
-          return space instanceof Space$ ? evaluate(clist[base], space) : null
+          return evaluate(clist[base], space)
       }
     }
+
     switch (clist.length - base) { // false logic
       case 0:
         return false
       case 1:
-        return space instanceof Space$ ? evaluate(clist[base], space) : null
+        return evaluate(clist[base], space)
       default:
-        return space instanceof Space$ ? evaluate(clist[base + 1], space) : null
+        return evaluate(clist[base + 1], space)
     }
   }))
 
@@ -103,11 +103,15 @@ module.exports = function logical ($void) {
   // x ?* y) - emptiness fallback, returns x itself or returns y if x is empty.
   // (x ?* y z) - emptiness switch, returns y if x is not an empty value, returns z otherwise.
   link(Null, '?*', operator(function (space, clause, that) {
-    var clist = clause && clause.$
-    if (!clist || !clist.length || clist.length < 2) {
-      return null // invalid call
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return true // defined as true.
     }
+    var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
+    if (clist.length < base) {
+      return true // defined as true
+    }
+
     if (thisCall(that, 'not-empty')) {
       switch (clist.length - base) { // true logic
         case 0:
@@ -115,16 +119,16 @@ module.exports = function logical ($void) {
         case 1:
           return that
         default:
-          return space instanceof Space$ ? evaluate(clist[base], space) : null
+          return evaluate(clist[base], space)
       }
     }
     switch (clist.length - base) { // false logic
       case 0:
         return false
       case 1:
-        return space instanceof Space$ ? evaluate(clist[base], space) : null
+        return evaluate(clist[base], space)
       default:
-        return space instanceof Space$ ? evaluate(clist[base + 1], space) : null
+        return evaluate(clist[base + 1], space)
     }
   }))
 
@@ -134,10 +138,15 @@ module.exports = function logical ($void) {
   // (null ?? y z ...) returns the first non-null value after it if x is null.
   link(Null, '??', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
-      return null
+      return true // defined as true.
     }
+
     var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
+    if (clist.length < base) {
+      return true // defined as true
+    }
+
     switch (clist.length - base) {
       case 0: // booleanize
         return false
@@ -151,10 +160,15 @@ module.exports = function logical ($void) {
   // for all non-null values.
   link($Type.proto, '??', operator(function (space, clause, that) {
     if (!(space instanceof Space$)) {
-      return null
+      return true // defined as true.
     }
+
     var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
+    if (clist.length < base) {
+      return true // defined as true
+    }
+
     switch (clist.length - base) {
       case 0: // booleanize
         return true
@@ -167,9 +181,9 @@ module.exports = function logical ($void) {
 
   // Boolean value verification helpers.
   link($Bool.proto, 'fails', operator(function (space, clause, that) {
-    return space instanceof Space$ ? !that : null
+    return typeof that === 'boolean' ? !that : true
   }))
   link($Bool.proto, 'succeeds', operator(function (space, clause, that) {
-    return space instanceof Space$ ? !!that : null
+    return typeof that === 'boolean' ? that : false
   }))
 }

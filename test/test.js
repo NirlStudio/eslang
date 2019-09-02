@@ -161,7 +161,7 @@ module.exports = function ($void) {
       // logical: not, ...
       'and', '&&', 'or', '||',
       '?', '?*', '??',
-      'all', 'both', 'any', 'either',
+      'all', 'both', 'any', 'either', 'neither',
       '*'
     ])
 
@@ -183,7 +183,7 @@ module.exports = function ($void) {
       'not', '!',
       'and', '&&', 'or', '||',
       '?', '?*', '??',
-      'all', 'both', 'any', 'either'
+      'all', 'both', 'any', 'either', 'not-any', 'neither', 'nor'
     ])
 
     checkFunctions($, '[Espresso / lib / functions] ', [
@@ -562,6 +562,10 @@ module.exports = function ($void) {
 
     checkAlias('not', '!')
     checkAlias('and', '&&')
-    checkAlias('or', 'or')
+    checkAlias('or', '||')
+
+    checkAlias('both', 'all')
+    checkAlias('either', 'any')
+    checkAlias('neither', 'not-any')
   }
 }
