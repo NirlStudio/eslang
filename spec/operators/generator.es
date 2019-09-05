@@ -2027,3 +2027,87 @@ const nobody (@);
     ).
   ).
 ).
+
+(define "general operation generator: *", (=> ()
+  (define "* as a free symbol.", (=> ()
+    (should "'*' is resolved to null.", (=> ()
+      assert null *;
+      assert ($* is null);
+
+      var *_ *;
+      assert null *_;
+      assert (*_ is null);
+    ).
+    (should "(*) is evaluated to null.", (=> ()
+      assert null (*);
+  ).
+  (define "(* sym): general predictor", (=> ()
+    (should "(* sym) returns a function like (=> (s) (s sym)).", (=> ()
+      var first-chars ((@ "12", "23", 3:"34") map (* first);
+      assert (first-chars is-an array);
+      assert 4 (first-chars length);
+      assert 3 (first-chars count);
+
+      assert "1" (first-chars 0);
+      assert "2" (first-chars 1);
+      assert null (first-chars 2);
+      assert "3" (first-chars 3);
+    ).
+    (should "(* sym value) returns a function like (=> (s) (s sym value)).", (=> ()
+      var first-chars ((@ "123", "234", 3:"345") map (* first 2);
+      assert (first-chars is-an array);
+      assert 4 (first-chars length);
+      assert 3 (first-chars count);
+
+      assert "12" (first-chars 0);
+      assert "23" (first-chars 1);
+      assert null (first-chars 2);
+      assert "34" (first-chars 3);
+    ).
+    (should "(* sym value ...) returns a function like (=> (s) (s sym value ...)).", (=> ()
+      var new-strings ((@ "a", "b", 3:"c") map (* concat 1 2);
+      assert (new-strings is-an array);
+      assert 4 (new-strings length);
+      assert 3 (new-strings count);
+
+      assert "a12" (new-strings 0);
+      assert "b12" (new-strings 1);
+      assert null (new-strings 2);
+      assert "c12" (new-strings 3);
+
+      let new-strings ((@ "a", "b", 3:"c") map (* concat 1 2 3);
+      assert (new-strings is-an array);
+      assert 4 (new-strings length);
+      assert 3 (new-strings count);
+
+      assert "a123" (new-strings 0);
+      assert "b123" (new-strings 1);
+      assert null (new-strings 2);
+      assert "c123" (new-strings 3);
+    ).
+  ).
+  (define "(* value): general indexer", (=> ()
+    (should "(* value) returns a function like (=> (s) (s: value)).", (=> ()
+      var first-chars ((@ "12", "23", 3:"34") map (* 0);
+      assert (first-chars is-an array);
+      assert 4 (first-chars length);
+      assert 3 (first-chars count);
+
+      assert "1" (first-chars 0);
+      assert "2" (first-chars 1);
+      assert null (first-chars 2);
+      assert "3" (first-chars 3);
+    ).
+    (should "(* value ...) returns a function like (=> (s) (s: value ...)).", (=> ()
+      var prefix-chars ((@ "123", "234", 3:"345") map (* 0 2);
+      assert (prefix-chars is-an array);
+      assert 4 (prefix-chars length);
+      assert 3 (prefix-chars count);
+
+      assert "12" (prefix-chars 0);
+      assert "23" (prefix-chars 1);
+      assert null (prefix-chars 2);
+      assert "34" (prefix-chars 3);
+    ).
+  ).
+).
