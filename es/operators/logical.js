@@ -7,6 +7,7 @@ module.exports = function logical ($void) {
   var Null = $void.null
   var link = $void.link
   var Space$ = $void.Space
+  var Symbol$ = $void.Symbol
   var isFalsy = $void.isFalsy
   var operator = $void.operator
   var evaluate = $void.evaluate
@@ -24,7 +25,9 @@ module.exports = function logical ($void) {
   }, isFalsy), isFalsy)
 
   // global logical AND operator
-  link(Null, ['&&', 'and'], operator(function (space, clause, that) {
+  var logicalAnd = link(Null, ['&&', 'and'], operator(function (
+    space, clause, that
+  ) {
     if (!(space instanceof Space$) || typeof that === 'undefined') {
       return true
     }
@@ -43,8 +46,26 @@ module.exports = function logical ($void) {
     return that
   }))
 
+  link(Null, '&&=', operator(function (space, clause, that) {
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return true
+    }
+
+    var result = logicalAnd(space, clause, that)
+    if (!Object.is(that, result)) {
+      var clist = clause.$
+      var sym = clist[clist[0] === symbolSubject ? 1 : 0]
+      if (sym instanceof Symbol$) {
+        space.let(sym.key, result)
+      }
+    }
+    return result
+  }))
+
   // global logical OR operator
-  link(Null, ['||', 'or'], operator(function (space, clause, that) {
+  var logicalOr = link(Null, ['||', 'or'], operator(function (
+    space, clause, that
+  ) {
     if (!(space instanceof Space$) || typeof that === 'undefined') {
       return false
     }
@@ -52,7 +73,7 @@ module.exports = function logical ($void) {
       return that
     }
 
-    var clist = clause && clause.$
+    var clist = clause.$
     var i = clist[0] === symbolSubject ? 3 : 2
     for (var len = clist.length; i < len; i++) {
       that = evaluate(clist[i], space)
@@ -61,6 +82,22 @@ module.exports = function logical ($void) {
       }
     }
     return that
+  }))
+
+  link(Null, '||=', operator(function (space, clause, that) {
+    if (!(space instanceof Space$) || typeof that === 'undefined') {
+      return false
+    }
+
+    var result = logicalOr(space, clause, that)
+    if (!Object.is(that, result)) {
+      var clist = clause.$
+      var sym = clist[clist[0] === symbolSubject ? 1 : 0]
+      if (sym instanceof Symbol$) {
+        space.let(sym.key, result)
+      }
+    }
+    return result
   }))
 
   // Boolean Test.

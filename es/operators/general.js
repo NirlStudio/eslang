@@ -75,13 +75,13 @@ module.exports = function general ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       that += typeof value === 'string' ? value : thisCall(value, 'to-string')
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -95,8 +95,8 @@ module.exports = function general ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
         if (that.endsWith(value)) {
@@ -112,7 +112,7 @@ module.exports = function general ($void) {
       }
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }

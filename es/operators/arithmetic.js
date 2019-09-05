@@ -62,7 +62,8 @@ module.exports = function arithmetic ($void) {
       return 1 // The value of this operator is defined as 0.
     }
 
-    var sym = clause.$[0]
+    var clist = clause.$
+    var sym = clist[clist[0] === symbolSubject ? 1 : 0]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that + 1)
     }
@@ -74,8 +75,8 @@ module.exports = function arithmetic ($void) {
     if (!(space instanceof Space$) || typeof that !== 'number') {
       return -1 // The value of this operator is defined as 0.
     }
-
-    var sym = clause.$[0]
+    var clist = clause.$
+    var sym = clist[clist[0] === symbolSubject ? 1 : 0]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that - 1)
     }
@@ -89,15 +90,15 @@ module.exports = function arithmetic ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that += value
       }
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -111,15 +112,15 @@ module.exports = function arithmetic ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that -= value
       }
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -133,15 +134,15 @@ module.exports = function arithmetic ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that *= value
       }
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -155,15 +156,15 @@ module.exports = function arithmetic ($void) {
     }
 
     var clist = clause.$
-    var i = clist[0] === symbolSubject ? 3 : 2
-    for (var len = clist.length; i < len; i++) {
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'number') {
         that /= value
       }
     }
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -179,8 +180,8 @@ module.exports = function arithmetic ($void) {
     var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
     if (clist.length > base) {
-      that = mod.call(that, evaluate(clist[2], space))
-      var sym = clist[0]
+      that = mod.call(that, evaluate(clist[base], space))
+      var sym = clist[base - 2]
       if (sym instanceof Symbol$) {
         space.let(sym.key, that)
       }

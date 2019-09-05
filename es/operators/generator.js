@@ -151,13 +151,25 @@ module.exports = function generator ($void) {
 
   // logical operators: not, !, ...
   var defaultAnd = tryToUpdateName(function (this_) { return this_ }, '*&&')
+
   var logicalAnd = bindThis(null, function (a, b) {
     return typeof a === 'undefined' || (
       isFalsy(a) || typeof b === 'undefined' ? a : b
     )
   })
 
-  staticOperator('and', staticOperator('&&', function (space, clause) {
+  var logicalAndAll = bindThis(null, function () {
+    var factor
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      factor = arguments[i]
+      if (factor !== logicalAndAll && isFalsy(factor)) {
+        return factor
+      }
+    }
+    return typeof factor !== 'undefined' ? factor : true
+  })
+
+  var generatorAnd = staticOperator('&&', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return defaultAnd
@@ -172,16 +184,31 @@ module.exports = function generator ($void) {
     return function (this_) {
       return logicalAnd(this_, value)
     }
-  }, logicalAnd), logicalAnd)
+  }, logicalAndAll)
+
+  staticOperator('and', generatorAnd, logicalAndAll)
+  staticOperator('&&=', generatorAnd, logicalAnd)
 
   var defaultOr = tryToUpdateName(function (this_) { return this_ }, '*||')
+
   var logicalOr = bindThis(null, function (a, b) {
     return typeof a !== 'undefined' && (
       isTruthy(a) || typeof b === 'undefined' ? a : b
     )
   })
 
-  staticOperator('or', staticOperator('||', function (space, clause) {
+  var logicalOrAny = bindThis(null, function () {
+    var factor
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      factor = arguments[i]
+      if (factor !== logicalOrAny && isTruthy(factor)) {
+        return factor
+      }
+    }
+    return typeof factor !== 'undefined' ? factor : false
+  })
+
+  var generatorOr = staticOperator('||', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2) {
       return defaultOr
@@ -196,7 +223,10 @@ module.exports = function generator ($void) {
     return function (this_) {
       return logicalOr(this_, value)
     }
-  }, logicalOr), logicalOr)
+  }, logicalOrAny)
+
+  staticOperator('or', generatorOr, logicalOrAny)
+  staticOperator('||=', generatorOr, logicalOr)
 
   var booleanize = tryToUpdateName(bindThis(null, isTruthy), '*?')
 
@@ -270,110 +300,71 @@ module.exports = function generator ($void) {
   }, booleanizeNull)
 
   // logical combinator
-  var allAreTruthy = noop(function () {
-    var factor
-    for (var i = 0, len = arguments.length; i < len; i++) {
-      if (arguments[i] !== logicalAnd) {
-        factor = arguments[i]
-        if (isFalsy(factor)) {
-          return factor
-        }
-      }
-    }
-    return typeof factor !== 'undefined' ? factor : true
-  })
-  var alwaysTrue = noop(function () { return true })
-  staticOperator('both', staticOperator('all', function (space, clause) {
-    var clist = clause.$
-    var factors = []
-    for (var i = 1, len = clist.length; i < len; i++) {
-      var factor = evaluate(clist[i], space)
-      // allow "and" to be used as a literal conjunction after "all".
-      factor !== logicalAnd && factors.push(factor)
-    }
-    return factors.length < 1 ? alwaysTrue : function (this_) {
+  function combine (factors, isNegative) {
+    return function (this_) {
       var factor
       for (var i = 0, len = factors.length; i < len; i++) {
         factor = factors[i]
-        if (isApplicable(factor)) {
-          factor = factor(this_)
-        }
-        if (isFalsy(factor)) {
+        factor = isApplicable(factor) ? factor(this_)
+          : thisCall(this_, 'equals', factor)
+        if (isNegative(factor)) {
           return factor
         }
       }
       return factor
     }
-  }, allAreTruthy), allAreTruthy)
+  }
 
-  var anyIsTruthy = noop(function () {
-    var factor
-    for (var i = 0, len = arguments.length; i < len; i++) {
-      if (arguments[i] !== logicalOr) {
-        factor = arguments[i]
-        if (isTruthy(factor)) {
-          return factor
-        }
-      }
-    }
-    return typeof factor !== 'undefined' ? factor : false
-  })
-  var alwaysFalse = noop(function () { return false })
-  staticOperator('either', staticOperator('any', function (space, clause) {
-    var clist = clause.$
+  var alwaysTrue = function yes () { return true }
+
+  var logicalAll = $export($, 'all', function () {
     var factors = []
-    for (var i = 1, len = clist.length; i < len; i++) {
-      var factor = evaluate(clist[i], space)
-      // allow "or" to be used as a literal conjunction after "any".
-      factor !== logicalOr && factors.push(factor)
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      (arguments[i] !== logicalAndAll) && factors.push(arguments[i])
     }
-    return factors.length < 1 ? alwaysFalse : function (this_) {
+    return factors.length < 1 ? alwaysTrue : combine(factors, isFalsy)
+  })
+  // both is only an alias of all.
+  $export($, 'both', logicalAll)
+
+  var alwaysFalse = function no () { return false }
+
+  var logicalAny = $export($, 'any', function any () {
+    var factors = []
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      (arguments[i] !== logicalOrAny) && factors.push(arguments[i])
+    }
+    return factors.length < 1 ? alwaysFalse : combine(factors, isTruthy)
+  })
+  // either is only an alias of any.
+  $export($, 'either', logicalAny)
+
+  function combineNot (factors) {
+    return function (this_) {
       var factor
       for (var i = 0, len = factors.length; i < len; i++) {
         factor = factors[i]
-        if (isApplicable(factor)) {
-          factor = factor(this_)
-        }
-        if (isTruthy(factor)) {
-          return factor
-        }
-      }
-      return factor
-    }
-  }, anyIsTruthy), anyIsTruthy)
-
-  var notAnyIsTruthy = noop(function () {
-    for (var i = 0, len = arguments.length; i < len; i++) {
-      if (arguments[i] !== logicalOr && isTruthy(arguments[i])) {
-        return false
-      }
-    }
-    return true
-  })
-
-  $export($, 'nor', $.or)
-  staticOperator('neither', staticOperator('not-any', function (space, clause) {
-    var clist = clause.$
-    var factors = []
-    for (var i = 1, len = clist.length; i < len; i++) {
-      var factor = evaluate(clist[i], space)
-      // allow "nor" to be used as a literal conjunction after "neither".
-      factor !== logicalOr && factors.push(factor)
-    }
-    return factors.length < 1 ? alwaysTrue : function (this_) {
-      var factor
-      for (var i = 0, len = factors.length; i < len; i++) {
-        factor = factors[i]
-        if (isApplicable(factor)) {
-          factor = factor(this_)
-        }
-        if (isTruthy(factor)) {
+        factor = isApplicable(factor) ? isTruthy(factor(this_))
+          : thisCall(this_, 'equals', factor)
+        if (factor) {
           return false
         }
       }
       return true
     }
-  }, notAnyIsTruthy), notAnyIsTruthy)
+  }
+
+  var logicalNotAny = $export($, 'not-any', function () {
+    var factors = []
+    for (var i = 0, len = arguments.length; i < len; i++) {
+      (arguments[i] !== logicalOrAny) && factors.push(arguments[i])
+    }
+    return factors.length < 1 ? alwaysTrue : combineNot(factors)
+  })
+  // neither is only an alias of not-any.
+  $export($, 'neither', logicalNotAny)
+  // nor is only an alias of or for neither.
+  $export($, 'nor', logicalOrAny)
 
   // general predictor
   staticOperator('*', function (space, clause) {

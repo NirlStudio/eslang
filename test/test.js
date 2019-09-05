@@ -159,9 +159,8 @@ module.exports = function ($void) {
       // control: ?
       // general: +, (str +=), (str -=)
       // logical: not, ...
-      'and', '&&', 'or', '||',
+      'and', '&&', '&&=', 'or', '||', '||=',
       '?', '?*', '??',
-      'all', 'both', 'any', 'either', 'neither',
       '*'
     ])
 
@@ -181,7 +180,7 @@ module.exports = function ($void) {
       '?',
       '+',
       'not', '!',
-      'and', '&&', 'or', '||',
+      'and', '&&', '&&=', 'or', '||', '||=',
       '?', '?*', '??',
       'all', 'both', 'any', 'either', 'not-any', 'neither', 'nor'
     ])
@@ -563,9 +562,5 @@ module.exports = function ($void) {
     checkAlias('not', '!')
     checkAlias('and', '&&')
     checkAlias('or', '||')
-
-    checkAlias('both', 'all')
-    checkAlias('either', 'any')
-    checkAlias('neither', 'not-any')
   }
 }

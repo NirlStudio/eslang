@@ -31,13 +31,10 @@ module.exports = function bitwise ($void) {
     }
     var clist = clause.$
     var base = clist[0] === symbolSubject ? 3 : 2
-    if (clist.length < base) {
-      return 0
-    }
-    var value = evaluate(clist[base], space)
+    var value = clist.length > base ? evaluate(clist[base], space) : 0
     that &= typeof value === 'number' ? value : numberValueOf(value)
-    // try to save back
-    var sym = clist[0]
+
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -55,7 +52,7 @@ module.exports = function bitwise ($void) {
     var value = clist.length > base ? evaluate(clist[base], space) : 0
     that |= typeof value === 'number' ? value : numberValueOf(value)
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -73,7 +70,7 @@ module.exports = function bitwise ($void) {
     var value = clist.length > base ? evaluate(clist[base], space) : 0
     that ^= typeof value === 'number' ? value : numberValueOf(value)
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -91,7 +88,7 @@ module.exports = function bitwise ($void) {
     var offset = clist.length > base ? evaluate(clist[base], space) : 0
     that <<= typeof offset === 'number' ? offset : intValueOf(offset)
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -109,7 +106,7 @@ module.exports = function bitwise ($void) {
     var offset = clist.length > base ? evaluate(clist[base], space) : 0
     that >>= typeof offset === 'number' ? offset : intValueOf(offset)
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -127,7 +124,7 @@ module.exports = function bitwise ($void) {
     var offset = clist.length > base ? evaluate(clist[base], space) : 0
     that >>>= typeof offset === 'number' ? offset : intValueOf(offset)
 
-    var sym = clist[0]
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }

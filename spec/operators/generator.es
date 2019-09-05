@@ -1486,13 +1486,59 @@ const nobody (@);
         ).
       ).
     ).
-    (should "(:&& one another extra) works like (one && another).", (=> ()
+    (should "(:&& one another extra) works like (one && another extra).", (=> ()
       (for another in flat-samples
         assert ($another &&) (:&& another);
 
         (for one in flat-samples
           assert ($one && another) (:&& one another);
-          assert ($one && another) (:&& one another one);
+          assert ($one && another one) (:&& one another one);
+        ).
+  ).
+  (define "&&=", (=> ()
+    (should "'&&=' is resolved to a function.", (=> ()
+      assert ($&&= is-a function);
+      var &&=_ &&=;
+      assert ($&&=_ is-a function);
+      assert ($&&=_ is &&=);
+    ).
+    (should "(:&&=) returns true because it has a virtual leading true.", (=> ()
+      assert true (:&&=);
+    ).
+    (should "((&&=) value) works like (value &&).", (=> ()
+      var *&&= (&&=);
+      assert ($*&&= is-a function);
+
+      assert (null &&) (*&&= null);
+      assert (type &&) (*&&= type);
+      (for sample in samples
+        assert (sample the-type:: &&) (*&&= (sample the-type);
+        assert (sample "empty":: &&) (*&&= (sample "empty");
+        (for value in (sample values)
+          assert ($value &&) (*&&= value);
+        ).
+    ).
+    (should "((&&= another extra) one) works like (one && another extra).", (=> ()
+      (for another in flat-samples
+        var &&=another1 (&&= another);
+        assert ($&&=another1 is-a function);
+
+        (for one in flat-samples
+          var &&=another2 (&&= another one);
+          assert ($&&=another2 is-a function);
+
+          assert ($one && another) (&&=another1 one);
+          assert ($one && another one) (&&=another2 one);
+        ).
+      ).
+    ).
+    (should "(:&&= one another extra) works like (one && another).", (=> ()
+      (for another in flat-samples
+        assert ($another &&) (:&&= another);
+
+        (for one in flat-samples
+          assert ($one && another) (:&&= one another);
+          assert ($one && another) (:&&= one another one);
         ).
   ).
   (define "and", (=> ()
@@ -1539,13 +1585,59 @@ const nobody (@);
         ).
       ).
     ).
-    (should "(:|| one another extra) works like (one || another).", (=> ()
+    (should "(:|| one another extra) works like (one || another extra).", (=> ()
       (for another in flat-samples
         assert ($another ||) (:|| another);
 
         (for one in flat-samples
           assert ($one || another) (:|| one another);
-          assert ($one || another) (:|| one another one);
+          assert ($one || another one) (:|| one another one);
+        ).
+  ).
+  (define "||=", (=> ()
+    (should "'||=' is resolved to a function.", (=> ()
+      assert ($||= is-a function);
+      var ||=_ ||=;
+      assert ($||=_ is-a function);
+      assert ($||=_ is ||=);
+    ).
+    (should "(:||=) returns false because it has a virtual leading false.", (=> ()
+      assert false (:||=);
+    ).
+    (should "((||=) value) works like (value ||).", (=> ()
+      var *||= (||=);
+      assert ($*||= is-a function);
+
+      assert (null ||) (*||= null);
+      assert (type ||) (*||= type);
+      (for sample in samples
+        assert (sample the-type:: ||) (*||= (sample the-type);
+        assert (sample "empty":: ||) (*||= (sample "empty");
+        (for value in (sample values)
+          assert ($value ||) (*||= value);
+        ).
+    ).
+    (should "((||= another extra) one) works like (one || another extra).", (=> ()
+      (for another in flat-samples
+        var ||another1 (|| another);
+        assert ($||another1 is-a function);
+
+        (for one in flat-samples
+          var ||another2 (|| another one);
+          assert ($||another2 is-a function);
+
+          assert ($one || another) (||another1 one);
+          assert ($one || another one) (||another2 one);
+        ).
+      ).
+    ).
+    (should "(:||= one another extra) works like (one || another).", (=> ()
+      (for another in flat-samples
+        assert ($another ||) (:|| another);
+
+        (for one in flat-samples
+          assert ($one || another) (:|| one another);
+          assert ($one || another one) (:|| one another one);
         ).
   ).
   (define "or", (=> ()
@@ -1676,7 +1768,7 @@ const nobody (@);
   ).
 ).
 
-(define "logical combination", (=> ()
+(define "logical combinators", (=> ()
   (define "all", (=> ()
     (should "'all' is resolved to a function.", (=> ()
       assert ($all is-a function);
@@ -1684,10 +1776,10 @@ const nobody (@);
       assert ($all_ is-a function);
       assert ($all_ is all);
     ).
-    (should "(:all) returns true because the condition of no condition is always met.", (=> ()
-      assert true (:all);
+    (should "(all) returns a function.", (=> ()
+      assert true (all:: is-a function);
     ).
-    (should "((all)) returns true for the same reason.", (=> ()
+    (should "((all)) returns true because the condition of no condition is always met.", (=> ()
       assert true ((all);
     ).
     (should "((all) value) returns true for the same reason.", (=> ()
@@ -1746,40 +1838,18 @@ const nobody (@);
       assert false (num-between-1-and-10 10.0);
       assert false (num-between-1-and-10 10.5);
     ).
-    (should "in the all-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
-      var num-between-1-and-10  (all true, (>= 1) and (< 10);
-      assert (num-between-1-and-10 1);
-      assert (num-between-1-and-10 3);
-      assert (num-between-1-and-10 5.5);
-      assert (num-between-1-and-10 7.5);
-      assert (num-between-1-and-10 9.5);
+    (should "in the all-testing, apply 'equals' logic if a test is neither a lambda nor a function.", (=> ()
+      var num-zero  (all 0, -0, (> -1) and (< 1);
+      assert (num-zero 0);
+      assert (num-zero -0);
 
-      assert null (num-between-1-and-10 null);
-      assert null (num-between-1-and-10 type);
-      assert null (num-between-1-and-10 true);
-      assert null (num-between-1-and-10 false);
+      assert false (num-zero -1);
+      assert false (num-zero 1);
 
-      assert false (num-between-1-and-10 -1.5);
-      assert false (num-between-1-and-10 -1);
-      assert false (num-between-1-and-10 0);
-      assert false (num-between-1-and-10 0.9);
-      assert false (num-between-1-and-10 10);
-      assert false (num-between-1-and-10 10.0);
-      assert false (num-between-1-and-10 10.5);
-    ).
-    (should "(:all value1, value2, ...) works like (value1 and value2, ...).", (=> ()
-      assert 0 (:all 0);
-      assert 0 (:all 5 0);
-      assert 0 (:all 5 3 0);
-      assert 1 (:all 5 3 1);
-    ).
-    (should "(:all value1, value2, ...) ignores 'and' too.", (=> ()
-      assert true (:all and);
-
-      assert 0 (:all and 0);
-      assert 0 (:all and 5 and 0 and);
-      assert 0 (:all and 5 and 3 and 0 and);
-      assert 1 (:all and 5 and 3 and 1 and);
+      assert false (num-zero null);
+      assert false (num-zero type);
+      assert false (num-zero true);
+      assert false (num-zero false);
     ).
   ).
   (define "both", (=> ()
@@ -1789,16 +1859,16 @@ const nobody (@);
     ).
   ).
   (define "any", (=> ()
-    (should "'any' is resolved to a function.", (=> ()
+    (should "'any' is a function.", (=> ()
       assert ($any is-a function);
       var any_ any;
       assert ($any_ is-a function);
       assert ($any_ is any);
     ).
-    (should "(:any) returns false because the condition of no condition is not any condition.", (=> ()
-      assert false (:any);
+    (should "(any) returns a function.", (=> ()
+      assert true (any:: is-a function);
     ).
-    (should "((any)) returns false for the same reason.", (=> ()
+    (should "((any)) returns false because the condition of no condition is not any condition.", (=> ()
       assert false ((any);
     ).
     (should "((any) value) returns false for the same reason.", (=> ()
@@ -1845,31 +1915,21 @@ const nobody (@);
       assert false (num-1-3-5 4);
       assert false (num-1-3-5 6);
     ).
-    (should "in the any-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
-      var num-1-3-5 (any (is 1), (is 3), false, (is 5);
-      assert (num-1-3-5 1);
-      assert (num-1-3-5 3);
-      assert (num-1-3-5 5);
+    (should "in the any-testing, apply 'equals' logic if a test is neither a lambda nor a function.", (=> ()
+      var num-1-3-5-7 (any 1, 3, (is 5), 7);
+      assert (num-1-3-5-7 1);
+      assert (num-1-3-5-7 3);
+      assert (num-1-3-5-7 5);
+      assert (num-1-3-5-7 7);
 
-      assert false (num-1-3-5 null);
-      assert false (num-1-3-5 type);
-      assert false (num-1-3-5 true);
-      assert false (num-1-3-5 false);
+      assert false (num-1-3-5-7 null);
+      assert false (num-1-3-5-7 type);
+      assert false (num-1-3-5-7 true);
+      assert false (num-1-3-5-7 false);
 
-      assert false (num-1-3-5 2);
-      assert false (num-1-3-5 4);
-      assert false (num-1-3-5 6);
-    ).
-    (should "(:any value1, value2, ...) works like (value1 or value2, ...).", (=> ()
-      assert 0 (:any 0);
-      assert null (:any 0 null);
-      assert 5 (:any 0 null 5);
-    ).
-    (should "(:any value1, value2, ...) ignores 'or' too.", (=> ()
-      assert false (:any or);
-      assert 0 (:any 0 or);
-      assert null (:any 0 or null);
-      assert 5 (:any 0 or null or 5 or);
+      assert false (num-1-3-5-7 2);
+      assert false (num-1-3-5-7 4);
+      assert false (num-1-3-5-7 6);
     ).
   ).
   (define "either", (=> ()
@@ -1879,16 +1939,16 @@ const nobody (@);
     ).
   ).
   (define "not-any", (=> ()
-    (should "'not-any' is resolved to a function.", (=> ()
+    (should "'not-any' is a function.", (=> ()
       assert ($not-any is-a function);
       var not-any_ not-any;
       assert ($not-any_ is-a function);
       assert ($not-any_ is not-any);
     ).
-    (should "(:not-any) returns true because the condition of no condition is not any condition.", (=> ()
-      assert true (:not-any);
+    (should "(not-any) returns a function.", (=> ()
+      assert true (not-any:: is-a function);
     ).
-    (should "((not-any)) returns true for the same reason.", (=> ()
+    (should "((not-any)) returns true because the condition of no condition is not any condition.", (=> ()
       assert true ((not-any);
     ).
     (should "((not-any) value) returns true for the same reason.", (=> ()
@@ -1937,31 +1997,21 @@ const nobody (@);
       assert (num-no-1-3-5 4);
       assert (num-no-1-3-5 6);
     ).
-    (should "in the any-testing, apply booleanize logic if a test is neither a lambda nor a function.", (=> ()
-      var num-no-1-3-5  (not-any (is 1), (is 3), false, (is 5);
-      assert false (num-no-1-3-5 1);
-      assert false (num-no-1-3-5 3);
-      assert false (num-no-1-3-5 5);
+    (should "in the any-testing, apply 'equals' logic if a test is neither a lambda nor a function.", (=> ()
+      var num-no-1-3-5-7  (not-any 1, 3, (is 5), 7;
+      assert false (num-no-1-3-5-7 1);
+      assert false (num-no-1-3-5-7 3);
+      assert false (num-no-1-3-5-7 5);
+      assert false (num-no-1-3-5-7 7);
 
-      assert (num-no-1-3-5 null);
-      assert (num-no-1-3-5 type);
-      assert (num-no-1-3-5 true);
-      assert (num-no-1-3-5 false);
+      assert (num-no-1-3-5-7 null);
+      assert (num-no-1-3-5-7 type);
+      assert (num-no-1-3-5-7 true);
+      assert (num-no-1-3-5-7 false);
 
-      assert (num-no-1-3-5 2);
-      assert (num-no-1-3-5 4);
-      assert (num-no-1-3-5 6);
-    ).
-    (should "(:not-any value1, value2, ...) works like ((not value1) and (not value2), ...).", (=> ()
-      assert true (:not-any 0);
-      assert true (:not-any 0 null);
-      assert false (:not-any 0 null 5);
-    ).
-    (should "(:not-any value1, value2, ...) ignores 'or' and 'nor' too.", (=> ()
-      assert true (:not-any or);
-      assert true (:not-any 0 or);
-      assert true (:not-any or 0 nor null);
-      assert false (:not-any 0 or null nor 5 or);
+      assert (num-no-1-3-5-7 2);
+      assert (num-no-1-3-5-7 4);
+      assert (num-no-1-3-5-7 6);
     ).
   ).
   (define "neither", (=> ()
