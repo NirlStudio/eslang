@@ -3,7 +3,6 @@
 module.exports = function import_ ($void) {
   var $ = $void.$
   var compile = $.compile
-  var $Object = $.object
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
   var warn = $void.$warn
@@ -22,39 +21,32 @@ module.exports = function import_ ($void) {
   //   (import field from module), or
   //   (import (fields ...) from module)
   var operator = staticOperator('import', function (space, clause) {
-    var clist = clause.$
-    if (clist.length < 2) {
-      return null
-    }
     if (!space.app) {
       warn('import', 'invalid without an app context.')
       return null
     }
-    var src
+    var clist = clause.$
+    if (clist.length < 2) {
+      return null
+    }
+    var src, imported
     if (clist.length < 3 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      src = importModule(space,
-        space.local['-app-home'],
-        space.local['-module'],
-        evaluate(clist[1], space)
-      )
+      imported = importModule(space, evaluate(clist[1], space))
       // clone to protect inner exporting object.
-      return src && Object.assign($Object.empty(), src)
+      return imported && referModule(imported)
     }
     // (import field-or-fields from src)
     src = evaluate(clist[3], space)
-    var imported
     if (isObject(src)) {
-      imported = src
+      imported = src // expanding object fields.
     } else if (typeof src !== 'string') {
-      warn('import', 'invalid source object or path:', src)
+      typeof src === 'undefined' || src === null
+        ? warn('import', 'missing source object or path.')
+        : warn('import', 'invalid source object or path:', src)
       return null
     } else {
-      imported = importModule(space,
-        space.local['-app-home'],
-        space.local['-module'],
-        src
-      )
+      imported = importModule(space, src)
       if (!imported) {
         return null // importing failed.
       }
@@ -86,7 +78,19 @@ module.exports = function import_ ($void) {
     return values
   })
 
-  function importModule (space, appHome, moduleUri, source) {
+  function referModule (imported) {
+    var ref = Object.create(imported)
+    for (var key in imported) {
+      // inner fields will not be copied by statement like:
+      //   (var * (import "module"))
+      if (!key.startsWith('-')) {
+        ref[key] = imported[key]
+      }
+    }
+    return ref
+  }
+
+  function importModule (space, source) {
     if (typeof source !== 'string' || !source) {
       warn('import', 'invalid module source:', source)
       return null
@@ -97,6 +101,8 @@ module.exports = function import_ ($void) {
       type = source.substring(0, ++offset)
     }
     // try to locate the source in dirs.
+    var appHome = space.local['-app-home']
+    var moduleUri = space.local['-module']
     var uri = type ? source.substring(offset) // native module
       : resolve(space, appHome, moduleUri, source)
     if (!uri) {
@@ -112,6 +118,7 @@ module.exports = function import_ ($void) {
     module_.exporting = (type ? loadNativeModule : loadModule)(
       space, uri, module_, source, moduleUri
     )
+    // make sure system properties cannot be overridden.
     return Object.assign(module_.exporting, module_.props)
   }
 
@@ -159,17 +166,20 @@ module.exports = function import_ ($void) {
   }
 
   function lookupInCache (modules, uri, moduleUri) {
-    var module_ = modules[uri]
-    if (!module_) {
-      module_ = modules[uri] = Object.assign(Object.create(null), {
-        status: 0, // an empty module.
-        props: Object.assign($Object.empty(), {
-          '-module': uri
-        }),
-        timestamp: Date.now()
-      })
-    } else if (module_.status === 100) {
-      warn('import', 'loop dependency when loading', uri, 'from', moduleUri)
+    var module_ = modules[uri] || (modules[uri] = {
+      status: 0, // an empty module.
+      props: {
+        '-module': uri
+      }
+    })
+    if (module_.status === 100) {
+      warn('import', 'loop dependency on', module_.props, 'from', moduleUri)
+      return module_
+    }
+    if (module_.status !== 200) {
+      module_.status = 0 // reset statue to re-import.
+      module_.props['-imported-by'] = moduleUri
+      module_.props['-imported-at'] = Date.now()
     }
     return module_
   }
@@ -194,10 +204,7 @@ module.exports = function import_ ($void) {
         return null
       }
       // to load module
-      var scope = execute(space, code, uri, {
-        // in reloading, the old exporting is accessible for module code.
-        this: module_.exporting || null
-      })[1]
+      var scope = execute(space, code, uri)[1] // ignore evaluation result.
       if (scope) {
         module_.status = 200
         return scope.exporting
@@ -222,10 +229,7 @@ module.exports = function import_ ($void) {
         return null
       }
       var scope = $void.createModuleSpace(uri, space)
-      var status = importing.call(
-        module_.exporting || null, // to serve reloading.
-        scope.exporting, scope.context, $void
-      )
+      var status = importing(scope.exporting, scope.context, $void)
       if (status === true) { // the loader can report error details
         module_.status = 200
         return scope.exporting
