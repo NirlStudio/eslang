@@ -1,4 +1,7 @@
-# Espresso Versioning 1.0.1
+# Espresso Versioning 1.0.2
+No only a versioning convention, but also a re-think of the best practice of
+software packing & distribution methodology.
+
 ## Summary
 The software life cycle is divided into three phases: **Development**,
 **Prerelease**, **Release**.
@@ -34,21 +37,23 @@ The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", "MAY" in this document
 are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2119).
 
 1. **Package** indicates **Software** from distribution's perspective.
+   - In design of Espresso, software is regarded as data, vice versa.
 2. A package MAY be an application, a library, a data set or a mix.
    - An Espresso package SHOULD follow Espresso Versioning.
+   - Other package systems MAY recommend Espresso Versioning.
 3. An Espresso Version MUST take the form X.Y.Z.
    - X, Y and Z MUST be non-negative integers.
    - X, Y and Z MUST NOT contain leading zeroes.
    - Z SHOULD be reset to 0 when either X or Y changes.
-4. In development phase, 0.0.1 is the minimal version and SHOULD be the first one.
-   - X MUST be kept as 0.
+4. In **development** phase, **0.0.1** is the minimal version and SHOULD be the first one.
+   - X MUST remain 0.
    - Y MAY be incremented yearly and MAY be great than 9.
    - Z MAY be incremented when a change is made.
-5. In prerelease phase, 1.0.0 SHOULD be the first one.
-   - X MUST be kept as 1.
-   - Y MUST be kept as 0.
+5. In **prerelease** phase, **1.0.0** SHOULD be the first version.
+   - X MUST remain 1.
+   - Y MUST remain 0.
    - Z SHOULD be incremented when a change is published.
-6. In release phase, 1.1.0 SHOULD be the first version.
+6. In **release** phase, **1.1.0** SHOULD be the first version.
    - X MUST be incremented each time when Y reaches 10 and goes back to 0.
    - Y MUST be incremented for each calendar year.
    - Z MUST be incremented when a change is published.
@@ -96,6 +101,12 @@ update at 2033.
 - A package without active maintainer may still have users.
 - A package without active user may still need to be discussed or referenced.
 - A package totally forgotten needs neither a name nor a dedicated phase. R.I.P.
+
+### **Is Espresso Versioning designed to replace other versioning systems?**
+Not entirely.
+It's firstly for Espresso Language and reflects one of its fundamental design
+principles, Mandatory Stability, on the design of packing & distribution system.
+
 
 ## License
 [Creative Commons - CC BY 3.0](http://creativecommons.org/licenses/by/3.0/)
