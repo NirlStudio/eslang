@@ -1,4 +1,4 @@
-# Espresso Versioning 1.0.2
+# Espresso Versioning 1.0.3
 No only a versioning convention, but also a re-think of the best practice of
 software packing & distribution methodology.
 
@@ -74,7 +74,7 @@ are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2
   when they upgrade THEIR systems.
 - A breakage is a bug which MAY be fixed with By-Design **and the loss of reputation**.
 
-### What's the benefits for developers, if there is any?
+### What's the benefit for developers, if there is any?
 Definitely.
 - No more struggling on choosing a version no when you change your code.
 - Most developers are firstly and more package consumers than producers.
@@ -104,9 +104,10 @@ update at 2033.
 
 ### **Is Espresso Versioning designed to replace other versioning systems?**
 Not entirely.
-It's firstly for Espresso Language and reflects one of its fundamental design
-principles, Mandatory Stability, on the design of packing & distribution system.
-
+It's definitely [not a silver bullet](https://en.wikipedia.org/wiki/No_Silver_Bullet).
+It's designed as part of of Espresso Language and reflects one of its
+fundamental design principles, **Mandatory Stability**, on the design of packing
+& distribution system.
 
 ## License
 [Creative Commons - CC BY 3.0](http://creativecommons.org/licenses/by/3.0/)
