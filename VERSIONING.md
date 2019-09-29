@@ -1,5 +1,5 @@
-# Espresso Versioning 1.0.0
-# Summary
+# Espresso Versioning 1.0.1
+## Summary
 The software life cycle is divided into three phases: **Development**,
 **Prerelease**, **Release**.
 
@@ -9,7 +9,7 @@ In release phase, given a version number **DECADE**.**YEAR**.**BUILD**, incremen
 - **BUILD** every time,
 when publishing a package update.
 
-# Introduction
+## Introduction
 In the world of software management there exists a dreaded place called
 Dependency Hell. The bigger your system grows and the more packages you
 integrate into your software, the more likely you are to find yourself, one day,
@@ -29,7 +29,7 @@ As a solution to this problem, I propose a different direction to think about:
 - Put your attention back to software to maintain its backward compatibility.
 - Whenever you break the compatibility, you're creating a new software in effect.
 
-# Espresso Versioning Specification (EsVer)
+## Espresso Versioning Specification (EsVer)
 The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", "MAY" in this document
 are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2119).
 
@@ -53,7 +53,7 @@ are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2
    - Y MUST be incremented for each calendar year.
    - Z MUST be incremented when a change is published.
 
-# Espresso Package Life Cycle
+## Espresso Package Life Cycle
 - In development, a package's backward compatibility is not guaranteed.
    - A package in development MAY be published.
 - In prerelease, a package's backward compatibility MAY be guaranteed.
@@ -62,7 +62,7 @@ are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2
    - A release package MUST be published.
    - Interestingly, it's not a violation if they don't because none knows it.
 
-# FAQ
+## FAQ
 ### **How should we regard the Backward Compatibility?**
 - It's not actually a technical concern in the design of EsVer.
 - It's the confidence of package users, both dependent developer and end users,
@@ -90,14 +90,14 @@ The elapsed year(s) MUST be counted when a change comes at any time. For example
 a package release as 1.1.0 at 2021 SHOULD be incremented to 2.3.0 in its first
 update at 2033.
 
-### **Why is there not a phase like Deprecated/Dead in software life cycle?**
+### **Why is there not a phase like Deprecated/Dead in Espresso Package Life Cycle?**
 - Developers cannot literally deprecate their work; they can only abandon it.
 - An abandoned package may be forked and maintained by other developers.
 - A package without active maintainer may still have users.
 - A package without active user may still need to be discussed or referenced.
-- A package totally forgotten needs neither a name nor a dedicated phase.
+- A package totally forgotten needs neither a name nor a dedicated phase. R.I.P.
 
-# License
+## License
 [Creative Commons - CC BY 3.0](http://creativecommons.org/licenses/by/3.0/)
 
-Some phrases are taken from [SemVer](https://semver.org/).
+Document layout and some phrases are taken from [SemVer](https://semver.org/).
