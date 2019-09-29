@@ -1,4 +1,4 @@
-# Espresso Versioning 1.0.3
+# Espresso Versioning 1.0.4
 No only a versioning convention, but also a re-think of the best practice of
 software packing & distribution methodology.
 
@@ -69,44 +69,62 @@ are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2
 
 ## FAQ
 ### **How should we regard the Backward Compatibility?**
-- It's not actually a technical concern in the design of EsVer.
-- It's the confidence of package users, both dependent developer and end users,
-  when they upgrade THEIR systems.
+- In Espresso Versioning, it is more regarded as a user experience concern
+  instead of a technical concern.
+- It's the confidence of package users, including both dependent developers and
+  end (app) users, when they want to upgrade THEIR systems.
 - A breakage is a bug which MAY be fixed with By-Design **and the loss of reputation**.
 
-### What's the benefit for developers, if there is any?
+### **Does this Backward Compatibility imply a-perfect-design-in-advance?**
+Not at all.
+- You can keep adding new features.
+- You can revise a bad interface design by supplementing a better alternative
+  and recommend it to your users.
+- You can refactor the whole package and release it with the same name as long
+  as you allocate a new package uri.
+  - This assumes you're using Espresso Lang because its package system is designed
+    as fully distributed, not even a central catalog.
+- In an enterprise system, you can safely retire some deprecated designs with
+  the help of a code analysis tool, your CI/CD process or both. In such a case,
+  the compatibility is still literally maintained. It's not breaking because
+  there's not a breakage.
+
+### What's the benefit of EsVer for developers, if there is any?
 Definitely.
-- No more struggling on choosing a version no when you change your code.
+- No more struggling on choosing a version number when you change your code.
 - Most developers are firstly and more package consumers than producers.
 
 ### **Can developers use their own conventions on Z?**
 Yes. There's no conflict except to violate a MUST.
 
 ### **Can developers use their own conventions on Y in development phase?**
-Yes. The same with above.
+Yes. The same of above.
 
 ### **Why is the compatibility guarantee of a release package not a "MUST"?**
 Developers MUST have the authority and freedom to make a best decision for
-their own work. If they decide the benefits is worthy of the reputation and
-technical cost, they're free to do it.
+their own work. If they decide the benefit is worthy of the reputation loss and,
+mostly their users', technical cost, they're free to do it.
 
 ### **What's the next version of a package unchanged more than 1 year or a decade?**
-The elapsed year(s) MUST be counted when a change comes at any time. For example,
-a package release as 1.1.0 at 2021 SHOULD be incremented to 2.3.0 in its first
-update at 2033.
+All the elapsed year(s) MUST be counted when a change comes at any time.
+For example, a package released as 1.1.0 at 2021 SHOULD be incremented to 2.3.0
+in its first update at 2033.
+
+*By "SHOULD", it means the new version MAY be 2.3.1 or any other value in Z.*
 
 ### **Why is there not a phase like Deprecated/Dead in Espresso Package Life Cycle?**
 - Developers cannot literally deprecate their work; they can only abandon it.
 - An abandoned package may be forked and maintained by other developers.
 - A package without active maintainer may still have users.
 - A package without active user may still need to be discussed or referenced.
-- A package totally forgotten needs neither a name nor a dedicated phase. R.I.P.
+- A package totally forgotten needs neither a name nor a dedicated phase. Or it has to, R.I.P.
 
 ### **Is Espresso Versioning designed to replace other versioning systems?**
 Not entirely.
+
 It's definitely [not a silver bullet](https://en.wikipedia.org/wiki/No_Silver_Bullet).
 It's designed as part of of Espresso Language and reflects one of its
-fundamental design principles, **Mandatory Stability**, on the design of packing
+fundamental design principles, **Mandatory Stability**, on the aspect of packing
 & distribution system.
 
 ## License
