@@ -1,4 +1,4 @@
-# Espresso Versioning 1.0.4
+# Espresso Versioning 1.0.5
 No only a versioning convention, but also a re-think of the best practice of
 software packing & distribution methodology.
 
@@ -71,8 +71,9 @@ are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2
 ### **How should we regard the Backward Compatibility?**
 - In Espresso Versioning, it is more regarded as a user experience concern
   instead of a technical concern.
-- It's the confidence of package users, including both dependent developers and
+- It's about the confidence of users, including both dependent developers and
   end (app) users, when they want to upgrade THEIR systems.
+  - Exciting and expecting instead of upset or hesitate.
 - A breakage is a bug which MAY be fixed with By-Design **and the loss of reputation**.
 
 ### **Does this Backward Compatibility imply a-perfect-design-in-advance?**
@@ -86,7 +87,7 @@ Not at all.
     as fully distributed, not even a central catalog.
 - In an enterprise system, you can safely retire some deprecated designs with
   the help of a code analysis tool, your CI/CD process or both. In such a case,
-  the compatibility is still literally maintained. It's not breaking because
+  the compatibility is still literally maintained, because it's not breaking if
   there's not a breakage.
 
 ### What's the benefit of EsVer for developers, if there is any?
@@ -99,6 +100,9 @@ Yes. There's no conflict except to violate a MUST.
 
 ### **Can developers use their own conventions on Y in development phase?**
 Yes. The same of above.
+
+### **Cannot I publish a testing/preview version in release phase?**
+Yes. you can put it in either a development branch or a separate repo (url).
 
 ### **Why is the compatibility guarantee of a release package not a "MUST"?**
 Developers MUST have the authority and freedom to make a best decision for
@@ -120,12 +124,14 @@ in its first update at 2033.
 - A package totally forgotten needs neither a name nor a dedicated phase. Or it has to, R.I.P.
 
 ### **Is Espresso Versioning designed to replace other versioning systems?**
-Not entirely.
+Not entirely. It's definitely [not a silver bullet](https://en.wikipedia.org/wiki/No_Silver_Bullet).
 
-It's definitely [not a silver bullet](https://en.wikipedia.org/wiki/No_Silver_Bullet).
-It's designed as part of of Espresso Language and reflects one of its
+It's designed as part of of Espresso Language and resonates one of its
 fundamental design principles, **Mandatory Stability**, on the aspect of packing
 & distribution system.
+
+But whatever programming language you're using, you can still apply EsVer to
+make your users more confident.
 
 ## License
 [Creative Commons - CC BY 3.0](http://creativecommons.org/licenses/by/3.0/)
