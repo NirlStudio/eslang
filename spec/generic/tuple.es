@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: tuple).
 
-(define "Tuple Common Behaviours" (=> ()
+(define "Tuple Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "a tuple is identified by its instance." (= ()
       (assert ((` (x y)) is-not (` (x y).
@@ -699,7 +699,7 @@
 ).
 
 (define "(a-tuple iterate)" (= ()
-  (should "(a-tuple iterate) returns an interator function to traverse all its items." (= ()
+  (should "(a-tuple iterate) returns an iterator function to traverse all its items." (= ()
     (var t (tuple of null true 1).
     (var iter (t iterate).
     (assert ($iter is-a function).
@@ -980,7 +980,7 @@
     (var t (` (x y).
     (assert null (t first-of).
   ).
-  (should "(a-tuple first-of value) returns the offset of the first occurance of value." (= ()
+  (should "(a-tuple first-of value) returns the offset of the first occurrence of value." (= ()
     (var t (` (x y x z x y).
     (assert 0 (t first-of (`x).
     (assert 1 (t first-of (`y).
@@ -1060,7 +1060,7 @@
     (var t (` (x y).
     (assert null (t last-of).
   ).
-  (should "(a-tuple last-of value) returns the offset of the first occurance of value." (= ()
+  (should "(a-tuple last-of value) returns the offset of the first occurrence of value." (= ()
     (var t (` (x y x z x y x).
     (assert 6 (t last-of (`x).
     (assert 5 (t last-of (`y).

@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: number).
 
-(define "Number Common Behaviours" (=> ()
+(define "Number Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "-0 is not 0." (= ()
       (assert false (0 is -0).
@@ -134,7 +134,7 @@
   ).
 
   (define "Representation" (=> ()
-    (should "common nubmers are represented as decimal strings." (=> ()
+    (should "common numbers are represented as decimal strings." (=> ()
       (assert "0" (0 to-string).
       (assert "-0" (-0 to-string).
 
@@ -144,7 +144,7 @@
       (assert "1" (1 to-string).
       (assert "-1" (-1 to-string).
     ).
-    (should "some special nubmers are represented as decimal strings." (=> ()
+    (should "some special numbers are represented as decimal strings." (=> ()
       (assert (((number smallest) to-string) is-a string).
 
       (assert (((number max) to-string) is-a string).
@@ -2659,8 +2659,8 @@
     (assert ((number invalid) as-bits) ((number invalid) << 0).
   ).
   (should "(num << n) returns a value by shifting all bits by n." (= ()
-    (assert 1 (1 << -2).
-    (assert 1 (1 << -1).
+    (assert (1 << 30) (1 << -2).
+    (assert (1 << 31) (1 << -1).
     (assert 2 (1 << 1).
     (assert 0x10 (1 << 4).
     (assert 0x100 (1 << 8).
@@ -2669,8 +2669,8 @@
     (assert 0x100000 (1 << 20).
     (assert 0x1000000 (1 << 24).
     (assert 0x10000000 (1 << 28).
-    (assert 0 (1 << 32).
-    (assert 0 (1 << 36).
+    (assert (1 << 0) (1 << 32).
+    (assert (1 << 4) (1 << 36).
   ).
 ).
 
@@ -2712,8 +2712,8 @@
     (assert ((number invalid) as-bits) ((number invalid) >> 0).
   ).
   (should "(num >> n) returns a value by shifting all bits by n, padding with highest bit." (= ()
-    (assert 0x40000000 (0x40000000 >> -2).
-    (assert 0x40000000 (0x40000000 >> -1).
+    (assert (0x40000000 >> 30) (0x40000000 >> -2).
+    (assert (0x40000000 >> 31) (0x40000000 >> -1).
     (assert 0x20000000 (0x40000000 >> 1).
     (assert 0x4000000 (0x40000000 >> 4).
     (assert 0x400000 (0x40000000 >> 8).
@@ -2724,8 +2724,8 @@
     (assert 0x4 (0x40000000 >> 28).
     (assert 1 (0x40000000 >> 30).
     (assert 0 (0x40000000 >> 31).
-    (assert 0 (0x40000000 >> 32).
-    (assert 0 (0x40000000 >> 36).
+    (assert 0x40000000 (0x40000000 >> 32).
+    (assert (0x40000000 >> 4) (0x40000000 >> 36).
 
     (assert -1 (-2 >> 1)
     (assert -1 (-4 >> 2)
@@ -2735,8 +2735,8 @@
     (assert -1 ((number min-bits) >> 36)
   ).
   (should "(-1 >> n) always returns -1." (= ()
-    (assert -1 (-1 >> -2).
-    (assert -1 (-1 >> -1).
+    (assert (-1 >> 30) (-1 >> -2).
+    (assert (-1 >> 31) (-1 >> -1).
     (assert -1 (-1 >> 1).
     (assert -1 (-1 >> 4).
     (assert -1 (-1 >> 8).
@@ -2763,14 +2763,14 @@
     (assert 1 (1 >>>).
     (assert 1 (1 >>> 0).
 
-    (assert -1 (-1 >>>).
-    (assert -1 (-1 >>> 0).
+    (assert (-1 >>> 0) (-1 >>>).
+    (assert 0xFFFFFFFF (-1 >>> 0).
 
     (assert 1 (1.5 >>>).
     (assert 1 (1.5 >>> 0).
 
-    (assert -1 (-1.5 >>>).
-    (assert -1 (-1.5 >>> 0).
+    (assert (-1 >>> 0) (-1.5 >>>).
+    (assert (-1 >>> 0) (-1.5 >>> 0).
 
     (assert ((number max) as-bits) ((number max) >>>).
     (assert ((number max) as-bits) ((number max) >>> 0).
@@ -2788,8 +2788,8 @@
     (assert ((number invalid) as-bits) ((number invalid) >>> 0).
   ).
   (should "(num >>> n) returns a value by shifting all bits by n, padding with 0." (= ()
-    (assert 0x40000000 (0x40000000 >>> -2).
-    (assert 0x40000000 (0x40000000 >>> -1).
+    (assert (0x40000000 >>> 30) (0x40000000 >>> -2).
+    (assert (0x40000000 >>> 31) (0x40000000 >>> -1).
     (assert 0x20000000 (0x40000000 >>> 1).
     (assert 0x4000000 (0x40000000 >>> 4).
     (assert 0x400000 (0x40000000 >>> 8).
@@ -2800,8 +2800,8 @@
     (assert 0x4 (0x40000000 >>> 28).
     (assert 1 (0x40000000 >>> 30).
     (assert 0 (0x40000000 >>> 31).
-    (assert 0 (0x40000000 >>> 32).
-    (assert 0 (0x40000000 >>> 36).
+    (assert 0x40000000 (0x40000000 >>> 32).
+    (assert (0x40000000 >>> 4) (0x40000000 >>> 36).
 
     (assert 0x7FFFFFFF (-1 >>> 1)
     (assert 0xFFFFFFF (-1 >>> 4)

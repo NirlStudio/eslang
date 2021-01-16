@@ -104,7 +104,7 @@ module.exports = function ($void) {
           beginWaiting('', commentWaiter)
           break
         case ' ':
-        case '\t': // It may spoil well foramtted code.
+        case '\t': // It may spoil well formatted code.
           processWhitespace(c)
           break
         default:
@@ -175,7 +175,7 @@ module.exports = function ($void) {
         }
         if (/[\s]/.test(c)) {
           if (stringPadding >= 0) { // padding or padded
-            if (stringPadding === 0) { // pading
+            if (stringPadding === 0) { // padding
               if (pendingText.length > 1) { // avoid a leading whitespace
                 pendingText += ' ' // keeps the first space character.
               }

@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: string).
 
-(define "String Common Behaviours" (= ()
+(define "String Common Behaviors" (= ()
   (define "Identity" (=> ()
     (should "a string is itself." (= ()
       (assert ("" is "").
@@ -465,6 +465,33 @@
     (assert false ("ABC" starts-with "B").
     (assert false ("ABC" starts-with "C").
   ).
+  (should "(str starts-with prefix1 prefix2 ...) return true if str starts with any given prefix." (= ()
+    (assert ("ABC" starts-with "A", "B").
+    (assert ("ABC" starts-with "B", "A").
+    (assert ("ABC" starts-with "B", "C", "A").
+
+    (assert ("ABC" starts-with "AB", "BA").
+    (assert ("ABC" starts-with "BA", "AB").
+    (assert ("ABC" starts-with "AA", "BA", "AB").
+
+    (assert false ("ABC" starts-with "AA", "BC").
+    (assert false ("ABC" starts-with "BC", "AA").
+    (assert false ("ABC" starts-with "BC", "AA", "BD").
+
+    (assert ("ABC" starts-with "ABC", "BCD").
+    (assert ("ABC" starts-with "BCD", "ABC").
+    (assert ("ABC" starts-with "BCD", "ABC", "BC").
+
+    (assert false ("ABC" starts-with "ABD", "B").
+    (assert false ("ABC" starts-with "ABD", "B", "C").
+
+    (assert false ("ABC" starts-with "ABCD").
+    (assert false ("ABC" starts-with "ABCD", "B", "C").
+
+    (assert false ("ABC" starts-with "B", "C").
+    (assert false ("ABC" starts-with "C", "B").
+    (assert false ("ABC" starts-with "C", "B", "D").
+  ).
 ).
 
 (define "(a-string ends-with ...)" (= ()
@@ -519,6 +546,33 @@
     (assert ("ABC" ends-with "ABC").
     (assert false ("ABC" ends-with "ABCD").
     (assert false ("ABC" ends-with "DABC").
+  ).
+  (should "(str ends-with suffix1 suffix2 ...) return true if str ends with any given suffix." (= ()
+    (assert ("ABC" ends-with "C", "B").
+    (assert ("ABC" ends-with "B", "C").
+    (assert ("ABC" ends-with "B", "C", "A").
+
+    (assert ("ABC" ends-with "BC", "BA").
+    (assert ("ABC" ends-with "BA", "BC").
+    (assert ("ABC" ends-with "AA", "BC", "AB").
+
+    (assert false ("ABC" ends-with "CC", "AB").
+    (assert false ("ABC" ends-with "AB", "CC").
+    (assert false ("ABC" ends-with "AB", "CC", "BD").
+
+    (assert ("ABC" ends-with "ABC", "BCD").
+    (assert ("ABC" ends-with "BCD", "ABC").
+    (assert ("ABC" ends-with "BCD", "ABC", "AB").
+
+    (assert false ("ABC" ends-with "ABD", "B").
+    (assert false ("ABC" ends-with "ABD", "B", "A").
+
+    (assert false ("ABC" ends-with "ABCD").
+    (assert false ("ABC" ends-with "ABCD", "B", "A").
+
+    (assert false ("ABC" ends-with "B", "A").
+    (assert false ("ABC" ends-with "A", "B").
+    (assert false ("ABC" ends-with "A", "B", "D").
   ).
 ).
 

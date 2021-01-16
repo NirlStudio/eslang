@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: function).
 
-(define "Function Common Behaviours" (=> ()
+(define "Function Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "an empty function without parameters is always the same." (= ()
       (var f1 (=>).
@@ -629,7 +629,7 @@
   ).
 ).
 
-(define "(do ...): recusive call" (= ()
+(define "(do ...): recursive call" (= ()
   (should "variable 'do' refers to current callee function." (= ()
     (var f (=> ()
       (assert ($do is-a function).
@@ -655,7 +655,7 @@
   ).
 ).
 
-(define "(redo ...): tail recusion elimination" (= ()
+(define "(redo ...): tail recursion elimination" (= ()
   (should "'redo' is a special global operator, so is a pure symbol." (= ()
     (var f (=> ()
       (assert ($redo is redo).
@@ -664,7 +664,7 @@
     ).
     (f)
   ).
-  (should "'redo' can be used to elminate tail recursion call." (= ()
+  (should "'redo' can be used to eliminate tail recursion call." (= ()
     (var base 0)
     (assert 50005000 (=> 10000: x
       (base += x)
@@ -873,7 +873,7 @@
 ).
 
 (define "y-combinator" (= ()
-  (should "y-combinator can implement recusive call for anonymous functions." (= ()
+  (should "y-combinator can implement recursive call for anonymous functions." (= ()
     (var Y (= f
       ((= x (x x))
         (=> x

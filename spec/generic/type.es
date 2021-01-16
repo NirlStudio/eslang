@@ -107,7 +107,7 @@
   (should "the indexer is a lambda." (= ()
     (assert ($(type ":") is-a lambda).
   ).
-  (should "the indexer is a readonly accessor." (= ()
+  (should "the indexer is a read-only accessor." (= ()
     (assert null (type :"__new_prop" 1).
     (assert ((type "__new_prop") is null).
 
@@ -231,6 +231,30 @@
       (var x type)
       (assert false (x && true false).
     ).
+    (should "'and' is an alias of '&&'." (=> ()
+      (assert (type "and") (type "&&").
+      (assert (type "&&") (type "and").
+    ).
+  ).
+  (define "Logical AND Self-Assignment: (type &&= ...)" (=> ()
+    (should "(type &&=) returns type." (=> ()
+      (assert type (type &&=).
+      (var x type)
+      (assert type (x &&=).
+      (assert type x).
+    ).
+    (should "(type &&= x) returns x." (=> ()
+      (assert true (type &&= true).
+      (var x type)
+      (assert true (x &&= true).
+      (assert true x).
+    ).
+    (should "(type &&= x y) returns y." (=> ()
+      (assert false (type &&= true false).
+      (var x type)
+      (assert false (x &&= true false).
+      (assert false x).
+    ).
   ).
   (define "Logical OR: (type || ...)" (=> ()
     (should "(type ||) returns type." (=> ()
@@ -248,9 +272,36 @@
       (var x type)
       (assert type (x || 1 2).
     ).
+    (should "'or' is an alias of '||'." (=> ()
+      (assert (type "or") (type "||").
+      (assert (type "||") (type "or").
+    ).
   ).
+  (define "Logical OR Self-Assignment: (type ||= ...)" (=> ()
+    (should "(type ||=) returns type." (=> ()
+      (assert type (type ||=).
+      (var x type)
+      (assert type (x ||=).
+      (assert type x)
+    ).
+    (should "(type ||= x) returns type." (=> ()
+      (assert type (type ||= 1).
+      (var x type)
+      (assert type (x ||= 1).
+      (assert type x)
+    ).
+    (should "(type ||= x y) returns type." (=> ()
+      (assert type (type ||= 1 2).
+      (var x type)
+      (assert type (x ||= 1 2).
+      (assert type x)
+    ).
+  ).
+).
+
+(define "Global Operators" (=> ()
   (define "Boolean Test: (type ? ...)" (=> ()
-    (should "Booeanize: (type ?) returns true." (=> ()
+    (should "Booleanize: (type ?) returns true." (=> ()
       (assert true (type ?).
       (var x type)
       (assert true (x ?).
@@ -273,33 +324,61 @@
       (assert 1 y)
     ).
   ).
-).
-
-(define "Global Operators" (=> ()
-  (define "Null fallback: (type ?? ...)" (=> ()
-    (should "(type ??) returns type." (=> ()
-      (assert type (type ??).
+  (define "Emptiness Test: (type ?* ...)" (=> ()
+    (should "Booleanize: (type ?*) returns false." (=> ()
+      (assert false (type ?*).
       (var x type)
-      (assert type (x ??).
+      (assert false (x ?*).
     ).
-    (should "(type ?? x) returns type." (=> ()
-      (var c 0)
-      (assert type (type ?? 1).
-      (assert type (type ?? (++ c).
-      (assert 0 c)
-
+    (should "Emptiness Fallback: (type ?* x) returns x." (=> ()
+      (assert 1 (type ?* 1).
+      (assert 1 (type ?* (1).
       (var x type)
-      (assert type (x ?? 1).
-      (assert type (x ?? (++ c).
-      (assert 0 c)
+      (assert 1 (x ?* 1).
+      (assert 1 (x ?* (1).
     ).
-    (should "(type ?? x y) returns type." (=> ()
-      (let x 1)
-      (let y -1)
-      (assert type (type ?? x y).
-      (assert type (type ?? (++ x) (-- y).
-      (assert 1 x)
-      (assert -1 y)
+    (should "Emptiness Switch: (type ?* x y) returns y." (=> ()
+      (var x -1)
+      (var y  1)
+      (assert 2 (type ?* x (++ y).
+      (assert 2 y)
+
+      (assert 3 (type ?* (-- x) (++ y).
+      (assert -1 x)
+      (assert 3 y)
+    ).
+  ).
+  (define "Null Test: (type ?? ...)", (=> ()
+    (define "Booleanize Null: (type ??)" (=> ()
+      (should "(type ??) returns true." (=> ()
+        (assert true (type ??).
+
+        (var t type)
+        (assert true (t ??).
+      ).
+    ).
+    (define "Null fallback: (type ?? value)" (=> ()
+      (should "(type ?? value) returns type." (=> ()
+        (var c 0)
+        (assert type (type ?? 1).
+        (assert type (type ?? (++ c).
+        (assert 0 c)
+
+        (var t type)
+        (assert type (t ?? 1).
+        (assert type (t ?? (++ c).
+        (assert 0 c)
+      ).
+    ).
+    (define "Null Switch: (type ?? truthy, falsy)" (=> ()
+      (should "(type ?? truthy, falsy) returns truthy." (=> ()
+        (let x 1)
+        (let y -1)
+        (assert 1 (type ?? x y).
+        (assert 2 (type ?? (++ x) (-- y).
+        (assert 2 x)
+        (assert -1 y)
+      ).
     ).
   ).
 ).
@@ -370,7 +449,7 @@
       "is-empty", "not-empty",
       "is-a", "is-an", "is-not-a", "is-not-an",
       "to-code", "to-string", ":",
-      "&&", "and", "||", "or", "?", "?*", "??", "type"
+      "&&", "and", "&&=", "||", "or", "||=", "?", "?*", "??", "type"
     ).
     (var fields (object fields-of t).
     (for field in fields

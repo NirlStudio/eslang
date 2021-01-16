@@ -201,35 +201,90 @@
 ).
 
 (define "Logical Operators" (=> ()
-  (var mod ((($the-value is false) || ($the-value equals 0)) ? "false" "true").
+  (var mod ($the-value is false:: or ($the-value == 0):: ? "false" "true").
   (load mod (@:@ the-value).
 ).
 
 (define "Global Operators" (=> ()
-  (define "Null fallback: (the-value ?? ...)" (=> ()
-    (should "(the-value ??) returns the-value." (=> ()
-      (assert the-value ($the-value ??).
+  (if ($the-value is-empty) (define "Emptiness Test: (the-empty-value ?* ...)" (=> ()
+    (should "Booleanize: (the-value ?*) returns false." (=> ()
+      (assert false ($the-value ?*).
       (var x the-value)
-      (assert the-value ($x ??).
+      (assert false ($x ?*).
     ).
-    (should "(the-value ?? x) returns the-value." (=> ()
-      (var c 0)
-      (assert the-value ($the-value ?? 1).
-      (assert the-value ($the-value ?? (++ c).
-      (assert 0 c)
+    (should "Emptiness Fallback: (the-value ?* x) returns x." (=> ()
+      (assert 1 ($the-value ?* 1).
+      (assert 1 ($the-value ?* (1).
+      (var x the-value)
+      (assert 1 ($x ?* 1).
+      (assert 1 ($x ?* (1).
+    ).
+    (should "Emptiness Switch: (the-value ?* x y) returns y." (=> ()
+      (var x -1)
+      (var y  1)
+      (assert 2 ($the-value ?* x (++ y).
+      (assert 2 y)
 
-      (var x the-value)
-      (assert the-value ($x ?? 1).
-      (assert the-value ($x ?? (++ c).
-      (assert 0 c)
+      (assert 3 ($the-value ?* (-- x) (++ y).
+      (assert -1 x)
+      (assert 3 y)
     ).
-    (should "(the-value ?? x y) returns the-value." (=> ()
-      (let x 1)
-      (let y -1)
-      (assert the-value ($the-value ?? x y).
-      (assert the-value ($the-value ?? (++ x) (-- y).
-      (assert 1 x)
-      (assert -1 y)
+  ).
+  (if ($the-value not-empty) (define "Emptiness Test: (the-non-empty-value ?* ...)" (=> ()
+    (should "Booleanize: (the-value ?*) returns true." (=> ()
+      (assert true ($the-value ?*).
+      (var x the-value)
+      (assert true ($x ?*).
+    ).
+    (should "Emptiness Fallback: (the-value ?* x) returns the-value." (=> ()
+      (assert the-value ($the-value ?* 1).
+      (assert the-value ($the-value ?* (1).
+      (var x the-value)
+      (assert the-value ($x ?* 1).
+      (assert the-value ($x ?* (1).
+    ).
+    (should "Emptiness Switch: (the-value ?* x y) returns x." (=> ()
+      (var x -1)
+      (var y  1)
+      (assert -1 ($the-value ?* x (++ y).
+      (assert 1 y)
+
+      (assert -2 ($the-value ?* (-- x) (++ y).
+      (assert -2 x)
+      (assert 1 y)
+    ).
+  ).
+  (define "Null Test: (the-value ?? ...)", (=> ()
+    (define "Booleanize Null: (the-value ??)" (=> ()
+      (should "(the-value ??) returns true." (=> ()
+        (assert true ($the-value ??).
+
+        (var v the-value)
+        (assert true ($v ??).
+      ).
+    ).
+    (define "Null fallback: (the-value ?? value)" (=> ()
+      (should "(the-value ?? value) returns the-value." (=> ()
+        (var c 0)
+        (assert the-value ($the-value ?? 1).
+        (assert the-value ($the-value ?? (++ c).
+        (assert 0 c)
+
+        (var v the-value)
+        (assert the-value ($v ?? 1).
+        (assert the-value ($v ?? (++ c).
+        (assert 0 c)
+      ).
+    ).
+    (define "Null Switch: (the-value ?? truthy, falsy)" (=> ()
+      (should "(the-value ?? truthy, falsy) returns truthy." (=> ()
+        (let x 1)
+        (let y -1)
+        (assert 1 ($the-value ?? x y).
+        (assert 2 ($the-value ?? (++ x) (-- y).
+        (assert 2 x)
+        (assert -1 y)
+      ).
     ).
   ).
 ).

@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: bool).
 
-(define "Bool Common Behaviours" (= ()
+(define "Bool Common Behaviors" (= ()
   (define "Identity" (=> ()
     (should "true is true." (= ()
       (assert (true is true).

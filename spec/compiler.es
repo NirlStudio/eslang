@@ -70,7 +70,7 @@
     ).
   ).
   (should "(compiler non-applicable) returns the global function compile." (= ()
-    (var non-applicables (@
+    (var non-applicable (@
       null type
       bool true false
       number -1 -0 0 1 1.1
@@ -86,7 +86,7 @@
       object (object empty)
       class (class empty) ((class empty) default)
     ).
-    (for nona in non-applicables
+    (for nona in non-applicable
       (var compiling (compiler nona).
       (assert ($compiling is-a function).
       (assert ($compiling is compile).

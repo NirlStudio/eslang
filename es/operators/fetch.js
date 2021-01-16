@@ -30,7 +30,7 @@ module.exports = function load ($void) {
     var dirs = space.local['-module'] ? [loader.dir(space.local['-module'])] : []
     var fetching = fetch.bind(null, loader, dirs)
     var tasks = []
-    for (var i = 1; i < clist.length; i++) {
+    for (var i = 1, len = clist.length; i < len; i++) {
       tasks.push(fetching(evaluate(clist[i], space)))
     }
     return promiseAll(tasks)
@@ -68,7 +68,7 @@ module.exports = function load ($void) {
       var clist = Array.isArray(uris) ? uris.slice()
         : Array.prototype.slice.call(arguments)
       clist.unshift(symbolFetch)
-      for (var i = 1; i < clist.length; i++) {
+      for (var i = 1, len = clist.length; i < len; i++) {
         var uri = clist[i]
         if (!uri || typeof uri !== 'string') {
           warn('$fetch', 'invalid source uri:', uri)

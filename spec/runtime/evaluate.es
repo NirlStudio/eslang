@@ -76,7 +76,7 @@
   op: (=? (X Y) (+ (X) (Y) (that z).
 ).
 
-(define "(? ? ...)" (=> ()
+(define "(word word ...)" (=> ()
   (should "(an-operator arg ...) invokes the operator with the argument(s)." (= ()
     (var sum (=? (X Y) (+ (X) (Y ?? 100).
     (assert 101 (sum 1).

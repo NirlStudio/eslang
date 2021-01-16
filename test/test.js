@@ -143,6 +143,48 @@ module.exports = function ($void) {
       '$env', '$run', '$interpreter'
     ])
 
+    checkStaticOperators('[Espresso / generators] ', [
+      'is', '===', 'is-not', '!==',
+      'equals', '==', 'not-equals', '!=',
+      'compare',
+      'is-empty', 'not-empty',
+      'is-a', 'is-an',
+      'is-not-a', 'is-not-an',
+      'to-code', 'to-string',
+      '>', '>=', '<', '<=',
+      // arithmetic: '-', '++', '--', ...
+      '+=', '-=', '*=', '/=', '%=',
+      // bitwise: '~', ...
+      '&=', '|=', '^=', '<<=', '>>=', '>>>=',
+      // control: ?
+      // general: +, (str +=), (str -=)
+      // logical: not, ...
+      'and', '&&', '&&=', 'or', '||', '||=',
+      '?', '?*', '??',
+      '*'
+    ])
+
+    checkFunctions($, '[Espresso / generator functions] ', [
+      'is', '===', 'is-not', '!==',
+      'equals', '==', 'not-equals', '!=',
+      'compare',
+      'is-empty', 'not-empty',
+      'is-a', 'is-an',
+      'is-not-a', 'is-not-an',
+      'to-code', 'to-string',
+      '>', '>=', '<', '<=',
+      '-', '++', '--',
+      '+=', '-=', '*=', '/=', '%=',
+      '~',
+      '&=', '|=', '^=', '<<=', '>>=', '>>>=',
+      '?',
+      '+',
+      'not', '!',
+      'and', '&&', '&&=', 'or', '||', '||=',
+      '?', '?*', '??',
+      'all', 'both', 'any', 'either', 'not-any', 'neither', 'nor'
+    ])
+
     checkFunctions($, '[Espresso / lib / functions] ', [
       'max', 'min'
     ])
@@ -172,6 +214,7 @@ module.exports = function ($void) {
     checkOperators()
     checkControl()
     checkOperations()
+    checkGeneratorAliases()
   }
 
   function checkObjects ($, group, names) {
@@ -274,6 +317,9 @@ module.exports = function ($void) {
     check('symbol', indexerOf($.symbol) === $.symbol[':'])
     check('symbol: empty', indexerOf($.symbol.empty) === $.symbol.proto[':'])
 
+    check('tuple', indexerOf($.tuple) === $.tuple[':'])
+    check('tuple: empty', indexerOf($.tuple.empty) === $.tuple.proto[':'])
+
     check('operator', indexerOf($.operator) === $.operator[':'])
     check('operator.empty', indexerOf($.operator.empty()) === $.operator.proto[':'])
 
@@ -284,8 +330,11 @@ module.exports = function ($void) {
     check('function: empty', indexerOf($.function.empty()) === $.function.proto[':'])
     check('function: generic', indexerOf(function () {}) === $.function.proto[':'])
 
-    check('array', indexerOf($.iterator.empty) === $.iterator.proto[':'])
-    check('array', indexerOf($.promise.empty) === $.promise.proto[':'])
+    check('iterator', indexerOf($.iterator) === $.iterator[':'])
+    check('iterator: empty', indexerOf($.iterator.empty) === $.iterator.proto[':'])
+
+    check('promise', indexerOf($.promise) === $.promise[':'])
+    check('promise: empty', indexerOf($.promise.empty) === $.promise.proto[':'])
 
     check('array', indexerOf($.array) === $.array[':'])
     check('array: empty', indexerOf($.array.empty()) === $.array.proto[':'])
@@ -294,6 +343,10 @@ module.exports = function ($void) {
     check('object', indexerOf($.object) === $.object[':'])
     check('object: empty', indexerOf($.object.empty()) === $.object.proto[':'])
     check('object: generic', indexerOf({}) === $.object.proto[':'])
+
+    check('class', indexerOf($.class) === $.class[':'])
+    check('class: empty', indexerOf($.class.empty()) === $.class.proto[':'])
+    check('instance: empty', indexerOf($.class.empty().empty()) === $.class.proto.proto[':'])
   }
 
   function eval_ (expected, expr, desc) {
@@ -422,8 +475,8 @@ module.exports = function ($void) {
 
   function checkOperators () {
     print('\n  - Operators')
-    eval_(1, '(? true 1 0)')
-    eval_(0, '(? false 1 0)')
+    eval_(1, '(if true 1 else 0)')
+    eval_(0, '(if false 1 else 0)')
 
     eval_(110, '(+ 10 100)')
     eval_(-110, '(+ -10 -100)')
@@ -467,6 +520,7 @@ module.exports = function ($void) {
     eval_(0, '(if false 1 else 0)')
 
     eval_(10, '(for x in (100 110) (++ i).')
+    eval_(10, '(var i 0)(for (@ 1 2 3 4) (i += _).')
     eval_(99, '(while ((++ i) < 100) i)')
     eval_(100, '(let i 0)(while ((i ++) < 100) i)')
     eval_(100, '(while ((++ i) < 100). i')
@@ -486,5 +540,27 @@ module.exports = function ($void) {
 
     eval_(11, '(let summer (@:class add: (= () ((this x) + (this y). (let s (summer of (@ x: 1 y: 10). (s add)')
     eval_(11, '(let summer (@:class type: (@ add: (= (x y ) (+ x y). (summer add 1 10)')
+  }
+
+  function checkGeneratorAliases () {
+    print('\n  - Generator Aliases')
+    function checkAlias (a, b) {
+      check('"' + a + '" is "' + b + '"',
+        Object.is($void.staticOperators[a], $void.staticOperators[b])
+      )
+    }
+
+    checkAlias('is', '===')
+    checkAlias('is-not', '!==')
+
+    checkAlias('equals', '==')
+    checkAlias('not-equals', '!=')
+
+    checkAlias('is-a', 'is-an')
+    checkAlias('is-not-a', 'is-not-an')
+
+    checkAlias('not', '!')
+    checkAlias('and', '&&')
+    checkAlias('or', '||')
   }
 }

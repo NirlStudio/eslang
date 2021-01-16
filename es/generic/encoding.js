@@ -7,7 +7,7 @@
 //  - anything defined in type cannot be overridden in instance
 //  - object.proto.* will allow the overridden and ensure the consistency and type safe.
 
-// ployfill Map & Array.prototype.indexOf
+// polyfill Map & Array.prototype.indexOf
 var createIndex = typeof Map === 'function' ? function () {
   var index = new Map()
   return {

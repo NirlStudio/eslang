@@ -170,7 +170,7 @@ var pall (promise all (@ p1 p2);
 var timeout;
 (var wait (promise of (=> async
   (let timeout (timer timeout 1000 (=> ms
-    print "timeouted" ms;
+    print "timeout" ms;
     async resolve ms;
   ).
 ).

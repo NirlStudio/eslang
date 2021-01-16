@@ -216,7 +216,7 @@
       (assert ($(the-type ":") is-a lambda).
       (assert ($(the-type ":") equals (type ":").
     ).
-    (should "the indexer is a readonly accessor." (=> ()
+    (should "the indexer is a read-only accessor." (=> ()
       (assert null (the-type :"__new_prop" 1).
       (assert ((the-type "__new_prop") is null).
 
@@ -287,7 +287,7 @@
   ).
 
   (define "Proto Indexer" (=> ()
-    (should "(a-type \"indexer\") is a lambda." (=> ()
+    (should "(the-type \"indexer\") is a lambda." (=> ()
       (assert ($(the-type "indexer") is-a lambda).
     ).
   ).
@@ -350,15 +350,36 @@
         (var x the-type)
         (assert the-type (x &&).
       ).
-      (should "(type && x) returns x." (=> ()
+      (should "(the-type && x) returns x." (=> ()
         (assert true (the-type && true).
         (var x the-type)
         (assert true (x && true).
       ).
-      (should "(type && x y) returns y." (=> ()
+      (should "(the-type && x y) returns y." (=> ()
         (assert false (the-type && true false).
         (var x the-type)
         (assert false (x && true false).
+      ).
+      (should "'and' is an alias of '&&'." (=> ()
+        (assert (the-type "and") (the-type "&&").
+        (assert (the-type "&&") (the-type "and").
+      ).
+    ).
+    (define "Logical AND Self-Assignment: (the-type &&= ...)" (=> ()
+      (should "(the-type &&=) returns the-type." (=> ()
+        (var x the-type)
+        (assert the-type (x &&=).
+        (assert the-type x).
+      ).
+      (should "(the-type &&= x) returns x." (=> ()
+        (var x the-type)
+        (assert true (x &&= true).
+        (assert true x).
+      ).
+      (should "(the-type &&= x y) returns y." (=> ()
+        (var x the-type)
+        (assert false (x &&= true false).
+        (assert false x).
       ).
     ).
     (define "Logical OR: (the-type || ...)" (=> ()
@@ -377,9 +398,33 @@
         (var x the-type)
         (assert the-type (x || 1 2).
       ).
+      (should "'or' is an alias of '||'." (=> ()
+        (assert (the-type "or") (the-type "||").
+        (assert (the-type "||") (the-type "or").
+      ).
     ).
+    (define "Logical OR Self-Assignment: (the-type ||= ...)" (=> ()
+      (should "(the-type ||=) returns the-type." (=> ()
+        (var x the-type)
+        (assert the-type (x ||=).
+        (assert the-type x).
+      ).
+      (should "(the-type ||= x) returns the-type." (=> ()
+        (var x the-type)
+        (assert the-type (x || 1).
+        (assert the-type x).
+      ).
+      (should "(the-type ||= x y) returns the-type." (=> ()
+        (var x the-type)
+        (assert the-type (x || 1 2).
+        (assert the-type x).
+      ).
+    ).
+  ).
+
+  (define "Global Operators" (=> ()
     (define "Boolean Test: (the-type ? ...)" (=> ()
-      (should "Booeanize: (the-type ?) returns true." (=> ()
+      (should "Booleanize: (the-type ?) returns true." (=> ()
         (assert true (the-type ?).
         (var x the-type)
         (assert true (x ?).
@@ -402,39 +447,67 @@
         (assert 1 y)
       ).
     ).
-  ).
-
-  (define "Global Operators" (=> ()
-    (define "Null fallback: (the-type ?? ...)" (=> ()
-      (should "(the-type ??) returns the-type." (=> ()
-        (assert the-type (the-type ??).
+    (define "Emptiness Test: (the-type ?* ...)" (=> ()
+      (should "Booleanize: (the-type ?*) returns true." (=> ()
+        (assert true (the-type ?*).
         (var x the-type)
-        (assert the-type (x ??).
+        (assert true (x ?*).
       ).
-      (should "(the-type ?? x) returns the-type." (=> ()
-        (var c 0)
-        (assert the-type (the-type ?? 1).
-        (assert the-type (the-type ?? (++ c).
-        (assert 0 c)
-
+      (should "Emptiness Fallback: (the-type ?* x) returns the-type." (=> ()
+        (assert the-type (the-type ?* 1).
+        (assert the-type (the-type ?* (1).
         (var x the-type)
-        (assert the-type (x ?? 1).
-        (assert the-type (x ?? (++ c).
-        (assert 0 c)
+        (assert the-type (x ?* 1).
+        (assert the-type (x ?* (1).
       ).
-      (should "(the-type ?? x y) returns the-type." (=> ()
-        (let x 1)
-        (let y -1)
-        (assert the-type (the-type ?? x y).
-        (assert the-type (the-type ?? (++ x) (-- y).
-        (assert 1 x)
-        (assert -1 y)
+      (should "Emptiness Switch: (the-type ?* x y) returns x." (=> ()
+        (var x -1)
+        (var y  1)
+        (assert -1 (the-type ?* x (++ y).
+        (assert 1 y)
+
+        (assert -2 (the-type ?* (-- x) (++ y).
+        (assert -2 x)
+        (assert 1 y)
+      ).
+    ).
+    (define "Null Test: (the-type ?? ...)", (=> ()
+      (define "Booleanize Null: (the-type ??)" (=> ()
+        (should "(the-type ??) returns true." (=> ()
+          (assert true (the-type ??).
+
+          (var t the-type)
+          (assert true (t ??).
+        ).
+      ).
+      (define "Null fallback: (the-type ?? value)" (=> ()
+        (should "(the-type ?? value) returns the-type." (=> ()
+          (var c 0)
+          (assert the-type (the-type ?? 1).
+          (assert the-type (the-type ?? (++ c).
+          (assert 0 c)
+
+          (var t the-type)
+          (assert the-type (t ?? 1).
+          (assert the-type (t ?? (++ c).
+          (assert 0 c)
+        ).
+      ).
+      (define "Null Switch: (the-type ?? truthy, falsy)" (=> ()
+        (should "(the-type ?? truthy, falsy) returns truthy." (=> ()
+          (let x 1)
+          (let y -1)
+          (assert 1 (the-type ?? x y).
+          (assert 2 (the-type ?? (++ x) (-- y).
+          (assert 2 x)
+          (assert -1 y)
+        ).
       ).
     ).
   ).
 
-  (define "General Behaviours" (=> ()
-    (should "(a-type empty) returns an empty value." (=> ()
+  (define "General Behaviors" (=> ()
+    (should "(the-type empty) returns an empty value." (=> ()
       (assert ($(the-type empty) is-not null).
       (assert false ($(the-type empty) is null).
 
@@ -444,7 +517,7 @@
       (assert ($(the-type empty) is-empty).
       (assert false($(the-type empty) not-empty).
     ).
-    (should "(a-type of) function returns an empty value." (=> ()
+    (should "(the-type of) function returns an empty value." (=> ()
       (assert ($(the-type of) is-empty).
       (assert false ($(the-type of) not-empty).
 

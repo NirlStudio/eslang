@@ -331,8 +331,8 @@
       (assert 12 (kitty age).
     ).
   ).
-  (define "general behaviours" (= ()
-    (should "(@:? ...) always returns a common object if the type cannot be recognised as any above type." (= ()
+  (define "general Behaviors" (= ()
+    (should "(@:? ...) always returns a common object if the type cannot be recognized as any above type." (= ()
       (var invalid-types (@
         null type bool string number date range symbol tuple
         operator lambda function

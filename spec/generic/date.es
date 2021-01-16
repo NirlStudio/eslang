@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: date).
 
-(define "Date Common Behaviours" (=> ()
+(define "Date Common Behaviors" (=> ()
   (define "Identity" (=> ()
     (should "(date of 0) is (date of -0)" (= ()
       (assert ((date of 0) is (date of -0).
@@ -742,13 +742,13 @@
 ).
 
 (define "(a-date to-string format)" (= ()
-  (should "(a-date to-string \"utc\") returns a readable string repesenting the date's UTC date+time." (= ()
+  (should "(a-date to-string \"utc\") returns a readable string representing the date's UTC date+time." (= ()
     (assert (((date of 0) to-string "utc") is-a string).
   ).
   (should "(a-date to-string \"date\") returns a readable string representing the date in current time zone." (= ()
     (assert (((date of 0) to-string "date") is-a string).
   ).
-  (should "(a-date to-string \"time\") returns a readable string repesenting the time in current time zone." (= ()
+  (should "(a-date to-string \"time\") returns a readable string representing the time in current time zone." (= ()
     (assert (((date of 0) to-string "time") is-a string).
   ).
   (should "(a-date to-string any-other-value) returns a representing a readable date+time string." (= ()

@@ -4,7 +4,9 @@ function createValueOf ($void, parse, parseInteger) {
   return function (input, defaultValue) {
     var value
     if (typeof input === 'string') {
-      value = input.startsWith('0x') || input.startsWith('0b') ? parseInteger(input) : parse(input)
+      value = input.startsWith('0x') || input.startsWith('0b')
+        ? parseInteger(input)
+        : parse(input)
     } else if (typeof input === 'boolean') {
       value = input ? 1 : 0
     } else if (input instanceof Date) {
@@ -16,7 +18,8 @@ function createValueOf ($void, parse, parseInteger) {
     } else {
       value = NaN
     }
-    return isNaN(value) && typeof defaultValue === 'number' ? defaultValue : value
+    return isNaN(value) && typeof defaultValue === 'number' ? defaultValue
+      : value
   }
 }
 
@@ -132,6 +135,7 @@ module.exports = function ($void) {
   var $Range = $.range
   var link = $void.link
   var Symbol$ = $void.Symbol
+  var bindThis = $void.bindThis
   var copyType = $void.copyType
   var protoValueOf = $void.protoValueOf
 
@@ -180,12 +184,12 @@ module.exports = function ($void) {
   var parseInteger = link(Type, 'parse-int', createIntParser($void), true)
 
   // get a number value from the input
-  var valueOf = link(Type, 'of',
-    createValueOf($void, parse, parseInteger), true
-  )
+  var valueOf = $void.numberValueOf = createValueOf($void, parse, parseInteger)
+  link(Type, 'of', bindThis(Type, valueOf), true)
 
   // get an integer value from the input
-  var intOf = link(Type, 'of-int', createIntValueOf($void, parseInteger), true)
+  var intOf = $void.intValueOf = createIntValueOf($void, parseInteger)
+  link(Type, 'of-int', bindThis(Type, intOf), true)
 
   // get an signed integer value which is stable with bitwise operation.
   link(Type, 'of-bits', function (input) {
@@ -247,37 +251,30 @@ module.exports = function ($void) {
   // remainder / modulus
   link(proto, '%', function (base) {
     return typeof base === 'undefined' ? this
-      : isNaN(base) || typeof base !== 'number' ? NaN
+      : typeof base !== 'number' || isNaN(base) ? NaN
         : isFinite(base) ? this % valueOf(base) : this
   })
 
   // bitwise operations
   link(proto, '&', function (value) {
-    return this & value
+    return this & (typeof value === 'number' ? value : valueOf(value))
   })
   link(proto, '|', function (value) {
-    return this | value
+    return this | (typeof value === 'number' ? value : valueOf(value))
   })
   link(proto, '^', function (value) {
-    return this ^ value
+    return this ^ (typeof value === 'number' ? value : valueOf(value))
   })
   link(proto, '<<', function (offset) {
-    offset >>= 0
-    return offset <= 0 ? this << 0
-      : offset >= 32 ? 0 : this << offset
+    return this << (typeof offset === 'number' ? offset : intOf(offset))
   })
   // signed right-shift.
   link(proto, '>>', function (offset) {
-    offset >>= 0
-    return offset <= 0 ? this >> 0
-      : offset >= 32 ? (this >> 0) >= 0 ? 0 : -1
-        : this >> offset
+    return this >> (typeof offset === 'number' ? offset : intOf(offset))
   })
   // zero-based right shift.
   link(proto, '>>>', function (offset) {
-    offset >>= 0
-    return offset <= 0 ? this >> 0
-      : offset >= 32 ? 0 : this >>> offset
+    return this >>> (typeof offset === 'number' ? offset : intOf(offset))
   })
 
   // support ordering logic - comparable

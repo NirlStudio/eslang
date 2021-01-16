@@ -9,8 +9,10 @@ module.exports = function general ($void) {
   var operator = $void.operator
   var thisCall = $void.thisCall
   var evaluate = $void.evaluate
-  var numberValueOf = $.number.of
+  var numberValueOf = $void.numberValueOf
   var staticOperator = $void.staticOperator
+
+  var symbolSubject = $.symbol.subject
 
   staticOperator('+', function (space, clause) {
     var clist = clause.$
@@ -22,6 +24,27 @@ module.exports = function general ($void) {
         : concat(space, base, clist)
     }
     return 0
+  }, function (base, value) {
+    var i = 1
+    var len = arguments.length
+    if (len < 1) {
+      return 0
+    }
+    if (typeof base === 'number') {
+      for (; i < len; i++) {
+        value = arguments[i]
+        base += typeof value === 'number' ? value : numberValueOf(value)
+      }
+    } else {
+      if (typeof base !== 'string') {
+        base = thisCall(base, 'to-string')
+      }
+      for (; i < len; i++) {
+        value = arguments[i]
+        base += typeof value === 'string' ? value : thisCall(value, 'to-string')
+      }
+    }
+    return base
   })
 
   function concat (space, str, clist) {
@@ -40,33 +63,25 @@ module.exports = function general ($void) {
     var length = clist.length
     for (var i = 2; i < length; i++) {
       var value = evaluate(clist[i], space)
-      if (typeof value === 'number') {
-        num += value
-      } else {
-        num += numberValueOf(value)
-      }
+      num += typeof value === 'number' ? value : numberValueOf(value)
     }
     return num
   }
 
   // (str += str ... )
   link($String.proto, '+=', operator(function (space, clause, that) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
+    if (!(space instanceof Space$) || typeof that !== 'string') {
+      return '' // The value of this operator is defined as 0.
     }
-    if (typeof that !== 'string') {
-      that = ''
-    }
-    var clist = clause && clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+
+    var clist = clause.$
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
-      if (typeof value === 'string') {
-        that += value
-      } else {
-        that += thisCall(value, 'to-string')
-      }
+      that += typeof value === 'string' ? value : thisCall(value, 'to-string')
     }
-    var sym = clist[0]
+
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }
@@ -75,17 +90,13 @@ module.exports = function general ($void) {
 
   // (str -= str ... ) or (str -= num)
   link($String.proto, '-=', operator(function (space, clause, that) {
-    if (!(space instanceof Space$)) {
-      return 0 // The value of this operator is defined as 0.
+    if (!(space instanceof Space$) || typeof that !== 'string') {
+      return '' // The value of this operator is defined as 0.
     }
-    if (typeof that !== 'string') {
-      return null
-    }
-    if (that.length < 1) {
-      return that
-    }
-    var clist = clause && clause.$ && clause.$.length ? clause.$ : []
-    for (var i = 2; i < clist.length; i++) {
+
+    var clist = clause.$
+    var base = clist[0] === symbolSubject ? 3 : 2
+    for (var i = base, len = clist.length; i < len; i++) {
       var value = evaluate(clist[i], space)
       if (typeof value === 'string') {
         if (that.endsWith(value)) {
@@ -100,7 +111,8 @@ module.exports = function general ($void) {
         }
       }
     }
-    var sym = clist[0]
+
+    var sym = clist[base - 2]
     if (sym instanceof Symbol$) {
       space.let(sym.key, that)
     }

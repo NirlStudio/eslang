@@ -15,9 +15,9 @@ module.exports = function ($void) {
     'is', '===',
     // Equivalence: to test if two entities are equivalent in effect.
     // Equivalence logic should be implemented symmetrically.
-    // So it's different with the behaviour of NaN in JS, since an identity must be
-    // equivalent in effect with itself, or as an identity's behaviour cannot be
-    // defined by any property that's unrelevant with its effect to its environment.
+    // So it's different with the behavior of NaN in JS, since an identity must be
+    // equivalent in effect with itself, or as an identity's behavior cannot be
+    // defined by any property that's irrelevant with its effect to its environment.
     'equals', '=='
   ], function (another) {
     return Object.is(typeof this === 'undefined' ? null : this,
@@ -43,7 +43,7 @@ module.exports = function ($void) {
       ? 0 : null
   })
 
-  // Emptiness: null, type.proto and all protos are empty.
+  // Emptiness: null, type.proto and all prototypes are empty.
   link(Null, 'is-empty', function () {
     return true
   })

@@ -1,7 +1,7 @@
 (let test true)
-(print "(? c t f)" test (? test "is true" "is false").
+(print "(if c t else f)" test (if test, "is true" else "is false").
 (let test false)
-(print "(? c t f)" test (? test "is true" "is false").
+(print "(if c t else f)" test (if test, "is true" else "is false").
 
 (let test true)
 (print "(c ? t f)" test (test ? "is true" "is false").

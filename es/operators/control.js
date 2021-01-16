@@ -16,25 +16,6 @@ module.exports = function control ($void) {
   var symbolIn = sharedSymbolOf('in')
   var symbolUnderscore = sharedSymbolOf('_')
 
-  // (? sym) - resolve in global scope or original scope (in operator only).
-  // (? cond true-branch false-branch)
-  staticOperator('?', function (space, clause) {
-    var clist = clause.$
-    var length = clist.length
-    if (length < 2) {
-      return null // short circuit - the result will be null anyway.
-    }
-    var cond = clist[1]
-    if (length < 3) {
-      return cond instanceof Symbol$ ? space.$resolve(cond.key) : null
-    }
-    cond = evaluate(cond, space)
-    if (typeof cond !== 'undefined' && cond !== null && cond !== 0 && cond !== false) {
-      return evaluate(clist[2], space)
-    }
-    return length > 3 ? evaluate(clist[3], space) : null
-  })
-
   // (if cond true-branch else false-branch)
   staticOperator('if', function (space, clause) {
     var clist = clause.$

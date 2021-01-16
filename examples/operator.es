@@ -19,7 +19,7 @@
   (let "x" 10)
   (var "y" 20)
   (local "z" 30)
-  (print "z in opeerator's scope is 30?" z)
+  (print "z in operator's scope is 30?" z)
   (sum)
 ).
 (and x (y + 1000) 1000).

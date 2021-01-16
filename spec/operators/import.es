@@ -32,6 +32,14 @@
     (var mod (import "./_module").
     (assert (mod -module-dir:: ends-with "operators").
   ).
+  (should "(import \"module\":: -imported-by) is the original importing module." (=> ()
+    (var mod (import "./_module").
+    (assert (mod -imported-by:: is -module).
+  ).
+  (should "(import \"module\":: -imported-at) is a unix timestamp." (=> ()
+    (var mod (import "./_module").
+    (assert (mod -imported-at:: is-a number).
+  ).
   (should "(import \"module\") returns an object with all exports." (=> ()
     (var mod (import "./_module").
 

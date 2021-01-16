@@ -29,6 +29,25 @@
   ).
   (should "(the-value \"and\") is an alias of (the-value \"&&\")." (=> ()
     (assert ($the-value "and":: is ($the-value "&&").
+    (assert ($the-value "&&":: is ($the-value "and").
+  ).
+).
+
+(define "Logical AND Self-Assignment: (the-value &&= ...)" (=> ()
+  (should "(the-value &&=) returns the-value." (=> ()
+    (var x the-value)
+    (assert the-value ($x &&=).
+    (assert the-value x)
+  ).
+  (should "(the-value &&= x) returns the-value." (=> ()
+    (var x the-value)
+    (assert the-value ($x &&= true).
+    (assert the-value x)
+  ).
+  (should "(the-value &&= x y) returns the-value." (=> ()
+    (var x the-value)
+    (assert the-value ($x &&= 1 2).
+    (assert the-value x)
   ).
 ).
 
@@ -52,6 +71,33 @@
   ).
   (should "(the-value \"or\") is an alias of (the-value \"||\")." (=> ()
     (assert ($the-value "or":: is ($the-value "||").
+    (assert ($the-value "||":: is ($the-value "or").
+  ).
+).
+
+(define "Logical OR Self-Assignment: (the-value ||= ...)" (=> ()
+  (should "(the-value ||=) returns the-value." (=> ()
+    (var x the-value)
+    (assert the-value ($x ||=).
+    (assert the-value x)
+  ).
+  (should "(the-value ||= x) returns x." (=> ()
+    (var x the-value)
+    (assert 1 ($x ||= 1).
+    (assert 1 x)
+  ).
+  (should "(the-value ||= falsy-value x) returns x." (=> ()
+    (var x the-value)
+    (assert 1 ($x ||= 0 1).
+    (assert 1 x)
+
+    (let x the-value)
+    (assert 1 ($x ||= null 1).
+    (assert 1 x)
+
+    (let x the-value)
+    (assert 1 ($x ||= false 1).
+    (assert 1 x)
   ).
 ).
 

@@ -127,3 +127,89 @@
     assert true (+ 1 2:: + 3:: is 6);
   ).
 ).
+
+(define "(.. expr) - resolve global value" (= ()
+  (should "symbol '..' is resolved to itself." (=> ()
+    assert .. (` ..);
+    assert .. (symbol of "..");
+  ).
+  (should "(.. ) returns null." (=> ()
+    assert null (..);
+  ).
+  (should "(.. sym) returns the value of sym from read-only global space." (=> ()
+    assert type (.. type);
+
+    var sym1 100;
+    assert 100 sym1;
+    assert 100 ($ sym1);
+    assert null (.. sym1);
+
+    const sym2 200;
+    assert 200 sym2;
+    assert 200 ($ sym2);
+    assert null (.. sym2);
+
+    let sym3 300;
+    assert 300 sym3;
+    assert 300 ($ sym3);
+    assert null (.. sym3);
+
+    local sym4 400;
+    assert 400 sym4;
+    assert 400 ($ sym4);
+    assert null (.. sym4);
+
+    locon sym5 500;
+    assert 500 sym5;
+    assert 500 ($ sym5);
+    assert null (.. sym5);
+  ).
+  (should "(.. a-tuple) returns the value from read-only global space by evaluating a-tuple to a symbol." (=> ()
+    assert null (.. (symbol of null);
+    assert true (.. (symbol of "true");
+    assert false (.. (symbol of "false");
+
+    var sym1 100;
+    assert 100 sym1;
+    assert null (.. (`sym1);
+
+    const sym2 200;
+    assert 200 sym2;
+    assert null (.. (` sym2);
+
+    let sym3 300;
+    assert 300 sym3;
+    assert null (.. (` sym3);
+
+    local sym4 400;
+    assert 400 sym4;
+    assert null (.. (` sym4);
+
+    locon sym5 500;
+    assert 500 sym5;
+    assert null (.. (symbol of ("sym" + 5);
+  ).
+  (should "(.. expr) returns null if expr is not a symbol." (=> ()
+    assert null (.. null);
+
+    assert null (.. true);
+    assert null (.. false);
+
+    assert null (.. -1);
+    assert null (.. 0);
+    assert null (.. 1);
+  ).
+  (should "(.. expr) returns null if expr is a tuple but cannot be evaluated to a symbol." (=> ()
+    assert null (.. ();
+    assert null (.. (*);
+
+    assert null (.. (0 ?);
+    assert null (.. (1 ?);
+
+    assert null (.. (null ??);
+    assert null (.. (type ??);
+
+    assert null (.. (1 + 2);
+    assert null (.. (1 + (2 + 3);
+  ).
+).

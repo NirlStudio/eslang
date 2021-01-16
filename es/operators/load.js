@@ -15,12 +15,12 @@ module.exports = function load ($void) {
 
   // load: a module from source.
   var operator = staticOperator('load', function (space, clause) {
-    var clist = clause.$
-    if (clist.length < 2) {
-      return null
-    }
     if (!space.app) {
       warn('load', 'invalid without an app context.')
+      return null
+    }
+    var clist = clause.$
+    if (clist.length < 2) {
       return null
     }
     // look into current space to have the base uri.

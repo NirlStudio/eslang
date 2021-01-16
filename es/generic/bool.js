@@ -12,7 +12,8 @@ module.exports = function ($void) {
 
   // booleanize
   $void.boolValueOf = link(Type, 'of', function (value) {
-    return value !== null && value !== 0 && value !== false && typeof value !== 'undefined'
+    return typeof value !== 'undefined' &&
+      value !== null && value !== 0 && value !== false
   }, true)
 
   var proto = Type.proto

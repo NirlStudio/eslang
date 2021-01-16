@@ -161,10 +161,10 @@ module.exports = function space ($void) {
     app.timer = $void.$timer
 
     var local = Object.create(app)
-    local['-module'] = uri
-    local['-module-dir'] = $void.loader.dir(uri)
+    local['-module'] = app['-app']
+    local['-module-dir'] = app['-app-dir']
 
-    var exporting = Object.create($Object.proto)
+    var exporting = Object.create(null)
     var space = new Space$(local, null, null, exporting)
     space.app = app
     space.modules = Object.create(null)
@@ -189,9 +189,8 @@ module.exports = function space ($void) {
     var app = appSpace && appSpace.app
     var local = Object.create(app || $)
     local['-module'] = uri || ''
-    if (uri && $void.loader.isResolved(uri)) {
-      local['-module-dir'] = $void.loader.dir(uri)
-    }
+    local['-module-dir'] = uri && $void.loader.isResolved(uri)
+      ? $void.loader.dir(uri) : ''
     var export_ = Object.create($Object.proto)
     var space = new Space$(local, null, null, export_)
     if (app) {
@@ -228,7 +227,7 @@ module.exports = function space ($void) {
     return space
   }
 
-  // customized the behaviour of the space of an operator
+  // customized the behavior of the space of an operator
   $void.OperatorSpace = OperatorSpace$
   function OperatorSpace$ (parent, origin) {
     // the original context is preferred over global.

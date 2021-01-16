@@ -89,25 +89,25 @@ module.exports = function assignment ($void) {
         return null // unrecognized pattern
       }
       // (var (symbol ...) value-or-values).
-      var syms = sym.$
+      var symbols = sym.$
       if (Array.isArray(values)) { // assign the value one by one.
-        for (i = 0; i < syms.length; i++) {
-          if (syms[i] instanceof Symbol$) {
-            space[method](syms[i].key, i < values.length ? values[i] : null)
+        for (i = 0; i < symbols.length; i++) {
+          if (symbols[i] instanceof Symbol$) {
+            space[method](symbols[i].key, i < values.length ? values[i] : null)
           }
         }
       } else if (isObject(values)) { // read fields into an array.
-        for (i = 0; i < syms.length; i++) {
-          if (syms[i] instanceof Symbol$) {
-            name = syms[i].key
+        for (i = 0; i < symbols.length; i++) {
+          if (symbols[i] instanceof Symbol$) {
+            name = symbols[i].key
             value = values[name]
             space[method](name, typeof value === 'undefined' ? null : value)
           }
         }
       } else { // assign all symbols the same value.
-        for (i = 0; i < syms.length; i++) {
-          if (syms[i] instanceof Symbol$) {
-            space[method](syms[i].key, values)
+        for (i = 0; i < symbols.length; i++) {
+          if (symbols[i] instanceof Symbol$) {
+            space[method](symbols[i].key, values)
           }
         }
       }

@@ -20,7 +20,7 @@ module.exports = function run ($void) {
         return null
       }
     } else if (expr instanceof Tuple$) {
-      // evauate it
+      // evaluate it
       code = expr
     } else if (expr instanceof Symbol$) {
       // resolve it in global space.

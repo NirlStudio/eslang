@@ -17,20 +17,20 @@ var pool = []
 var spooling = false
 var panel, input, enter
 
-function enqueue (todo) {
+function enqueue (task) {
   if (pool.length > (MaxLines * 2)) {
     pool = pool.slice(MaxLines)
   }
-  pool.push(todo)
+  pool.push(task)
 }
 
 function drain () {
   if (pool.length < 1) { return }
   setTimeout(function () {
-    var todos = pool.splice(0, DrainBatch)
-    for (var i = 0, len = todos.length; i < len; i++) {
-      var todo = todos[i]
-      todo[0](todo[1], todo[2], true)
+    var tasks = pool.splice(0, DrainBatch)
+    for (var i = 0, len = tasks.length; i < len; i++) {
+      var task = tasks[i]
+      task[0](task[1], task[2], true)
     }
     drain()
   }, MinimalDelay)

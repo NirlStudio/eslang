@@ -1,6 +1,6 @@
 (var * (load "share/type" (@ the-type: iterator).
 
-(define "Iterator Common Behaviours" (=> ()
+(define "Iterator Common Behaviors" (=> ()
   (define "Identity" (= ()
     (should "all empty iterators are the same instance." (= ()
       (assert ((iterator empty) is (iterator empty).
@@ -150,7 +150,7 @@
   (should "(empty-iter iterate) returns null." (= ()
     (assert null ((iterator empty) iterate).
   ).
-  (should "(iter iterate) returns this iterator's inner next function." (= ()
+  (should "(iter iterate) returns the inner next function of this iterator." (= ()
     (var next (= () null).
     (var iter (iterator of next).
     (assert next (iter iterate).
@@ -636,7 +636,7 @@
     (assert "" ((iterator empty) join " ").
     (assert "" ((iterator empty) join "_").
   ).
-  (should "(iter join) concatenates the string values of all iterations with whitespaces." (= ()
+  (should "(iter join) concatenates the string values of all iterations with whitespace." (= ()
     (assert "1" ((iterator of (@ 1)) join).
     (assert "1 10" ((iterator of (@ 1 10:10)) join).
     (assert "1 10 100" ((iterator of (@ 1 10:10 100:100)) join).

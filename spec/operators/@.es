@@ -8,6 +8,7 @@
   "fetch",
   "function",
   "general",
+  "generator",
   "import",
   "literal",
   "load",
