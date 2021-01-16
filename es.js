@@ -1,7 +1,5 @@
 'use strict'
 
-require('./lib/polyfill')
-
 module.exports = function espresso (stdout, loader) {
   // create the void.
   var start = require('./es/start')

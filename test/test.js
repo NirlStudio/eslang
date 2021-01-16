@@ -35,7 +35,6 @@ module.exports = function ($void) {
     // check native environment
     print('\n  Checking JavaScript environment')
     checkJavascript()
-    checkPolyfill()
 
     // check espresso runtime.
     checkRuntime()
@@ -71,17 +70,6 @@ module.exports = function ($void) {
     passed('JS is using the space of ' + (global ? 'global.' : 'window.'));
     (typeof Promise === 'undefined' ? failed : passed)('Promise');
     (typeof Object.defineProperty !== 'function' ? failed : passed)('Object.defineProperty')
-  }
-
-  function checkPolyfill () {
-    var polyfill = require('../lib/polyfill')
-    if (polyfill.length > 0) {
-      passed('Espresso is using some polyfill functions:')
-      var padding = '      - '
-      gray(padding + polyfill.join('\n' + padding))
-    } else {
-      green('      Congratulations! Espresso does not need any polyfill.')
-    }
   }
 
   function checkRuntime () {
