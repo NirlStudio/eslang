@@ -1,17 +1,11 @@
 'use strict'
 
 function ignoreUnhandledRejectionsBy (filter) {
-  if (typeof window !== 'undefined') {
+  if (typeof process !== 'undefined') {
+    process.on('unhandledRejection', filter)
+  } else /* if (typeof window !== 'undefined') */ {
     window.addEventListener('unhandledrejection', function (event) {
-      var detail = event.promise ? event
-        : event.detail // for bluebird polyfill.
-      if (detail.promise && filter(detail.promise, detail.reason)) {
-        event.preventDefault()
-      }
-    })
-  } else if (typeof process !== 'undefined') {
-    process.on('unhandledRejection', function (reason, promise) {
-      filter(promise, reason)
+      filter(event.reason, event.promise) && event.preventDefault()
     })
   }
 }
@@ -194,8 +188,8 @@ module.exports = function ($void) {
   var empty = link(Type, 'empty', Promise$.resolve(null))
 
   // guard espresso promises to ignore unhandled rejections.
-  ignoreUnhandledRejectionsBy(function (promise, excuse) {
-    // create warnings
+  ignoreUnhandledRejectionsBy(function (excuse, promise) {
+    // TODO: create warnings
     return promise.excusable === true
   })
 

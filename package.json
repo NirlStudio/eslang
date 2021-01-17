@@ -1,6 +1,6 @@
 {
   "name": "eslang",
-  "version": "1.0.12",
+  "version": "1.0.21",
   "author": {
     "email": "leevi@nirlstudio.com",
     "name": "Leevi Li"
@@ -45,6 +45,7 @@
     "html-webpack-plugin": "^4.5.1",
     "shelljs": "^0.8.4",
     "webpack": "^4.46.0",
-    "webpack-cli": "^4.3.1"
+    "webpack-cli": "^4.3.1",
+    "webpack-dev-server": "^3.11.2"
   }
 }
