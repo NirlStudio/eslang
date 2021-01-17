@@ -1,11 +1,7 @@
 'use strict'
 
-var isFirefox = (typeof window !== 'undefined') &&
-  (typeof firefox !== 'undefined' || navigator.userAgent.indexOf('Firefox/') > 0)
-
 module.exports = function ($void) {
   var $ = $void.$
-  var link = $void.link
   var $export = $void.export
   var thisCall = $void.thisCall
   var copyType = $void.copyType
@@ -41,11 +37,6 @@ module.exports = function ($void) {
 
     'random': 'random'
   })
-
-  // hot-fix for Firefox, in which Math.exp(1) does not returns Math.E.
-  isFirefox && link(math, 'exp', function exp (x) {
-    return x === 1 ? Math.E : Math.exp(x)
-  }, true)
 
   $export($, 'math', math)
 

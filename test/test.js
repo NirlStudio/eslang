@@ -1,9 +1,9 @@
 'use strict'
 
-var symbols = Object.create(null)
-require('../lib/modules/symbols')(symbols)
-
 module.exports = function ($void) {
+  var symbols = Object.create(null)
+  require('../lib/modules/symbols')(symbols, null, $void)
+
   var $ = $void.$
   var print = $void.$print
   var printf = $void.$printf

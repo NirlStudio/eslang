@@ -10,7 +10,7 @@ module.exports = function espresso (stdout, loader) {
   $void.loader = loader($void)
   // set the location of the runtime
   $void.runtime('home',
-    typeof window === 'undefined' ? __dirname
+    $void.isNativeHost ? __dirname
       : window.ES_HOME || (window.location.origin + '/es')
   )
   // now we got a complete runtime.

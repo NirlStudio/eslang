@@ -1,15 +1,5 @@
 'use strict'
 
-function ignoreUnhandledRejectionsBy (filter) {
-  if (typeof process !== 'undefined') {
-    process.on('unhandledRejection', filter)
-  } else /* if (typeof window !== 'undefined') */ {
-    window.addEventListener('unhandledrejection', function (event) {
-      filter(event.reason, event.promise) && event.preventDefault()
-    })
-  }
-}
-
 module.exports = function ($void) {
   var $ = $void.$
   var Type = $.promise
@@ -23,6 +13,16 @@ module.exports = function ($void) {
   var isApplicable = $void.isApplicable
   var protoValueOf = $void.protoValueOf
   var sharedSymbolOf = $void.sharedSymbolOf
+
+  function ignoreUnhandledRejectionsBy (filter) {
+    if ($void.isNativeHost) {
+      process.on('unhandledRejection', filter)
+    } else {
+      window.addEventListener('unhandledrejection', function (event) {
+        filter(event.reason, event.promise) && event.preventDefault()
+      })
+    }
+  }
 
   function hasExcuse (excuse) {
     return typeof excuse !== 'undefined' && excuse !== null
