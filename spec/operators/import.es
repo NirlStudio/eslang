@@ -112,11 +112,15 @@
       (assert (mod -module:: ends-with "test.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "window" (= ()
+    (if (env "runtime-host":: is "browser") (should "window" (= ()
       (var mod (import "window").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "window.es").
       (assert (mod -module-dir:: ends-with "modules").
+
+      (assert (mod "document":: is-an object).
+      (assert (mod "navigator":: is-an object).
+      (assert (mod "location":: is-an object).
     ).
   ).
   (define "import native modules", (= ()

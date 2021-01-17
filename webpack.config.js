@@ -18,7 +18,8 @@ const langDirs = [
   'spec/',
   'test/',
   'tools/',
-  'web/'
+  'web/',
+  'web/modules/'
 ]
 
 const updateWebSite = new HooksPlugin({
@@ -58,8 +59,9 @@ const updateWebSite = new HooksPlugin({
   done: () => {
     shell.cp('web/favicon.*', 'dist/www/')
     shell.cp('web/index.css', 'dist/www/')
-    shell.cp('profile.es', 'dist/www/')
     shell.cp('web/*.es', 'dist/www/')
+    shell.cp('web/modules/*.es', 'dist/www/modules/')
+    shell.cp('profile.es', 'dist/www/')
     shell.cp('modules/*.es', 'dist/www/modules/')
     shell.cp('test/test.es', 'dist/www/test/')
     shell.cp('-r', 'examples/', 'dist/www/')
