@@ -5,7 +5,7 @@ module.exports = function espresso (stdout, loader) {
   var start = require('./es/start')
   var $void = start(stdout)
   // mount native module loader
-  $void.require = require('./modules')($void)
+  $void.require = require('./lib/modules')($void)
   // create the source loader
   $void.loader = loader($void)
   // set the location of the runtime

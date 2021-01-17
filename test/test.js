@@ -1,7 +1,7 @@
 'use strict'
 
 var symbols = Object.create(null)
-require('../modules/symbols')(symbols)
+require('../lib/modules/symbols')(symbols)
 
 module.exports = function ($void) {
   var $ = $void.$
