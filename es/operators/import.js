@@ -2,6 +2,7 @@
 
 module.exports = function import_ ($void) {
   var $ = $void.$
+  var $Object = $.object
   var compile = $.compile
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
@@ -96,9 +97,9 @@ module.exports = function import_ ($void) {
       return null
     }
     var type
-    var offset = source.indexOf('$')
-    if (offset >= 0) {
-      type = source.substring(0, ++offset)
+    var offset = source.startsWith('$') ? 1 : 0
+    if (offset) {
+      type = source.substring(0, offset)
     }
     // try to locate the source in dirs.
     var appHome = space.local['-app-home']
@@ -119,6 +120,9 @@ module.exports = function import_ ($void) {
       space, uri, module_, source, moduleUri
     )
     // make sure system properties cannot be overridden.
+    if (!module_.exporting) {
+      module_.exporting = Object.create($Object.proto)
+    }
     return Object.assign(module_.exporting, module_.props)
   }
 

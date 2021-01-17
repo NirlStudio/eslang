@@ -144,11 +144,16 @@
       (assert "$symbols" (mod -module).
       (assert null (mod -module-dir).
     ).
-    (should "$window" (= ()
-      (var mod (import "$window").
+    (should "$global" (= ()
+      (var mod (import "$global").
       (assert (mod is-an object).
-      (assert "$window" (mod -module).
+      (assert "$global" (mod -module).
       (assert null (mod -module-dir).
+
+      (assert (mod "setTimeout":: is-a function).
+      (assert (mod "clearTimeout":: is-a function).
+      (assert (mod "setInterval":: is-a function).
+      (assert (mod "clearInterval":: is-a function).
     ).
   ).
 ).

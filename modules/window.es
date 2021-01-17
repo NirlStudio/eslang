@@ -1,4 +1,4 @@
-const window (import "$window");
+const window (import "$global");
 
 # only expose some members of native window.
 export (document, navigator, location) window;
