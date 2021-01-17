@@ -9,7 +9,7 @@ const MODE_PROD = 'production'
 const MODE_DEV = 'development'
 
 const ignoreNativeModules = new webpack.IgnorePlugin(
-  /^(\.\/loader-fs|node-localstorage|colors\/safe)$/
+  /^(\.\/loader-fs|colors\/safe)$/
 )
 
 const langDirs = [
