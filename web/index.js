@@ -1,7 +1,5 @@
 'use strict'
 
-var espresso = require('./es')
-var loadIOProvider = require('./lib/io')
 var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')
 var terminalStdout = require('./lib/stdout')
@@ -21,8 +19,8 @@ module.exports = function (term, stdin, stdout, loader) {
   stdout = typeof stdout === 'function' ? stdout : terminalStdout(term)
   loader = ensure(loader, defaultLoader)
 
-  var $void = espresso(stdout, loader)
-  loadIOProvider($void)
+  var $void = require('./es')(stdout, loader)
+  require('./lib/io')($void)
 
   // prepare app environment.
   var home = getDefaultHome()

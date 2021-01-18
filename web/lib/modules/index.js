@@ -1,8 +1,8 @@
 'use strict'
 
 module.exports = function ($void) {
-  $void.$symbols = require('./symbols')($void)
-  $void.$restful = require('./restful')($void)
+  $void.$symbols = require('../../../lib/modules/symbols')($void)
+  $void.$restful = require('../../../lib/modules/restful')($void)
 
   function loadDefault (moduleUri) {
     switch (moduleUri) {
@@ -19,7 +19,7 @@ module.exports = function ($void) {
         return $void.$symbols
 
       case 'global':
-        return global
+        return window
 
       default:
         return null

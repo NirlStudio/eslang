@@ -2,7 +2,7 @@
 
 function nop () {}
 
-module.exports = function () {
+module.exports = function ($void) {
   var term = {}
   var buffer = ''
 

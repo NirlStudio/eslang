@@ -10,6 +10,7 @@ module.exports = function import_ ($void) {
   var execute = $void.execute
   var evaluate = $void.evaluate
   var isObject = $void.isObject
+  var safelyAssign = $void.safelyAssign
   var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
@@ -226,21 +227,11 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      var importing = $void.require(uri, moduleUri)
-      if (typeof importing !== 'function') {
-        module_.status = 400
-        warn('import', 'invalid native module', source, 'at', uri)
-        return null
-      }
-      var scope = $void.createModuleSpace(uri, space)
-      var status = importing(scope.exporting, scope.context, $void)
-      if (status === true) { // the loader can report error details
-        module_.status = 200
-        return scope.exporting
-      }
-      module_.status = 500 // internal error
-      warn('import', 'failed to import native module of', source,
-        'for', status, 'at', uri)
+      var exporting = $void.require(uri, moduleUri)
+      module_.status = 200
+      return typeof exporting !== 'function' && typeof exporting !== 'object'
+        ? exporting
+        : safelyAssign(Object.create(null), exporting)
     } catch (err) {
       module_.status = 503 // service unavailable
       warn('import', 'failed to import native module of', source,
