@@ -36,8 +36,7 @@
     "eslang": "bin/eslang"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "colors": "^1.4.0"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "hooks-webpack-plugin": "^1.0.3",

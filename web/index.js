@@ -1,6 +1,6 @@
 'use strict'
 
-var espresso = require('../es')
+var espresso = require('./es')
 var loadIOProvider = require('./lib/io')
 var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')

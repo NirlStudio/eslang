@@ -1,16 +1,11 @@
 const fs = require('fs')
 const path = require('path')
 const shell = require('shelljs')
-const webpack = require('webpack')
 const HooksPlugin = require('hooks-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const MODE_PROD = 'production'
 const MODE_DEV = 'development'
-
-const ignoreNativeModules = new webpack.IgnorePlugin(
-  /^(\.\/colors\/safe)$/
-)
 
 const langDirs = [
   'examples/',
@@ -80,7 +75,6 @@ module.exports = (env, options) => {
     mode,
     entry: './web/lib/shell.js',
     plugins: [
-      ignoreNativeModules,
       injectJavaScript,
       updateWebSite
     ],
