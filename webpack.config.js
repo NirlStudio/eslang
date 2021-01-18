@@ -9,7 +9,7 @@ const MODE_PROD = 'production'
 const MODE_DEV = 'development'
 
 const ignoreNativeModules = new webpack.IgnorePlugin(
-  /^(\.\/loader-fs|colors\/safe)$/
+  /^(\.\/colors\/safe)$/
 )
 
 const langDirs = [
@@ -18,8 +18,7 @@ const langDirs = [
   'spec/',
   'test/',
   'tools/',
-  'web/',
-  'web/modules/'
+  'web/'
 ]
 
 const updateWebSite = new HooksPlugin({

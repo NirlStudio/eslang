@@ -5,7 +5,7 @@ var loadIOProvider = require('./lib/io')
 var consoleTerm = require('./lib/console')
 var terminalStdin = require('./lib/stdin')
 var terminalStdout = require('./lib/stdout')
-var defaultLoader = require('../lib/loader')
+var defaultLoader = require('../lib/loader/http')
 
 function ensure (factory, alternative) {
   return typeof factory === 'function' ? factory : alternative
