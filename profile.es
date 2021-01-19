@@ -10,7 +10,7 @@ else
   export reload (->() (exit );
 ).
 
-gray "# profile functions";
+gray "# functions";
 blue " version"; gray ",";
 (export version (= ()
   run "tools/version";

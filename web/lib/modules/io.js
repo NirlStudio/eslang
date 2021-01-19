@@ -14,12 +14,12 @@ function storeOf (storage) {
   }
 }
 
-module.exports = function ($void) {
+module.exports = function $io ($void) {
   var warn = $void.$warn
   var thisCall = $void.thisCall
   var stringOf = $void.$.string.of
 
-  var $io = $void.$io = {}
+  var $io = Object.create(null)
 
   var storage = window.localStorage || storeOf(tempStorage)
   var session = window.sessionStorage || storeOf(tempSession)
@@ -75,4 +75,6 @@ module.exports = function ($void) {
     chooseStoreBy(path).setItem(path, value)
     return Promise.resolve(value)
   }
+
+  return $io
 }

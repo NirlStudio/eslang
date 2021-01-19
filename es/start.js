@@ -52,9 +52,7 @@ function initializeRuntime ($void) {
 
   require('./runtime/execute')($void)
   require('./runtime/eval')($void)
-
   require('./runtime/run')($void)
-  require('./runtime/interpreter')($void)
 }
 
 function initializeOperators ($void) {

@@ -1,12 +1,10 @@
 'use strict'
 
 module.exports = function ($void) {
-  var symbols = Object.create(null)
-  require('../lib/modules/symbols')(symbols, null, $void)
-
   var $ = $void.$
   var print = $void.$print
   var printf = $void.$printf
+  var symbols = $void.$symbols
 
   // provide a field to print for testing purpose
   ;(print.bound || print).nativeField = true
@@ -128,7 +126,7 @@ module.exports = function ($void) {
 
     checkFunctions($void, '[Espresso / functions] ', [
       // runtime
-      '$env', '$run', '$interpreter'
+      '$env', '$run'
     ])
 
     checkStaticOperators('[Espresso / generators] ', [

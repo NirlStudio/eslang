@@ -1,26 +1,19 @@
 'use strict'
 
-var consoleTerm = require('./lib/console')
-var terminalStdin = require('./lib/stdin')
-var terminalStdout = require('./lib/stdout')
-var defaultLoader = require('../lib/loader/http')
-
-function ensure (factory, alternative) {
-  return typeof factory === 'function' ? factory : alternative
-}
-
 function getDefaultHome () {
   var href = window.location.href
   return href.substring(0, href.lastIndexOf('/'))
 }
 
 module.exports = function (term, stdin, stdout, loader) {
-  term = typeof term === 'object' ? term : consoleTerm()
-  stdout = typeof stdout === 'function' ? stdout : terminalStdout(term)
-  loader = ensure(loader, defaultLoader)
-
-  var $void = require('./es')(stdout, loader)
-  require('./lib/io')($void)
+  // create the void.
+  var $void = require('../es/start')(stdout ||
+    require('./lib/stdout')(term ||
+      require('./lib/console')()
+    )
+  )
+  // set the location of the runtime
+  $void.runtime('home', window.ES_HOME || (window.location.origin + '/es'))
 
   // prepare app environment.
   var home = getDefaultHome()
@@ -28,7 +21,13 @@ module.exports = function (term, stdin, stdout, loader) {
   $void.env('user-home', home)
   $void.env('os', window.navigator.userAgent)
 
-  var isObject = $void.isObject
+  // create the source loader
+  $void.loader = (loader || require('../lib/loader/http'))($void)
+
+  // mount native module loader
+  $void.module = require('../lib/module')($void)
+  $void.module.native = require('./lib/module-native')($void)
+
   var bootstrap = $void.createBootstrapSpace(home + '/@')
 
   var run = function (appHome, context, args, app) {
@@ -69,26 +68,17 @@ module.exports = function (term, stdin, stdout, loader) {
     })
   }
 
-  function enableConsole (context, args, profile) {
-    return shell(context || ['_@', '_profile'], args,
-      profile && typeof profile === 'string' ? profile
-        : '(var * (load "_profile"))'
-    )
+  function enableConsole (context, args) {
+    return shell(context, args)
   }
 
-  function shell (context, args, profile) {
+  function shell (context, args) {
     return initialize(context, function () {
-      var reader = ensure(stdin, terminalStdin)($void, term)
+      var reader = (stdin || require('./lib/stdin'))($void, term)
       var agent = require('../lib/shell')($void, reader,
         require('./lib/process')($void)
       )
-      // export global shell commands
-      $void.$shell['test-bootstrap'] = require('../test/test')($void)
-      if (isObject(args)) {
-        Object.assign($void.$shell, args)
-        args = []
-      }
-      agent(args, term.echo, profile)
+      agent(args, term.echo)
       return reader.open()
     })
   }

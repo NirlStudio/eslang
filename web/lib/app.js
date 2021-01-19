@@ -5,7 +5,7 @@ var term = require('./term')
 
 var espresso = $void(term()/*, stdin, stdout, loader */)
 // start shell and expose the shell's reader function.
-var initializing = espresso.shell(/* context, args, profile */)
+var initializing = espresso.shell(/* context, args */)
 if (!(initializing instanceof Promise)) {
   console.info('shell is ready.')
 } else {

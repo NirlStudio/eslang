@@ -73,7 +73,7 @@ module.exports = (env, options) => {
   const name = mode === MODE_PROD ? 'eslang.min' : 'eslang'
   return {
     mode,
-    entry: './web/lib/shell.js',
+    entry: './web/lib/app.js',
     plugins: [
       injectJavaScript,
       updateWebSite

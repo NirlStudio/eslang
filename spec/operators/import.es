@@ -136,12 +136,6 @@
       (assert "$restful" (mod -module).
       (assert null (mod -module-dir).
     ).
-    (should "$shell" (= ()
-      (var mod (import "$shell").
-      (assert (mod is-an object).
-      (assert "$shell" (mod -module).
-      (assert null (mod -module-dir).
-    ).
     (should "$symbols" (= ()
       (var mod (import "$symbols").
       (assert (mod is-an object).

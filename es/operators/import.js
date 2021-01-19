@@ -97,27 +97,27 @@ module.exports = function import_ ($void) {
       warn('import', 'invalid module source:', source)
       return null
     }
-    var type
-    var offset = source.startsWith('$') ? 1 : 0
-    if (offset) {
-      type = source.substring(0, offset)
-    }
-    // try to locate the source in dirs.
-    var appHome = space.local['-app-home']
+    var userHome = $void.$env('user-home')
     var moduleUri = space.local['-module']
-    var uri = type ? source.substring(offset) // native module
-      : resolve(space, appHome, moduleUri, source)
+    var moduleDir = space.local['-module-dir']
+    var appHome = space.local['-app-home']
+    var appDir = space.local['-app-dir']
+
+    var isNative = source.startsWith('$')
+    var uri = isNative
+      ? $void.module.native.resolve(source, moduleDir, appHome, appDir, userHome)
+      : resolve(space, appHome, userHome, moduleUri, source)
     if (!uri) {
       return null
     }
     // look up it in cache.
-    var module_ = lookupInCache(space.modules, type ? source : uri, moduleUri)
+    var module_ = lookupInCache(space.modules, uri, moduleUri)
     if (module_.status) {
       return module_.exporting
     }
 
     module_.status = 100 // indicate loading
-    module_.exporting = (type ? loadNativeModule : loadModule)(
+    module_.exporting = (isNative ? loadNativeModule : loadModule)(
       space, uri, module_, source, moduleUri
     )
     // make sure system properties cannot be overridden.
@@ -127,7 +127,7 @@ module.exports = function import_ ($void) {
     return Object.assign(module_.exporting, module_.props)
   }
 
-  function resolve (space, appHome, moduleUri, source) {
+  function resolve (space, appHome, userHome, moduleUri, source) {
     var loader = $void.loader
     var isResolved = loader.isResolved(source)
     if (!moduleUri && isResolved) {
@@ -137,22 +137,13 @@ module.exports = function import_ ($void) {
     var dirs = isResolved ? [] : dirsOf(source,
       moduleUri && loader.dir(moduleUri),
       appHome + '/modules',
-      $void.$env('user-home') + '/.es/modules',
+      userHome + '/.es/modules',
       $void.$env('home') + '/modules', // working dir
       $void.runtime('home') + '/modules'
     )
     var uri = loader.resolve(completeFile(source), dirs)
     if (typeof uri === 'string') {
       return uri
-    }
-    // try to load native Espresso modules.
-    if ($void.require.resolve && !isRelative(source)) {
-      uri = $void.require.resolve(source, appHome,
-        space.local['-app-dir'], $void.$env('user-home')
-      )
-      if (typeof uri === 'string') {
-        return uri
-      } // else, make sure to display both warnings.
     }
     warn('import', 'failed to resolve', source, 'in', dirs)
     return null
@@ -227,7 +218,7 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, source, moduleUri) {
     try {
       // the native module must export a loader function.
-      var exporting = $void.require(uri, moduleUri)
+      var exporting = $void.module.native.load(uri)
       module_.status = 200
       return typeof exporting !== 'function' && typeof exporting !== 'object'
         ? exporting

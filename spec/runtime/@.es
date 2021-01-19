@@ -3,7 +3,6 @@
   "env",
   "eval",
   "evaluate",
-  "interpreter",
   "run",
   "signal",
   "space",

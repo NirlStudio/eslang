@@ -1,34 +1,34 @@
 'use strict'
 
+const RuntimeModules = new Set([
+  '$global', '$io', '$path', '$restful', '$symbols'
+])
+
 module.exports = function ($void) {
-  $void.$symbols = require('../../../lib/modules/symbols')($void)
+  $void.$io = require('./io')($void)
   $void.$restful = require('../../../lib/modules/restful')($void)
+  $void.$symbols = require('../../../lib/modules/symbols')($void)
 
-  function loadDefault (moduleUri) {
-    switch (moduleUri) {
-      case 'io':
-        return $void.$io
+  var modules = Object.create(null)
 
-      case 'restful':
-        return $void.$restful
+  modules.has = function has (moduleUri) {
+    return RuntimeModules.has(moduleUri)
+  }
 
-      case 'shell':
-        return $void.$shell
-
-      case 'symbols':
-        return $void.$symbols
-
+  modules.load = function load (name) {
+    switch (name) {
       case 'global':
         return window
-
+      case 'io':
+        return $void.$io
+      case 'restful':
+        return $void.$restful
+      case 'symbols':
+        return $void.$symbols
       default:
         return null
     }
   }
 
-  function $require (moduleUri, baseUri) {
-    return loadDefault(moduleUri) || null
-  }
-
-  return $require
+  return modules
 }
