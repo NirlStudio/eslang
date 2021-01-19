@@ -1,11 +1,12 @@
 'use strict'
 
-const RuntimeModules = new Set([
+var RuntimeModules = new Set([
   '$global', '$io', '$path', '$restful', '$symbols'
 ])
 
 module.exports = function modulesIn ($void) {
   $void.$io = require('./io')($void)
+  $void.$path = require('./path')($void)
   $void.$restful = require('../../../lib/modules/restful')($void)
   $void.$symbols = require('../../../lib/modules/symbols')($void)
 
@@ -21,6 +22,8 @@ module.exports = function modulesIn ($void) {
         return window
       case 'io':
         return $void.$io
+      case 'path':
+        return $void.$path
       case 'restful':
         return $void.$restful
       case 'symbols':

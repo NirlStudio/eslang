@@ -45,5 +45,10 @@
     "webpack": "^4.46.0",
     "webpack-cli": "^4.3.1",
     "webpack-dev-server": "^3.11.2"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-var": 0
+    }
   }
 }

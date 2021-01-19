@@ -1,176 +1,285 @@
 'use strict'
 
-var delimiter = ':'
-var separator = '/'
+var Delimiter = ':'
+var Separator = '/'
+
+var RegexUrl = /^(\w+:\/\/)/i
+
+function invalidType (arg, value, type) {
+  var err = new TypeError(
+    'The "' + arg + '" argument must be of type ' + (type || 'string') +
+    '. Received ' + (typeof value)
+  )
+  err.code = 'ERR_INVALID_ARG_TYPE'
+  return err
+}
+
+function parseUrl (path) {
+  try {
+    return new URL(path)
+  } catch (err) {
+    return null
+  }
+}
 
 module.exports = function pathIn ($void) {
-  var warn = $void.$warn
+  var BaseUrl = $void.$env('home')
 
-  function dir (path) {
-    if (typeof path === 'undefined') {
-      return '.'
+  var $path = Object.create(null)
+  $path.delimiter = Delimiter
+  $path.sep = Separator
+
+  $path.basename = function basename (path, ext) {
+    if (typeof path !== 'string') {
+      throw invalidType('path', path)
+    }
+    if (typeof ext !== 'string' && typeof ext !== 'undefined') {
+      throw invalidType('ext', ext)
     }
 
+    if (RegexUrl.test(path)) {
+      var url = parseUrl(path)
+      if (!url) return ''
+      path = new URL(path).pathname
+    }
+
+    var offset = path.lastIndexOf(Separator)
+    if (offset >= 0) {
+      path = path.substring(offset + 1)
+    }
+
+    if (ext && path.endsWith(ext) && path.length > ext.length) {
+      return path.substring(0, path.length - ext.length)
+    }
+    return path
+  }
+
+  $path.dirname = function dirname (path) {
     if (typeof path !== 'string') {
-      warn('path:dir', 'a path should be a string.', [path, typeof path])
-      return null
+      throw invalidType('path', path)
+    }
+
+    var origin
+    if (RegexUrl.test(path)) {
+      var url = parseUrl(path)
+      if (!url) return path
+
+      origin = url.protocol + '://' + url.host
+      path = url.pathname
     }
 
     var offset = path.length
-    while (path[offset - 1] === separator) {
+    while (offset > 0 && path[offset - 1] === Separator) {
       offset--
     }
     if (offset < path.length) {
       path = path.substring(0, offset)
     }
 
-    offset = path.lastIndexOf(separator)
+    offset = path.lastIndexOf(Separator)
     switch (offset) {
       case -1:
-        return '.'
+        return origin || '.'
       case 0:
-        return separator
+        return origin || Separator
       default:
-        return path.substring(0, offset)
+        return origin ? origin + path.substring(0, offset) : path.substring(0, offset)
     }
   }
 
-  function isResolved (path) {
-    if (typeof path === 'string') {
-      return path.startsWith('/')
+  $path.extname = function extname (path) {
+    if (typeof path !== 'string') {
+      throw invalidType('path', path)
     }
-    warn('path:is-resolved', 'a path should be a string.', [path, typeof path])
-    return null
-  }
 
-  function joinOf (method) {
-    var warn_ = warn.bind($void, 'path:' + method)
-
-    return function join (base) {
-      if (arguments.length < 1) {
-        return '.'
-      }
-
-      var parts = []
-      var i = 0
-      for (; i < arguments.length; i++) {
-        var path = arguments[i]
-        if (typeof path !== 'string') {
-          warn_('a path should be a string', [
-            path, typeof path, i, Array.prototype.slice.call(arguments)
-          ])
-          return null
-        }
-        if (path) { // ignore empty argument.
-          Array.prototype.push.apply(parts, path.split(separator))
-        }
-      }
-
-      for (i = 1; i < parts.length; i++) {
-        if (parts[i] === '') parts[i] = '.' // '/' works like '/./.'
-      }
-
-      for (i = 0; i < parts.length;) {
-        var part = parts[i]
-        switch (part) {
-          case '.':
-            parts.splice(i, 1)
-            break
-
-          case '..':
-            if (i < 1) {
-              i++ // a leading '..' is always reserved.
-            } else {
-              switch (parts[i - 1]) {
-                case '': parts.splice(i, 1); break
-                case '..': i++; break
-                default: parts.splice(--i, 2)
-              }
-            }
-            break
-
-          default:
-            i++
-        }
-      }
-
-      return parts.length === 1 && parts[0] === '' ? '/'
-        : parts.join(separator) || '.'
+    if (RegexUrl.test(path)) {
+      var url = parseUrl(path)
+      if (!url) return ''
+      path = new URL(path).pathname
     }
-  }
 
-  var resolving = joinOf('resolve')
-  function resolve (appHome, userHome, base) {
-    try {
-      var args = Array.prototype.slice.call(arguments, 2)
-      if (typeof base === 'undefined' || base === null) {
-        base = args[0] = ''
-      }
-
-      if (isResolved(base)) {
-        return resolving.apply(null, args)
-      }
-
-      if (base === '~' || base.startsWith('~/')) {
-        args[0] = base.substring(1)
-        args.unshift(userHome)
-        return resolving.apply(null, args)
-      }
-
-      args.unshift(appHome)
-      return resolving.apply(null, args)
-    } catch (err) {
-      warn('path:resolve', err.message, [
-        appHome, userHome, Array.prototype.slice.call(arguments, 1), err
-      ])
-      return null
+    var offset = path.lastIndexOf('.')
+    if (offset <= 0) {
+      return ''
     }
-  }
 
-  function split (paths) {
-    if (typeof paths === 'string') {
-      return paths.split(delimiter)
+    var sep = path.lastIndexOf(Separator) + 1
+    if (sep >= offset) {
+      return ''
     }
-    warn('path:split', 'the paths argument should be a string.', [
-      paths, typeof paths
-    ])
-    return null
+
+    offset += 1
+    return offset >= path.length ? '.' : path.substring(offset)
   }
 
-  function separate (path) {
-    if (typeof path === 'string') {
-      return path.split(separator)
+  var PathObjectKeys = ['dir', 'root', 'base', 'name', 'ext']
+  $path.format = function format (pathObject) {
+    if (typeof pathObject !== 'object') {
+      throw invalidType('pathObject', pathObject, 'object')
     }
-    warn('path:separate', 'a path should be a string.', [path, typeof path])
-    return null
+    PathObjectKeys.forEach(function (key) {
+      var value = pathObject[key]
+      if (typeof value !== 'string' && typeof value !== 'undefined' && value !== null) {
+        throw invalidType('pathObject.' + key, value)
+      }
+    })
+
+    var paths = []
+    if (pathObject.dir && RegexUrl.test(pathObject.dir)) {
+      paths.push(pathObject.dir)
+    } else {
+      pathObject.root && paths.push(pathObject.root)
+      pathObject.dir && paths.push(pathObject.dir)
+    }
+
+    if (pathObject.base) {
+      paths.push(pathObject.base)
+    } else {
+      pathObject.name && paths.push(pathObject.name)
+      pathObject.ext && paths.push(pathObject.ext)
+    }
+
+    return $path.join.apply($path, paths)
   }
 
-  function $export (scope, space) {
-    scope.export('delimiter', delimiter)
-    scope.export('separator', separator)
-
-    scope.export('dir', dir.bind(scope.context))
-    scope.export('is-resolved', isResolved.bind(scope.context))
-    scope.export('join', joinOf('join').bind(scope.context))
-    scope.export('resolve', resolve.bind(scope.context,
-      space.app['-app-home'],
-      $void.$env('user-home')
-    ))
-
-    scope.export('split', split.bind(scope.context))
-    scope.export('separate', separate.bind(scope.context))
+  $path.isAbsolute = function isAbsolute (path) {
+    if (typeof path !== 'string') {
+      throw invalidType('path', path)
+    }
+    return RegexUrl.test(path)
   }
-  // expose for global usages.
-  $export.delimiter = delimiter
-  $export.separator = separator
 
-  $export.dir = dir
-  $export.isResolved = isResolved
-  $export.join = joinOf('$join')
-  $export.resolve = resolve
+  $path.join = function join (paths) {
+    paths = Array.prototype.slice.call(arguments)
+    paths.forEach(function (path) {
+      if (typeof path !== 'string') {
+        throw invalidType('path', path)
+      }
+    })
+    return $path.normalize(paths.join(Separator)) || '.'
+  }
 
-  $export.split = split
-  $export.separate = separate
+  function reduce (root, segments) {
+    for (var i = 0; i < segments.length;) {
+      if (!segments[i]) {
+        segments.splice(i, 1); continue
+      }
+      if (segments[i] === '.' && (i > 0 || root)) {
+        segments.splice(i, 1); continue
+      }
+      if (segments[i] !== '..') {
+        i += 1; continue
+      }
+      if (i === 0) {
+        root ? segments.splice(i, 1) : (i += 1)
+        continue
+      }
+      if (segments[i - 1] === '..') {
+        i += 1; continue
+      }
+      if (segments[i - 1] === '.') {
+        segments.splice(i - 1, 1)
+      } else {
+        segments.splice(i - 1, 2)
+        i -= 1
+      }
+    }
+    return segments
+  }
 
-  return $export
+  $path.normalize = function normalize (path) {
+    if (typeof path !== 'string') {
+      throw invalidType('path', path)
+    }
+
+    var root
+    if (RegexUrl.test(path)) {
+      var url = parseUrl(path)
+      if (!url) return path
+
+      root = url.protocol + '://' + url.host
+      path = url.pathname
+    } else if (path.startsWith(Separator)) {
+      root = Separator
+    }
+
+    var segments = reduce(root, path.split(Separator))
+    var pathname = segments.join(Separator)
+    return !root ? pathname
+      : root === Separator || !pathname ? root + pathname
+        : root + Separator + pathname
+  }
+
+  $path.parse = function normalize (path) {
+    if (typeof path !== 'string') {
+      throw invalidType('path', path)
+    }
+
+    var pathObject = { base: '', name: '', ext: '' }
+    pathObject.dir = $path.dirname(path)
+
+    if (RegexUrl.test(path)) {
+      var offset = path.indexOf('://') + 3
+      offset = path.indexOf(Separator, offset)
+      if (offset < 0) {
+        pathObject.root = path
+        return pathObject
+      }
+      pathObject.root = path.substring(0, offset)
+    } else {
+      pathObject.root = ''
+    }
+
+    pathObject.base = $path.basename(path)
+    pathObject.ext = $path.extname(path)
+    pathObject.name = pathObject.ext
+      ? $path.basename(path, pathObject.ext)
+      : pathObject.base
+
+    return pathObject
+  }
+
+  $path.relative = function relative (from, to) {
+    if (typeof from !== 'string') {
+      throw invalidType('from', from)
+    }
+    if (typeof to !== 'string') {
+      throw invalidType('to', from)
+    }
+
+    var fromSegments = $path.normalize(from).split(Separator)
+    var toSegments = $path.normalize(to).split(Separator)
+    if (fromSegments[0] !== toSegments[0]) {
+      return from
+    }
+    var i = 1
+    for (; i < fromSegments.length && i < toSegments.length; i++) {
+      if (fromSegments[i] !== toSegments[i]) {
+        break
+      }
+    }
+    var segments = []
+    for (var j = i; j < fromSegments.length; j++) {
+      segments.push('..')
+    }
+    for (var k = i; k < toSegments.length; k++) {
+      segments.push(toSegments[k])
+    }
+    return segments.join(Separator)
+  }
+
+  $path.resolve = function resolve (base) {
+    var paths = Array.prototype.slice.call(arguments)
+    paths.forEach(function (path) {
+      if (typeof path !== 'string') {
+        throw invalidType('path', path)
+      }
+    })
+    if (!RegexUrl.test(base)) {
+      paths.unshift(BaseUrl)
+    }
+    return $path.join.apply($path, paths)
+  }
+
+  return $path
 }

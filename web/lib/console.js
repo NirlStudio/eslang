@@ -2,7 +2,7 @@
 
 function nop () {}
 
-module.exports = function consoleIn ($void) {
+module.exports = function console () {
   var term = {}
   var buffer = ''
 
@@ -46,7 +46,7 @@ module.exports = function consoleIn ($void) {
   }
 
   term.connect = function (reader) {
-    window['_$'] = function shell (line) {
+    window._$ = function shell (line) {
       if (typeof line === 'string') {
         reader(line)
         if (echos.length > 0) {
@@ -63,7 +63,7 @@ module.exports = function consoleIn ($void) {
     return reader
   }
   term.disconnect = function () {
-    window['_$'] = null
+    window._$ = null
   }
   return term
 }

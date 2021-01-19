@@ -11,7 +11,7 @@ module.exports = function module$native ($void, packer) {
     }
 
     if (!packer) {
-      warn('module-native', 'no packer provided.', [moduleUri, moduleDir])
+      warn('module-native', 'no module packer provided.', [moduleUri, moduleDir])
       return null
     }
 

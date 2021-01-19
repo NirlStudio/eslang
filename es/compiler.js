@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function compilerIn ($void) {
   var $ = $void.$
   var Tuple$ = $void.Tuple
   var warn = $void.$warn
