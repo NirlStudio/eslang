@@ -68,7 +68,7 @@ var createIndex = typeof Map === 'function' ? function () {
   }
 }
 
-module.exports = function ($void) {
+module.exports = function encodingIn ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var $Array = $.array

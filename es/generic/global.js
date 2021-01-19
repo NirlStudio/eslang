@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function globalIn ($void) {
   var $ = $void.$
   var $export = $void.export
   var sharedSymbolOf = $void.sharedSymbolOf

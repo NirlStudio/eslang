@@ -129,7 +129,7 @@ function normalize (value) {
   return value >= 0 ? Math.trunc(value) : (0x100000000 + (value >> 0))
 }
 
-module.exports = function ($void) {
+module.exports = function numberIn ($void) {
   var $ = $void.$
   var Type = $.number
   var $Range = $.range

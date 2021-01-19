@@ -6,7 +6,7 @@ function createEmptyOperation () {
   }
 }
 
-module.exports = function ($void) {
+module.exports = function voidSetup ($void) {
   var $ = $void.$
   var $Tuple = $.tuple
   var $Bool = $.bool

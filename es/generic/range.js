@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function rangeIn ($void) {
   var $ = $void.$
   var Type = $.range
   var Range$ = $void.Range

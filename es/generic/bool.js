@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function boolIn ($void) {
   var $ = $void.$
   var Type = $.bool
   var link = $void.link

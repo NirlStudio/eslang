@@ -62,7 +62,7 @@ function setter (key, value) {
   return null
 }
 
-module.exports = function ($void) {
+module.exports = function espressIn ($void) {
   var $ = $void.$
   var $Class = $.class
   var $Object = $.object

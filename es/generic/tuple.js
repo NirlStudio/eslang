@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function tupleIn ($void) {
   var $ = $void.$
   var Type = $.tuple
   var $Array = $.array

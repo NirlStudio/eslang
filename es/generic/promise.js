@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function promiseIn ($void) {
   var $ = $void.$
   var Type = $.promise
   var $Tuple = $.tuple

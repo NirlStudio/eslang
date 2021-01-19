@@ -4,7 +4,7 @@ const RuntimeModules = new Set([
   '$global', '$io', '$path', '$restful', '$symbols'
 ])
 
-module.exports = function ($void) {
+module.exports = function modulesIn ($void) {
   $void.$io = require('./io')($void)
   $void.$restful = require('../../../lib/modules/restful')($void)
   $void.$symbols = require('../../../lib/modules/symbols')($void)

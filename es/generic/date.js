@@ -16,7 +16,7 @@ function UtcTimezoneOffset () {
   return offset >= 0 ? 'UTC+' + offset.toString() : 'UTC' + offset.toString()
 }
 
-module.exports = function ($void) {
+module.exports = function dateIn ($void) {
   var $ = $void.$
   var Type = $.date
   var $Object = $.object

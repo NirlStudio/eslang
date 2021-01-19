@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function tokenizerIn ($void) {
   var $ = $void.$
   var symbolOf = $.symbol.of
   var intValueOf = $.number['parse-int']

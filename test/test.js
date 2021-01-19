@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function testIn ($void) {
   var $ = $void.$
   var print = $void.$print
   var printf = $void.$printf

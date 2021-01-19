@@ -1,10 +1,10 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function signalOfIn ($void) {
   var Signal$ = $void.Signal
   var evaluate = $void.evaluate
 
-  $void.signalOf = function $signalOf (type) {
+  $void.signalOf = function signalOf (type) {
     return function (space, clause) {
       var clist = clause.$
       var length = clist.length

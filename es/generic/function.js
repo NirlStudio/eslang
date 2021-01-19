@@ -1,7 +1,7 @@
 
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function functionIn ($void) {
   var $ = $void.$
   var Type = $.function
   var $Tuple = $.tuple

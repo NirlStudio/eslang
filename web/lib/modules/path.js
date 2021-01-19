@@ -3,7 +3,7 @@
 var delimiter = ':'
 var separator = '/'
 
-module.exports = function $pathOf ($void) {
+module.exports = function pathIn ($void) {
   var warn = $void.$warn
 
   function dir (path) {

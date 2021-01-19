@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function mathIn ($void) {
   var $ = $void.$
   var $export = $void.export
   var thisCall = $void.thisCall

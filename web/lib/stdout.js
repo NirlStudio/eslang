@@ -11,8 +11,8 @@ function connectTo (term, tracing, type) {
   }
 }
 
-module.exports = function (term) {
-  return function ($void) {
+module.exports = function stdoutIn (term) {
+  return function stdout ($void) {
     var tracing = tracer($void, true)
     var connect = connectTo.bind(null, term, tracing)
     var stdout = {}

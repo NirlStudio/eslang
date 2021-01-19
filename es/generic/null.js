@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function nullIn ($void) {
   var Null = $void.null
   var link = $void.link
   var Symbol$ = $void.Symbol

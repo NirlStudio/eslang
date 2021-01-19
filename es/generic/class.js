@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function classIn ($void) {
   var $ = $void.$
   var Type = $.class
   var $Type = $.type

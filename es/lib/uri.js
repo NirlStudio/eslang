@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function uriIn ($void) {
   var $ = $void.$
   var $Object = $.object
   var link = $void.link

@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function ($void) {
+module.exports = function objectIn ($void) {
   var $ = $void.$
   var Type = $.object
   var $Symbol = $.symbol

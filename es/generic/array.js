@@ -28,7 +28,7 @@ function checkSpacing (s, i, last) {
   }
 }
 
-module.exports = function ($void) {
+module.exports = function arrayIn ($void) {
   var $ = $void.$
   var Type = $.array
   var $Symbol = $.symbol
