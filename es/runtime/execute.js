@@ -29,13 +29,13 @@ module.exports = function execute ($void) {
   function prepareAppSpace (uri, appHome) {
     var scope = $void.bootstrap
     if (scope && scope['-app'] === uri) { // bootstrap app
-      if (scope.modules[uri]) { // re-run the bootstrap app
+      if (scope.app.modules.cache[uri]) { // re-run the bootstrap app
         scope = createAppSpace(uri, appHome)
       } // start to run bootstrap app
     } else { // a new app
       scope = createAppSpace(uri, appHome)
     }
-    scope.modules[uri] = Object.assign(Object.create(null), {
+    scope.app.modules.cache[uri] = Object.assign(Object.create(null), {
       status: 201,
       exports: scope.exporting,
       timestamp: Date.now()

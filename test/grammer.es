@@ -535,7 +535,6 @@ compile((compile)compile)compile
 compiler((compiler)compiler)compiler
 tokenize((tokenize)tokenize)tokenize
 tokenizer((tokenizer)tokenizer)tokenizer
-interpreter((interpreter)interpreter)interpreter
 eval((eval)eval)eval
 run((run)run)run
 env((env)env)env

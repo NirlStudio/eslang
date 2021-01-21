@@ -64,7 +64,7 @@ module.exports = function pathIn ($void) {
       var url = parseUrl(path)
       if (!url) return path
 
-      origin = url.protocol + '://' + url.host
+      origin = url.protocol + '//' + url.host
       path = url.pathname
     }
 
@@ -197,7 +197,7 @@ module.exports = function pathIn ($void) {
       var url = parseUrl(path)
       if (!url) return path
 
-      root = url.protocol + '://' + url.host
+      root = url.protocol + '//' + url.host
       path = url.pathname
     } else if (path.startsWith(Separator)) {
       root = Separator

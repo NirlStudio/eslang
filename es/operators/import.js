@@ -18,8 +18,8 @@ module.exports = function import_ ($void) {
   var symbolFrom = sharedSymbolOf('from')
   var symbolImport = sharedSymbolOf('import')
 
-  // import: a module from source.
-  //   (import src), or
+  // import a module.
+  //   (import module), or
   //   (import field from module), or
   //   (import (fields ...) from module)
   var operator = staticOperator('import', function (space, clause) {
@@ -31,24 +31,24 @@ module.exports = function import_ ($void) {
     if (clist.length < 2) {
       return null
     }
-    var src, imported
+    var imported
     if (clist.length < 3 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
       imported = importModule(space, evaluate(clist[1], space))
       // clone to protect inner exporting object.
       return imported && referModule(imported)
     }
-    // (import field-or-fields from src)
-    src = evaluate(clist[3], space)
-    if (isObject(src)) {
-      imported = src // expanding object fields.
-    } else if (typeof src !== 'string') {
-      typeof src === 'undefined' || src === null
-        ? warn('import', 'missing source object or path.')
-        : warn('import', 'invalid source object or path:', src)
+    // (import field-or-fields from target)
+    var target = evaluate(clist[3], space)
+    if (isObject(target)) {
+      imported = target // expanding object fields.
+    } else if (typeof target !== 'string') {
+      typeof target === 'undefined' || target === null
+        ? warn('import', 'missing target object or path.')
+        : warn('import', 'invalid target object or path:', target)
       return null
     } else {
-      imported = importModule(space, src)
+      imported = importModule(space, target)
       if (!imported) {
         return null // importing failed.
       }
@@ -92,9 +92,9 @@ module.exports = function import_ ($void) {
     return ref
   }
 
-  function importModule (space, source) {
-    if (typeof source !== 'string' || !source) {
-      warn('import', 'invalid module source:', source)
+  function importModule (space, target) {
+    if (typeof target !== 'string' || !target) {
+      warn('import', 'invalid module identifer:', target)
       return null
     }
     var userHome = $void.$env('user-home')
@@ -103,22 +103,22 @@ module.exports = function import_ ($void) {
     var appHome = space.local['-app-home']
     var appDir = space.local['-app-dir']
 
-    var isNative = source.startsWith('$')
+    var isNative = target.startsWith('$')
     var uri = isNative
-      ? $void.module.native.resolve(source, moduleDir, appHome, appDir, userHome)
-      : resolve(space, appHome, userHome, moduleUri, source)
+      ? $void.module.native.resolve(target, moduleDir, appHome, appDir, userHome)
+      : resolve(space, appHome, userHome, moduleUri, target)
     if (!uri) {
       return null
     }
     // look up it in cache.
-    var module_ = lookupInCache(space.modules, uri, moduleUri)
+    var module_ = lookupInCache(space.app.modules.cache, uri, moduleUri)
     if (module_.status) {
       return module_.exporting
     }
 
     module_.status = 100 // indicate loading
     module_.exporting = (isNative ? loadNativeModule : loadModule)(
-      space, uri, module_, source, moduleUri
+      space, uri, module_, target, moduleUri
     )
     // make sure system properties cannot be overridden.
     if (!module_.exporting) {
@@ -127,38 +127,38 @@ module.exports = function import_ ($void) {
     return Object.assign(module_.exporting, module_.props)
   }
 
-  function resolve (space, appHome, userHome, moduleUri, source) {
+  function resolve (space, appHome, userHome, moduleUri, target) {
     var loader = $void.loader
-    var isResolved = loader.isResolved(source)
+    var isResolved = loader.isResolved(target)
     if (!moduleUri && isResolved) {
       warn('import', "It's forbidden to import a module from an absolute uri.")
       return null
     }
-    var dirs = isResolved ? [] : dirsOf(source,
+    var dirs = isResolved ? [] : dirsOf(target,
       moduleUri && loader.dir(moduleUri),
       appHome + '/modules',
       userHome + '/.es/modules',
       $void.$env('home') + '/modules', // working dir
       $void.runtime('home') + '/modules'
     )
-    var uri = loader.resolve(completeFile(source), dirs)
+    var uri = loader.resolve(completeFile(target), dirs)
     if (typeof uri === 'string') {
       return uri
     }
-    warn('import', 'failed to resolve', source, 'in', dirs)
+    warn('import', 'failed to resolve', target, 'in', dirs)
     return null
   }
 
-  function isRelative (source) {
-    return source.startsWith('./') || source.startsWith('../')
+  function isRelative (target) {
+    return target.startsWith('./') || target.startsWith('../')
   }
 
-  function dirsOf (source, moduleDir, appDir, userDir, homeDir, runtimeDir) {
+  function dirsOf (target, moduleDir, appDir, userDir, homeDir, runtimeDir) {
     return moduleDir
-      ? isRelative(source)
+      ? isRelative(target)
         ? [ moduleDir ]
         : [ runtimeDir, appDir, userDir, homeDir ]
-      : [ runtimeDir ] // for dynamic or unknown-source code.
+      : [ runtimeDir ] // for dynamic or unknown-target code.
   }
 
   function lookupInCache (modules, uri, moduleUri) {
@@ -180,7 +180,7 @@ module.exports = function import_ ($void) {
     return module_
   }
 
-  function loadModule (space, uri, module_, source, moduleUri) {
+  function loadModule (space, uri, module_, target, moduleUri) {
     try {
       // -module-dir is only meaningful for an Espresso module.
       module_.props['-module-dir'] = $void.loader.dir(uri)
@@ -189,14 +189,14 @@ module.exports = function import_ ($void) {
       var text = doc[0]
       if (typeof text !== 'string') {
         module_.status = 415 // unsupported media type
-        warn('import', 'failed to read', source, 'for', doc[1])
+        warn('import', 'failed to read', target, 'for', doc[1])
         return null
       }
       // compile text
       var code = compile(text, uri, doc[1])
       if (!(code instanceof Tuple$)) {
         module_.status = 400 //
-        warn('import', 'failed to compile', source, 'for', code)
+        warn('import', 'failed to compile', target, 'for', code)
         return null
       }
       // to load module
@@ -215,7 +215,7 @@ module.exports = function import_ ($void) {
     return null
   }
 
-  function loadNativeModule (space, uri, module_, source, moduleUri) {
+  function loadNativeModule (space, uri, module_, target, moduleUri) {
     try {
       // the native module must export a loader function.
       var exporting = $void.module.native.load(uri)
@@ -225,7 +225,7 @@ module.exports = function import_ ($void) {
         : safelyAssign(Object.create(null), exporting)
     } catch (err) {
       module_.status = 503 // service unavailable
-      warn('import', 'failed to import native module of', source,
+      warn('import', 'failed to import native module of', target,
         'for', err, 'at', uri, 'from', moduleUri)
     }
     return null
@@ -234,7 +234,7 @@ module.exports = function import_ ($void) {
   $void.bindOperatorImport = function (space) {
     return (space.$import = function (uri) {
       if (!uri || typeof uri !== 'string') {
-        warn('$import', 'invalid source uri:', uri)
+        warn('$import', 'invalid module uri:', uri)
         return null
       }
       return operator(space, new Tuple$([symbolImport, uri]))

@@ -38,7 +38,7 @@ module.exports = function function_ ($void) {
       var tbody = new Tuple$(body, true)
       code.push(tbody)
       return lambda(createLambda(
-        params, tbody, space.app, space.modules, space.local['-module']
+        params, tbody, space.app, space.local['-module']
       ), new Tuple$(code))
     } else {
       code.push($Tuple.blank) // empty body
@@ -47,8 +47,8 @@ module.exports = function function_ ($void) {
     }
   }
 
-  function createLambda (params, tbody, app, modules, module_) {
-    var createScope = createLambdaSpace.bind(null, app, modules, module_)
+  function createLambda (params, tbody, app, module_) {
+    var createScope = createLambdaSpace.bind(null, app, app && app.modules.cache, module_)
     var $lambda = function () {
       var scope = createScope()
       // populate arguments

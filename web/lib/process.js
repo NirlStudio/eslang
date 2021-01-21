@@ -33,7 +33,7 @@ module.exports = function ($void, environ, exit) {
   var location = window.location
   environ['_'] = location.href
 
-  var origin = location.origin || (location.protocol + '://' + location.host)
+  var origin = location.origin || (location.protocol + '//' + location.host)
   environ['HOME'] = origin
 
   var pathname = safePathname(location.pathname)
