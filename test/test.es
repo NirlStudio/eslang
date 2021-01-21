@@ -3,7 +3,7 @@
 # check the existence of testing framework
 (if ($test is null) # running as an app.
   const direct-testing true;
-  export * (import "test");
+  export * (import "es/test");
 ).
 
 # define the full feature set.

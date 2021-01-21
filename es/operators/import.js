@@ -11,7 +11,6 @@ module.exports = function import_ ($void) {
   var evaluate = $void.evaluate
   var isObject = $void.isObject
   var safelyAssign = $void.safelyAssign
-  var completeFile = $void.completeFile
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
@@ -98,86 +97,33 @@ module.exports = function import_ ($void) {
       return null
     }
     var userHome = $void.$env('user-home')
-    var moduleUri = space.local['-module']
-    var moduleDir = space.local['-module-dir']
+    var srcModuleUri = space.local['-module']
+    var srcModuleDir = space.local['-module-dir']
     var appHome = space.local['-app-home']
     var appDir = space.local['-app-dir']
 
     var isNative = target.startsWith('$')
     var uri = isNative
-      ? $void.module.native.resolve(target, moduleDir, appHome, appDir, userHome)
-      : resolve(space, appHome, userHome, moduleUri, target)
+      ? $void.module.native.resolve(target, srcModuleDir, appHome, appDir, userHome)
+      : space.app.modules.resolve(target, srcModuleDir)
     if (!uri) {
       return null
     }
     // look up it in cache.
-    var module_ = lookupInCache(space.app.modules.cache, uri, moduleUri)
+    var module_ = space.app.modules.lookupInCache(uri, srcModuleUri)
     if (module_.status) {
       return module_.exporting
     }
 
     module_.status = 100 // indicate loading
     module_.exporting = (isNative ? loadNativeModule : loadModule)(
-      space, uri, module_, target, moduleUri
+      space, uri, module_, target, srcModuleUri
     )
     // make sure system properties cannot be overridden.
     if (!module_.exporting) {
       module_.exporting = Object.create($Object.proto)
     }
     return Object.assign(module_.exporting, module_.props)
-  }
-
-  function resolve (space, appHome, userHome, moduleUri, target) {
-    var loader = $void.loader
-    var isResolved = loader.isResolved(target)
-    if (!moduleUri && isResolved) {
-      warn('import', "It's forbidden to import a module from an absolute uri.")
-      return null
-    }
-    var dirs = isResolved ? [] : dirsOf(target,
-      moduleUri && loader.dir(moduleUri),
-      appHome + '/modules',
-      userHome + '/.es/modules',
-      $void.$env('home') + '/modules', // working dir
-      $void.runtime('home') + '/modules'
-    )
-    var uri = loader.resolve(completeFile(target), dirs)
-    if (typeof uri === 'string') {
-      return uri
-    }
-    warn('import', 'failed to resolve', target, 'in', dirs)
-    return null
-  }
-
-  function isRelative (target) {
-    return target.startsWith('./') || target.startsWith('../')
-  }
-
-  function dirsOf (target, moduleDir, appDir, userDir, homeDir, runtimeDir) {
-    return moduleDir
-      ? isRelative(target)
-        ? [ moduleDir ]
-        : [ runtimeDir, appDir, userDir, homeDir ]
-      : [ runtimeDir ] // for dynamic or unknown-target code.
-  }
-
-  function lookupInCache (modules, uri, moduleUri) {
-    var module_ = modules[uri] || (modules[uri] = {
-      status: 0, // an empty module.
-      props: {
-        '-module': uri
-      }
-    })
-    if (module_.status === 100) {
-      warn('import', 'loop dependency on', module_.props, 'from', moduleUri)
-      return module_
-    }
-    if (module_.status !== 200) {
-      module_.status = 0 // reset statue to re-import.
-      module_.props['-imported-by'] = moduleUri
-      module_.props['-imported-at'] = Date.now()
-    }
-    return module_
   }
 
   function loadModule (space, uri, module_, target, moduleUri) {

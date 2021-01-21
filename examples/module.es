@@ -1,4 +1,4 @@
-(let mod (import "module_").
+(let mod (import "./module_").
 (print "mod is an object" (mod is-an object).
 (print "(mod x) is a number 100" ((mod x) is-a number) ((mod x) == 100).
 (print "(mod y) is a number 200" ((mod y) is-a number) ((mod y) == 200).

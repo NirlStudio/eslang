@@ -324,10 +324,10 @@
     (assert null (ctx 2).
   ).
   (should "a stambda cannot import another module." (= ()
-    (var mod (=:() (import "test").
+    (var mod (=:() (import "es/test").
     (assert (mod is-an object).
 
-    (let mod (->:() (import "test").
+    (let mod (->:() (import "es/test").
     (assert (mod is null).
   ).
   (should "a stambda has no access to (env)." (= ()

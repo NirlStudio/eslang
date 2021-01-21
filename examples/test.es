@@ -1,6 +1,6 @@
 (if ($define is null)
   (var direct-testing true)
-  (var * (import "test").
+  (var * (import "es/test").
   (print "---- testing framework is loaded. ----\n").
 else
   (print "---- testing framework has been loaded. ----\n")

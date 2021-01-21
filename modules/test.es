@@ -6,7 +6,7 @@ var indent indent-step;
 
 # import rendering
 const symbols (import "$symbols");
-const (gray, green, red, yellow, underlined) (import "styledout");
+const (gray, green, red, yellow, underlined) (import "es/styledout");
 
 const sign-passed (=> () (green indent, (symbols passed);
 const sign-failed (=> () (red indent, (symbols failed);

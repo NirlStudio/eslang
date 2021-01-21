@@ -87,33 +87,33 @@
     (assert null p)
     (assert null b)
   ).
-  (define "import modules", (= ()
-    (should "io" (= ()
-      (var mod (import "io").
+  (define "import es modules", (= ()
+    (should "es/io" (= ()
+      (var mod (import "es/io").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "io.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "restful" (= ()
-      (var mod (import "restful").
+    (should "es/restful" (= ()
+      (var mod (import "es/restful").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "restful.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "styledout" (= ()
-      (var mod (import "styledout").
+    (should "es/styledout" (= ()
+      (var mod (import "es/styledout").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "styledout.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "test" (= ()
-      (var mod (import "test").
+    (should "es/test" (= ()
+      (var mod (import "es/test").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "test.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (if (env "runtime-host":: is "browser") (should "window" (= ()
-      (var mod (import "window").
+    (if (env "runtime-host":: is "browser") (should "es/window" (= ()
+      (var mod (import "es/window").
       (assert (mod is-an object).
       (assert (mod -module:: ends-with "window.es").
       (assert (mod -module-dir:: ends-with "modules").
