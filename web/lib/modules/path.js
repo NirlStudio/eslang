@@ -270,13 +270,19 @@ module.exports = function pathIn ($void) {
 
   $path.resolve = function resolve (base) {
     var paths = Array.prototype.slice.call(arguments)
-    paths.forEach(function (path) {
+    var rootOffset = -1
+    paths.forEach(function (path, i) {
       if (typeof path !== 'string') {
         throw invalidType('path', path)
       }
+      if (RegexUrl.test(path)) {
+        rootOffset = i
+      }
     })
-    if (!RegexUrl.test(base)) {
+    if (rootOffset < 0) {
       paths.unshift(BaseUrl)
+    } else if (rootOffset > 0) {
+      paths = paths.slice(rootOffset)
     }
     return $path.join.apply($path, paths)
   }

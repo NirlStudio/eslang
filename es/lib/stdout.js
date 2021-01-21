@@ -6,6 +6,18 @@ module.exports = function ($void, stdout) {
   var thisCall = $void.thisCall
   var staticOperator = $void.staticOperator
 
+  var env = function (name) {
+    env = $void.env
+    return env(name)
+  }
+  var evaluate = function (clause, space) {
+    evaluate = $void.evaluate
+    return evaluate(clause, space)
+  }
+  var sourceOf = function (atomValue) {
+    return thisCall(atomValue, 'to-string')
+  }
+
   // standard output.
   $export($void, '$print', function (value) {
     return stdout.print.apply(stdout, arguments)
@@ -46,17 +58,14 @@ module.exports = function ($void, stdout) {
     return lastWarning
   })
 
-  var sourceOf = function (atomValue) {
-    return thisCall(atomValue, 'to-string')
-  }
-  var evaluate = function (clause, space) {
-    evaluate = $void.evaluate
-    return evaluate(clause, space)
-  }
-  var env = function (name) {
-    env = $void.env
-    return env(name)
-  }
+  $export($void, '$debug', function () {
+    if (env('is-debugging') !== true) {
+      return false
+    }
+    stdout.debug.apply(stdout, arguments)
+    return true
+  })
+
   staticOperator('debug', function (space, clause) {
     var clist = clause.$
     if (clist.length < 2 || !space.app) {
@@ -69,7 +78,7 @@ module.exports = function ($void, stdout) {
     }
     if (env('is-debugging') === true) {
       stdout.debug.apply(stdout, args)
-    } else if ($void.env('logging-level') >= 2) {
+    } else if (env('logging-level') >= 2) {
       lastWarning = ['stdout:debug',
         '(debug ...) is only for temporary usage in coding.',
         'Please consider to remove it or replace it with (log d ...) for',
@@ -114,21 +123,21 @@ module.exports = function ($void, stdout) {
     switch (type.toLowerCase()) {
       case 'd':
       case 'debug':
-        return $void.env('is-debugging') === true ? stdout.debug : null
+        return env('is-debugging') === true ? stdout.debug : null
       case 'v':
       case 'verbose':
-        return $void.env('logging-level') >= 4 ? stdout.verbose : null
+        return env('logging-level') >= 4 ? stdout.verbose : null
       case 'i':
       case 'info':
-        return $void.env('logging-level') >= 3 ? stdout.info : null
+        return env('logging-level') >= 3 ? stdout.info : null
       case 'w':
       case 'warn':
       case 'warning':
-        return $void.env('logging-level') >= 2 ? stdout.warn : null
+        return env('logging-level') >= 2 ? stdout.warn : null
       case 'e':
       case 'err':
       case 'error':
-        return $void.env('logging-level') >= 1 ? stdout.error : null
+        return env('logging-level') >= 1 ? stdout.error : null
       default:
         return false
     }
