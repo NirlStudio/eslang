@@ -94,10 +94,10 @@
       (assert (mod -module:: ends-with "io.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "es/styledout" (= ()
-      (var mod (import "es/styledout").
+    (should "es/styles" (= ()
+      (var mod (import "es/styles").
       (assert (mod is-an object).
-      (assert (mod -module:: ends-with "styledout.es").
+      (assert (mod -module:: ends-with "styles.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
     (should "es/test" (= ()

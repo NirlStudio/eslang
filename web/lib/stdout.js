@@ -6,7 +6,7 @@ module.exports = function $stdout (term) {
   return function stdoutIn ($void) {
     var stdout = Object.create(null)
 
-    var tracing = tracer($void, true)
+    var tracing = tracer($void)
 
     function forward (type) {
       return function trace () {

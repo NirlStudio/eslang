@@ -1,4 +1,4 @@
 export io (import "./io");
-export styledout (import "./styledout");
+export styles (import "./styles");
 export test (import "./test");
 export window (import "./window");

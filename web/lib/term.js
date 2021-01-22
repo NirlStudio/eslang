@@ -1,5 +1,7 @@
 'use strict'
 
+var style = require('../../lib/style')
+
 var MaxLines = 2400
 var DrainBatch = 300
 
@@ -101,41 +103,17 @@ function styleOf (format) {
   var style = ''
   for (var key in format) {
     var value = format[key]
+    if (value instanceof Set) {
+      value = Array.from(value)
+    }
+    if (Array.isArray(value)) {
+      value = value.join(' ')
+    }
     if (typeof value === 'string') {
       style += key + ': ' + value + ';'
     }
   }
   return style
-}
-
-var styleClasses = Object.assign(Object.create(null), {
-  red: 'color',
-  green: 'color',
-  blue: 'color',
-  yellow: 'color',
-  grey: 'color',
-  gray: 'color',
-  underline: '*text-decoration',
-  overline: '*text-decoration',
-  'line-through': '*text-decoration'
-})
-
-function applyClass (cls) {
-  var values = cls.split(/\s/)
-  var style = {}
-  for (var i = 0; i < values.length; i++) {
-    var value = values[i]
-    if (styleClasses[value]) {
-      var key = styleClasses[value]
-      if (key.startsWith('*')) {
-        key = key.substring(1)
-        style[key] = style[key] ? style[key] + ' ' + value : value
-      } else {
-        style[key] = value
-      }
-    }
-  }
-  return applyStyle(style)
 }
 
 function applyStyle (obj) {
@@ -304,12 +282,13 @@ module.exports = function () {
   // serve stdout
   var writerOf = writeTo.bind(null, panel)
   var write = writerOf('print')
+
   term.print = function (text) {
     write(text.charAt(text.length - 1) === '\n' ? text : text + '\n')
   }
+
   term.printf = function (text, format) {
-    var render = typeof format === 'string' ? applyClass(format)
-      : typeof format === 'object' ? applyStyle(format) : null
+    var render = applyStyle(style.parse(format))
     write(text, render)
   }
 

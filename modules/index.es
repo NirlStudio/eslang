@@ -1,3 +1,3 @@
 export io (import "./io");
-export styledout (import "./styledout");
+export style (import "./style");
 export test (import "./test");

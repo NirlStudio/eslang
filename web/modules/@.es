@@ -1,6 +1,6 @@
 (fetch
   "io",
-  "styledout",
+  "styles",
   "test",
   "window"
 ).
