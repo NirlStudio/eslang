@@ -1,4 +1,4 @@
-(var * (load "share/type" (@ the-type: array).
+(var * (load "./share/type" (@ the-type: array).
 
 (define "Array Common Behaviors" (=> ()
   (define "Identity" (=> ()

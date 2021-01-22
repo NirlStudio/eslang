@@ -1,4 +1,4 @@
-(var * (load "share/type" (@ the-type: number).
+(var * (load "./share/type" (@ the-type: number).
 
 (define "Number Common Behaviors" (=> ()
   (define "Identity" (=> ()

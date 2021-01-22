@@ -6,7 +6,7 @@
   roar: (=() ("..." + age).
   hop: (=>() ("hopping" + age).
 ).
-(var * (load "share/type" (@
+(var * (load "./share/type" (@
   the-type: (var cat (@:class type: mammal
     name: "kitty"
     revived: false
@@ -164,7 +164,7 @@
       (var kitty1 (cat of 1 10 1).
       (var kitty2 (cat of 2 20 2).
       (kitty1 "friend" kitty2)
-      (kitty2 "firend" kitty1)
+      (kitty2 "friend" kitty1)
       (assert (kitty1 to-string) ((kitty1 to-code) to-string).
     ).
   ).

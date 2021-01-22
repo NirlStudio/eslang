@@ -15,9 +15,14 @@ module.exports = function load ($void) {
   var promiseAll = $Promise.all
   var symbolFetch = sharedSymbolOf('fetch')
   var promiseOfResolved = $Promise['of-resolved']
+  var promiseOfRejected = $Promise['of-rejected']
 
-  // fetch: asynchronously load a module from source.
+  // fetch: asynchronously load a module.
   var operator = staticOperator('fetch', function (space, clause) {
+    if (!space.app) {
+      warn('load', 'invalid without an app context.')
+      return null
+    }
     var clist = clause.$
     if (clist.length < 2) {
       return null // at least one file.
@@ -27,8 +32,9 @@ module.exports = function load ($void) {
       return null
     }
     var loader = $void.loader
-    var dirs = space.local['-module'] ? [loader.dir(space.local['-module'])] : []
-    var fetching = fetch.bind(null, loader, dirs)
+    var fetching = fetch.bind(null, loader,
+      space.local['-module-dir'] || space.local['-app-dir']
+    )
     var tasks = []
     for (var i = 1, len = clist.length; i < len; i++) {
       tasks.push(fetching(evaluate(clist[i], space)))
@@ -36,23 +42,27 @@ module.exports = function load ($void) {
     return promiseAll(tasks)
   })
 
-  function fetch (loader, dirs, source) {
-    if (!source || typeof source !== 'string') {
-      warn('fetch', 'invalid resource uri to fetch.', source)
-      return promiseOfResolved(source)
+  function fetch (loader, baseDir, target) {
+    if (!target || typeof target !== 'string') {
+      warn('fetch', 'invalid module url.', target)
+      return promiseOfRejected(target)
     }
-    source = completeFile(source)
-    if (!loader.isResolved(source)) {
-      source = loader.resolve(source, dirs)
-      if (typeof source !== 'string') {
-        warn('fetch', 'failed to resolve ', source)
-        return promiseOfResolved(source)
-      }
+    target = completeFile(target)
+    if (!target.endsWith('.es')) {
+      warn('fetch', 'only supports Espresso modules.', target)
+      return promiseOfRejected(target)
     }
-    return source.endsWith('@.es')
+    if (!loader.isUrl(target)) {
+      target = [baseDir, target].join('/')
+    }
+    if (!loader.isUrl(target)) {
+      warn('fetch', 'only supports remote modules.', target)
+      return promiseOfResolved(target)
+    }
+    return target.endsWith('/@.es')
       ? new Promise$(function (resolve, reject) {
-        loader.fetch(source).then(function () {
-          var result = run(source)
+        loader.fetch(target).then(function () {
+          var result = run(target)
           if (result instanceof Promise$) {
             result.then(resolve, reject)
           } else {
@@ -60,7 +70,7 @@ module.exports = function load ($void) {
           }
         }, reject)
       })
-      : loader.fetch(source)
+      : loader.fetch(target)
   }
 
   $void.bindOperatorFetch = function (space) {
@@ -71,7 +81,7 @@ module.exports = function load ($void) {
       for (var i = 1, len = clist.length; i < len; i++) {
         var uri = clist[i]
         if (!uri || typeof uri !== 'string') {
-          warn('$fetch', 'invalid source uri:', uri)
+          warn('$fetch', 'invalid target uri:', uri)
           clist[i] = null
         }
       }

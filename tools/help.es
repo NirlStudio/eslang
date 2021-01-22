@@ -28,11 +28,11 @@ export _library (object assign (@:) (this _library);
 # provide help content for shell object and functions.
 (for subject in
   (@ "debug", "echo", "loader", "logging")
-  set '.$subject', (load 'help/shell/$subject');
+  set '.$subject', (load './help/shell/$subject');
 ).
 
 # provide help content for profile operators and functions.
 (for subject in
   (@ "describe", "help", "selftest", "version")
-  set subject, (load 'help/profile/$subject');
+  set subject, (load './help/profile/$subject');
 ).

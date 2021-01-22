@@ -201,7 +201,7 @@
 ).
 
 (define "Logical Operators" (=> ()
-  (var mod ($the-value is false:: or ($the-value == 0):: ? "false" "true").
+  (var mod ($the-value is false:: or ($the-value == 0):: ? "./false" "./true").
   (load mod (@:@ the-value).
 ).
 

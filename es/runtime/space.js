@@ -187,8 +187,8 @@ module.exports = function space ($void) {
     var app = appSpace && appSpace.app
     var local = Object.create(app || $)
     local['-module'] = uri || ''
-    local['-module-dir'] = uri && $void.loader.isResolved(uri)
-      ? $void.loader.dir(uri) : ''
+    local['-module-dir'] = uri && $void.$path.isAbsolute(uri)
+      ? $void.$path.dirname(uri) : ''
     var export_ = Object.create($Object.proto)
     var space = new Space$(local, null, null, export_)
     if (app) {
@@ -207,7 +207,7 @@ module.exports = function space ($void) {
     }
     if (module_) {
       space.local['-module'] = module_ || ''
-      space.local['-module-dir'] = module_ ? $void.loader.dir(module_) : ''
+      space.local['-module-dir'] = module_ ? $void.$path.dirname(module_) : ''
     }
     return space
   }

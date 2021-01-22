@@ -1,4 +1,4 @@
-(var * (load "share/type" (@ the-type: bool).
+(var * (load "./share/type" (@ the-type: bool).
 
 (define "Bool Common Behaviors" (= ()
   (define "Identity" (=> ()

@@ -1,4 +1,4 @@
-var * (load "share/type" (@ the-type: promise);
+var * (load "./share/type" (@ the-type: promise);
 
 (define "Promise Common Behaviors" (=> ()
   (define "Identity" (= ()

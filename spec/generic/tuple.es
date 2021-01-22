@@ -1,4 +1,4 @@
-(var * (load "share/type" (@ the-type: tuple).
+(var * (load "./share/type" (@ the-type: tuple).
 
 (define "Tuple Common Behaviors" (=> ()
   (define "Identity" (=> ()

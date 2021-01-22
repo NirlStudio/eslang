@@ -1,4 +1,4 @@
-(var * (load "share/type" (@ the-type: operator).
+(var * (load "./share/type" (@ the-type: operator).
 
 (define "Operator Common Behaviors" (=> ()
   (define "Identity" (= ()

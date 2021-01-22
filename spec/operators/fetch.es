@@ -5,27 +5,29 @@
   (should "(fetch) returns null." (= ()
     assert null (fetch);
   ).
-  (should "(fetch module) returns a promise resolved to (@ module)." (=> ()
+  (if (env "runtime-host":: is "browser") (should "(fetch module) returns a promise resolved to (@ module)." (=> ()
     (fetch "_data":: then (=> waiting
       assert (waiting result:: is-an array);
       assert 1 (waiting result:: length);
       assert (waiting result:: 0:: ends-with (path-of "_data.es");
     ).
   ).
-  (should "(fetch module1 module2) returns a promise resolved to (@ module1 module2)." (=> ()
-    (fetch "_data" "_module":: then (=> waiting
-      assert (waiting result:: is-an array);
-      assert 2 (waiting result:: length);
-      assert (waiting result:: 0:: ends-with (path-of "_data.es");
-      assert (waiting result:: 1:: ends-with (path-of "_module.es");
+  (if (env "runtime-host":: is "browser")
+    (should "(fetch module1 module2) returns a promise resolved to (@ module1 module2)." (=> ()
+      (fetch "_data" "_module":: then (=> waiting
+        assert (waiting result:: is-an array);
+        assert 2 (waiting result:: length);
+        assert (waiting result:: 0:: ends-with (path-of "_data.es");
+        assert (waiting result:: 1:: ends-with (path-of "_module.es");
     ).
   ).
-  (should "(fetch module1 module2 ...) returns a promise resolved to (@ module1 module2 ...)." (=> ()
-    (fetch "_data" "_module":: then (=> waiting
-      assert (waiting result:: is-an array);
-      assert 2 (waiting result:: length);
-      assert (waiting result:: 0:: ends-with (path-of "_data.es");
-      assert (waiting result:: 1:: ends-with (path-of "_module.es");
+  (if (env "runtime-host":: is "browser")
+    (should "(fetch module1 module2 ...) returns a promise resolved to (@ module1 module2 ...)." (=> ()
+      (fetch "_data" "_module":: then (=> waiting
+        assert (waiting result:: is-an array);
+        assert 2 (waiting result:: length);
+        assert (waiting result:: 0:: ends-with (path-of "_data.es");
+        assert (waiting result:: 1:: ends-with (path-of "_module.es");
     ).
   ).
   (should "(fetch remote-module) returns a promise resolved to (@ remote-module)." (=> ()

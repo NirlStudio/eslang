@@ -129,7 +129,7 @@ module.exports = function import_ ($void) {
   function loadModule (space, uri, module_, target, moduleUri) {
     try {
       // -module-dir is only meaningful for an Espresso module.
-      module_.props['-module-dir'] = $void.loader.dir(uri)
+      module_.props['-module-dir'] = $void.$path.dirname(uri)
       // try to load file
       var doc = $void.loader.load(uri)
       var text = doc[0]

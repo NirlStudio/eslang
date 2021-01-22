@@ -20,6 +20,6 @@
   do (left + 1), end;
 ).
 
-print (var data (load "sort-data");
+print (var data (load "./sort-data");
 sort 0, (-- (data length);
 print '=> $data';

@@ -11,5 +11,5 @@
   (do left) += mid (do right);
 ).
 
-print (let data (load "sort-data");
+print (let data (load "./sort-data");
 print '=> $(sort data)';
