@@ -124,7 +124,7 @@
     (assert (result 3) (result 6).
   ).
   (should "use current home as -app-home if it's not a string." (= ()
-    (let path (import "$path").
+    (let path (import "$eslang/path").
     (var result (run (path resolve (env "runtime-home"), "spec/runtime/_app"), null, true).
     (assert (result is-an array).
     (assert ((result 0) is-a string).

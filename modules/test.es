@@ -5,7 +5,7 @@ const indent-step "  ";
 var indent indent-step;
 
 # import rendering
-const symbols (import "$symbols");
+const symbols (import "$eslang/symbols");
 const (gray, green, red, yellow, underlined) (import "es/styledout");
 
 const sign-passed (=> () (green indent, (symbols passed);

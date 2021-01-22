@@ -1,4 +1,4 @@
-const path (import "$path");
+const path (import "$eslang/path");
 const (get-help, set-help) (import (get set) from "./tools/help");
 
 const gray (= text (printf text, "gray");

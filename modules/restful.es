@@ -1,9 +1,9 @@
-const restful (import "$restful");
+const restful (import "$eslang/restful");
 
 # export recommended MIME types for Content-Type.
 (export mime-types (@
   "application/x-espresso",
-  "application/espresso"
+  "text/x-espresso"
 ).
 
 # use the first mime type as the default content type.
@@ -15,7 +15,7 @@ export mime-espresso (mime-types first);
   timeout: 60000,
   headers: (@ Accept:
     "application/x-espresso;q=0.9,
-     application/espresso;q=0.8,
+     text/x-espresso;q=0.8,
      application/json;q=0.5,
      */*;q=0.4"
   ).

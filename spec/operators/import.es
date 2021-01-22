@@ -124,28 +124,34 @@
     ).
   ).
   (define "import native modules", (= ()
-    (should "$io" (= ()
-      (var mod (import "$io").
+    (should "$eslang/io" (= ()
+      (var mod (import "$eslang/io").
       (assert (mod is-an object).
-      (assert "$io" (mod -module).
+      (assert "$eslang/io" (mod -module).
       (assert null (mod -module-dir).
     ).
-    (should "$restful" (= ()
-      (var mod (import "$restful").
+    (should "$eslang/path" (= ()
+      (var mod (import "$eslang/path").
       (assert (mod is-an object).
-      (assert "$restful" (mod -module).
+      (assert "$eslang/path" (mod -module).
       (assert null (mod -module-dir).
     ).
-    (should "$symbols" (= ()
-      (var mod (import "$symbols").
+    (should "$eslang/restful" (= ()
+      (var mod (import "$eslang/restful").
       (assert (mod is-an object).
-      (assert "$symbols" (mod -module).
+      (assert "$eslang/restful" (mod -module).
       (assert null (mod -module-dir).
     ).
-    (should "$global" (= ()
-      (var mod (import "$global").
+    (should "$eslang/symbols" (= ()
+      (var mod (import "$eslang/symbols").
       (assert (mod is-an object).
-      (assert "$global" (mod -module).
+      (assert "$eslang/symbols" (mod -module).
+      (assert null (mod -module-dir).
+    ).
+    (should "$eslang/global" (= ()
+      (var mod (import "$eslang/global").
+      (assert (mod is-an object).
+      (assert "$eslang/global" (mod -module).
       (assert null (mod -module-dir).
 
       (assert (mod "setTimeout":: is-a function).
