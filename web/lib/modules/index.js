@@ -4,14 +4,12 @@ var RuntimeModules = new Set([
   '$eslang/global',
   '$eslang/io',
   '$eslang/path',
-  '$eslang/restful',
   '$eslang/symbols'
 ])
 
 module.exports = function modulesIn ($void) {
   $void.$io = require('./io')($void)
   $void.$path = require('./path')($void)
-  $void.$restful = require('../../../lib/modules/restful')($void)
   $void.$symbols = require('../../../lib/modules/symbols')($void)
 
   var modules = Object.create(null)
@@ -34,8 +32,6 @@ module.exports = function modulesIn ($void) {
         return $void.$io
       case 'eslang/path':
         return $void.$path
-      case 'eslang/restful':
-        return $void.$restful
       case 'eslang/symbols':
         return $void.$symbols
       default:

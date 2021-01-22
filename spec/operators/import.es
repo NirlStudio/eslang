@@ -94,12 +94,6 @@
       (assert (mod -module:: ends-with "io.es").
       (assert (mod -module-dir:: ends-with "modules").
     ).
-    (should "es/restful" (= ()
-      (var mod (import "es/restful").
-      (assert (mod is-an object).
-      (assert (mod -module:: ends-with "restful.es").
-      (assert (mod -module-dir:: ends-with "modules").
-    ).
     (should "es/styledout" (= ()
       (var mod (import "es/styledout").
       (assert (mod is-an object).
@@ -134,12 +128,6 @@
       (var mod (import "$eslang/path").
       (assert (mod is-an object).
       (assert "$eslang/path" (mod -module).
-      (assert null (mod -module-dir).
-    ).
-    (should "$eslang/restful" (= ()
-      (var mod (import "$eslang/restful").
-      (assert (mod is-an object).
-      (assert "$eslang/restful" (mod -module).
       (assert null (mod -module-dir).
     ).
     (should "$eslang/symbols" (= ()
