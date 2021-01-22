@@ -6,7 +6,7 @@
 
 (define "(run app-source)" (= ()
   (should "load and return the evaluation result of file source." (= ()
-    (var result (run "spec/runtime/_app").
+    (var result (run "_app", null, -module-dir).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -34,7 +34,7 @@
 
 (define "(run app-source args)" (= ()
   (should "pass args to the app as arguments." (= ()
-    (var result (run "spec/runtime/_app" (@ 1 10 100).
+    (var result (run "_app", (@ 1 10 100), -module-dir).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -46,7 +46,7 @@
     (assert 100 ((result 2) 2).
   ).
   (should "requires args must be an array." (= ()
-    (var result (run "spec/runtime/_app" (@ x: 1).
+    (var result (run "_app", (@ x: 1), -module-dir).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -62,7 +62,7 @@
       type (=?) (=) (=?) (@) (@:) ((class empty) default)
     ).
 
-    (var result (run "spec/runtime/_app" args).
+    (var result (run "_app", args, -module-dir).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -103,7 +103,7 @@
 
 (define "(run app-source args app-home)" (=> ()
   (should "pass app-home to new app if it's a string." (=> ()
-    (var result (run "_app" null -module-dir).
+    (var result (run "_app", null, -module-dir).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).
@@ -124,7 +124,8 @@
     (assert (result 3) (result 6).
   ).
   (should "use current home as -app-home if it's not a string." (= ()
-    (var result (run "spec/runtime/_app" null true).
+    (let path (import "$path").
+    (var result (run (path resolve (env "runtime-home"), "spec/runtime/_app"), null, true).
     (assert (result is-an array).
     (assert ((result 0) is-a string).
     (assert (env "home") (result 0).

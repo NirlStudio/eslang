@@ -28,9 +28,4 @@ module.exports = function runtime ($void) {
     return typeof value === 'undefined' ? environment[name]
       : (environment[name] = value)
   }
-
-  $void.runtime = function (name, value) {
-    name = 'runtime-' + name
-    return $void.env(name, value)
-  }
 }

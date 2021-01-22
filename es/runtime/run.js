@@ -24,9 +24,8 @@ module.exports = function run ($void) {
     // try to resolve the uri for source
     var loader = $void.loader
     appSource = completeFile(appSource)
-    var uri = loader.resolve(appSource, [
-      appHome, $void.runtime('home')
-    ])
+    var uri = $void.$path.isAbsolute(appSource) ? appSource
+      : $void.$path.resolve(appHome, appSource)
     if (typeof uri !== 'string') {
       warn('run', 'failed to resolve source for', uri)
       return null

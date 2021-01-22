@@ -13,7 +13,7 @@ module.exports = function (term, stdin, stdout, loader) {
     )
   )
   // set the location of the runtime
-  $void.runtime('home', window.ES_HOME || (window.location.origin + '/es'))
+  $void.env('runtime-home', window.ES_HOME || (window.location.origin + '/es'))
 
   // prepare app environment.
   var home = getDefaultHome()

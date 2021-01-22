@@ -14,13 +14,13 @@
 
 (define "app" (= ()
   (should "in an app space, -app equals -module." (= ()
-    (var result (run "spec/runtime/_app").
+    (var result (run "_app", null, -module-dir).
     (assert ((result 3) is-a string).
     (assert ((result 6) is-a string).
     (assert (result 3) (result 6).
   ).
   (should "in an app space, -app-dir equals -module-dir." (= ()
-    (var result (run "spec/runtime/_app").
+    (var result (run "_app", *, -module-dir).
     (assert ((result 4) is-a string).
     (assert ((result 7) is-a string).
     (assert (result 4) (result 7).
@@ -33,10 +33,10 @@
     (assert (result 4) (result 5).
   ).
   (should "-app-home can be different with -app-dir." (= ()
-    (var result (run "spec/runtime/_app").
+    (var result (run "spec/runtime/_app", *, (env "runtime-home").
     (assert ((result 4) is-a string).
     (assert ((result 5) is-a string).
-    (assert (env "home") (result 5).
+    (assert (env "runtime-home") (result 5).
     (assert (result 5:: is-not (result 4).
   ).
 ).
