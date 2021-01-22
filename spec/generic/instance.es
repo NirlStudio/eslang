@@ -362,7 +362,7 @@
         constructor: (= name (this "name" name).
         to-code: (=() (tuple of-plain (`lion) (`of) name).
       ).
-      (var cub (lion of "Sinba").
+      (var cub (lion of "Simba").
       (var code (cub to-code).
       (assert (code is-a tuple).
       (assert 6 (code length).
@@ -371,7 +371,7 @@
       (assert (` lion) (code 2).
       (assert (` name) (code 3).
       (assert (symbol pairing) (code 4).
-      (assert "Sinba" (code 5).
+      (assert "Simba" (code 5).
     ).
     (should "an instance can replace its type before encoding." (=> ()
       (var kitty (@:cat name: "Tom").
@@ -393,10 +393,10 @@
       to-string: (=() ("cat is " + name ", " (arguments join).
     ).
     (var kitty (@:cat name: "Tom").
-    (should "a class can cusomtized its to-string logic." (=> ()
+    (should "a class can customized its to-string logic." (=> ()
       (assert "cat is Tom, " (kitty to-string).
     ).
-    (should "cusomtized to-string can receive extra argument(s) to help formatting." (=> ()
+    (should "customized to-string can receive extra argument(s) to help formatting." (=> ()
       (assert "cat is Tom, Mew!" (kitty to-string "Mew!").
       (assert "cat is Tom, Mew! ..." (kitty to-string "Mew!" "...").
     ).
@@ -629,7 +629,7 @@
       (assert "Bark!" (kitty roar).
     ).
   ).
-  (define "Acess Overridden Members" (=> ()
+  (define "Access Overridden Members" (=> ()
     (var kitty (@:cat
       age: 2
       mew: (=() "Woof!").
@@ -668,7 +668,7 @@
   (define "Abstract/Empty Members" (=> ()
     (should "an abstract member can be indicated by null or an empty lambda or function." (=> ()
       (var base (@:class walk: null run: (lambda empty) fly: (function empty).
-      (var cls (@:class type: bsae
+      (var cls (@:class type: base
         walk: (=() "walking").
       ).
       (var inst (cls default).

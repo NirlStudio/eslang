@@ -245,7 +245,7 @@
     (assert 0 ("A" first-of "").
     (assert 0 ("ABC" first-of "").
   ).
-  (should "(str first-of value) returns the index of first occurence of value or -1." (= ()
+  (should "(str first-of value) returns the index of first occurrence of value or -1." (= ()
     (assert -1 ("" first-of "A").
     (assert -1 ("A" first-of "AB").
     (assert 0 ("A" first-of "A").
@@ -318,7 +318,7 @@
     (assert 2 ("AB" last-of "").
     (assert 3 ("ABC" last-of "").
   ).
-  (should "(str last-of value) returns the offset of the last occurence of value or -1." (= ()
+  (should "(str last-of value) returns the offset of the last occurrence of value or -1." (= ()
     (assert 3 ("ABCABC" last-of "A").
     (assert 4 ("ABCABC" last-of "B").
     (assert 5 ("ABCABC" last-of "C").
@@ -735,7 +735,7 @@
     (assert "AB" ("AB" replace).
     (assert "ABC" ("ABC" replace).
   ).
-  (should "(str replace value) removes the occurences of value" (= ()
+  (should "(str replace value) removes the occurrences of value" (= ()
     (assert "" ("A" replace "A").
     (assert "A" ("A" replace "B").
 
@@ -757,7 +757,7 @@
     (assert "AA" ("ABCABC" replace "BC").
     (assert "ABBC" ("ABCABC" replace "CA").
   ).
-  (should "(str replace value new-value) replace the occurences of value with new-value" (= ()
+  (should "(str replace value new-value) replace the occurrences of value with new-value" (= ()
     (assert "DBC" ("ABC" replace "A" "D").
     (assert "ADC" ("ABC" replace "B" "D").
     (assert "ABD" ("ABC" replace "C" "D").
@@ -903,7 +903,7 @@
     (assert "AB" ("ABAB" - "A" "X" "B").
     (assert "AB" ("ABAB" -  "X" "A" "B").
   ).
-  (should "(str - value ...) converts non-string value to strings brefore removing." (=> ()
+  (should "(str - value ...) converts non-string value to strings before removing." (=> ()
     (assert "X-" ("X-null" - null).
     (assert "X-" ("X-type" - type).
     (assert "X-" ("X-string" - string).
@@ -970,7 +970,7 @@
 ).
 
 (define "(a-string split)" (= ()
-  (should "(str split) returns an array with separated by an ASCII whitepace" (= ()
+  (should "(str split) returns an array with separated by an ASCII whitespace" (= ()
     (assert (("" split) is-an array).
     (assert ((("" split) length) is 1).
     (assert ((("" split) 0) is "").
@@ -1010,7 +1010,7 @@
     (assert ((("A B" split "") 1) is " ").
     (assert ((("A B" split "") 2) is "B").
   ).
-  (should "(str split separater) returns an array splted by the separater." (= ()
+  (should "(str split separator) returns an array split by the separator." (= ()
     (assert (("" split "A") is-an array).
     (assert ((("" split "A") length) is 1).
     (assert ((("" split "A") 0) is "").
@@ -1297,7 +1297,7 @@
 ).
 
 (define "(a-string to-string)" (=> ()
-  (should "(str to-string) returns the str's representation in source code." (= ()
+  (should "(str to-string) returns the string's representation in source code." (= ()
     (assert "\"\"" ("" to-string).
     (assert "\"A\"" ("A" to-string).
     (assert "\"ABC\"" ("ABC" to-string).
@@ -1306,7 +1306,7 @@
 ).
 
 (define "(a-string : ...)" (= ()
-  (should "(str: offset) returns the charact at the offset or an empty string." (= ()
+  (should "(str: offset) returns the character at the offset or an empty string." (= ()
     (assert "" ("": 0).
     (assert "" ("": 1).
     (assert "" ("": -1).
