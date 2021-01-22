@@ -52,10 +52,10 @@ module.exports = function load ($void) {
       warn('fetch', 'only supports Espresso modules.', target)
       return promiseOfRejected(target)
     }
-    if (!loader.isUrl(target)) {
+    if (!loader.isRemote(target)) {
       target = [baseDir, target].join('/')
     }
-    if (!loader.isUrl(target)) {
+    if (!loader.isRemote(target)) {
       warn('fetch', 'only supports remote modules.', target)
       return promiseOfResolved(target)
     }
