@@ -98,9 +98,10 @@ module.exports = function voidSetup ($void) {
   $void.safelyAssign = safelyAssign
 
   // make sure a file uri has correct espresso extension
-  $void.completeFile = function (path) {
-    return !path || typeof path !== 'string' ? 'index.es'
-      : path.endsWith('/') ? path + 'index.es'
+  $void.completeFile = function (path, testing) {
+    return !path || typeof path !== 'string'
+      ? testing ? 'test.es' : 'index.es'
+      : path.endsWith('/') ? path + (testing ? 'test.es' : 'index.es')
         : path.endsWith('.es') ? path : path + '.es'
   }
 

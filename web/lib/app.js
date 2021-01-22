@@ -1,11 +1,19 @@
 'use strict'
 
-var $void = require('../index')
-var term = require('./term')
+var term = require('./term')()
+var $void = require('../index')(
+  term /*, - use web page based terminal
+  stdout,  - use default [term + console (as tracer)] based stdout
+  loader   - use default axios-based http loader */
+)
 
-var espresso = $void(term()/*, stdin, stdout, loader */)
 // start shell and expose the shell's reader function.
-var initializing = espresso.shell(/* context, args */)
+var initializing = $void.web.shell(/*
+  context, - fetch from the default url: page-home/@.es
+  stdin,   - use default term-based stdin
+  exit     - use reloading page to mimic an exit */
+)
+
 if (!(initializing instanceof Promise)) {
   console.info('shell is ready.')
 } else {
@@ -13,6 +21,6 @@ if (!(initializing instanceof Promise)) {
   initializing.then(function () {
     console.info('shell is ready now.')
   }, function (err) {
-    console.error('shell failed to be initialized for', err)
+    console.error('shell failed to initialize for', err)
   })
 }

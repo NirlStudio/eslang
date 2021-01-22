@@ -2,28 +2,31 @@
 
 var tracer = require('../../lib/stdout')
 
-function connectTo (term, tracing, type) {
-  return function () {
-    var trace = tracing[type]
-    var text = trace.apply(null, arguments)
-    term[type](text)
-    return text
-  }
-}
+module.exports = function $stdout (term) {
+  return function stdoutIn ($void) {
+    var stdout = Object.create(null)
 
-module.exports = function stdoutIn (term) {
-  return function stdout ($void) {
     var tracing = tracer($void, true)
-    var connect = connectTo.bind(null, term, tracing)
-    var stdout = {}
+
+    function forward (type) {
+      return function trace () {
+        var trace = tracing[type]
+        var text = trace.apply(null, arguments)
+        term[type](text)
+        return text
+      }
+    }
+
     for (var type in tracing) {
-      stdout[type] = type !== 'printf' ? connect(type)
-        : function (value, format) {
+      stdout[type] = type !== 'printf'
+        ? forward(type)
+        : function printf (value, format) {
           value = tracing.printf(value)
           term.printf(value, format)
           return value
         }
     }
+
     return stdout
   }
 }

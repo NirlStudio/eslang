@@ -3,7 +3,7 @@
 function nop () {}
 
 module.exports = function console () {
-  var term = {}
+  var term = Object.create(null)
   var buffer = ''
 
   // serve stdout
@@ -14,6 +14,7 @@ module.exports = function console () {
     }
     console.log(text)
   }
+
   term.printf = function (text) {
     var lines = text.split('\n')
     var ending = lines.pop()
@@ -26,7 +27,7 @@ module.exports = function console () {
     }
   }
 
-  // serve stderr
+  // serve stderr - tracing logic will work.
   term.verbose = nop
   term.info = nop
   term.warn = nop
@@ -62,8 +63,10 @@ module.exports = function console () {
     }
     return reader
   }
+
   term.disconnect = function () {
     window._$ = null
   }
+
   return term
 }

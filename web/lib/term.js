@@ -295,7 +295,8 @@ function bindInput (term) {
 }
 
 module.exports = function () {
-  var term = {}
+  var term = Object.create(null)
+
   panel = document.getElementById('stdout-panel')
   input = document.getElementById('stdin-input')
   enter = document.getElementById('stdin-enter')
@@ -331,14 +332,17 @@ module.exports = function () {
       prompt.innerText = inputPrompt = text
     }
   }
+
   var writeInput = loggerOf('input')
   term.input = function (text) {
     writeInput(inputPrompt, text)
   }
   bindInput(term)
+
   term.connect = function (reader) {
     return (term.reader = typeof reader === 'function' ? reader : null)
   }
+
   term.disconnect = function () {
     term.reader = null
   }
