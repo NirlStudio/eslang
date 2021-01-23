@@ -7,13 +7,13 @@
     assert (math pi:: is-a number);
     assert (math abs (math pi:: - 3.1415926):: < 0.0000001);
   ).
-  (should "(math ln2)" (= ()
-    assert (math ln2:: is-a number);
-    assert (math abs (math ln 2:: - (math ln2)):: < 0.0000001);
+  (should "(math ln-2)" (= ()
+    assert (math ln-2:: is-a number);
+    assert (math abs (math ln 2:: - (math ln-2)):: < 0.0000001);
   ).
-  (should "(math ln10)" (= ()
-    assert (math ln10:: is-a number);
-    assert (math abs (math ln 10:: - (math ln10)):: < 0.0000001);
+  (should "(math ln-10)" (= ()
+    assert (math ln-10:: is-a number);
+    assert (math abs (math ln 10:: - (math ln-10)):: < 0.0000001);
   ).
   (should "(math log2-e)" (= ()
     assert (math log2-e:: is-a number);

@@ -9,8 +9,8 @@ module.exports = function mathIn ($void) {
   var math = copyType($.object.empty(), Math, {
     'E': 'e',
     'PI': 'pi',
-    'LN2': 'ln2',
-    'LN10': 'ln10',
+    'LN2': 'ln-2',
+    'LN10': 'ln-10',
     'LOG10E': 'log-e',
     'LOG2E': 'log2-e',
     'SQRT2': 'sqrt-2',
