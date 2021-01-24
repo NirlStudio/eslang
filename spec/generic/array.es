@@ -159,104 +159,6 @@
   ).
 ).
 
-(define "(an-array is-sparse)" (= ()
-  (should "(an-array is-sparse) returns false for a common array." (= ()
-    (assert false ((@) is-sparse).
-    (assert false ((@ null) is-sparse).
-    (assert false ((@ 1) is-sparse).
-    (assert false ((@ 1 2) is-sparse).
-  ).
-  (should "(an-array is-sparse) returns true for a sparse array." (= ()
-    (var a (@).
-    (assert 101 (a 100 101).
-    (assert 101 (a length).
-    (assert 1 (a count).
-    (assert (a is-sparse).
-
-    (var a (@ 1 2).
-    (assert 101 (a 100 101).
-    (assert 101 (a length).
-    (assert 3 (a count).
-    (assert (a is-sparse).
-  ).
-).
-
-(define "(an-array not-sparse)" (= ()
-  (should "(an-array not-sparse) returns true for a common array." (= ()
-    (assert ((@) not-sparse).
-    (assert ((@ null) not-sparse).
-    (assert ((@ 1) not-sparse).
-    (assert ((@ 1 2) not-sparse).
-  ).
-  (should "(an-array not-sparse) returns false for a sparse array." (= ()
-    (var a (@).
-    (assert 101 (a 100 101).
-    (assert 101 (a length).
-    (assert 1 (a count).
-    (assert false (a not-sparse).
-
-    (var a (@ 1 2).
-    (assert 101 (a 100 101).
-    (assert 101 (a length).
-    (assert 3 (a count).
-    (assert false (a not-sparse).
-  ).
-).
-
-(define "(an-array as-sparse ...)" (= ()
-  (should "(an-array as-sparse) marks the array as sparse and returns the array." (= ()
-    (var a (@).
-    (assert ((a as-sparse) is a).
-    (assert (a is-sparse).
-
-    (let a (@ null).
-    (assert ((a as-sparse) is a).
-    (assert (a is-sparse).
-
-    (let a (@ 1).
-    (assert ((a as-sparse) is a).
-    (assert (a is-sparse).
-
-    (let a (@ 1 2).
-    (assert ((a as-sparse) is a).
-    (assert (a is-sparse).
-  ).
-  (should "(an-array as-sparse truthy) marks the array as sparse and returns the array." (= ()
-    (var a (@))
-    (assert ((a as-sparse true) is a).
-    (assert (a is-sparse).
-
-    (let a (@ null).
-    (assert ((a as-sparse 1) is a).
-    (assert (a is-sparse).
-
-    (let a (@ 1).
-    (assert ((a as-sparse "") is a).
-    (assert (a is-sparse).
-
-    (let a (@ 1 2).
-    (assert ((a as-sparse "x") is a).
-    (assert (a is-sparse).
-  ).
-  (should "(an-array as-sparse falsy) marks the array as common and returns the array." (= ()
-    (var a (@))
-    (assert ((a as-sparse false) is a).
-    (assert false (a is-sparse).
-
-    (let a (@ null).
-    (assert ((a as-sparse 0) is a).
-    (assert false (a is-sparse).
-
-    (let a (@ 1).
-    (assert ((a as-sparse null) is a).
-    (assert false (a is-sparse).
-
-    (let a (@ 1 2).
-    (assert ((a as-sparse null) is a).
-    (assert false (a is-sparse).
-  ).
-).
-
 (define "(an-array count ...)" (= ()
   (should "(an-array count) returns the count of items in the array." (= ()
     (var a (@).
@@ -275,11 +177,9 @@
     (assert 3 (a count (= x (x > 2).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert 4 (a count (= x (x > 2).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 5 (a count (= x (x > 2).
   ).
 ).
@@ -363,7 +263,6 @@
     (var a (@ 1).
     (a 2 5)
     (a 4 9)
-    (assert (a not-sparse).
 
     (var counter 0)
     (a trace (=> (v i)
@@ -377,7 +276,6 @@
     (var a (@ 1).
     (a 100 201)
     (a 200 401)
-    (assert (a is-sparse).
 
     (var counter 0)
     (a trace (=> (v i)
@@ -433,7 +331,6 @@
     (var a (@ 1).
     (a 2 5)
     (a 4 9)
-    (assert (a not-sparse).
 
     (var counter 0)
     (a retrace (=> (v i)
@@ -447,7 +344,6 @@
     (var a (@ 1).
     (a 100 201)
     (a 200 401)
-    (assert (a is-sparse).
 
     (var counter 0)
     (a retrace (=> (v i)
@@ -486,7 +382,6 @@
     (a 10 11).
     (assert 11 (a length).
     (assert 3 (a count).
-    (assert (a not-sparse).
     (assert 11 (a 10).
 
     (var iter (a iterate).
@@ -513,7 +408,6 @@
     (a 100 101).
     (assert 101 (a length).
     (assert 3 (a count).
-    (assert (a is-sparse).
     (assert 101 (a 100).
 
     (var iter (a iterate).
@@ -606,7 +500,6 @@
     (a 10 11).
     (assert 11 (a length).
     (assert 3 (a count).
-    (assert (a not-sparse).
     (assert 11 (a 10).
 
     (var iter (a iterate 1).
@@ -678,7 +571,6 @@
     (a 100 101).
     (assert 101 (a length).
     (assert 3 (a count).
-    (assert (a is-sparse).
     (assert 101 (a 100).
 
     (var iter (a iterate 1).
@@ -794,7 +686,6 @@
     (a 10 11).
     (assert 11 (a length).
     (assert 3 (a count).
-    (assert (a not-sparse).
     (assert 11 (a 10).
 
     (var iter (a iterate 1 11).
@@ -852,7 +743,6 @@ f
     (a 100 101).
     (assert 101 (a length).
     (assert 3 (a count).
-    (assert (a is-sparse).
     (assert 101 (a 100).
 
     (var iter (a iterate 1 101).
@@ -916,7 +806,6 @@ f
     (var values (@ null true 1 "a" (date of 1) (0 1) (` x) (` (x y).
     (var list (@).
     (for (v i) in values (list:(i * i) v).
-    (assert (list is-sparse).
     (let i 0)
     (for v in list
       (assert (values: (i ++)) v).
@@ -932,7 +821,6 @@ f
     (var values (@ null true 1 "a" (date of 1) (0 1) (` x) (` (x y).
     (var list (@).
     (for (v i) in values (list:(i * 64) v).
-    (assert (list is-sparse).
 
     (var j 0)
     (for (v i) in list
@@ -944,7 +832,6 @@ f
     (var values (@ null true 1 "a" (date of 1) (0 1) (` x) (` (x y).
     (var list (@).
     (for (v i) in values (list:(i * 64) v).
-    (assert (list is-sparse).
 
     (var j 0)
     (for (v i) in list
@@ -965,7 +852,6 @@ f
 
     (a 10 11)
     (var c (a copy).
-    (assert (c not-sparse).
     (assert 11 (c length).
     (assert 3 (c count).
     (assert ((c 0) is 1).
@@ -975,7 +861,6 @@ f
 
     (a 100 101)
     (var c (a copy).
-    (assert (c is-sparse).
     (assert 101 (c length).
     (assert 4 (c count).
     (assert ((c 0) is 1).
@@ -1019,7 +904,6 @@ f
 
     (a 10 11)
     (var c (a copy 1).
-    (assert (c not-sparse).
     (assert 10 (c length).
     (assert 2 (c count).
     (assert ((c 0) is 2).
@@ -1028,7 +912,6 @@ f
 
     (a 100 101)
     (var c (a copy 1).
-    (assert (c is-sparse).
     (assert 100 (c length).
     (assert 3 (c count).
     (assert ((c 0) is 2).
@@ -1094,7 +977,6 @@ f
     (assert 12 (a length).
     (assert 5 (a count).
     (var c (a copy 1 10).
-    (assert (c not-sparse).
     (assert 10 (c length).
     (assert 3 (c count).
     (assert ((c 0) is 2).
@@ -1107,7 +989,6 @@ f
     (assert 102 (a length).
     (assert 7 (a count).
     (var c (a copy 1 100).
-    (assert (c is-sparse).
     (assert 100 (c length).
     (assert 5 (c count).
     (assert ((c 0) is 2).
@@ -1197,7 +1078,6 @@ f
 
     (a 10 11)
     (var s (a slice 1).
-    (assert (s not-sparse).
     (assert 10 (s length).
     (assert 2 (s count).
     (assert ((s 0) is 2).
@@ -1206,7 +1086,6 @@ f
 
     (a 100 101)
     (var s (a slice 1).
-    (assert (s is-sparse).
     (assert 100 (s length).
     (assert 3 (s count).
     (assert ((s 0) is 2).
@@ -1264,7 +1143,6 @@ f
     (a 10 11)
     (a 11 12)
     (var s (a slice 1 -1).
-    (assert (s not-sparse).
     (assert 10 (s length).
     (assert 3 (s count).
     (assert ((s 0) is 2).
@@ -1275,7 +1153,6 @@ f
     (a 100 101)
     (a 101 102)
     (var s (a slice 1 -1).
-    (assert (s is-sparse).
     (assert 100 (s length).
     (assert 5 (s count).
     (assert ((s 0) is 2).
@@ -1297,11 +1174,9 @@ f
     (assert ((a slice -1 -2) is-empty).
 
     (a 10 11)
-    (assert (a not-sparse).
     (assert ((a slice 0 0) is-empty).
 
     (a 100 101)
-    (assert (a is-sparse).
     (assert ((a slice 10 0) is-empty).
   ).
 ).
@@ -1316,18 +1191,14 @@ f
     (assert 2 (b 1).
 
     (a 10 10).
-    (assert (a not-sparse).
     (let b (a concat).
     (assert (b is-not a).
-    (assert (b not-sparse).
     (assert 11 (b length).
     (assert 3 (b count).
 
     (a 100 100).
-    (assert (a is-sparse).
     (let b (a concat).
     (assert (b is-not a).
-    (assert (b is-sparse).
     (assert 101 (b length).
     (assert 4 (b count).
   ).
@@ -1351,13 +1222,11 @@ f
 
     (a 10 11)
     (let b (a concat 12).
-    (assert (b not-sparse).
     (assert 12 (b length).
     (assert 4 (b count).
 
     (a 100 101)
     (let b (a concat 102 103).
-    (assert (b is-sparse).
     (assert 103 (b length).
     (assert 6 (b count).
   ).
@@ -1374,13 +1243,11 @@ f
 
     (a 10 10).
     (assert ((a append) is a).
-    (assert (a not-sparse).
     (assert 11 (a length).
     (assert 3 (a count).
 
     (a 100 100).
     (assert ((a append) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 4 (a count).
   ).
@@ -1395,13 +1262,11 @@ f
 
     (a 10 10).
     (assert ((a append 11) is a).
-    (assert (a not-sparse).
     (assert 12 (a length).
     (assert 5 (a count).
 
     (a 100 100).
     (assert ((a append 101 102) is a).
-    (assert (a is-sparse).
     (assert 103 (a length).
     (assert 8 (a count).
   ).
@@ -1419,7 +1284,6 @@ f
     (let a (@ 1 2).
     (b 10 10)
     (assert ((a append b (@ 11 12)) is a).
-    (assert (a not-sparse))
     (assert 15 (a length).
     (assert 7 (a count).
     (assert 10 (a 12).
@@ -1428,9 +1292,7 @@ f
 
     (let a (@ 1 2).
     (b 100 100)
-    (assert (b is-sparse))
     (assert ((a append b 101 102) is a).
-    (assert (a is-sparse))
     (assert 105 (a length).
     (assert 8 (a count).
     (assert 10 (a 12).
@@ -1451,7 +1313,6 @@ f
     (let a (@ 1 2).
     (a 10 10)
     (assert ((a append (11 13) (@ 13 14)) is a).
-    (assert (a not-sparse).
     (assert 15 (a length).
     (assert 7 (a count).
     (assert 10 (a 10).
@@ -1463,7 +1324,6 @@ f
     (let a (@ 1 2).
     (a 100 100)
     (assert ((a append (101 103) 103 104) is a).
-    (assert (a is-sparse))
     (assert 105 (a length).
     (assert 7 (a count).
     (assert 100 (a 100).
@@ -1493,7 +1353,6 @@ f
     (a 10 10)
     (let b (a merge).
     (assert (b is-not a).
-    (assert (b not-sparse).
     (assert 11 (b length).
     (assert 3 (b count).
     (assert 10 (b 10).
@@ -1501,7 +1360,6 @@ f
     (a 100 100)
     (let b (a merge).
     (assert (b is-not a).
-    (assert (b is-sparse).
     (assert 101 (b length).
     (assert 4 (b count).
     (assert 100 (b 100).
@@ -1518,7 +1376,6 @@ f
     (a 10 10)
     (let b (a merge 11 12).
     (assert (b is-not a).
-    (assert (b not-sparse).
     (assert 13 (b length).
     (assert 5 (b count).
     (assert 10 (b 10).
@@ -1528,7 +1385,6 @@ f
     (a 100 100)
     (let b (a merge 101 102).
     (assert (b is-not a).
-    (assert (b is-sparse).
     (assert 103 (b length).
     (assert 6 (b count).
     (assert 100 (b 100).
@@ -1549,7 +1405,6 @@ f
     (aa 10 10)
     (let b (a merge aa 11).
     (assert (b is-not a).
-    (assert (b not-sparse).
     (assert 14 (b length).
     (assert 6 (b count).
     (assert 10 (b 12).
@@ -1558,7 +1413,6 @@ f
     (aa 100 100)
     (let b (a merge aa 101 102).
     (assert (b is-not a).
-    (assert (b is-sparse).
     (assert 105 (b length).
     (assert 8 (b count).
     (assert 100 (b 102).
@@ -1613,11 +1467,9 @@ f
 
     (let a (@).
     (a 10 10).
-    (assert (a not-sparse).
     (assert null (a get).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a get).
   ).
   (should "(an-array get offset) returns the element at offset or null." (= ()
@@ -1643,7 +1495,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert 1 (a get 0).
     (assert 2 (a get 1).
     (assert null (a get 2).
@@ -1654,7 +1505,6 @@ f
     (assert null (a get 11).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a get -2).
     (assert null (a get 99).
     (assert 100 (a get -1).
@@ -1684,7 +1534,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert 1 (a: 0).
     (assert 2 (a: 1).
     (assert null (a: 2).
@@ -1695,7 +1544,6 @@ f
     (assert null (a: 11).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a: -2).
     (assert null (a: 99).
     (assert 100 (a: -1).
@@ -1725,7 +1573,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert 1 (a 0).
     (assert 2 (a 1).
     (assert null (a 2).
@@ -1736,7 +1583,6 @@ f
     (assert null (a 11).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a -2).
     (assert null (a 99).
     (assert 100 (a -1).
@@ -1765,12 +1611,10 @@ f
 
     (var a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert null (a set).
     (assert null (a 0).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a set 0 1).
     (assert null (a set).
     (assert null (a 0).
@@ -1834,7 +1678,6 @@ f
 
     (var a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert null (a set 0).
     (assert null (a 0).
 
@@ -1847,7 +1690,6 @@ f
     (assert null (a -1).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a set 0 1).
     (assert null (a set).
     (assert null (a 0).
@@ -1919,7 +1761,6 @@ f
 
     (var a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert 1 (a set 0 1).
     (assert 1 (a 0).
 
@@ -1932,7 +1773,6 @@ f
     (assert -10 (a -1).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a set 0 1).
     (assert 1 (a 0).
 
@@ -2003,7 +1843,6 @@ f
 
     (var a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert 1 (a: 0 1).
     (assert 1 (a 0).
 
@@ -2016,7 +1855,6 @@ f
     (assert -10 (a -1).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a set 0 1).
     (assert 1 (a 0).
 
@@ -2087,7 +1925,6 @@ f
 
     (var a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert 1 (a 0 1).
     (assert 1 (a 0).
 
@@ -2100,7 +1937,6 @@ f
     (assert -10 (a -1).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a set 0 1).
     (assert 1 (a 0).
 
@@ -2163,7 +1999,6 @@ f
 
     (let a (@ 1 2 3).
     (a 10 10)
-    (assert (a not-sparse).
     (assert a (a reset 3).
     (assert 11 (a length).
     (assert 4 (a count).
@@ -2176,7 +2011,6 @@ f
 
     (let a (@ 1 2 3).
     (a 100 100)
-    (assert (a is-sparse).
     (assert a (a reset 3).
     (assert 101 (a length).
     (assert 4 (a count).
@@ -2207,7 +2041,6 @@ f
     (let a (@ 1 2 3).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (assert a (a reset 2 3 10).
     (assert 12 (a length).
     (assert 3 (a count).
@@ -2215,7 +2048,6 @@ f
     (let a (@ 1 2 3).
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (assert a (a reset 2 3 -2).
     (assert 102 (a length).
     (assert 3 (a count).
@@ -2230,7 +2062,6 @@ f
     (assert 0 (a count).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert 11 (a length).
     (assert 1 (a count).
 
@@ -2239,7 +2070,6 @@ f
     (assert 0 (a count).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 1 (a count).
 
@@ -2267,7 +2097,6 @@ f
     (a 11 1).
     (a 12 2).
     (a 13 3).
-    (assert (a not-sparse).
     (assert 14 (a length).
     (assert 10 (a count).
 
@@ -2279,7 +2108,6 @@ f
     (a 101 1).
     (a 102 2).
     (a 103 3).
-    (assert (a is-sparse).
     (assert 104 (a length).
     (assert 11 (a count).
 
@@ -2313,7 +2141,6 @@ f
     (a 11 1).
     (a 12 2).
     (a 13 3).
-    (assert (a not-sparse).
     (assert 14 (a length).
     (assert 11 (a count).
 
@@ -2326,7 +2153,6 @@ f
     (a 102 2).
     (a 103 3).
     (a 104 4).
-    (assert (a is-sparse).
     (assert 105 (a length).
     (assert 12 (a count).
 
@@ -2346,14 +2172,12 @@ f
 
     (a 10 10).
     (let b (a remove).
-    (assert (b not-sparse).
     (assert (b is-not a).
     (assert 11 (b length).
     (assert 4 (b count).
 
     (a 100 100).
     (let b (a remove).
-    (assert (b is-sparse).
     (assert (b is-not a).
     (assert 101 (b length).
     (assert 5 (b count).
@@ -2382,7 +2206,6 @@ f
     (a 12 2).
     (a 13 3).
     (let b (a remove 2).
-    (assert (b not-sparse).
     (assert (b is-not a).
     (assert 11 (b length).
     (assert 6 (b count).
@@ -2392,7 +2215,6 @@ f
     (a 102 2).
     (a 104 3).
     (let b (a remove 2).
-    (assert (b is-sparse).
     (assert (b is-not a).
     (assert 102 (b length).
     (assert 6 (b count).
@@ -2427,7 +2249,6 @@ f
     (a 12 2).
     (a 13 3).
     (let b (a remove 2 4).
-    (assert (b not-sparse).
     (assert (b is-not a).
     (assert 10 (b length).
     (assert 6 (b count).
@@ -2437,7 +2258,6 @@ f
     (a 102 2).
     (a 104 3).
     (let b (a remove 2 4).
-    (assert (b is-sparse).
     (assert (b is-not a).
     (assert 101 (b length).
     (assert 6 (b count).
@@ -2455,12 +2275,10 @@ f
     (assert 2 (a length).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert a (a replace).
     (assert 11 (a length).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert a (a replace).
     (assert 101 (a length).
   ).
@@ -2479,7 +2297,6 @@ f
 
     (let a (@ 1 2 1.5 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert a (a replace 2).
     (assert 11 (a length).
     (assert 3 (a count).
@@ -2489,7 +2306,6 @@ f
 
     (let a (@ 1 2 1.5 2).
     (a 100 100).
-    (assert (a is-sparse).
     (assert a (a replace 2).
     (assert 101 (a length).
     (assert 3 (a count).
@@ -2514,7 +2330,6 @@ f
 
     (let a (@ 1 2 1.5 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert a (a replace 2 3).
     (assert 11 (a length).
     (assert 5 (a count).
@@ -2526,7 +2341,6 @@ f
 
     (let a (@ 1 2 1.5 2).
     (a 100 100).
-    (assert (a is-sparse).
     (assert a (a replace 2 3).
     (assert 101 (a length).
     (assert 5 (a count).
@@ -2614,14 +2428,12 @@ f
     (a 11 11)
     (a 12 12)
     (a 13 13)
-    (assert (a not-sparse).
     (assert (a has (= x (x == 12).
 
     (let a (@ 1 2).
     (a 101 101)
     (a 102 102)
     (a 103 103)
-    (assert (a is-sparse).
     (assert (a has (= x (x == 102).
   ).
 ).
@@ -2638,11 +2450,9 @@ f
     (assert false (a contains).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert false (a contains).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert false (a contains).
   ).
   (should "(an-array contains value) returns a boolean value indicating if the value exists in the array." (= ()
@@ -2686,12 +2496,10 @@ f
     (assert false (src contains (@ x: 1).
 
     (src 10 10).
-    (assert (src not-sparse).
     (assert true (src contains 10).
 
     (src 100 100).
     (src 101 101).
-    (assert (src is-sparse).
     (assert true (src contains 100).
   ).
 ).
@@ -2708,11 +2516,9 @@ f
     (assert false (a swap).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert false (a swap).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert false (a swap).
   ).
   (should "(an-array swap i) always tries to swap the elements at i with the first one." (= ()
@@ -2737,7 +2543,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert false (a swap 0).
     (assert true (a swap 10).
     (assert 10 (a 0).
@@ -2745,7 +2550,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100).
-    (assert (a is-sparse).
     (assert false (a swap 0).
     (assert true (a swap -1).
     (assert 100 (a 0).
@@ -2773,7 +2577,6 @@ f
     (a 11 11).
     (a 12 12).
     (a 13 13).
-    (assert (a not-sparse).
     (assert true (a swap 1 -1).
     (assert 13 (a 1).
     (assert 2 (a 13).
@@ -2781,7 +2584,6 @@ f
     (a 101 101).
     (a 102 102).
     (a 103 103).
-    (assert (a is-sparse).
     (assert true (a swap 2 -2).
     (assert 102 (a 2).
     (assert 3 (a 102).
@@ -2819,11 +2621,9 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert 1 (a first).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 1 (a first).
   ).
   (should "(an-array first filter) returns the first matched element by filter or null." (= ()
@@ -2846,12 +2646,10 @@ f
     (let a (@ 1 2).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (assert 10 (a first (= x (x >= 10).
 
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (assert 101 (a first (= x (x > 100).
   ).
   (should "(an-array first count) returns an empty array if count <= 0." (= ()
@@ -2869,12 +2667,10 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert ((a first 0) is-empty).
     (assert ((a first -1) is-empty).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a first 0) is-empty).
     (assert ((a first -1) is-empty).
   ).
@@ -2908,7 +2704,6 @@ f
     (let a (@ 1 2).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (let b (a first 3).
     (assert 3 (b length).
     (assert 1 (b 0).
@@ -2918,7 +2713,6 @@ f
     (let a (@ 1 2).
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (let b (a first 3).
     (assert 3 (b length).
     (assert 1 (b 0).
@@ -2978,7 +2772,6 @@ f
     (let a (@ 1 2 3).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (let b (a first 3 (= x (x > 2).
     (assert 3 (b length).
     (assert 3 (b 0).
@@ -2988,7 +2781,6 @@ f
     (let a (@ 1 2 3).
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (let b (a first 3 (= x (x > 2).
     (assert 3 (b length).
     (assert 3 (b 0).
@@ -3007,11 +2799,9 @@ f
     (assert null (a first-of).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert null (a first-of).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a first-of).
   ).
   (should "(an-array first-of value) returns the offset of the first occurrence of value." (= ()
@@ -3024,13 +2814,11 @@ f
     (a 10 10).
     (a 11 11).
     (a 12 10).
-    (assert (a not-sparse).
     (assert 10 (a first-of 10).
 
     (a 100 100).
     (a 101 101).
     (a 102 100).
-    (assert (a is-sparse).
     (assert 100 (a first-of 100).
   ).
   (should "(an-array first-of value) returns null if value is not an element of the array." (= ()
@@ -3040,11 +2828,9 @@ f
     (assert null (a first-of true).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert null (a first-of 11).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a first-of 101).
   ).
 ).
@@ -3061,11 +2847,9 @@ f
     (assert 2 (a last).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert 10 (a last).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 100 (a last).
   ).
   (should "(an-array last filter) returns the last matched element by filter or null." (= ()
@@ -3087,12 +2871,10 @@ f
 
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (assert 10 (a last (= x (x < 11).
 
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (assert 100 (a last (= x (x < 101).
   ).
   (should "(an-array last count) returns an empty array if count <= 0." (= ()
@@ -3109,13 +2891,11 @@ f
     (assert ((a last -1) is-empty).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert ((a last 0) is-an array).
     (assert ((a last 0) is-empty).
     (assert ((a last -1) is-empty).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert ((a last 0) is-an array).
     (assert ((a last 0) is-empty).
     (assert ((a last -1) is-empty).
@@ -3150,7 +2930,6 @@ f
     (a 10 10).
     (a 11 11).
     (a 13 13).
-    (assert (a not-sparse).
     (let b (a last 2).
     (assert (b is-not a).
     (assert 2 (b length).
@@ -3161,7 +2940,6 @@ f
     (a 100 100).
     (a 101 101).
     (a 103 103).
-    (assert (a is-sparse).
     (let b (a last 2).
     (assert (b is-not a).
     (assert 2 (b length).
@@ -3222,7 +3000,6 @@ f
     (a 10 10).
     (a 12 12).
     (a 14 14).
-    (assert (a not-sparse).
     (let b (a last 2 (= x (x < 14).
     (assert (b is-not a).
     (assert 2 (b length).
@@ -3233,7 +3010,6 @@ f
     (a 100 100).
     (a 102 102).
     (a 104 104).
-    (assert (a is-sparse).
     (let b (a last 2 (= x (x < 104).
     (assert (b is-not a).
     (assert 2 (b length).
@@ -3253,11 +3029,9 @@ f
     (assert null (a last-of).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert null (a last-of).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a last-of).
   ).
   (should "(an-array last-of value) returns the offset of the last occurrence of value." (= ()
@@ -3270,13 +3044,11 @@ f
     (a 10 10).
     (a 11 11).
     (a 13 13).
-    (assert (a not-sparse).
     (assert 11 (a last-of 11).
 
     (a 100 100).
     (a 101 101).
     (a 103 103).
-    (assert (a is-sparse).
     (assert 101 (a last-of 101).
   ).
   (should "(an-array last-of value) returns null if value is not an element of the array." (= ()
@@ -3286,11 +3058,9 @@ f
     (assert null (a last-of true).
 
     (a 10 10).
-    (assert (a not-sparse).
     (assert null (a last-of 11).
 
     (a 100 100).
-    (assert (a is-sparse).
     (assert null (a last-of 101).
   ).
 ).
@@ -3624,7 +3394,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10).
-    (assert (a not-sparse).
     (assert ((a delete) is a).
     (assert 10 (a length).
     (assert 2 (a count).
@@ -3633,7 +3402,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100).
-    (assert (a is-sparse).
     (assert ((a delete) is a).
     (assert 100 (a length).
     (assert 2 (a count).
@@ -3716,7 +3484,6 @@ f
     (a 10 10).
     (a 11 11).
     (a 13 13).
-    (assert (a not-sparse).
     (assert ((a delete 11) is a).
     (assert 13 (a length).
     (assert 4 (a count).
@@ -3726,7 +3493,6 @@ f
     (a 100 100).
     (a 101 101).
     (a 103 103).
-    (assert (a is-sparse).
     (assert ((a delete 101) is a).
     (assert 103 (a length).
     (assert 4 (a count).
@@ -3795,7 +3561,6 @@ f
     (a 10 10).
     (a 11 11).
     (a 13 13).
-    (assert (a not-sparse).
     (assert ((a delete 11 2) is a).
     (assert 12 (a length).
     (assert 4 (a count).
@@ -3805,7 +3570,6 @@ f
     (a 100 100).
     (a 101 101).
     (a 103 103).
-    (assert (a is-sparse).
     (assert ((a delete 99 3) is a).
     (assert 101 (a length).
     (assert 3 (a count).
@@ -3829,7 +3593,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a splice).
     (assert (b is-not a).
     (assert 11 (a length).
@@ -3839,7 +3602,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a splice).
     (assert (b is-not a).
     (assert 101 (a length).
@@ -3888,7 +3650,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a splice 1).
     (assert (b is-not a).
     (assert 1 (a length).
@@ -3898,7 +3659,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a splice 1).
     (assert (b is-not a).
     (assert 1 (a length).
@@ -3989,7 +3749,6 @@ f
     (a 10 10)
     (a 11 11)
     (a 12 12)
-    (assert (a not-sparse).
     (let b (a splice 1 11).
     (assert (b is-not a).
     (assert 2 (a length).
@@ -4001,7 +3760,6 @@ f
     (a 100 100)
     (a 101 101)
     (a 102 102)
-    (assert (a is-sparse).
     (let b (a splice 1 101).
     (assert (b is-not a).
     (assert 2 (a length).
@@ -4106,7 +3864,6 @@ f
     (a 10 10)
     (a 11 11)
     (a 12 12)
-    (assert (a not-sparse).
     (let b (a splice 1 11 5).
     (assert (b is-not a).
     (assert 3 (a length).
@@ -4118,7 +3875,6 @@ f
     (a 100 100)
     (a 101 101)
     (a 102 102)
-    (assert (a is-sparse).
     (let b (a splice 1 101 10 11).
     (assert (b is-not a).
     (assert 4 (a length).
@@ -4144,14 +3900,12 @@ f
 
     (let  a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert ((a push) is a).
     (assert 11 (a length).
     (assert 3 (a count).
 
     (let  a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a push) is a).
     (assert 101 (a length).
     (assert 3 (a count).
@@ -4182,7 +3936,6 @@ f
 
     (let  a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert ((a push 11) is a).
     (assert 12 (a length).
     (assert 4 (a count).
@@ -4191,7 +3944,6 @@ f
 
     (let  a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a push 101) is a).
     (assert 102 (a length).
     (assert 4 (a count).
@@ -4216,7 +3968,6 @@ f
     (let  a (@ 1 2).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (assert 12 (a length).
     (assert 4 (a count).
     (assert 11 (a pop).
@@ -4232,7 +3983,6 @@ f
     (let  a (@ 1 2).
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (assert 102 (a length).
     (assert 4 (a count).
     (assert 101 (a pop).
@@ -4315,7 +4065,6 @@ f
     (let  a (@ 1 2).
     (a 10 10)
     (a 11 11)
-    (assert (a not-sparse).
     (assert 12 (a length).
     (assert 4 (a count).
     (let b (a pop 1).
@@ -4329,7 +4078,6 @@ f
     (let  a (@ 1 2).
     (a 100 100)
     (a 101 101)
-    (assert (a is-sparse).
     (assert 102 (a length).
     (assert 4 (a count).
     (let b (a pop 3).
@@ -4360,14 +4108,12 @@ f
 
     (let  a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert ((a enqueue) is a).
     (assert 11 (a length).
     (assert 3 (a count).
 
     (let  a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a enqueue) is a).
     (assert 101 (a length).
     (assert 3 (a count).
@@ -4399,7 +4145,6 @@ f
 
     (let  a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (assert ((a enqueue 0) is a).
     (assert 12 (a length).
     (assert 4 (a count).
@@ -4408,7 +4153,6 @@ f
 
     (let  a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a enqueue 0 -1 -2) is a).
     (assert 104 (a length).
     (assert 6 (a count).
@@ -4453,7 +4197,6 @@ f
 
     (let a (@ 1).
     (a 2 2)
-    (assert (a not-sparse).
     (assert ((a reverse) is a).
     (assert 3 (a length).
     (assert 2 (a count).
@@ -4464,7 +4207,6 @@ f
 
     (let a (@ 1).
     (a 100 100)
-    (assert (a is-sparse).
     (assert ((a reverse) is a).
     (assert 101 (a length).
     (assert 2 (a count).
@@ -4510,7 +4252,6 @@ f
     (let a (@ 2).
     (a 2 1)
     (assert ((a sort) is a).
-    (assert (a not-sparse).
     (assert 3 (a length).
     (assert 2 (a count).
     (assert 1 (a 0).
@@ -4521,7 +4262,6 @@ f
     (let a (@ 2).
     (a 100 1)
     (assert ((a sort) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 2 (a count).
     (assert 1 (a 0).
@@ -4563,7 +4303,6 @@ f
     (let a (@ 2).
     (a 2 1)
     (assert ((a sort ascending) is a).
-    (assert (a not-sparse).
     (assert 3 (a length).
     (assert 2 (a count).
     (assert 1 (a 0).
@@ -4574,7 +4313,6 @@ f
     (let a (@ 2).
     (a 100 1)
     (assert ((a sort ascending) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 2 (a count).
     (assert 1 (a 0).
@@ -4616,7 +4354,6 @@ f
     (let a (@ 2).
     (a 2 1)
     (assert ((a sort descending) is a).
-    (assert (a not-sparse).
     (assert 3 (a length).
     (assert 2 (a count).
     (assert 2 (a 0).
@@ -4627,7 +4364,6 @@ f
     (let a (@ 2).
     (a 100 1)
     (assert ((a sort descending) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 2 (a count).
     (assert 2 (a 0).
@@ -4657,7 +4393,6 @@ f
     (let a (@ 12 3).
     (a 10 101)
     (assert ((a sort cmp) is a).
-    (assert (a not-sparse).
     (assert 11 (a length).
     (assert 3 (a count).
     (assert 101 (a 0).
@@ -4669,7 +4404,6 @@ f
     (let a (@ 12 3).
     (a 100 101)
     (assert ((a sort cmp) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 3 (a count).
     (assert 101 (a 0).
@@ -4698,7 +4432,6 @@ f
     (let a (@ 12 3).
     (a 10 101)
     (assert ((a sort ascending cmp) is a).
-    (assert (a not-sparse).
     (assert 11 (a length).
     (assert 3 (a count).
     (assert 101 (a 0).
@@ -4710,7 +4443,6 @@ f
     (let a (@ 12 3).
     (a 100 101)
     (assert ((a sort ascending cmp) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 3 (a count).
     (assert 101 (a 0).
@@ -4739,7 +4471,6 @@ f
     (let a (@ 12 3).
     (a 10 101)
     (assert ((a sort descending cmp) is a).
-    (assert (a not-sparse).
     (assert 11 (a length).
     (assert 3 (a count).
     (assert 12 (a 0).
@@ -4751,7 +4482,6 @@ f
     (let a (@ 12 3).
     (a 100 101)
     (assert ((a sort descending cmp) is a).
-    (assert (a is-sparse).
     (assert 101 (a length).
     (assert 3 (a count).
     (assert 12 (a 0).
@@ -4779,7 +4509,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a find).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4790,7 +4519,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a find).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4817,7 +4545,6 @@ f
 
     (let a (@ 4 2 3 1).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a find matched).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4828,7 +4555,6 @@ f
 
     (let a (@ 4 2 3 1).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a find matched).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4858,7 +4584,6 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a select).
     (assert (b is-an array).
     (assert (b is-not a).
@@ -4870,7 +4595,6 @@ f
 
     (let a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a select).
     (assert (b is-an array).
     (assert (b is-not a).
@@ -4898,7 +4622,6 @@ f
 
     (let a (@ 4 2 3 1).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a select matched).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4909,7 +4632,6 @@ f
 
     (let a (@ 4 2 3 1).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a select matched).
     (assert (b is-an array).
     (assert 3 (b length).
@@ -4937,10 +4659,8 @@ f
 
     (let a (@ 1 2).
     (a 10 10)
-    (assert (a not-sparse).
     (let b (a map).
     (assert (b is-an array).
-    (assert (b not-sparse).
     (assert (b is-not a).
     (assert 11 (b length).
     (assert 3 (b count).
@@ -4950,10 +4670,8 @@ f
 
     (let a (@ 1 2).
     (a 100 100)
-    (assert (a is-sparse).
     (let b (a map).
     (assert (b is-an array).
-    (assert (b is-sparse).
     (assert (b is-not a).
     (assert 101 (b length).
     (assert 3 (b count).
@@ -4973,11 +4691,9 @@ f
     (assert null (a reduce).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert null (a reduce).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert null (a reduce).
   ).
   (should "(an-array reduce value) returns value." (= ()
@@ -4989,11 +4705,9 @@ f
     (assert 100 (a reduce 100).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert true (a reduce true).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert "xyz" (a reduce "xyz").
   ).
   (should "(an-array reduce reducer) returns the last value returned by reducer with a null a the initial value." (= ()
@@ -5005,11 +4719,9 @@ f
     (assert 104 (a reduce summing).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert 124 (a reduce summing).
 
     (a 100 100)
-    (assert (a is-sparse).
     (assert 324 (a reduce summing).
   ).
   (should "(an-array reduce value reducer) returns the last value returned by reducer with the initial value." (= ()
@@ -5026,13 +4738,11 @@ f
 
     (a 10 10)
     (let called 0).
-    (assert (a not-sparse).
     (assert 134 (a reduce 110 summing).
     (assert 3 called)
 
     (a 100 100)
     (let called 0).
-    (assert (a is-sparse).
     (assert 344 (a reduce 120 summing).
     (assert 4 called)
   ).
@@ -5050,28 +4760,22 @@ f
     (assert "1 2" (a join).
 
     (a 3 3)
-    (assert (a not-sparse).
     (assert "1 2 * 3" (a join).
 
     (a 6 6)
-    (assert (a not-sparse).
     (assert "1 2 * 3 * * 6" (a join).
 
     (a 6 6)
-    (assert (a not-sparse).
     (assert "1 2 * 3 * * 6" (a join).
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert "1 2 * 3 * * 6 * * * 10" (a join).
 
     (a 15 15)
-    (assert (a not-sparse).
     (assert "1 2 * 3 * * 6 * * * 10 ... 15" (a join).
 
     (a 100 100)
     (let called 0).
-    (assert (a is-sparse).
     (assert "1 2 * 3 * * 6 * * * 10 ... 15 ... 100" (a join).
   ).
   (should "(an-array join separator) returns a string of all stringified (string of ..) element values." (= ()
@@ -5085,24 +4789,19 @@ f
     (assert "1, 2" (a join ", ").
 
     (a 3 3)
-    (assert (a not-sparse).
     (assert "1, 2, *, 3" (a join ", ").
 
     (a 6 6)
-    (assert (a not-sparse).
     (assert "1, 2, *, 3, *, *, 6" (a join ", ").
 
     (a 10 10)
-    (assert (a not-sparse).
     (assert "1, 2, *, 3, *, *, 6, *, *, *, 10" (a join ", ").
 
     (a 15 15)
-    (assert (a not-sparse).
     (assert "1, 2, *, 3, *, *, 6, *, *, *, 10, ..., 15" (a join ", ").
 
     (a 100 100)
     (let called 0).
-    (assert (a is-sparse).
     (assert "1, 2, *, 3, *, *, 6, *, *, *, 10, ..., 15, ..., 100" (a join ", ").
   ).
 ).
@@ -5129,7 +4828,6 @@ f
 
     (let arr (code).
     (assert (arr is-an array).
-    (assert (arr not-sparse).
     (assert 11 (arr length).
     (assert 3 (arr count).
     (assert 1 (arr 0).
@@ -5146,7 +4844,6 @@ f
 
     (let arr (code).
     (assert (arr is-an array).
-    (assert (arr is-sparse).
     (assert 101 (arr length).
     (assert 3 (arr count).
     (assert 1 (arr 0).

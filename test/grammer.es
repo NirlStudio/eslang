@@ -478,9 +478,6 @@ finally((prom finally) finally)
 # meta.function-array-type-espresso
 ((array from) from)
 # meta.function-array-espresso
-is-sparse((a is-sparse) is-sparse)
-not-sparse((a not-sparse) not-sparse)
-as-sparse((a as-sparse) as-sparse)
 trace((a trace) trace)
 retrace((a retrace) retrace)
 append((t append) append)

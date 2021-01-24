@@ -37,7 +37,6 @@ module.exports = function arrayIn ($void) {
   var isApplicable = $void.isApplicable
   var protoValueOf = $void.protoValueOf
   var EncodingContext$ = $void.EncodingContext
-  var defineProperty = $void.defineProperty
 
   // create an empty array.
   link(Type, 'empty', function () {
@@ -57,16 +56,12 @@ module.exports = function arrayIn ($void) {
 
   // create an array with items from iterable arguments, or the argument itself
   // if its value is not iterable.
-  var ShortArray = 16
   var arrayFrom = link(Type, 'from', function () {
     var list = []
-    var isSparse
     for (var i = 0; i < arguments.length; i++) {
       var source = arguments[i]
       if (Array.isArray(source)) {
-        source <= ShortArray ? list.push.apply(list, source)
-          : (list = list.concat(source))
-        isSparse = isSparse || source.isSparse
+        list = list.concat(source)
       } else {
         var next = iterateOf(source)
         if (!next) {
@@ -80,7 +75,6 @@ module.exports = function arrayIn ($void) {
         }
       }
     }
-    isSparse && asSparse.call(list)
     return list
   }, true)
 
@@ -88,20 +82,6 @@ module.exports = function arrayIn ($void) {
   // return the length of this array.
   link(proto, 'length', function () {
     return this.length
-  })
-  // check whether this array is a sparse one.
-  link(proto, 'is-sparse', function () {
-    return this.isSparse || false
-  })
-  link(proto, 'not-sparse', function () {
-    return !this.isSparse
-  })
-  // mark this array as a sparse or common array.
-  var asSparse = link(proto, 'as-sparse', function (flag) {
-    defineProperty(this, 'isSparse',
-      typeof flag === 'undefined' || boolValueOf(flag)
-    )
-    return this
   })
   // return the amount of elements.
   link(proto, ['count', 'for-each'], function (filter) {
@@ -194,18 +174,15 @@ module.exports = function arrayIn ($void) {
     if (count < 0) {
       count = 0
     }
-    var list = this.slice(begin, begin + count)
-    return this.isSparse ? asSparse.call(list) : list
+    return this.slice(begin, begin + count)
   })
   link(proto, 'slice', function (begin, end) {
-    var list = this.slice(beginOf(this.length, begin), endOf(this.length, end))
-    return this.isSparse ? asSparse.call(list) : list
+    return this.slice(beginOf(this.length, begin), endOf(this.length, end))
   })
 
   // create a new array with items in this array and argument values.
   link(proto, 'concat', function () {
-    var list = this.concat(Array.prototype.slice.call(arguments))
-    return this.isSparse ? asSparse.call(list) : list
+    return this.concat(Array.prototype.slice.call(arguments))
   })
 
   // append more items to the end of this array
@@ -217,14 +194,12 @@ module.exports = function arrayIn ($void) {
       this.push.apply(this, src)
       isSparse = isSparse || src.isSparse
     }
-    return isSparse && !this.isSparse ? asSparse.call(this) : this
+    return this
   })
 
   // create a new array with items in this array and argument arrays.
   link(proto, ['merge', '+'], function () {
-    var copy = this.slice()
-    this.isSparse && asSparse.call(copy)
-    return appendFrom.apply(copy, arguments)
+    return appendFrom.apply(this.slice(), arguments)
   })
 
   // getter by index
@@ -234,9 +209,7 @@ module.exports = function arrayIn ($void) {
   })
   // setter by index
   var setter = link(proto, 'set', function (index, value) {
-    index = offsetOf(this.length, index);
-    ((index > 16) && (index + 1) >= (this.length / 2 * 3)) &&
-      !this.isSparse && asSparse.call(this, true)
+    index = offsetOf(this.length, index)
     return index < 0 ? null
       : (this[index] = typeof value === 'undefined' ? null : value)
   })
@@ -271,10 +244,10 @@ module.exports = function arrayIn ($void) {
   link(proto, 'remove', function (value) {
     var argc = arguments.length
     if (argc < 1) {
-      return this.isSparse ? asSparse.call(this.slice()) : this.slice()
+      return this.slice()
     }
     var args = Array.prototype.slice.call(arguments)
-    var result = this.isSparse ? asSparse.call([]) : []
+    var result = []
     var removed = 0
     trace.call(this, function (v, i) {
       var keep = true
@@ -540,14 +513,12 @@ module.exports = function arrayIn ($void) {
     }, this)
   })
   link(proto, 'map', function (converter) {
-    var result = isApplicable(converter)
+    return isApplicable(converter)
       ? this.map(function (v, i) {
         if (typeof v !== 'undefined') {
           return converter.call(this, v, i)
         }
       }, this) : this.slice()
-    this.isSparse && asSparse.call(result)
-    return result
   })
   link(proto, 'reduce', function (value, reducer) {
     if (!isApplicable(reducer)) {

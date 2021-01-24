@@ -98,6 +98,9 @@ module.exports = function testIn ($void) {
 
     ;(typeof Promise === 'undefined' ? failed : passed)('Promise')
 
+    ;(typeof Map === 'undefined' ? failed : passed)('Map')
+    ;(typeof Set === 'undefined' ? failed : passed)('Set')
+
     ;(typeof Math.trunc === 'undefined' ? failed : passed)('Math.trunc')
     ;(typeof Math.log2 === 'undefined' ? failed : passed)('Math.log2')
     ;(typeof Math.log10 === 'undefined' ? failed : passed)('Math.log10')
