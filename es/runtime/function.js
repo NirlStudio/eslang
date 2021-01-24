@@ -233,9 +233,7 @@ module.exports = function function_ ($void) {
       return true
     } catch (err) {
       // fortunately, this should only happen in IE, ...
-      if (err.number !== -2146823209) { // but if not, display its details.
-        warn('runtime/function', 'function\'s length is not writable.', err)
-      }
+      warn('runtime/function', 'function\'s length is not writable.', err)
       return false
     }
   }

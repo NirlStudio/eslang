@@ -65,9 +65,51 @@ module.exports = function testIn ($void) {
   }
 
   function checkJavascript () {
-    passed('JS is using the space of ' + (global ? 'global.' : 'window.'));
-    (typeof Promise === 'undefined' ? failed : passed)('Promise');
-    (typeof Object.defineProperty !== 'function' ? failed : passed)('Object.defineProperty')
+    passed('JS is using the space of ' + (global ? 'global.' : 'window.'))
+
+    ;(typeof Array.isArray === 'undefined' ? failed : passed)('Array.isArray')
+    ;(typeof Array.prototype.filter === 'undefined' ? failed : passed)('Array.prototype.filter')
+    ;(typeof Array.prototype.forEach === 'undefined' ? failed : passed)('Array.prototype.forEach')
+    ;(typeof Array.prototype.map === 'undefined' ? failed : passed)('Array.prototype.map')
+    ;(typeof Array.prototype.reduce === 'undefined' ? failed : passed)('Array.prototype.reduce')
+    ;(typeof Array.prototype.reduceRight === 'undefined' ? failed : passed)('Array.prototype.reduceRight')
+
+    ;(typeof Date.now === 'undefined' ? failed : passed)('Date.now')
+
+    ;(typeof Number.isInteger === 'undefined' ? failed : passed)('Number.isInteger')
+    ;(typeof Number.isSafeInteger === 'undefined' ? failed : passed)('Number.isSafeInteger')
+    ;(typeof Number.MAX_SAFE_INTEGER === 'undefined' ? failed : passed)('Number.MAX_SAFE_INTEGER')
+    ;(typeof Number.MIN_SAFE_INTEGER === 'undefined' ? failed : passed)('Number.MIN_SAFE_INTEGER')
+
+    ;(typeof Object.assign !== 'function' ? failed : passed)('Object.assign')
+    ;(typeof Object.create !== 'function' ? failed : passed)('Object.create')
+    ;(typeof Object.defineProperties !== 'function' ? failed : passed)('Object.defineProperties')
+    ;(typeof Object.defineProperty !== 'function' ? failed : passed)('Object.defineProperty')
+    ;(typeof Object.freeze !== 'function' ? failed : passed)('Object.freeze')
+    ;(typeof Object.getOwnPropertyNames !== 'function' ? failed : passed)('Object.getOwnPropertyNames')
+    ;(typeof Object.is !== 'function' ? failed : passed)('Object.is')
+    ;(typeof Object.isFrozen !== 'function' ? failed : passed)('Object.isFrozen')
+
+    ;(typeof String.prototype.endsWith === 'undefined' ? failed : passed)('String.prototype.endsWith')
+    ;(typeof String.prototype.startsWith === 'undefined' ? failed : passed)('String.prototype.startsWith')
+    ;(typeof String.prototype.trim === 'undefined' ? failed : passed)('String.prototype.trim')
+    ;(typeof String.prototype.trimLeft === 'undefined' ? failed : passed)('String.prototype.trimLeft')
+    ;(typeof String.prototype.trimRight === 'undefined' ? failed : passed)('String.prototype.trimRight')
+
+    ;(typeof Promise === 'undefined' ? failed : passed)('Promise')
+
+    ;(typeof Math.trunc === 'undefined' ? failed : passed)('Math.trunc')
+    ;(typeof Math.log2 === 'undefined' ? failed : passed)('Math.log2')
+    ;(typeof Math.log10 === 'undefined' ? failed : passed)('Math.log10')
+
+    ;(typeof console !== 'object' ? failed : passed)('console')
+    if (typeof console === 'object') {
+      ;(typeof console.debug === 'undefined' ? failed : passed)('console.debug')
+      ;(typeof console.error === 'undefined' ? failed : passed)('console.error')
+      ;(typeof console.info === 'undefined' ? failed : passed)('console.info')
+      ;(typeof console.log === 'undefined' ? failed : passed)('console.log')
+      ;(typeof console.warn === 'undefined' ? failed : passed)('console.warn')
+    }
   }
 
   function checkRuntime () {
@@ -436,7 +478,7 @@ module.exports = function testIn ($void) {
     }, '(@:class x: 1 y: 0)')
     eval_(function (c) {
       return c.type === $.class
-    }, '(class of (@: x: 1 y: 0).')
+    }, '(class of (@ x: 1 y: 0).')
   }
 
   function checkAssignment () {

@@ -255,12 +255,12 @@ module.exports = function () {
   // type is not enumerable.
   $void.defineProperty = defineProperty
   function defineProperty (obj, name, value) {
-    Object.defineProperty ? Object.defineProperty(obj, name, {
+    Object.defineProperty(obj, name, {
       enumerable: false,
       configurable: false,
       writable: true,
       value: value
-    }) : (obj[name] = value)
+    })
     return value
   }
 
@@ -270,12 +270,12 @@ module.exports = function () {
 
   $void.defineConst = defineConst
   function defineConst (ctx, key, value) {
-    Object.defineProperty ? Object.defineProperty(ctx, key, {
+    Object.defineProperty(ctx, key, {
       enumerable: false,
       configurable: false,
       writable: false,
       value: value
-    }) : (ctx[key] = value)
+    })
     return value
   }
 

@@ -14,10 +14,6 @@ function endOf (length, to) {
   return typeof to === 'undefined' ? length : beginOf(length, to)
 }
 
-function isSimple (arr) {
-  return arr.length <= 16 || !arr.isSparse
-}
-
 function checkSpacing (s, i, last) {
   switch (i - last) {
     case 1: return
@@ -108,25 +104,7 @@ module.exports = function arrayIn ($void) {
     return this
   })
   // return the amount of elements.
-  var count = function (filter) {
-    var i = 0
-    var counter = 0
-    if (isApplicable(filter)) {
-      for (; i < this.length; i++) {
-        typeof this[i] !== 'undefined' &&
-          boolValueOf(filter.call(this, this[i], i)) && counter++
-      }
-    } else {
-      for (; i < this.length; i++) {
-        typeof this[i] !== 'undefined' && counter++
-      }
-    }
-    return counter
-  }
-  link(proto, ['count', 'for-each'], Array.prototype.forEach ? function (filter) {
-    if (isSimple(this)) {
-      return count.call(this, filter)
-    }
+  link(proto, ['count', 'for-each'], function (filter) {
     var counter = 0
     if (isApplicable(filter)) {
       this.forEach(function (v, i) {
@@ -139,7 +117,7 @@ module.exports = function arrayIn ($void) {
       })
     }
     return counter
-  } : count)
+  })
 
   // Mutability
   link(proto, 'seal', function () {
@@ -151,21 +129,7 @@ module.exports = function arrayIn ($void) {
 
   var stopSignal = new Error('tracing.stopped')
   // call a handler for each element until it returns a truthy value.
-  var each = function (tracer) {
-    var value
-    if (isApplicable(tracer)) {
-      for (var i = 0; i < this.length; i++) {
-        value = this[i]
-        if (typeof value !== 'undefined' &&
-          boolValueOf(tracer.call(this, value, i))) break
-      }
-    }
-    return this
-  }
-  var trace = link(proto, 'trace', Array.prototype.forEach ? function (tracer) {
-    if (isSimple(this)) {
-      return each.call(this, tracer)
-    }
+  var trace = link(proto, 'trace', function (tracer) {
     if (isApplicable(tracer)) {
       try {
         this.forEach(function (v, i, s) {
@@ -178,24 +142,10 @@ module.exports = function arrayIn ($void) {
       }
     }
     return this
-  } : each)
+  })
 
   // like trace, but to traverse all element from the end.
-  var eachRight = function (tracer) {
-    var value
-    if (isApplicable(tracer)) {
-      for (var i = this.length - 1; i >= 0; i--) {
-        value = this[i]
-        if (typeof value !== 'undefined' &&
-          boolValueOf(tracer.call(this, value, i))) break
-      }
-    }
-    return this
-  }
-  var retrace = link(proto, 'retrace', Array.prototype.reduceRight ? function (tracer) {
-    if (isSimple(this)) {
-      return eachRight.call(this, tracer)
-    }
+  var retrace = link(proto, 'retrace', function (tracer) {
     if (isApplicable(tracer)) {
       try {
         this.reduceRight(function (_, v, i, s) {
@@ -208,28 +158,12 @@ module.exports = function arrayIn ($void) {
       }
     }
     return this
-  } : eachRight)
+  })
 
   // generate an iterator function to traverse all array items.
-  var iterate = function (list, begin, end) {
-    var current
-    return function (inSitu) {
-      if (typeof current !== 'undefined' &&
-        typeof inSitu !== 'undefined' && boolValueOf(inSitu)) {
-        return current
-      }
-      while (begin < end && typeof list[begin] === 'undefined') {
-        begin++
-      }
-      return begin >= end ? null : (current = [list[begin], begin++])
-    }
-  }
   link(proto, 'iterate', function (begin, end) {
     begin = beginOf(this.length, begin)
     end = endOf(this.length, end)
-    if (isSimple(this)) {
-      return iterate(this, begin, end)
-    }
     var list = this
     var indices = []
     trace.call(this, function (_, i) {
@@ -317,31 +251,11 @@ module.exports = function arrayIn ($void) {
   })
 
   // remove all entries or some values from this array.
-  var clear = function (value) {
-    var argc = arguments.length
-    if (argc < 1) {
-      this.splice(0)
-    } else {
-      for (var i = this.length - 1; i >= 0; i--) {
-        for (var j = 0; j < argc; j++) {
-          value = this[i]
-          if (typeof value !== 'undefined' &&
-            thisCall(this[i], 'equals', arguments[j])) {
-            this.splice(i, 1); break
-          }
-        }
-      }
-    }
-    return this
-  }
   link(proto, 'clear', function (value) {
     var argc = arguments.length
     if (argc < 1) {
       this.splice(0)
       return this
-    }
-    if (isSimple(this)) {
-      return clear.apply(this, arguments)
     }
     var args = Array.prototype.slice.call(arguments)
     retrace.call(this, function (v, i) {
@@ -354,31 +268,10 @@ module.exports = function arrayIn ($void) {
     return this
   })
   // remove one or more values to create a new array.
-  var remove = function (value) {
-    var argc = arguments.length
-    var result = this.isSparse ? asSparse.call([]) : []
-    for (var i = 0, offset = 0; i < this.length; i++) {
-      value = this[i]
-      if (typeof value === 'undefined') {
-        offset++; continue
-      }
-      var keep = true
-      for (var j = 0; j < argc; j++) {
-        if (thisCall(value, 'equals', arguments[j])) {
-          keep = false; break
-        }
-      }
-      keep && (result[offset++] = value)
-    }
-    return result
-  }
   link(proto, 'remove', function (value) {
     var argc = arguments.length
     if (argc < 1) {
       return this.isSparse ? asSparse.call(this.slice()) : this.slice()
-    }
-    if (isSimple(this)) {
-      return remove.apply(this, arguments)
     }
     var args = Array.prototype.slice.call(arguments)
     var result = this.isSparse ? asSparse.call([]) : []
@@ -396,33 +289,9 @@ module.exports = function arrayIn ($void) {
   })
 
   // replace all occurrences of a value to another value or reset them.
-  var replace = function (value, newValue) {
-    var i, current
-    if (typeof newValue === 'undefined') {
-      for (i = this.length - 1; i >= 0; i--) {
-        current = this[i]
-        if (typeof current !== 'undefined' &&
-          thisCall(current, 'equals', value)) {
-          delete this[i]
-        }
-      }
-    } else {
-      for (i = 0; i < this.length; i++) {
-        current = this[i]
-        if (typeof current !== 'undefined' &&
-          thisCall(current, 'equals', value)) {
-          this[i] = newValue
-        }
-      }
-    }
-    return this
-  }
   link(proto, 'replace', function (value, newValue) {
     if (typeof value === 'undefined') {
       return this
-    }
-    if (isSimple(this)) {
-      return replace.call(this, value, newValue)
     }
     typeof newValue === 'undefined' ? retrace.call(this, function (v, i) {
       thisCall(v, 'equals', value) && delete this[i]
@@ -444,23 +313,9 @@ module.exports = function arrayIn ($void) {
     return found
   })
   // check the existence of a value
-  var contains = function (value) {
-    var current
-    for (var i = 0; i < this.length; i++) {
-      current = this[i]
-      if (typeof current !== 'undefined' &&
-        thisCall(current, 'equals', value)) {
-        return true
-      }
-    }
-    return false
-  }
   link(proto, 'contains', function (value) {
     if (typeof value === 'undefined') {
       return false
-    }
-    if (isSimple(this)) {
-      return contains.call(this, value)
     }
     var found = false
     trace.call(this, function (v, i) {
@@ -516,23 +371,9 @@ module.exports = function arrayIn ($void) {
     return result
   })
   // find the index of first occurrence of a value.
-  var firstOf = function (value) {
-    for (var i = 0; i < this.length; i++) {
-      var v = this[i]
-      if (typeof v !== 'undefined' && (
-        v === value || thisCall(v, 'equals', value)
-      )) {
-        return i
-      }
-    }
-    return null
-  }
   var indexOf = link(proto, 'first-of', function (value) {
     if (typeof value === 'undefined') {
       return null
-    }
-    if (isSimple(this)) {
-      return firstOf.call(this, value)
     }
     var found = null
     trace.call(this, function (v, i) {
@@ -573,23 +414,9 @@ module.exports = function arrayIn ($void) {
     return result
   })
   // find the index of the last occurrence of a value.
-  var lastOf = function (value) {
-    for (var i = this.length - 1; i >= 0; i--) {
-      var v = this[i]
-      if (typeof v !== 'undefined' && (
-        v === value || thisCall(v, 'equals', value)
-      )) {
-        return i
-      }
-    }
-    return null
-  }
   link(proto, 'last-of', function (value) {
     if (typeof value === 'undefined') {
       return null
-    }
-    if (isSimple(this)) {
-      return lastOf.call(this, value)
     }
     var found = null
     retrace.call(this, function (v, i) {
@@ -705,24 +532,14 @@ module.exports = function arrayIn ($void) {
     }
     return result
   })
-  link(proto, 'select', Array.prototype.filter ? function (filter) {
+  link(proto, 'select', function (filter) {
     return isApplicable(filter) ? this.filter(function (v, i) {
       return typeof v !== 'undefined' && boolValueOf(filter.call(this, v, i))
     }, this) : this.filter(function (v) {
       return typeof v !== 'undefined' // pick all valid indices.
     }, this)
-  } : function (filter) {
-    var result = []
-    if (isApplicable(filter)) {
-      trace.call(this, function (v, i) {
-        boolValueOf(filter.call(this, v, i)) && result.push(v)
-      })
-    } else { // pick all valid indices.
-      trace.call(this, function (v) { result.push(v) })
-    }
-    return result
   })
-  link(proto, 'map', Array.prototype.map ? function (converter) {
+  link(proto, 'map', function (converter) {
     var result = isApplicable(converter)
       ? this.map(function (v, i) {
         if (typeof v !== 'undefined') {
@@ -731,18 +548,8 @@ module.exports = function arrayIn ($void) {
       }, this) : this.slice()
     this.isSparse && asSparse.call(result)
     return result
-  } : function (converter) {
-    var result = this.slice()
-    this.isSparse && asSparse.call(result)
-    if (isApplicable(converter)) {
-      trace.call(this, function (v, i) {
-        var value = converter.call(this, v, i)
-        result[i] = typeof value === 'undefined' ? null : value
-      })
-    }
-    return result
   })
-  link(proto, 'reduce', Array.prototype.reduce ? function (value, reducer) {
+  link(proto, 'reduce', function (value, reducer) {
     if (!isApplicable(reducer)) {
       if (!isApplicable(value)) {
         return value
@@ -753,21 +560,9 @@ module.exports = function arrayIn ($void) {
     return this.reduce(function (s, v, i, t) {
       return typeof v !== 'undefined' ? reducer.call(t, s, v, i) : s
     }, value)
-  } : function (value, reducer) {
-    if (!isApplicable(reducer)) {
-      if (!isApplicable(value)) {
-        return value
-      }
-      reducer = value
-      value = null
-    }
-    trace.call(this, function (v, i) {
-      value = reducer.call(this, value, v, i)
-    })
-    return value
   })
 
-  link(proto, 'join', Array.prototype.reduce ? function (separator) {
+  link(proto, 'join', function (separator) {
     var last = -1
     var strings = this.reduce(function (s, v, i, t) {
       if (typeof v !== 'undefined') {
@@ -779,16 +574,6 @@ module.exports = function arrayIn ($void) {
     }, [])
     checkSpacing(strings, this.length, last)
     return strings.join(typeof separator === 'string' ? separator : ' ')
-  } : function (separator) {
-    var last = -1
-    var s = []
-    trace.call(this, function (v, i) {
-      checkSpacing(s, i, last)
-      s.push(typeof v === 'string' ? v : thisCall(v, 'to-string'))
-      last = i
-    })
-    checkSpacing(s, this.length, last)
-    return s.join(typeof separator === 'string' ? separator : ' ')
   })
 
   // determine emptiness by array's length
