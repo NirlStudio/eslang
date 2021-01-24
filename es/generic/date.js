@@ -204,7 +204,8 @@ module.exports = function dateIn ($void) {
         : ts === 0 ? '(date empty)'
           : '(date of ' + numberToString.call(this.getTime()) + ')'
     }
-    switch (format) {
+    switch (format.toLocaleLowerCase()) {
+      case 'gmt':
       case 'utc':
         return this.toUTCString()
       case 'date':

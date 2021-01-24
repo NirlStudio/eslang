@@ -744,14 +744,24 @@
 (define "(a-date to-string format)" (= ()
   (should "(a-date to-string \"utc\") returns a readable string representing the date's UTC date+time." (= ()
     (assert (((date of 0) to-string "utc") is-a string).
+    (assert (((date of 0) to-string "Utc") is-a string).
+    (assert (((date of 0) to-string "UTC") is-a string).
+  ).
+  (should "(a-date to-string \"gmt\") returns the same result of (a-date to-string \"utc\")." (= ()
+    (assert (((date of 0) to-string "gmt") is ((date of 0) to-string "utc").
+    (assert (((date of 0) to-string "Gmt") is ((date of 0) to-string "utc").
+    (assert (((date of 0) to-string "GMT") is ((date of 0) to-string "utc").
   ).
   (should "(a-date to-string \"date\") returns a readable string representing the date in current time zone." (= ()
     (assert (((date of 0) to-string "date") is-a string).
+    (assert (((date of 0) to-string "Date") is-a string).
   ).
   (should "(a-date to-string \"time\") returns a readable string representing the time in current time zone." (= ()
     (assert (((date of 0) to-string "time") is-a string).
+    (assert (((date of 0) to-string "Time") is-a string).
   ).
   (should "(a-date to-string any-other-value) returns a representing a readable date+time string." (= ()
     (assert (((date of 0) to-string "all") is-a string).
+    (assert (((date of 0) to-string "All") is-a string).
   ).
 ).
