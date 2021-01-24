@@ -2,11 +2,12 @@
 
 module.exports = function import_ ($void) {
   var $ = $void.$
+  var $Symbol = $.symbol
   var $Object = $.object
   var compile = $.compile
+  var warn = $void.$warn
   var Tuple$ = $void.Tuple
   var Symbol$ = $void.Symbol
-  var warn = $void.$warn
   var execute = $void.execute
   var evaluate = $void.evaluate
   var isObject = $void.isObject
@@ -14,8 +15,23 @@ module.exports = function import_ ($void) {
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
+  var symbolAll = $Symbol.all
   var symbolFrom = sharedSymbolOf('from')
   var symbolImport = sharedSymbolOf('import')
+
+  // late binding: transient wrappers
+  var nativeResolve = function $nativeResolve () {
+    nativeResolve = $void.module.native.resolve.bind($void.module.native)
+    return nativeResolve.apply(null, arguments)
+  }
+  var nativeLoad = function $nativeLoad () {
+    nativeLoad = $void.module.native.load.bind($void.module.native)
+    return nativeLoad.apply(null, arguments)
+  }
+  var dirname = function $dirname () {
+    dirname = $void.$path.dirname.bind($void.$path)
+    return dirname.apply(null, arguments)
+  }
 
   // import a module.
   //   (import module), or
@@ -30,36 +46,41 @@ module.exports = function import_ ($void) {
     if (clist.length < 2) {
       return null
     }
-    var imported
+    var module_
     if (clist.length < 3 || clist[2] !== symbolFrom) {
       // look into current space to have the base uri.
-      imported = importModule(space, evaluate(clist[1], space))
+      module_ = importModule(space, evaluate(clist[1], space))
       // clone to protect inner exporting object.
-      return imported && referModule(imported)
+      return module_ && referModule(module_)
     }
     // (import field-or-fields from target)
     var target = evaluate(clist[3], space)
+    var imported
     if (isObject(target)) {
+      module_ = null
       imported = target // expanding object fields.
-    } else if (typeof target !== 'string') {
+    } else if (typeof target === 'string') {
+      module_ = importModule(space, target)
+      imported = module_ && module_.exporting
+      if (!imported) {
+        return null // importing failed.
+      }
+    } else {
       typeof target === 'undefined' || target === null
         ? warn('import', 'missing target object or path.')
         : warn('import', 'invalid target object or path:', target)
       return null
-    } else {
-      imported = importModule(space, target)
-      if (!imported) {
-        return null // importing failed.
-      }
     }
 
     // find out fields
     var fields = clist[1]
     if (fields instanceof Symbol$) {
-      return imported[fields.key] // import only a single field.
+      return fields !== symbolAll ? imported[fields.key]
+        : module_ ? referModule(module_) : imported
     }
     if (!(fields instanceof Tuple$)) {
-      return null // invalid field descriptor
+      warn('import', 'invalid field descriptor.', fields)
+      return null
     }
 
     var i
@@ -79,13 +100,20 @@ module.exports = function import_ ($void) {
     return values
   })
 
-  function referModule (imported) {
-    var ref = Object.create(imported)
-    for (var key in imported) {
+  function referModule (module_) {
+    var exporting = module_.exporting
+    if (module_.isNative) {
+      // not try to wrap a native module which is supposed to protect itself if
+      // it intends so.
+      return exporting
+    }
+
+    var ref = Object.create(exporting)
+    for (var key in exporting) {
       // inner fields will not be copied by statement like:
       //   (var * (import "module"))
       if (!key.startsWith('-')) {
-        ref[key] = imported[key]
+        ref[key] = exporting[key]
       }
     }
     return ref
@@ -96,23 +124,27 @@ module.exports = function import_ ($void) {
       warn('import', 'invalid module identifer:', target)
       return null
     }
-    var userHome = $void.$env('user-home')
     var srcModuleUri = space.local['-module']
     var srcModuleDir = space.local['-module-dir']
-    var appHome = space.local['-app-home']
-    var appDir = space.local['-app-dir']
 
     var isNative = target.startsWith('$')
+    var appModules = space.app.modules
     var uri = isNative
-      ? $void.module.native.resolve(target, srcModuleDir, appHome, appDir, userHome)
-      : space.app.modules.resolve(target, srcModuleDir)
+      ? nativeResolve(target, srcModuleDir,
+        space.local['-app-home'],
+        space.local['-app-dir'],
+        $void.$env('user-home')
+      )
+      : appModules.resolve(target, srcModuleDir)
     if (!uri) {
+      // any warning should be recorded in resolving process.
       return null
     }
+
     // look up it in cache.
-    var module_ = space.app.modules.lookupInCache(uri, srcModuleUri)
+    var module_ = appModules.lookupInCache(uri, srcModuleUri)
     if (module_.status) {
-      return module_.exporting
+      return module_
     }
 
     module_.status = 100 // indicate loading
@@ -123,13 +155,14 @@ module.exports = function import_ ($void) {
     if (!module_.exporting) {
       module_.exporting = Object.create($Object.proto)
     }
-    return Object.assign(module_.exporting, module_.props)
+    Object.assign(module_.exporting, module_.props)
+    return module_
   }
 
   function loadModule (space, uri, module_, target, moduleUri) {
     try {
-      // -module-dir is only meaningful for an Espresso module.
-      module_.props['-module-dir'] = $void.$path.dirname(uri)
+      module_.props['-module'] = uri
+      module_.props['-module-dir'] = dirname(uri)
       // try to load file
       var doc = $void.loader.load(uri)
       var text = doc[0]
@@ -164,10 +197,11 @@ module.exports = function import_ ($void) {
   function loadNativeModule (space, uri, module_, target, moduleUri) {
     try {
       // the native module must export a loader function.
-      var exporting = $void.module.native.load(uri)
+      module_.isNative = true
+      module_.props['-module'] = uri
+      var exporting = nativeLoad(uri)
       module_.status = 200
-      return typeof exporting !== 'function' && typeof exporting !== 'object'
-        ? exporting
+      return typeof exporting !== 'function' ? exporting
         : safelyAssign(Object.create(null), exporting)
     } catch (err) {
       module_.status = 503 // service unavailable

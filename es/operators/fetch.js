@@ -31,10 +31,8 @@ module.exports = function load ($void) {
       warn('fetch', 'invalid without an app context.')
       return null
     }
-    var loader = $void.loader
-    var fetching = fetch.bind(null, loader,
-      space.local['-module-dir'] || space.local['-app-dir']
-    )
+
+    var fetching = fetch.bind(null, $void.loader, space.local['-module-dir'])
     var tasks = []
     for (var i = 1, len = clist.length; i < len; i++) {
       tasks.push(fetching(evaluate(clist[i], space)))

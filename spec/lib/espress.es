@@ -99,8 +99,9 @@
     var printer (espress print);
     assert (printer is-an object);
 
-    assert (printer "call":: is-a function);
     assert (printer "new":: is-a function);
+    assert (printer "bind":: is-a function);
+    assert (printer "call":: is-a function);
   ).
   (should "(espress a-generic-func) provide a set- function." (= ()
     var printer (espress print);

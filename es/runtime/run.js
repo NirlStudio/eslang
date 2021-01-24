@@ -10,6 +10,16 @@ module.exports = function run ($void) {
   var completeFile = $void.completeFile
   var atomicArrayOf = $void.atomicArrayOf
 
+  // late binding: transient wrappers
+  var isAbsolutePath = function $isAbsolutePath () {
+    isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    return isAbsolutePath.apply(null, arguments)
+  }
+  var resolvePath = function $resolvePath () {
+    resolvePath = $void.$path.resolve.bind($void.$path)
+    return resolvePath.apply(null, arguments)
+  }
+
   // run a module from source as an application.
   $export($void, '$run', function (appUri, args, appHome) {
     if (typeof appUri !== 'string') {
@@ -26,16 +36,14 @@ module.exports = function run ($void) {
 
     // try to resolve the uri for source
     appUri = completeFile(appUri)
-    var path = $void.$path
-    var uri = path.isAbsolute(appUri) ? appUri : path.resolve(appHome, appUri)
+    var uri = isAbsolutePath(appUri) ? appUri : resolvePath(appHome, appUri)
     if (typeof uri !== 'string') {
       warn('run', 'failed to resolve app at', uri)
       return null
     }
 
     // try to load file
-    var loader = $void.loader
-    var doc = loader.load(uri)
+    var doc = $void.loader.load(uri)
     var text = doc[0]
     if (!text) {
       warn('run', 'failed to read source', appUri, 'for', doc[1])

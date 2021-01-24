@@ -77,7 +77,7 @@ module.exports = function voidSetup ($void) {
   $void.newInstance = newInstance
 
   // safe copy all members from a generic object or function source to a target
-  // object. To generate "call" and "new" operations for a function source.
+  // object. To generate "bind", "call" and "new" operations for a function.
   var safelyAssign = function (target, source, ownedOnly) {
     for (var key in source) {
       if (!ownedOnly || ownsProperty(source, key)) {
@@ -87,11 +87,9 @@ module.exports = function voidSetup ($void) {
       }
     }
     if (typeof source === 'function') {
-      // If the source have a 'new' function or overriding 'call', it will be
-      // just overridden by the generated function.
-      // This behavior can be changed if it's really worthy in future.
-      target.call = safelyBind(source, null)
-      target.new = newInstance.bind(null, source)
+      !target.new && (target.new = newInstance.bind(null, source))
+      !target.bind && (target.bind = safelyBind(Function.prototype.bind, source))
+      !target.call && (target.call = safelyBind(Function.prototype.call, source))
     }
     return target
   }

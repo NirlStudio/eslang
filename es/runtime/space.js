@@ -9,6 +9,20 @@ module.exports = function space ($void) {
   var defineConst = $void.defineConst
   var ownsProperty = $void.ownsProperty
 
+  // late binding: transient wrappers
+  var moduleCreate = function $moduleCreate () {
+    moduleCreate = $void.module.create.bind($void.module)
+    return moduleCreate.apply(null, arguments)
+  }
+  var dirname = function $dirname () {
+    dirname = $void.$path.dirname.bind($void.$path)
+    return dirname.apply(null, arguments)
+  }
+  var isAbsolutePath = function $isAbsolutePath () {
+    isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    return isAbsolutePath.apply(null, arguments)
+  }
+
   // shared empty array
   var EmptyArray = Object.freeze([])
 
@@ -148,7 +162,7 @@ module.exports = function space ($void) {
   $void.createAppSpace = function (uri, home) {
     var app = Object.create($)
     app['-app'] = uri
-    app['-app-dir'] = $void.$path.dirname(uri)
+    app['-app-dir'] = dirname(uri)
     app['-app-home'] = home || app['-app-dir']
     app.env = $void.$env
     app.run = $void.$run
@@ -164,7 +178,7 @@ module.exports = function space ($void) {
 
     var exporting = Object.create(null)
     var space = new Space$(local, null, null, exporting)
-    app.modules = $void.module.create(space)
+    app.modules = moduleCreate(space)
     space.app = app
     space.export = function (key, value) {
       if (typeof exporting[key] === 'undefined') {
@@ -187,8 +201,7 @@ module.exports = function space ($void) {
     var app = appSpace && appSpace.app
     var local = Object.create(app || $)
     local['-module'] = uri || ''
-    local['-module-dir'] = uri && $void.$path.isAbsolute(uri)
-      ? $void.$path.dirname(uri) : ''
+    local['-module-dir'] = uri && (isAbsolutePath(uri) ? dirname(uri) : '')
     var export_ = Object.create($Object.proto)
     var space = new Space$(local, null, null, export_)
     if (app) {
@@ -207,7 +220,7 @@ module.exports = function space ($void) {
     }
     if (module_) {
       space.local['-module'] = module_ || ''
-      space.local['-module-dir'] = module_ ? $void.$path.dirname(module_) : ''
+      space.local['-module-dir'] = module_ ? dirname(module_) : ''
     }
     return space
   }

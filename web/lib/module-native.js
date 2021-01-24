@@ -34,7 +34,16 @@ module.exports = function module$native ($void, packer) {
 
   native.load = function load (resolvedUri) {
     var request = resolvedUri.substring(1)
-    return runtimeModules.load(request) || (packer && packer.load(request))
+    var mod = runtimeModules.load(request)
+    if (mod) {
+      return mod
+    }
+    if (packer) {
+      return packer.load(request)
+    }
+    var err = new Error('[No Packer] Cannot find module ' + request)
+    err.code = 'MODULE_NOT_FOUND'
+    throw err
   }
 
   return native
