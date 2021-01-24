@@ -21,6 +21,12 @@ module.exports = function literal ($void) {
   var symbolObject = $Symbol.of('object')
   var symbolClass = $Symbol.of('class')
 
+  // late binding
+  var $warn = function warn () {
+    $warn = $void.$warn
+    return $warn.apply($void, arguments)
+  }
+
   // (@ value ...)
   function arrayCreate (space, clist, offset) {
     var result = []
@@ -72,6 +78,14 @@ module.exports = function literal ($void) {
     return obj
   }
 
+  function tryToCreateInstance (space, clist, type, offset) {
+    if (!(type instanceof ClassType$)) {
+      $warn('@-literal', 'invalid literal type', [typeof type, type])
+      type = $Object // downgrade an unknown type to a common object.
+    }
+    return objectCreate(space, clist, type, offset)
+  }
+
   staticOperator('@', function (space, clause) {
     var clist = clause.$
     var length = clist.length
@@ -82,8 +96,10 @@ module.exports = function literal ($void) {
     if (indicator !== symbolPairing) {
       return length <= 2 || clist[2] !== symbolPairing ||
           typeof indicator === 'number' || indicator instanceof Tuple$
-        ? arrayCreate(space, clist, 1) // (@ ...) or (@ offset: value ...)
-        : objectCreate(space, clist, $Object, 1) // (@ name: ...) or (@ "name": ...)
+        // implicit array: (@ ...), or discrete array: (@ offset: value ...)
+        ? arrayCreate(space, clist, 1)
+        // implicit object: (@ name: ...) or (@ "name": ...)
+        : objectCreate(space, clist, $Object, 1)
     }
     // (@: ...)
     if (length < 3) { // (@:)
@@ -92,15 +108,15 @@ module.exports = function literal ($void) {
     // (@:a-type ...)
     var type = clist[2]
     return type === symbolClass
-      ? $Class.of(objectCreate(space, clist, $Object, 3)) // (@:class ...)
+      // class declaration: (@:class ...)
+      ? $Class.of(objectCreate(space, clist, $Object, 3))
       : type === symbolLiteral || type === symbolObject
-        ? objectCreate(space, clist, $Object, 3) // (@:@ ...) (@:object ...)
+        // explicit object: (@:@ ...) (@:object ...)
+        ? objectCreate(space, clist, $Object, 3)
         : type === symbolAll || type === symbolArray
-          ? arrayCreate(space, clist, 3) // (@:* ...) (@:array ...)
-          : objectCreate(space, clist,
-            (type = evaluate(type, space)) instanceof ClassType$
-              ? type // (@:a-class ...)
-              : $Object, // ignore type and treat it as a common object.
-            3)
+          // mandatory array: (@:* ...) (@:array ...)
+          ? arrayCreate(space, clist, 3)
+          // class instance: (@:a-class ...)
+          : tryToCreateInstance(space, clist, evaluate(type, space), 3)
   })
 }
