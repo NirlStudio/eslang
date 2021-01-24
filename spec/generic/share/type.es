@@ -88,25 +88,25 @@
 
   (define "Ordering" (=> ()
     (should "type is only comparable with itself." (=> ()
-      (assert 0 (the-type compare the-type).
+      (assert 0 (the-type compares-to the-type).
 
-      (assert null (the-type compare).
-      (assert null (the-type compare null).
-      (assert null (null compare the-type).
+      (assert null (the-type compares-to).
+      (assert null (the-type compares-to null).
+      (assert null (null compares-to the-type).
 
-      (assert null (the-type compare type).
-      (assert null (type compare the-type).
+      (assert null (the-type compares-to type).
+      (assert null (type compares-to the-type).
 
       (for t in types
-        (assert null (the-type compare (t the-type).
-        (assert null ((t the-type) compare the-type).
+        (assert null (the-type compares-to (t the-type).
+        (assert null ((t the-type) compares-to the-type).
 
-        (assert null (the-type compare (t "empty").
-        (assert null ((t "empty") compare the-type).
+        (assert null (the-type compares-to (t "empty").
+        (assert null ((t "empty") compares-to the-type).
 
         (for v in (t values)
-          (assert null (the-type compare v).
-          (assert null (v compare the-type).
+          (assert null (the-type compares-to v).
+          (assert null (v compares-to the-type).
         ).
   ).
 

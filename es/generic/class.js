@@ -302,13 +302,18 @@ module.exports = function classIn ($void) {
   })
 
   // Enable the customization of Ordering.
-  var compare = link(instance, 'compare', function (another) {
-    var ordering
-    return this === another || equals.call(this, another) ? 0
-      : this.compare === compare || !isApplicable(this.compare) ? null
-        : (ordering = this.compare(another)) > 0 ? 1
-          : ordering < 0 ? -1
-            : ordering === 0 ? 0 : null
+  var comparesTo = link(instance, 'compares-to', function (another) {
+    if (this === another || equals.call(this, another)) {
+      return 0
+    }
+    var thisComparesTo = this['compares-to']
+    if (thisComparesTo === comparesTo || !isApplicable(thisComparesTo)) {
+      return null
+    }
+    var ordering = this['compares-to'](another)
+    return ordering > 0 ? 1
+      : ordering < 0 ? -1
+        : ordering === 0 ? 0 : null
   })
 
   // Emptiness: allow customization.

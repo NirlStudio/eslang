@@ -267,7 +267,7 @@ module.exports = function iterate ($void) {
         if (Array.isArray(value) && value.length > 0) {
           value = value[0]
           if (filter.call(this, value) && (max === null ||
-            thisCall(value, 'compare', max) > 0)) {
+            thisCall(value, 'compares-to', max) > 0)) {
             max = value
           }
         }
@@ -277,7 +277,7 @@ module.exports = function iterate ($void) {
       while (typeof value !== 'undefined' && value != null) {
         if (Array.isArray(value) && value.length > 0) {
           value = value[0]
-          if (max === null || thisCall(value, 'compare', max) > 0) {
+          if (max === null || thisCall(value, 'compares-to', max) > 0) {
             max = value
           }
         }
@@ -297,7 +297,7 @@ module.exports = function iterate ($void) {
         if (Array.isArray(value) && value.length > 0) {
           value = value[0]
           if (filter.call(this, value) && (min === null ||
-            thisCall(value, 'compare', min) < 0)) {
+            thisCall(value, 'compares-to', min) < 0)) {
             min = value
           }
         }
@@ -307,7 +307,7 @@ module.exports = function iterate ($void) {
       while (typeof value !== 'undefined' && value != null) {
         if (Array.isArray(value) && value.length > 0) {
           value = value[0]
-          if (min === null || thisCall(value, 'compare', min) < 0) {
+          if (min === null || thisCall(value, 'compares-to', min) < 0) {
             min = value
           }
         }

@@ -50,16 +50,16 @@
 
 (define "Ordering" (=> ()
   (should "null is only comparable with itself." (=> ()
-    (assert 0 (null compare).
-    (assert 0 (null compare null).
+    (assert 0 (null compares-to).
+    (assert 0 (null compares-to null).
 
-    (assert null (null compare type).
+    (assert null (null compares-to type).
 
     (for t in types
-      (assert null (null compare (t the-type).
-      (assert null (null compare (t "empty").
+      (assert null (null compares-to (t the-type).
+      (assert null (null compares-to (t "empty").
       (for v in (t values)
-        (assert null (null compare v).
+        (assert null (null compares-to v).
       ).
 ).
 

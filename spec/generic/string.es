@@ -31,41 +31,41 @@
 
   (define "Ordering" (=> ()
     (should "an empty string is less than any non-empty string." (=> ()
-      (assert 0 ("" compare "").
+      (assert 0 ("" compares-to "").
 
-      (assert -1 ("" compare " ").
-      (assert 1 (" " compare "").
+      (assert -1 ("" compares-to " ").
+      (assert 1 (" " compares-to "").
 
-      (assert -1 ("" compare "\t").
-      (assert 1 ("\t" compare "").
+      (assert -1 ("" compares-to "\t").
+      (assert 1 ("\t" compares-to "").
 
-      (assert -1 ("" compare "\r").
-      (assert 1 ("\r" compare "").
+      (assert -1 ("" compares-to "\r").
+      (assert 1 ("\r" compares-to "").
 
-      (assert -1 ("" compare "\n").
-      (assert 1 ("\n" compare "").
+      (assert -1 ("" compares-to "\n").
+      (assert 1 ("\n" compares-to "").
 
-      (assert -1 ("" compare "a").
-      (assert 1 ("a" compare "").
+      (assert -1 ("" compares-to "a").
+      (assert 1 ("a" compares-to "").
 
-      (assert -1 ("" compare "A").
-      (assert 1 ("A" compare "").
+      (assert -1 ("" compares-to "A").
+      (assert 1 ("A" compares-to "").
 
-      (assert -1 ("a" compare "aa").
-      (assert 1 ("aa" compare "a").
+      (assert -1 ("a" compares-to "aa").
+      (assert 1 ("aa" compares-to "a").
 
-      (assert -1 ("A" compare "AA").
-      (assert 1 ("AA" compare "A").
+      (assert -1 ("A" compares-to "AA").
+      (assert 1 ("AA" compares-to "A").
     ).
     (should "an string is compared by each character's unicode." (=> ()
-      (assert 0 ("a" compare "a").
-      (assert 0 ("A" compare "A").
+      (assert 0 ("a" compares-to "a").
+      (assert 0 ("A" compares-to "A").
 
-      (assert -1 ("A" compare "a").
-      (assert 1 ("a" compare "A").
+      (assert -1 ("A" compares-to "a").
+      (assert 1 ("a" compares-to "A").
 
-      (assert -1 ("aa" compare "ab").
-      (assert 1 ("ab" compare "aa").
+      (assert -1 ("aa" compares-to "ab").
+      (assert 1 ("ab" compares-to "aa").
     ).
   ).
 
@@ -1125,38 +1125,38 @@
   ).
 ).
 
-(define "(a-string compare)" (=> ()
-  (should "(str compare) always returns null." (= ()
-    (assert null ("" compare).
-    (assert null ("A" compare).
-    (assert null ("ABC" compare).
+(define "(a-string compares-to)" (=> ()
+  (should "(str compares-to) always returns null." (= ()
+    (assert null ("" compares-to).
+    (assert null ("A" compares-to).
+    (assert null ("ABC" compares-to).
   ).
-  (should "(str compare non-string) always returns null." (=> ()
-    (assert null ("" compare null).
-    (assert null ("" compare type).
-    (assert null ("" compare string).
+  (should "(str compares-to non-string) always returns null." (=> ()
+    (assert null ("" compares-to null).
+    (assert null ("" compares-to type).
+    (assert null ("" compares-to string).
     (for a-type in other-types
-      (assert null ("" compare (a-type the-type).
-      (assert null ("" compare (a-type empty).
+      (assert null ("" compares-to (a-type the-type).
+      (assert null ("" compares-to (a-type empty).
       (for a-value in (a-type values)
-        (assert null ("" compare a-value).
+        (assert null ("" compares-to a-value).
       ).
     ).
   ).
-  (should "(str compare s) compares str and s by their UTF-16 values." (= ()
-    (assert 0 ("" compare "").
-    (assert 0 ("A" compare "A").
-    (assert 0 ("ABC" compare "ABC").
+  (should "(str compares-to s) compares str and s by their UTF-16 values." (= ()
+    (assert 0 ("" compares-to "").
+    (assert 0 ("A" compares-to "A").
+    (assert 0 ("ABC" compares-to "ABC").
 
-    (assert 1 ("a" compare "A").
-    (assert 1 ("B" compare "A").
-    (assert 1 ("BA" compare "AA").
-    (assert 1 ("AB" compare "AA").
+    (assert 1 ("a" compares-to "A").
+    (assert 1 ("B" compares-to "A").
+    (assert 1 ("BA" compares-to "AA").
+    (assert 1 ("AB" compares-to "AA").
 
-    (assert -1 ("A" compare "a").
-    (assert -1 ("A" compare "B").
-    (assert -1 ("AA" compare "BA").
-    (assert -1 ("AA" compare "AB").
+    (assert -1 ("A" compares-to "a").
+    (assert -1 ("A" compares-to "B").
+    (assert -1 ("AA" compares-to "BA").
+    (assert -1 ("AA" compares-to "AB").
   ).
 ).
 

@@ -65,21 +65,21 @@
     (should "comparing a function with itself returns 0." (= ()
       (var f (=> x x).
       (assert ($f is-a function).
-      (assert 0 ($f compare f).
-      (assert 0 ($(function empty) compare (function empty).
+      (assert 0 ($f compares-to f).
+      (assert 0 ($(function empty) compares-to (function empty).
     ).
     (should "comparison of two functions returns null." (=> ()
       (var f1 (=> () null).
       (var f2 (=> () null).
       (assert ($f1 is-a function).
       (assert ($f2 is-a function).
-      (assert null ($f1 compare f2).
+      (assert null ($f1 compares-to f2).
 
       (let f1 (=> x x).
       (let f2 (=> x x).
       (assert ($f1 is-a function).
       (assert ($f2 is-a function).
-      (assert null ($f1 compare f2).
+      (assert null ($f1 compares-to f2).
     ).
   ).
 

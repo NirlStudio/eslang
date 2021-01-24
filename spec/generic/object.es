@@ -31,7 +31,7 @@
   (define "Ordering" (=> ()
     (should "comparison of an object with itself returns 0." (=> ()
       (for a in (the-values concat (@:) (@:))
-        (assert 0 (a compare a).
+        (assert 0 (a compares-to a).
       ).
     ).
     (should "comparison of two different objects return null." (=> ()
@@ -39,7 +39,7 @@
       (for a in values
         (for b in values
           (if (a is-not b)
-            (assert null (a compare b).
+            (assert null (a compares-to b).
       ).
     ).
   ).
@@ -1427,7 +1427,7 @@
     (assert 1 (obj "==" 1).
     (assert 1 (obj "not-equals" 1).
     (assert 1 (obj "!=" 1).
-    (assert 1 (obj "compare" 1).
+    (assert 1 (obj "compares-to" 1).
     (assert 1 (obj "is-empty" 1).
     (assert 1 (obj "not-empty" 1).
     (assert 1 (obj "is-a" 1).
@@ -1438,7 +1438,7 @@
     (assert 1 (obj "type" 1).
     (for field in (@
         "is" "===" "is-not" "!==" "equals" "==" "not-equals" "!="
-        "compare" "is-empty" "not-empty" "is-a" "is-not-a"
+        "compares-to" "is-empty" "not-empty" "is-a" "is-not-a"
         "to-code" "to-string" ":" "type"
       )
       (assert 1 (object get obj field).
@@ -1448,7 +1448,7 @@
     (var (obj v1 v2) (@ (@:) 1 2).
     (for field in (@
         "is" "===" "is-not" "!==" "equals" "==" "not-equals" "!="
-        "compare" "is-empty" "not-empty" "is-a" "is-not-a"
+        "compares-to" "is-empty" "not-empty" "is-a" "is-not-a"
         "to-code" "to-string" ":" "type"
       )
       (assert v1 (obj: field v1).
@@ -1461,7 +1461,7 @@
     (var (obj ref) (@ (@:) (@:).
     (for field in (@
         "is" "===" "is-not" "!==" "equals" "==" "not-equals" "!="
-        "compare" "is-empty" "not-empty" "is-a" "is-not-a"
+        "compares-to" "is-empty" "not-empty" "is-a" "is-not-a"
         "to-code" "to-string" ":"
       )
       (assert (object has obj field).

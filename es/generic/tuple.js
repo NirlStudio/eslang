@@ -212,7 +212,7 @@ module.exports = function tupleIn ($void) {
   })
 
   // override comparison logic to keep consistent with Equivalence.
-  link(proto, 'compare', function (another) {
+  link(proto, 'compares-to', function (another) {
     return equals.call(this, another) ? 0 : null
   })
 

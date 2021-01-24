@@ -38,7 +38,7 @@ module.exports = function nullIn ($void) {
   //     1 - from this to another is descending.
   //    -1 - from this to another is ascending.
   //  null - not-sortable
-  link(Null, 'compare', function (another) {
+  link(Null, 'compares-to', function (another) {
     return Object.is(this, typeof another === 'undefined' ? null : another)
       ? 0 : null
   })

@@ -86,7 +86,7 @@ module.exports = function rangeIn ($void) {
   })
 
   // override comparison logic to keep consistent with Identity & Equivalence.
-  link(proto, 'compare', function (another) {
+  link(proto, 'compares-to', function (another) {
     return this === another ? 0
       : !(another instanceof Range$) || this.step !== another.step ? null
         : this.step > 0

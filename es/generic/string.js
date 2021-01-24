@@ -236,7 +236,7 @@ module.exports = function stringIn ($void) {
   })
 
   // Ordering: override general comparison logic.
-  link(proto, 'compare', function (another) {
+  link(proto, 'compares-to', function (another) {
     return typeof another !== 'string' ? null
       : this === another ? 0 : this > another ? 1 : -1
   })

@@ -673,11 +673,11 @@ module.exports = function arrayIn ($void) {
     }
   }
   var ascComparer = function (a, b) {
-    var order = thisCall(a, 'compare', b)
+    var order = thisCall(a, 'compares-to', b)
     return order > 0 ? 1 : order < 0 ? -1 : 0
   }
   var descComparer = function (a, b) {
-    var order = thisCall(a, 'compare', b)
+    var order = thisCall(a, 'compares-to', b)
     return order > 0 ? -1 : order < 0 ? 1 : 0
   }
   link(proto, 'sort', function (order, comparer) {

@@ -48,7 +48,7 @@ module.exports = function mathIn ($void) {
         return x
       case 2:
         return x === null || typeof x === 'undefined' ? y
-          : thisCall(x, 'compare', y) === -1 ? y : x
+          : thisCall(x, 'compares-to', y) === -1 ? y : x
       default:
         break
     }
@@ -56,7 +56,7 @@ module.exports = function mathIn ($void) {
       y = arguments[i]
       if (y !== null && typeof y !== 'undefined') {
         if (x === null || typeof x === 'undefined' ||
-          thisCall(y, 'compare', x) === 1) {
+          thisCall(y, 'compares-to', x) === 1) {
           x = y
         }
       }
@@ -72,7 +72,7 @@ module.exports = function mathIn ($void) {
         return x
       case 2:
         return x === null || typeof x === 'undefined' ? y
-          : thisCall(x, 'compare', y) === 1 ? y : x
+          : thisCall(x, 'compares-to', y) === 1 ? y : x
       default:
         break
     }
@@ -80,7 +80,7 @@ module.exports = function mathIn ($void) {
       y = arguments[i]
       if (y !== null && typeof y !== 'undefined') {
         if (x === null || typeof x === 'undefined' ||
-          thisCall(y, 'compare', x) === -1) {
+          thisCall(y, 'compares-to', x) === -1) {
           x = y
         }
       }

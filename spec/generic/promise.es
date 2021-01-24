@@ -45,14 +45,14 @@ var * (load "./share/type" (@ the-type: promise);
     var values (the-values concat (promise empty) (promise nothing);
     (should "comparison of a promise with itself returns 0." (=> ()
       (for p in values
-        assert 0 (p compare p);
+        assert 0 (p compares-to p);
       ).
     ).
     (should "comparison of two different promises return null." (=> ()
       (for a in values
         (for b in values
           (if (a is-not b)
-            assert null (a compare b);
+            assert null (a compares-to b);
       ).
     ).
   ).

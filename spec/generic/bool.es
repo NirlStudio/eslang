@@ -35,12 +35,12 @@
 
   (define "Ordering" (=> ()
     (should "true is only comparable with itself." (=> ()
-      (assert 0 (true compare true).
-      (assert null (true compare false).
+      (assert 0 (true compares-to true).
+      (assert null (true compares-to false).
     ).
     (should "false is only comparable with itself." (=> ()
-      (assert 0 (false compare false).
-      (assert null (false compare true).
+      (assert 0 (false compares-to false).
+      (assert null (false compares-to true).
     ).
   ).
 

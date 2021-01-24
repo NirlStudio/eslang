@@ -82,25 +82,25 @@
 
   (define "Ordering" (=> ()
     (should "comparison of two equivalent tuples returns 0." (=> ()
-      (assert 0 ((tuple of null) compare (tuple of null).
-      (assert 0 ((tuple of-plain null) compare (tuple of-plain null).
+      (assert 0 ((tuple of null) compares-to (tuple of null).
+      (assert 0 ((tuple of-plain null) compares-to (tuple of-plain null).
 
       (assert 0 ((tuple of null 1 true "abc" (0 1) (` x))
-        compare (tuple of null 1 true "abc" (0 1) (` x))
+        compares-to (tuple of null 1 true "abc" (0 1) (` x))
       ).
       (assert 0 ((tuple of-plain null 1 true "abc" (0 1) (` x))
-        compare (tuple of-plain null 1 true "abc" (0 1) (` x))
+        compares-to (tuple of-plain null 1 true "abc" (0 1) (` x))
       ).
     ).
     (should "comparison of two non-equivalent tuples return null." (=> ()
-      (assert null ((tuple empty) compare (tuple blank).
-      (assert null ((tuple of null) compare (tuple of-plain null).
+      (assert null ((tuple empty) compares-to (tuple blank).
+      (assert null ((tuple of null) compares-to (tuple of-plain null).
 
       (assert null ((tuple of null 1 true "abc" (0 1) (` x))
-        compare (tuple of-plain null 1 true "abc" (0 1) (` x))
+        compares-to (tuple of-plain null 1 true "abc" (0 1) (` x))
       ).
       (assert null ((tuple of-plain null 1 true "abc" (0 1) (` x))
-        compare (tuple of null 1 true "abc" (0 1) (` x))
+        compares-to (tuple of null 1 true "abc" (0 1) (` x))
       ).
     ).
   ).

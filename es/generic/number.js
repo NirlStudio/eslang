@@ -280,7 +280,7 @@ module.exports = function numberIn ($void) {
   // support ordering logic - comparable
   // For incomparable entities, comparison result is consistent with the Equivalence.
   // incomparable state is indicated by a null and is taken as nonequivalent.
-  var compare = link(proto, 'compare', function (another) {
+  var comparesTo = link(proto, 'compares-to', function (another) {
     return typeof another !== 'number' ? null
       : this === another ? 0 // two same valid values.
         : !isNaN(this) && !isNaN(another)
@@ -292,19 +292,19 @@ module.exports = function numberIn ($void) {
 
   // comparing operators for instance values
   link(proto, '>', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order > 0 : null
   })
   link(proto, '>=', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order >= 0 : null
   })
   link(proto, '<', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order < 0 : null
   })
   link(proto, '<=', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order <= 0 : null
   })
 

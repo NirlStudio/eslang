@@ -45,8 +45,8 @@
             (@ (number max-bits) 100)
             (@ -100 (number min-bits).
           ).
-        (assert 1 ((date of (pair 0)) compare (date of (pair 1).
-        (assert -1 ((date of (pair 1)) compare (date of (pair 0).
+        (assert 1 ((date of (pair 0)) compares-to (date of (pair 1).
+        (assert -1 ((date of (pair 1)) compares-to (date of (pair 0).
       ).
     ).
     (should "an invalid date is not comparable with other valid dates." (=> ()
@@ -56,8 +56,8 @@
             (number max-bits)
             (number min-bits).
           ).
-        (assert null ((date invalid) compare (date of value).
-        (assert null ((date of value) compare (date of (number invalid).
+        (assert null ((date invalid) compares-to (date of value).
+        (assert null ((date of value) compares-to (date of (number invalid).
       ).
   ).
 
@@ -536,43 +536,43 @@
   class (class empty)
 ).
 
-(define "(a-date compare b-date)" (=> ()
-  (should "(a-date compare b-date) returns 1 if a-date is later than b-date." (= ()
-    (assert 1 ((date of 1) compare (date of 0).
-    (assert 1 ((date of 0) compare (date of -1).
-    (assert 1 ((date of 1) compare (date of -1).
+(define "(a-date compares-to b-date)" (=> ()
+  (should "(a-date compares-to b-date) returns 1 if a-date is later than b-date." (= ()
+    (assert 1 ((date of 1) compares-to (date of 0).
+    (assert 1 ((date of 0) compares-to (date of -1).
+    (assert 1 ((date of 1) compares-to (date of -1).
   ).
-  (should "(a-date compare b-date) returns 0 if a-date is identical with b-date." (= ()
-    (assert 0 ((date of 0) compare (date of 0).
-    (assert 0 ((date of -0) compare (date of 0).
-    (assert 0 ((date of 0) compare (date of -0).
-    (assert 0 ((date of -0) compare (date of -0).
+  (should "(a-date compares-to b-date) returns 0 if a-date is identical with b-date." (= ()
+    (assert 0 ((date of 0) compares-to (date of 0).
+    (assert 0 ((date of -0) compares-to (date of 0).
+    (assert 0 ((date of 0) compares-to (date of -0).
+    (assert 0 ((date of -0) compares-to (date of -0).
 
-    (assert 0 ((date of 1) compare (date of 1).
-    (assert 0 ((date of -1) compare (date of -1).
+    (assert 0 ((date of 1) compares-to (date of 1).
+    (assert 0 ((date of -1) compares-to (date of -1).
   ).
-  (should "((date invalid) compare (date invalid)) returns 0." (= ()
-    (assert 0 ((date invalid) compare (date invalid).
+  (should "((date invalid) compares-to (date invalid)) returns 0." (= ()
+    (assert 0 ((date invalid) compares-to (date invalid).
   ).
-  (should "(a-date compare b-date) returns -1 if a-date is earlier than b-date." (= ()
-    (assert -1 ((date of 0) compare (date of 1).
-    (assert -1 ((date of -1) compare (date of 0).
-    (assert -1 ((date of -1) compare (date of 1).
+  (should "(a-date compares-to b-date) returns -1 if a-date is earlier than b-date." (= ()
+    (assert -1 ((date of 0) compares-to (date of 1).
+    (assert -1 ((date of -1) compares-to (date of 0).
+    (assert -1 ((date of -1) compares-to (date of 1).
   ).
-  (should "(a-date compare b-date) returns null if a-date is invalid and b-date is valid." (= ()
-    (assert null ((date invalid) compare (date of 1).
-    (assert null ((date invalid) compare (date of 0).
-    (assert null ((date invalid) compare (date of -1).
+  (should "(a-date compares-to b-date) returns null if a-date is invalid and b-date is valid." (= ()
+    (assert null ((date invalid) compares-to (date of 1).
+    (assert null ((date invalid) compares-to (date of 0).
+    (assert null ((date invalid) compares-to (date of -1).
   ).
-  (should "(a-date compare b-date) returns null if a-date is valid and b-date is invalid." (= ()
-    (assert null ((date of 0) compare (date invalid).
-    (assert null ((date of 1) compare (date invalid).
-    (assert null ((date of -1) compare (date invalid).
+  (should "(a-date compares-to b-date) returns null if a-date is valid and b-date is invalid." (= ()
+    (assert null ((date of 0) compares-to (date invalid).
+    (assert null ((date of 1) compares-to (date invalid).
+    (assert null ((date of -1) compares-to (date invalid).
   ).
-  (should "(a-date compare b-date) returns null if b-date is not a date value." (=> ()
+  (should "(a-date compares-to b-date) returns null if b-date is not a date value." (=> ()
     (for value in non-date-values
-      (assert null ((date of 0) compare value)
-      (assert null ((date invalid) compare value)
+      (assert null ((date of 0) compares-to value)
+      (assert null ((date invalid) compares-to value)
     ).
   ).
 ).

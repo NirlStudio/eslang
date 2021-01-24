@@ -49,22 +49,22 @@
 
 (define "Ordering" (=> ()
   (should "type is only comparable with itself." (=> ()
-    (assert 0 (type compare type).
+    (assert 0 (type compares-to type).
 
-    (assert null (type compare).
-    (assert null (type compare null).
-    (assert null (null compare type).
+    (assert null (type compares-to).
+    (assert null (type compares-to null).
+    (assert null (null compares-to type).
 
     (for t in types
-      (assert null (type compare (t the-type).
-      (assert null ((t the-type) compare type).
+      (assert null (type compares-to (t the-type).
+      (assert null ((t the-type) compares-to type).
 
-      (assert null (type compare (t "empty").
-      (assert null ((t "empty") compare type).
+      (assert null (type compares-to (t "empty").
+      (assert null ((t "empty") compares-to type).
 
       (for v in (t values)
-        (assert null (type compare v).
-        (assert null ($v compare type).
+        (assert null (type compares-to v).
+        (assert null ($v compares-to type).
       ).
 ).
 
@@ -445,7 +445,7 @@
 
     (const all-fields (@
       "is", "===", "is-not", "!==",
-      "equals", "==", "not-equals", "!=", "compare",
+      "equals", "==", "not-equals", "!=", "compares-to",
       "is-empty", "not-empty",
       "is-a", "is-an", "is-not-a", "is-not-an",
       "to-code", "to-string", ":",

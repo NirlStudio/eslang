@@ -12,7 +12,7 @@ module.exports = function symbolIn ($void) {
   var escapeSymbol = $void.escapeSymbol
   var protoValueOf = $void.protoValueOf
 
-  var strCompare = $String.proto.compare
+  var strComparesTo = $String.proto['compares-to']
   var strToString = $String.proto['to-string']
 
   // common symbol repository
@@ -105,10 +105,10 @@ module.exports = function symbolIn ($void) {
   })
 
   // Ordering: to determine by the string value of key.
-  link(proto, 'compare', function (another) {
+  link(proto, 'compares-to', function (another) {
     return this === another ? 0
       : another instanceof Symbol$
-        ? strCompare.call(this.key, another.key)
+        ? strComparesTo.call(this.key, another.key)
         : null
   })
 

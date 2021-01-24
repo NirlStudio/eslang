@@ -132,7 +132,7 @@ module.exports = function testIn ($void) {
     checkStaticOperators('[Espresso / generators] ', [
       'is', '===', 'is-not', '!==',
       'equals', '==', 'not-equals', '!=',
-      'compare',
+      'compares-to',
       'is-empty', 'not-empty',
       'is-a', 'is-an',
       'is-not-a', 'is-not-an',
@@ -153,7 +153,7 @@ module.exports = function testIn ($void) {
     checkFunctions($, '[Espresso / generator functions] ', [
       'is', '===', 'is-not', '!==',
       'equals', '==', 'not-equals', '!=',
-      'compare',
+      'compares-to',
       'is-empty', 'not-empty',
       'is-a', 'is-an',
       'is-not-a', 'is-not-an',

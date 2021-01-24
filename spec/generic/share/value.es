@@ -91,20 +91,20 @@
 
 (define "Ordering" (=> ()
   (should "A value is at least comparable with itself." (=> ()
-    (assert 0 ($the-value compare the-value).
+    (assert 0 ($the-value compares-to the-value).
   ).
   # a value may be comparable with values of the same type.
   (should "A value is not comparable with any one of types." (=> ()
-    (assert null ($the-value compare type).
-    (assert null ($the-value compare the-type).
+    (assert null ($the-value compares-to type).
+    (assert null ($the-value compares-to the-type).
     (for a-type in other-types
-      (assert null ($the-value compare (a-type the-type).
+      (assert null ($the-value compares-to (a-type the-type).
     ).
   ).
   (should "a value is not comparable with any value of other types." (=> ()
     (for a-type in other-types
       (for a-value in ((a-type values) concat (a-type "empty"))
-        (assert null ($the-value compare a-value).
+        (assert null ($the-value compares-to a-value).
       ).
     ).
   ).

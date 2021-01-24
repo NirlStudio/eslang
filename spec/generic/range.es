@@ -21,25 +21,25 @@
 
   (define "Ordering" (= ()
     (should "a range cannot be compared with another range which is not a subset, or vice versa." (= ()
-      (assert null ((range of 1 10) compare).
-      (assert null ((range of 1 10) compare null).
+      (assert null ((range of 1 10) compares-to).
+      (assert null ((range of 1 10) compares-to null).
 
-      (assert null ((range of 1 10) compare (range of 10 1).
-      (assert null ((range of -10 -1) compare (range of -1 -10).
-      (assert null ((range of -10 10) compare (range of 10 -10).
+      (assert null ((range of 1 10) compares-to (range of 10 1).
+      (assert null ((range of -10 -1) compares-to (range of -1 -10).
+      (assert null ((range of -10 10) compares-to (range of 10 -10).
 
-      (assert null ((range of 1 10) compare (range of 2 11).
-      (assert null ((range of -10 -1) compare (range of -11 -2).
-      (assert null ((range of -10 10) compare (range of -9 11).
+      (assert null ((range of 1 10) compares-to (range of 2 11).
+      (assert null ((range of -10 -1) compares-to (range of -11 -2).
+      (assert null ((range of -10 10) compares-to (range of -9 11).
     ).
     (should "a range cannot be compared with another range having different step value." (= ()
-      (assert null ((range of 1 10 1) compare (range of 1 10 2).
-      (assert null ((range of -10 -1 1) compare (range of -10 -1 2).
-      (assert null ((range of -10 10 1) compare (range of -10 10 2).
+      (assert null ((range of 1 10 1) compares-to (range of 1 10 2).
+      (assert null ((range of -10 -1 1) compares-to (range of -10 -1 2).
+      (assert null ((range of -10 10 1) compares-to (range of -10 10 2).
 
-      (assert null ((range of 10 1 -1) compare (range of 10 1 -2).
-      (assert null ((range of -1 -10 -1) compare (range of -1 -10 -2).
-      (assert null ((range of 10 -10 -1) compare (range of 10 -10 -2).
+      (assert null ((range of 10 1 -1) compares-to (range of 10 1 -2).
+      (assert null ((range of -1 -10 -1) compares-to (range of -1 -10 -2).
+      (assert null ((range of 10 -10 -1) compares-to (range of 10 -10 -2).
     ).
   ).
 
@@ -335,41 +335,41 @@
   ).
 ).
 
-(define "(a-range compare b-range)" (=> ()
-  (should "(a-range compare b-range) returns 0 if a-range and b-range are identical." (= ()
-    (assert 0 ((range of 1) compare (range of 1).
-    (assert 0 ((range of 1 2) compare (range of 1 2).
-    (assert 0 ((range of 1 2 3) compare (range of 1 2 3).
+(define "(a-range compares-to b-range)" (=> ()
+  (should "(a-range compares-to b-range) returns 0 if a-range and b-range are identical." (= ()
+    (assert 0 ((range of 1) compares-to (range of 1).
+    (assert 0 ((range of 1 2) compares-to (range of 1 2).
+    (assert 0 ((range of 1 2 3) compares-to (range of 1 2 3).
   ).
-  (should "(a-range compare b-range) returns 1 if values in b-range is a subset of values in a-range." (= ()
-    (assert 1 ((range of 1 10) compare (range of 1 9).
-    (assert 1 ((range of 1 10) compare (range of 2 10).
-    (assert 1 ((range of 1 10) compare (range of 2 9).
+  (should "(a-range compares-to b-range) returns 1 if values in b-range is a subset of values in a-range." (= ()
+    (assert 1 ((range of 1 10) compares-to (range of 1 9).
+    (assert 1 ((range of 1 10) compares-to (range of 2 10).
+    (assert 1 ((range of 1 10) compares-to (range of 2 9).
 
-    (assert 1 ((range of -1 -10) compare (range of -1 -9).
-    (assert 1 ((range of -1 -10) compare (range of -2 -10).
-    (assert 1 ((range of -1 -10) compare (range of -2 -9).
+    (assert 1 ((range of -1 -10) compares-to (range of -1 -9).
+    (assert 1 ((range of -1 -10) compares-to (range of -2 -10).
+    (assert 1 ((range of -1 -10) compares-to (range of -2 -9).
   ).
-  (should "(a-range compare b-range) returns -1 if values in a-range is a subset of values in b-range." (= ()
-    (assert -1 ((range of 1 9) compare (range of 1 10).
-    (assert -1 ((range of 2 10) compare (range of 1 10).
-    (assert -1 ((range of 2 9) compare (range of 1 10).
+  (should "(a-range compares-to b-range) returns -1 if values in a-range is a subset of values in b-range." (= ()
+    (assert -1 ((range of 1 9) compares-to (range of 1 10).
+    (assert -1 ((range of 2 10) compares-to (range of 1 10).
+    (assert -1 ((range of 2 9) compares-to (range of 1 10).
 
-    (assert -1 ((range of -1 -9) compare (range of -1 -10).
-    (assert -1 ((range of -2 -10) compare (range of -1 -10).
-    (assert -1 ((range of -2 -9) compare (range of -1 -10).
+    (assert -1 ((range of -1 -9) compares-to (range of -1 -10).
+    (assert -1 ((range of -2 -10) compares-to (range of -1 -10).
+    (assert -1 ((range of -2 -9) compares-to (range of -1 -10).
   ).
-  (should "(a-range compare b-range) returns null if either of them is not the other's subset." (= ()
-    (assert null ((range of 1 4) compare (range of 5 9).
-    (assert null ((range of 5 9) compare (range of 1 4).
+  (should "(a-range compares-to b-range) returns null if either of them is not the other's subset." (= ()
+    (assert null ((range of 1 4) compares-to (range of 5 9).
+    (assert null ((range of 5 9) compares-to (range of 1 4).
 
-    (assert null ((range of 1 5) compare (range of 4 9).
-    (assert null ((range of 4 9) compare (range of 1 5).
+    (assert null ((range of 1 5) compares-to (range of 4 9).
+    (assert null ((range of 4 9) compares-to (range of 1 5).
 
-    (assert null ((range of -1 -4) compare (range of -5 -9).
-    (assert null ((range of -5 -9) compare (range of -1 -4).
+    (assert null ((range of -1 -4) compares-to (range of -5 -9).
+    (assert null ((range of -5 -9) compares-to (range of -1 -4).
 
-    (assert null ((range of -1 -5) compare (range of -4 -9).
-    (assert null ((range of -4 -9) compare (range of -1 -5).
+    (assert null ((range of -1 -5) compares-to (range of -4 -9).
+    (assert null ((range of -4 -9) compares-to (range of -1 -5).
   ).
 ).

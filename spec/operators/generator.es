@@ -247,60 +247,60 @@ const nobody (@);
     ).
   ).
 
-  (define "compare", (=> ()
-    (should "((compare) one) works like (one compare).", (=> ()
-      var *compare (compare);
-      assert ($*compare is-a function);
+  (define "compares-to", (=> ()
+    (should "((compares-to) one) works like (one compares-to).", (=> ()
+      var *compares-to (compares-to);
+      assert ($*compares-to is-a function);
 
       (for sample in samples
-        assert (sample the-type:: compare) (*compare (sample the-type);
-        assert (sample "empty":: compare) (*compare (sample "empty");
+        assert (sample the-type:: compares-to) (*compares-to (sample the-type);
+        assert (sample "empty":: compares-to) (*compares-to (sample "empty");
         (for value in (sample values)
-          assert ($value compare) (*compare value);
+          assert ($value compares-to) (*compares-to value);
         ).
     ).
-    (should "((compare another) one) works like (one compare another).", (=> ()
-      var compare-nobody (compare nobody);
-      assert ($compare-nobody is-a function);
+    (should "((compares-to another) one) works like (one compares-to another).", (=> ()
+      var compares-to-nobody (compares-to nobody);
+      assert ($compares-to-nobody is-a function);
 
       (for sample in samples
-        assert 0 ((compare (sample the-type)) (sample the-type);
-        assert null (compare-nobody (sample the-type);
+        assert 0 ((compares-to (sample the-type)) (sample the-type);
+        assert null (compares-to-nobody (sample the-type);
 
-        assert 0 ((compare (sample "empty")) (sample "empty");
-        assert null (compare-nobody (sample "empty");
+        assert 0 ((compares-to (sample "empty")) (sample "empty");
+        assert null (compares-to-nobody (sample "empty");
 
         var last (sample "empty");
         (for value in (sample values)
-          assert 0 ((compare value) value);
-          (if ((compare value) last:: is-a number)
-            assert ((compare last) value) (- ((compare value) last);
+          assert 0 ((compares-to value) value);
+          (if ((compares-to value) last:: is-a number)
+            assert ((compares-to last) value) (- ((compares-to value) last);
           ).
-          assert null (compare-nobody value);
+          assert null (compares-to-nobody value);
           let last value;
         ).
     ).
-    (should "'compare' is resolved to a function.", (=> ()
-      assert ($compare is-a function);
-      var compare_ compare;
-      assert ($compare_ is-a function);
-      assert ($compare_ is compare);
+    (should "'compares-to' is resolved to a function.", (=> ()
+      assert ($compares-to is-a function);
+      var compares-to_ compares-to;
+      assert ($compares-to_ is-a function);
+      assert ($compares-to_ is compares-to);
     ).
-    (should "(:compare one another) works like (one compare another).", (=> ()
+    (should "(:compares-to one another) works like (one compares-to another).", (=> ()
       (for sample in samples
-        assert 0 (:compare (sample the-type) (sample the-type);
-        assert null (:compare (sample the-type) nobody);
+        assert 0 (:compares-to (sample the-type) (sample the-type);
+        assert null (:compares-to (sample the-type) nobody);
 
-        assert 0 (:compare (sample "empty") (sample "empty");
-        assert null(:compare (sample "empty") nobody);
+        assert 0 (:compares-to (sample "empty") (sample "empty");
+        assert null(:compares-to (sample "empty") nobody);
 
         var last (sample "empty");
         (for value in (sample values)
-          assert 0 (:compare value value);
-          (if (:compare value last:: is-a number)
-            assert (:compare last value) (- (:compare value last);
+          assert 0 (:compares-to value value);
+          (if (:compares-to value last:: is-a number)
+            assert (:compares-to last value) (- (:compares-to value last);
           ).
-          assert null (:compare value nobody);
+          assert null (:compares-to value nobody);
           let last value;
         ).
   ).

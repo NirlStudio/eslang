@@ -36,10 +36,10 @@
   ).
 
   (define "Ordering" (=> ()
-    (var compare (= pairs
+    (var compares-to (= pairs
       (for pair in pairs
-        (assert 1 ((pair 0) compare (pair 1).
-        (assert -1 ((pair 1) compare (pair 0).
+        (assert 1 ((pair 0) compares-to (pair 1).
+        (assert -1 ((pair 1) compares-to (pair 0).
       ).
     ).
     (should "a common number can be compared with other common numbers." (=> ()
@@ -95,8 +95,8 @@
     (should "(number invalid) is not comparable with other common numbers." (=> ()
       (for value
           in ((the-values remove (number invalid)) append 0).
-        (assert null ((number invalid) compare value).
-        (assert null (value compare (number invalid).
+        (assert null ((number invalid) compares-to value).
+        (assert null (value compares-to (number invalid).
       ).
     ).
   ).
@@ -2817,118 +2817,118 @@
   ).
 ).
 
-(define "(a-number compare ...)" (= ()
-  (should "(num compare) returns null." (= ()
-    (assert null (0 compare).
-    (assert null (-0 compare).
+(define "(a-number compares-to ...)" (= ()
+  (should "(num compares-to) returns null." (= ()
+    (assert null (0 compares-to).
+    (assert null (-0 compares-to).
 
-    (assert null (1 compare).
-    (assert null (-1 compare).
+    (assert null (1 compares-to).
+    (assert null (-1 compares-to).
 
-    (assert null (1.5 compare).
-    (assert null (-1.5 compare).
+    (assert null (1.5 compares-to).
+    (assert null (-1.5 compares-to).
 
-    (assert null ((number max) compare).
-    (assert null ((number min) compare).
+    (assert null ((number max) compares-to).
+    (assert null ((number min) compares-to).
 
-    (assert null ((number infinite) compare).
-    (assert null ((number -infinite) compare).
+    (assert null ((number infinite) compares-to).
+    (assert null ((number -infinite) compares-to).
 
-    (assert null ((number invalid) compare).
+    (assert null ((number invalid) compares-to).
   ).
-  (should "((number invalid) compare a-valid-num) returns null." (= ()
-    (assert null ((number invalid) compare 0).
-    (assert null (0 compare (number invalid).
+  (should "((number invalid) compares-to a-valid-num) returns null." (= ()
+    (assert null ((number invalid) compares-to 0).
+    (assert null (0 compares-to (number invalid).
 
-    (assert null ((number invalid) compare 1).
-    (assert null (1 compare (number invalid).
+    (assert null ((number invalid) compares-to 1).
+    (assert null (1 compares-to (number invalid).
 
-    (assert null ((number invalid) compare -1).
-    (assert null (-1 compare (number invalid).
+    (assert null ((number invalid) compares-to -1).
+    (assert null (-1 compares-to (number invalid).
 
-    (assert null ((number invalid) compare 1.5).
-    (assert null (1.5 compare (number invalid).
+    (assert null ((number invalid) compares-to 1.5).
+    (assert null (1.5 compares-to (number invalid).
 
-    (assert null ((number invalid) compare -1.5).
-    (assert null (-1.5 compare (number invalid).
+    (assert null ((number invalid) compares-to -1.5).
+    (assert null (-1.5 compares-to (number invalid).
 
-    (assert null ((number invalid) compare (number max).
-    (assert null ((number max) compare (number invalid).
+    (assert null ((number invalid) compares-to (number max).
+    (assert null ((number max) compares-to (number invalid).
 
-    (assert null ((number invalid) compare (number min).
-    (assert null ((number min) compare (number invalid).
+    (assert null ((number invalid) compares-to (number min).
+    (assert null ((number min) compares-to (number invalid).
 
-    (assert null ((number invalid) compare (number infinite).
-    (assert null ((number infinite) compare (number invalid).
+    (assert null ((number invalid) compares-to (number infinite).
+    (assert null ((number infinite) compares-to (number invalid).
 
-    (assert null ((number invalid) compare (number -infinite).
-    (assert null ((number -infinite) compare (number invalid).
+    (assert null ((number invalid) compares-to (number -infinite).
+    (assert null ((number -infinite) compares-to (number invalid).
   ).
-  (should "(0 compare -0) and (-0 compare 0) return 0." (= ()
-    (assert ((0 compare -0) is 0).
-    (assert ((-0 compare 0) is 0).
+  (should "(0 compares-to -0) and (-0 compares-to 0) return 0." (= ()
+    (assert ((0 compares-to -0) is 0).
+    (assert ((-0 compares-to 0) is 0).
   ).
-  (should "(num compare num) returns 0." (= ()
-    (assert ((0 compare 0) is 0).
-    (assert ((-0 compare -0) is 0).
+  (should "(num compares-to num) returns 0." (= ()
+    (assert ((0 compares-to 0) is 0).
+    (assert ((-0 compares-to -0) is 0).
 
-    (assert ((1 compare 1) is 0).
-    (assert ((-1 compare -1) is 0).
+    (assert ((1 compares-to 1) is 0).
+    (assert ((-1 compares-to -1) is 0).
 
-    (assert ((1.5 compare 1.5) is 0).
-    (assert ((-1.5 compare -1.5) is 0).
+    (assert ((1.5 compares-to 1.5) is 0).
+    (assert ((-1.5 compares-to -1.5) is 0).
 
-    (assert (((number max) compare (number max)) is 0).
-    (assert (((number min) compare (number min)) is 0).
+    (assert (((number max) compares-to (number max)) is 0).
+    (assert (((number min) compares-to (number min)) is 0).
 
-    (assert (((number infinite) compare (number infinite)) is 0).
-    (assert (((number -infinite) compare (number -infinite)) is 0).
+    (assert (((number infinite) compares-to (number infinite)) is 0).
+    (assert (((number -infinite) compares-to (number -infinite)) is 0).
 
-    (assert (((number invalid) compare (number invalid)) is 0).
+    (assert (((number invalid) compares-to (number invalid)) is 0).
   ).
-  (should "(num compare a-smaller-num) returns 1." (= ()
-    (assert 1 (1 compare 0).
-    (assert 1 (1 compare -0).
-    (assert 1 (0 compare -1).
-    (assert 1 (-0 compare -1).
-    (assert 1 (1 compare -1).
+  (should "(num compares-to a-smaller-num) returns 1." (= ()
+    (assert 1 (1 compares-to 0).
+    (assert 1 (1 compares-to -0).
+    (assert 1 (0 compares-to -1).
+    (assert 1 (-0 compares-to -1).
+    (assert 1 (1 compares-to -1).
 
-    (assert 1 (1.5 compare 0).
-    (assert 1 (1.5 compare -0).
-    (assert 1 (0 compare -1.5).
-    (assert 1 (-0 compare -1.5).
-    (assert 1 (1.5 compare -1.5).
+    (assert 1 (1.5 compares-to 0).
+    (assert 1 (1.5 compares-to -0).
+    (assert 1 (0 compares-to -1.5).
+    (assert 1 (-0 compares-to -1.5).
+    (assert 1 (1.5 compares-to -1.5).
 
-    (assert 1 ((number max) compare 0).
-    (assert 1 ((number max) compare -0).
-    (assert 1 (0 compare (number min).
-    (assert 1 (-0 compare (number min).
-    (assert 1 ((number max) compare (number min).
+    (assert 1 ((number max) compares-to 0).
+    (assert 1 ((number max) compares-to -0).
+    (assert 1 (0 compares-to (number min).
+    (assert 1 (-0 compares-to (number min).
+    (assert 1 ((number max) compares-to (number min).
 
-    (assert 1 ((number infinite) compare (number max).
-    (assert 1 ((number min) compare (number -infinite).
+    (assert 1 ((number infinite) compares-to (number max).
+    (assert 1 ((number min) compares-to (number -infinite).
   ).
-  (should "(num compare a-great-num) returns -1." (= ()
-    (assert -1 (-1 compare 0).
-    (assert -1 (-1 compare -0).
-    (assert -1 (0 compare 1).
-    (assert -1 (-0 compare 1).
-    (assert -1 (-1 compare 1).
+  (should "(num compares-to a-great-num) returns -1." (= ()
+    (assert -1 (-1 compares-to 0).
+    (assert -1 (-1 compares-to -0).
+    (assert -1 (0 compares-to 1).
+    (assert -1 (-0 compares-to 1).
+    (assert -1 (-1 compares-to 1).
 
-    (assert -1 (-1.5 compare 0).
-    (assert -1 (-1.5 compare -0).
-    (assert -1 (0 compare 1.5).
-    (assert -1 (-0 compare 1.5).
-    (assert -1 (-1.5 compare 1.5).
+    (assert -1 (-1.5 compares-to 0).
+    (assert -1 (-1.5 compares-to -0).
+    (assert -1 (0 compares-to 1.5).
+    (assert -1 (-0 compares-to 1.5).
+    (assert -1 (-1.5 compares-to 1.5).
 
-    (assert -1 (0 compare (number max).
-    (assert -1 (-0 compare (number max).
-    (assert -1 ((number min) compare 0).
-    (assert -1 ((number min) compare -0).
-    (assert -1 ((number min) compare (number max).
+    (assert -1 (0 compares-to (number max).
+    (assert -1 (-0 compares-to (number max).
+    (assert -1 ((number min) compares-to 0).
+    (assert -1 ((number min) compares-to -0).
+    (assert -1 ((number min) compares-to (number max).
 
-    (assert -1 ((number -infinite) compare (number min).
-    (assert -1 ((number max) compare (number infinite).
+    (assert -1 ((number -infinite) compares-to (number min).
+    (assert -1 ((number max) compares-to (number infinite).
   ).
 ).
 

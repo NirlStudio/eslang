@@ -23,7 +23,7 @@ module.exports = function dateIn ($void) {
   var link = $void.link
   var Symbol$ = $void.Symbol
   var protoValueOf = $void.protoValueOf
-  var numberCompare = $.number.proto.compare
+  var numberComparesTo = $.number.proto['compares-to']
   var numberToString = $.number.proto['to-string']
 
   // the empty value
@@ -153,35 +153,35 @@ module.exports = function dateIn ($void) {
   })
 
   // Ordering: date comparison
-  var compare = link(proto, 'compare', function (another) {
+  var comparesTo = link(proto, 'compares-to', function (another) {
     return another instanceof Date
-      ? numberCompare.call(this.getTime(), another.getTime())
+      ? numberComparesTo.call(this.getTime(), another.getTime())
       : null
   })
 
   // override Identity and Equivalence logic to test by timestamp value
   link(proto, ['is', '===', 'equals', '=='], function (another) {
-    return this === another || compare.call(this, another) === 0
+    return this === another || comparesTo.call(this, another) === 0
   })
   link(proto, ['is-not', '!==', 'not-equals', '!='], function (another) {
-    return this !== another && compare.call(this, another) !== 0
+    return this !== another && comparesTo.call(this, another) !== 0
   })
 
   // ordering operators for instance values
   link(proto, '>', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order > 0 : null
   })
   link(proto, '>=', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order >= 0 : null
   })
   link(proto, '<', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order < 0 : null
   })
   link(proto, '<=', function (another) {
-    var order = compare.call(this, another)
+    var order = comparesTo.call(this, another)
     return order !== null ? order <= 0 : null
   })
 

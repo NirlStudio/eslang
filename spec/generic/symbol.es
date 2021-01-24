@@ -27,12 +27,12 @@
 
   (define "Ordering" (= ()
     (should "an empty symbol is less than any non-empty symbol." (= ()
-      (assert -1 ((symbol empty) compare (` a).
-      (assert -1 ((symbol empty) compare (` A).
-      (assert -1 ((symbol empty) compare (` z).
-      (assert -1 ((symbol empty) compare (` z).
-      (assert -1 ((symbol empty) compare (` -).
-      (assert -1 ((symbol empty) compare (` _).
+      (assert -1 ((symbol empty) compares-to (` a).
+      (assert -1 ((symbol empty) compares-to (` A).
+      (assert -1 ((symbol empty) compares-to (` z).
+      (assert -1 ((symbol empty) compares-to (` z).
+      (assert -1 ((symbol empty) compares-to (` -).
+      (assert -1 ((symbol empty) compares-to (` _).
     ).
     (should "non-empty symbols are compared by their string values." (= ()
       (var key-pairs (@
@@ -46,12 +46,12 @@
       ).
       (for pair in key-pairs
         (assert
-          ((pair 0) compare (pair 1).
-          ((symbol of (pair 0)) compare (symbol of (pair 1).
+          ((pair 0) compares-to (pair 1).
+          ((symbol of (pair 0)) compares-to (symbol of (pair 1).
         ).
         (assert
-          ((pair 1) compare (pair 0).
-          ((symbol of (pair 1)) compare (symbol of (pair 0).
+          ((pair 1) compares-to (pair 0).
+          ((symbol of (pair 1)) compares-to (symbol of (pair 0).
         ).
       ).
     ).

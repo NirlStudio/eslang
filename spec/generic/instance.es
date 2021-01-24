@@ -65,7 +65,7 @@
   (define "Ordering" (=> ()
     (should "comparison of an instance with itself returns 0." (=> ()
       (for a in (the-values concat (@:cat) (@:cat))
-        (assert 0 (a compare a).
+        (assert 0 (a compares-to a).
       ).
     ).
     (should "comparison of two different instances return null." (=> ()
@@ -73,7 +73,7 @@
       (for a in values
         (for b in values
           (if (a is-not b)
-            (assert null (a compare b).
+            (assert null (a compares-to b).
       ).
     ).
   ).
@@ -252,47 +252,47 @@
   (define "Ordering" (= ()
     (var cls (@:class
       equals: (=(another) (value == (another value).
-      compare: (=(another) (value - (another value) -1).
+      compares-to: (=(another) (value - (another value) -1).
     ).
     (var inst1 (@:cls value: 8).
     (var inst2 (@:cls value: 8).
     (var inst3 (@:cls value: 7).
     (should "comparison of an instance with itself always returns 0." (=> ()
-      (assert 0 (inst1 compare inst1).
-      (assert 0 (inst2 compare inst2).
-      (assert 0 (inst3 compare inst3).
+      (assert 0 (inst1 compares-to inst1).
+      (assert 0 (inst2 compares-to inst2).
+      (assert 0 (inst3 compares-to inst3).
     ).
     (should "comparison two equivalent instances always returns 0." (=> ()
       (assert (inst1 equals inst2).
-      (assert 0 (inst1 compare inst2).
+      (assert 0 (inst1 compares-to inst2).
 
       (assert (inst2 equals inst1).
-      (assert 0 (inst2 compare inst1).
+      (assert 0 (inst2 compares-to inst1).
     ).
     (should "a positive value will be converted to 1." (=> ()
       (assert (inst1 not-equals inst3).
       (assert false (inst1 equals inst3).
-      (assert 1 (inst1 compare inst3).
+      (assert 1 (inst1 compares-to inst3).
     ).
     (should "a zero value will be kept." (=> ()
-      (assert 0 (inst3 compare inst1).
+      (assert 0 (inst3 compares-to inst1).
     ).
     (should "a negative value will be converted to -1." (=> ()
       (var inst4 (@:cls value: 6).
-      (assert -1 (inst4 compare inst1).
+      (assert -1 (inst4 compares-to inst1).
     ).
     (should "a not-a-number value will be converted to null." (=> ()
       (var inst4 (@:cls value: (number invalid).
-      (assert null (inst4 compare inst1).
-      (assert null (inst1 compare inst4).
+      (assert null (inst4 compares-to inst1).
+      (assert null (inst1 compares-to inst4).
 
       (let inst4 (@:cls value: true).
-      (assert null (inst4 compare inst1).
-      (assert 1 (inst1 compare inst4).
+      (assert null (inst4 compares-to inst1).
+      (assert 1 (inst1 compares-to inst4).
 
       (let inst4 (@:cls value: (@).
-      (assert null (inst4 compare inst1).
-      (assert null (inst1 compare inst4).
+      (assert null (inst4 compares-to inst1).
+      (assert null (inst1 compares-to inst4).
     ).
   ).
 

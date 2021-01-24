@@ -25,7 +25,7 @@
   (define "Ordering" (=> ()
     (should "comparison of a class with itself returns 0." (=> ()
       (for a in (the-values concat (@:class) (@:class))
-        (assert 0 (a compare a).
+        (assert 0 (a compares-to a).
       ).
     ).
     (should "comparison of two different classes return null." (=> ()
@@ -33,7 +33,7 @@
       (for a in values
         (for b in values
           (if (a is-not b)
-            (assert null (a compare b).
+            (assert null (a compares-to b).
       ).
     ).
   ).

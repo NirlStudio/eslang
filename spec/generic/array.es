@@ -31,7 +31,7 @@
   (define "Ordering" (=> ()
     (should "comparison of an array with itself returns 0." (=> ()
       (for a in (the-values concat (@) (@))
-        (assert 0 (a compare a).
+        (assert 0 (a compares-to a).
       ).
     ).
     (should "comparison of two different arrays return null." (=> ()
@@ -39,7 +39,7 @@
       (for a in values
         (for b in values
           (if (a is-not b)
-            (assert null (a compare b).
+            (assert null (a compares-to b).
       ).
     ).
   ).

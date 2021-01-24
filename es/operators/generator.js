@@ -62,7 +62,7 @@ module.exports = function generator ($void) {
   staticOperator('==', generatorOf('equals'), $['equals'])
   staticOperator('!=', generatorOf('not-equals'), $['not-equals'])
 
-  generatorOf('compare')
+  generatorOf('compares-to')
 
   generatorOf('is-empty')
   generatorOf('not-empty')
