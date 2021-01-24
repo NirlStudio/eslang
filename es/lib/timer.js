@@ -128,5 +128,5 @@ module.exports = function timerIn ($void) {
     return this
   })
 
-  $export($void, '$timer', timer)
+  $export($void.$app, 'timer', timer)
 }

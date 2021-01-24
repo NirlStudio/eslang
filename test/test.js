@@ -126,7 +126,7 @@ module.exports = function testIn ($void) {
 
     checkFunctions($void, '[Espresso / functions] ', [
       // runtime
-      '$env', '$run'
+      '$env', 'env', '$run', '$warn', '$print', '$printf'
     ])
 
     checkStaticOperators('[Espresso / generators] ', [
@@ -175,8 +175,8 @@ module.exports = function testIn ($void) {
       'max', 'min'
     ])
 
-    checkFunctions($void, '[Espresso / lib / app-only functions] ', [
-      '$print', '$printf', '$warn', '$espress'
+    checkFunctions($void.$app, '[Espresso / lib / app-only functions] ', [
+      'env', 'run', 'warn', 'print', 'printf', 'espress'
     ])
 
     checkObjects($, '[Espresso / lib / objects] ', [
@@ -187,8 +187,8 @@ module.exports = function testIn ($void) {
       'emitter'
     ])
 
-    checkObjects($void, '[Espresso / lib / classes] ', [
-      '$timer'
+    checkObjects($void.$app, '[Espresso / lib / app classes] ', [
+      'timer'
     ])
 
     // bootstrap tests

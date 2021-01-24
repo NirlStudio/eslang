@@ -21,7 +21,7 @@ module.exports = function run ($void) {
   }
 
   // run a module from source as an application.
-  $export($void, '$run', function (appUri, args, appHome) {
+  $void.$run = $export($void.$app, 'run', function (appUri, args, appHome) {
     if (typeof appUri !== 'string') {
       warn('run', 'invalid app uri type:', typeof appUri, 'of', appUri)
       return null

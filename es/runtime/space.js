@@ -161,16 +161,10 @@ module.exports = function space ($void) {
 
   $void.createAppSpace = function (uri, home) {
     var app = Object.create($)
+    Object.assign(app, $void.$app)
     app['-app'] = uri
     app['-app-dir'] = dirname(uri)
     app['-app-home'] = home || app['-app-dir']
-    app.env = $void.$env
-    app.run = $void.$run
-    app.warn = $void.$warn
-    app.print = $void.$print
-    app.printf = $void.$printf
-    app.espress = $void.$espress
-    app.timer = $void.$timer
 
     var local = Object.create(app)
     local['-module'] = app['-app']

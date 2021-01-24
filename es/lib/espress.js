@@ -74,7 +74,7 @@ module.exports = function espressIn ($void) {
 
   var objectOfGenericFunc = $Function.proto.generic
 
-  $export($void, '$espress', function (src) {
+  $export($void.$app, 'espress', function (src) {
     // espress only returns null, a string or an object.
     if (typeof src === 'string') {
       return hyphenize(src)

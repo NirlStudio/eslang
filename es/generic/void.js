@@ -29,6 +29,9 @@ module.exports = function voidSetup ($void) {
   var ClassType$ = $void.ClassType
   var isApplicable = $void.isApplicable
 
+  // a temporary space to keep app-only global functions.
+  $void.$app = Object.create(null)
+
   // flag indicates if it's running in native host.
   $void.isNativeHost = typeof window === 'undefined'
 

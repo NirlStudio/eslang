@@ -16,7 +16,7 @@ module.exports = function runtime ($void) {
   })
 
   // this will be put into app space only.
-  $export($void, '$env', function (name, defaulue) {
+  $void.$env = $export($void.$app, 'env', function (name, defaulue) {
     return typeof name === 'undefined' || name === null
       ? Object.assign(emptyObject(), environment)
       : typeof name !== 'string' ? null
@@ -24,6 +24,7 @@ module.exports = function runtime ($void) {
           : typeof defaulue !== 'undefined' ? defaulue : null
   })
 
+  // allow runtime to update environment.
   $void.env = function (name, value) {
     return typeof value === 'undefined' ? environment[name]
       : (environment[name] = value)

@@ -6,9 +6,10 @@ module.exports = function ($void, stdout) {
   var thisCall = $void.thisCall
   var staticOperator = $void.staticOperator
 
-  var env = function (name) {
-    env = $void.env
-    return env(name)
+  // late binding: transient wrappers
+  var $env = function (name) {
+    $env = $void.$env
+    return $env(name)
   }
   var evaluate = function (clause, space) {
     evaluate = $void.evaluate
@@ -19,12 +20,12 @@ module.exports = function ($void, stdout) {
   }
 
   // standard output.
-  $export($void, '$print', function (value) {
+  $void.$print = $export($void.$app, 'print', function (value) {
     return stdout.print.apply(stdout, arguments)
   })
 
   // standard output.
-  $export($void, '$printf', function (value, format) {
+  $void.$printf = $export($void.$app, 'printf', function (value, format) {
     return stdout.printf(
       typeof value === 'undefined' ? '' : value,
       typeof format === 'undefined' ? null : format
@@ -39,7 +40,7 @@ module.exports = function ($void, stdout) {
       : [ts, lastWarning[1][1] + 1]
   }
 
-  $export($void, '$warn', function (category) {
+  $void.$warn = $export($void.$app, 'warn', function (category) {
     if (typeof category === 'undefined') {
       return lastWarning
     }
@@ -59,7 +60,7 @@ module.exports = function ($void, stdout) {
   })
 
   $export($void, '$debug', function () {
-    if (env('is-debugging') !== true) {
+    if ($env('is-debugging') !== true) {
       return false
     }
     stdout.debug.apply(stdout, arguments)
@@ -76,9 +77,9 @@ module.exports = function ($void, stdout) {
       (i > 1) && args.push('\n ')
       args.push(sourceOf(clist[i]), '=', evaluate(clist[i], space))
     }
-    if (env('is-debugging') === true) {
+    if ($env('is-debugging') === true) {
       stdout.debug.apply(stdout, args)
-    } else if (env('logging-level') >= 2) {
+    } else if ($env('logging-level') >= 2) {
       lastWarning = ['stdout:debug',
         '(debug ...) is only for temporary usage in coding.',
         'Please consider to remove it or replace it with (log d ...) for',
@@ -123,21 +124,21 @@ module.exports = function ($void, stdout) {
     switch (type.toLowerCase()) {
       case 'd':
       case 'debug':
-        return env('is-debugging') === true ? stdout.debug : null
+        return $env('is-debugging') === true ? stdout.debug : null
       case 'v':
       case 'verbose':
-        return env('logging-level') >= 4 ? stdout.verbose : null
+        return $env('logging-level') >= 4 ? stdout.verbose : null
       case 'i':
       case 'info':
-        return env('logging-level') >= 3 ? stdout.info : null
+        return $env('logging-level') >= 3 ? stdout.info : null
       case 'w':
       case 'warn':
       case 'warning':
-        return env('logging-level') >= 2 ? stdout.warn : null
+        return $env('logging-level') >= 2 ? stdout.warn : null
       case 'e':
       case 'err':
       case 'error':
-        return env('logging-level') >= 1 ? stdout.error : null
+        return $env('logging-level') >= 1 ? stdout.error : null
       default:
         return false
     }
