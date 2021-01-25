@@ -1,26 +1,30 @@
 # Espresso Script Language - eslang
 ### A simple &amp; expressive script language, which is inspired by Lisp, Python, JavaScript and many other great languages.
-```python
+```lisp
 print "Hello, world!";
 
 # or, without sweetener
 (print "Hello, world!")
+
+# or, with some decoration
+printf "Hello, world!\n", "green bold underline";
 ```
 
 # Try it online
 ### [Espresso Web Shell](https://eslang.dev)
-```python
+```lisp
 help; # for help.
 
-# to verify your browser's compatibility.
+# verify your browser's compatibility.
 selftest;
 
-# to run a quick-sort example
+# run a quick-sort example
 run "examples/qsort1";
-# to print its code
+
+# print its code
 print (.loader read "examples/qsort1");
 
-# try to list all examples
+# list all examples
 .loader list "examples/";
 
 # use print to show a full list.
@@ -29,7 +33,7 @@ print (.loader list "examples/");
 # break items into lines
 .loader list "examples/":: for-each print;
 
-# display source url only
+# display file url only
 .loader list "examples/":: for-each (= item (print (item 0);
 
 # display item no. for counting
@@ -73,7 +77,7 @@ es examples/qsort1
 es
 ```
 ### You can do [almost the same things](#try-it-online) after calling
-```python
+```lisp
 fetch "https://eslang.dev/@";
 
 # or try

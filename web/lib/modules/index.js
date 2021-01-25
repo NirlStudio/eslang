@@ -9,7 +9,7 @@ var RuntimeModules = new Set([
 
 module.exports = function modulesIn ($void) {
   $void.$io = require('./io')($void)
-  $void.$path = require('./path')($void)
+  $void.$path = require('../../../lib/modules/path-http')($void)
   $void.$symbols = require('../../../lib/modules/symbols')($void)
 
   var modules = Object.create(null)

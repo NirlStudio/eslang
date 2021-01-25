@@ -127,8 +127,8 @@
     (should "$eslang/path" (= ()
       (var mod (import "$eslang/path").
       (assert (mod is-an object).
-      (assert false (object is-plain mod).
-      (assert (object is-generic mod).
+      (assert (object is-plain mod).
+      (assert false (object is-generic mod).
     ).
     (should "$eslang/symbols" (= ()
       (var mod (import "$eslang/symbols").

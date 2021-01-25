@@ -11,6 +11,10 @@ module.exports = function run ($void) {
   var atomicArrayOf = $void.atomicArrayOf
 
   // late binding: transient wrappers
+  var isRemote = function $isRemote () {
+    isRemote = $void.loader.isRemote.bind($void.loader)
+    return isRemote.apply(null, arguments)
+  }
   var isAbsolutePath = function $isAbsolutePath () {
     isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
     return isAbsolutePath.apply(null, arguments)
@@ -36,7 +40,8 @@ module.exports = function run ($void) {
 
     // try to resolve the uri for source
     appUri = completeFile(appUri)
-    var uri = isAbsolutePath(appUri) ? appUri : resolvePath(appHome, appUri)
+    var uri = isAbsolutePath(appUri) || isRemote(appUri) ? appUri
+      : resolvePath(appHome, appUri)
     if (typeof uri !== 'string') {
       warn('run', 'failed to resolve app at', uri)
       return null
