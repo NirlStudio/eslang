@@ -225,6 +225,13 @@ module.exports = function tupleIn ($void) {
   })
 
   // expand to a string list as an enclosed expression or a series of expressions.
+  var punctuations = new Set([
+    $Symbol.begin,
+    $Symbol.end,
+    $Symbol.comma,
+    $Symbol.semicolon,
+    $Symbol.pairing
+  ])
   var encode = function (list, indent, padding) {
     if (!Array.isArray(list)) {
       list = []
@@ -264,8 +271,11 @@ module.exports = function tupleIn ($void) {
 
     list.push('(')
     var first = true
+    var isLiteral = false
     for (i = 0; i < this.$.length; i++) {
       item = this.$[i]
+      ;(i === 0) && (isLiteral = item === $Symbol.literal)
+      ;(i === 1) && (isLiteral = isLiteral && (item === $Symbol.pairing))
       if (item instanceof Tuple$) {
         if (item.plain) {
           if (item.$.length > 0) {
@@ -277,10 +287,16 @@ module.exports = function tupleIn ($void) {
           encode.call(item, list, indent, padding)
         }
       } else {
-        first || item === $Symbol.pairing || (
-          i === 2 && list[1] === '@' && list[2] === ':'
-        ) ? (first = false) : list.push(' ')
-        list.push($void.thisCall(item, 'to-string'))
+        if (punctuations.has(item)) {
+          list.push(item.key)
+        } else if ($void.operatorSymbols.has(item) && i < 1) {
+          first = false
+          list.push(item.key)
+        } else {
+          first ? (first = false)
+            : isLiteral && i > 1 ? (isLiteral = false) : list.push(' ')
+          list.push($void.thisCall(item, 'to-string'))
+        }
       }
     }
     list.push(')')

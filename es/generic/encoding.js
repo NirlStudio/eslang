@@ -69,11 +69,12 @@ module.exports = function encodingIn ($void) {
         : new Tuple$([symbolClass, symbolAttach, ref, code])
   }
 
-  $void.EncodingContext = function (root) {
+  $void.EncodingContext = function (root, printing) {
     this.objects = createIndex()
     this.objects.add(this.root = root, null)
     this.clist = []
     this.shared = []
+    this.printing = printing
   }
   $void.EncodingContext.prototype = {
     _createRef: function (offset) {

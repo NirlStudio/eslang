@@ -17,6 +17,7 @@ module.exports = function setIn ($void) {
   var EncodingContext$ = $void.EncodingContext
   var iterateOfGeneric = $void.iterateOfGeneric
 
+  var symbolComma = $Symbol.comma
   var symbolLiteral = $Symbol.literal
   var symbolPairing = $Symbol.pairing
   var symbolSet = sharedSymbolOf('set')
@@ -47,7 +48,6 @@ module.exports = function setIn ($void) {
   link(proto, 'has', function (value) {
     return this.has(value)
   })
-
   link(proto, 'contains', function (items) {
     if (!(items instanceof Set) && !Array.isArray(items)) {
       items = $Array.from(items)
@@ -66,20 +66,18 @@ module.exports = function setIn ($void) {
     }
     return this
   })
-
   link(proto, ['combines-with', 'combines', '+='], function () {
     for (var i = 0, len = arguments.length; i < len; i++) {
-      var entries = arguments[i]
-      if (!(entries instanceof Set) && !Array.isArray(entries)) {
-        entries = $Array.from(entries)
+      var items = arguments[i]
+      if (!(items instanceof Set) && !Array.isArray(items)) {
+        items = $Array.from(items)
       }
-      for (var entry of entries) {
-        this.add(entry)
+      for (var item of items) {
+        this.add(item)
       }
     }
     return this
   })
-
   link(proto, ['merge', '+'], function () {
     var sources = Array.prototype.slice.call(arguments)
     sources.unshift(this)
@@ -96,26 +94,24 @@ module.exports = function setIn ($void) {
   // delete elements in other collection(s)
   link(proto, 'remove', function () {
     for (var i = 0, len = arguments.length; i < len; i++) {
-      var entries = arguments[i]
-      if (!(entries instanceof Set) && !Array.isArray(entries)) {
-        entries = $Array.from(entries)
+      var items = arguments[i]
+      if (!(items instanceof Set) && !Array.isArray(items)) {
+        items = $Array.from(items)
       }
-      for (var entry of entries) {
-        this.delete(entry)
+      for (var item of items) {
+        this.delete(item)
       }
     }
     return this
   })
-
   link(proto, 'clear', function () {
     this.clear()
     return this
   })
 
-  link(proto, 'iterate', function (begin, count) {
+  link(proto, 'iterate', function () {
     return iterateOfGeneric(this.values())
   })
-
   link(proto, 'values', function () {
     return iteratorOfGeneric(this.values())
   })
@@ -130,10 +126,8 @@ module.exports = function setIn ($void) {
       return this.size // keep consistency with array.
     }
     var counter = 0
-    this.forEach(function (v) {
-      (typeof v === 'undefined'
-        ? boolValueOf(filter.call(this))
-        : boolValueOf(filter.call(this, v))) && counter++
+    this.forEach(function (v, _, s) {
+      boolValueOf(filter.call(s, v)) && counter++
     })
     return counter
   })
@@ -186,7 +180,6 @@ module.exports = function setIn ($void) {
       : reverse ? -1 : 1
   })
 
-  // Emptiness: The empty symbol's key is an empty string.
   link(proto, 'is-empty', function () {
     return !(this.size > 0)
   })
@@ -195,15 +188,19 @@ module.exports = function setIn ($void) {
   })
 
   // default object persistency & describing logic
-  var toCode = link(proto, 'to-code', function (ctx) {
-    if (ctx instanceof EncodingContext$) {
+  var toCode = link(proto, 'to-code', function (printing) {
+    var ctx
+    if (printing instanceof EncodingContext$) {
+      ctx = printing
       var sym = ctx.begin(this)
       if (sym) { return sym }
     } else {
-      ctx = new EncodingContext$(this)
+      ctx = new EncodingContext$(this, printing)
     }
     var code = [symbolLiteral, symbolPairing, symbolSet]
+    var first = true
     for (var item of this) {
+      first ? (first = false) : ctx.printing && code.push(symbolComma)
       code.push(ctx.encode(item))
     }
     return ctx.end(this, Type, new Tuple$(code))
@@ -211,7 +208,7 @@ module.exports = function setIn ($void) {
 
   // Description
   link(proto, 'to-string', function () {
-    return thisCall(toCode.call(this), 'to-string')
+    return thisCall(toCode.call(this, true), 'to-string')
   })
 
   // Indexer

@@ -158,7 +158,7 @@
     (assert "(x y)" (string of (tuple of (` x) (` y).
 
     (assert "(@ 1)" (string of (@ 1).
-    (assert "(@ 1 2)" (string of (@ 1 2).
+    (assert "(@ 1, 2)" (string of (@ 1 2).
 
     (assert "(@:)" (string of (@:).
     (assert "(@ x: 1)" (string of (@ x:1).

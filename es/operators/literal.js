@@ -65,7 +65,7 @@ module.exports = function literal ($void) {
     var length = clist.length
     while (offset < length) {
       var key = evaluate(clist[offset++], space)
-      if (clist[offset++] === symbolPairing && offset < length) {
+      if (clist[offset] === symbolPairing && (++offset <= length)) {
         map.set(key, evaluate(clist[offset++], space))
       } else {
         map.set(key, null)

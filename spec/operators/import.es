@@ -121,26 +121,26 @@
     (should "$eslang/io" (= ()
       (var mod (import "$eslang/io").
       (assert (mod is-an object).
-      (assert "$eslang/io" (mod -module).
-      (assert null (mod -module-dir).
+      (assert (object is-plain mod).
+      (assert false (object is-generic mod).
     ).
     (should "$eslang/path" (= ()
       (var mod (import "$eslang/path").
       (assert (mod is-an object).
-      (assert "$eslang/path" (mod -module).
-      (assert null (mod -module-dir).
+      (assert false (object is-plain mod).
+      (assert (object is-generic mod).
     ).
     (should "$eslang/symbols" (= ()
       (var mod (import "$eslang/symbols").
       (assert (mod is-an object).
-      (assert "$eslang/symbols" (mod -module).
-      (assert null (mod -module-dir).
+      (assert (object is-plain mod).
+      (assert false (object is-generic mod).
     ).
     (should "$eslang/global" (= ()
       (var mod (import "$eslang/global").
       (assert (mod is-an object).
-      (assert "$eslang/global" (mod -module).
-      (assert null (mod -module-dir).
+      (assert false (object is-plain mod).
+      (assert false (object is-generic mod).
 
       (assert (mod "setTimeout":: is-a function).
       (assert (mod "clearTimeout":: is-a function).

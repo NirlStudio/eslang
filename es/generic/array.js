@@ -38,6 +38,10 @@ module.exports = function arrayIn ($void) {
   var protoValueOf = $void.protoValueOf
   var EncodingContext$ = $void.EncodingContext
 
+  var symbolComma = $Symbol.comma
+  var symbolLiteral = $Symbol.literal
+  var symbolPairing = $Symbol.pairing
+
   // create an empty array.
   link(Type, 'empty', function () {
     return []
@@ -87,9 +91,9 @@ module.exports = function arrayIn ($void) {
   link(proto, ['count', 'for-each'], function (filter) {
     var counter = 0
     if (isApplicable(filter)) {
-      this.forEach(function (v, i) {
+      this.forEach(function (v, i, arr) {
         typeof v !== 'undefined' &&
-          boolValueOf(filter.call(this, v, i)) && counter++
+          boolValueOf(filter.call(arr, v, i)) && counter++
       })
     } else {
       this.forEach(function (v) {
@@ -112,11 +116,11 @@ module.exports = function arrayIn ($void) {
   var trace = link(proto, 'trace', function (tracer) {
     if (isApplicable(tracer)) {
       try {
-        this.forEach(function (v, i, s) {
-          if (typeof v !== 'undefined' && boolValueOf(tracer.call(s, v, i))) {
+        this.forEach(function (v, i, arr) {
+          if (typeof v !== 'undefined' && boolValueOf(tracer.call(arr, v, i))) {
             throw stopSignal
           }
-        }, this)
+        })
       } catch (err) {
         if (err !== stopSignal) throw err
       }
@@ -556,18 +560,22 @@ module.exports = function arrayIn ($void) {
   })
 
   // default object persistency & describing logic
-  var toCode = link(proto, 'to-code', function (ctx) {
-    if (ctx instanceof EncodingContext$) {
+  var toCode = link(proto, 'to-code', function (printing) {
+    var ctx
+    if (printing instanceof EncodingContext$) {
+      ctx = printing
       var sym = ctx.begin(this)
       if (sym) { return sym }
     } else {
-      ctx = new EncodingContext$(this)
+      ctx = new EncodingContext$(this, printing)
     }
-    var code = [$Symbol.literal]
+    var code = [symbolLiteral]
+    var first = true
     var last = -1
     trace.call(this, function (v, i) {
-      v = ctx.encode(v);
-      (i - last) > 1 ? code.push(i, $Symbol.pairing, v) : code.push(v)
+      first ? (first = false) : ctx.printing && code.push(symbolComma)
+      v = ctx.encode(v)
+      ;(i - last) > 1 ? code.push(i, symbolPairing, v) : code.push(v)
       last = i
     })
     return ctx.end(this, Type, new Tuple$(code))
@@ -575,7 +583,7 @@ module.exports = function arrayIn ($void) {
 
   // Description
   link(proto, 'to-string', function () {
-    return thisCall(toCode.call(this), 'to-string')
+    return thisCall(toCode.call(this, true), 'to-string')
   })
 
   // Indexer

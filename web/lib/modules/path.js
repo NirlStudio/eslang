@@ -25,7 +25,7 @@ function parseUrl (path) {
 module.exports = function pathIn ($void) {
   var BaseUrl = $void.$env('home')
 
-  var $path = Object.create(null)
+  var $path = {} // use the same type as it's in nodejs.
   $path.delimiter = Delimiter
   $path.sep = Separator
 

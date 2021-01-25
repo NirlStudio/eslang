@@ -16,6 +16,10 @@ module.exports = function objectIn ($void) {
   var encodeFieldName = $void.encodeFieldName
   var EncodingContext$ = $void.EncodingContext
 
+  var symbolComma = $Symbol.comma
+  var symbolLiteral = $Symbol.literal
+  var symbolPairing = $Symbol.pairing
+
   // create an empty object.
   var createObject = link(Type, 'empty', Object.create.bind(Object, Type.proto))
 
@@ -274,21 +278,25 @@ module.exports = function objectIn ($void) {
   // Encoding
   // encoding logic for all object instances.
   var typeOf = $.type.of
-  var toCode = link(proto, 'to-code', function (ctx) {
-    if (ctx instanceof EncodingContext$) {
+  var toCode = link(proto, 'to-code', function (printing) {
+    var ctx
+    if (printing instanceof EncodingContext$) {
+      ctx = printing
       var sym = ctx.begin(this)
       if (sym) { return sym }
     } else {
-      ctx = new EncodingContext$(this)
+      ctx = new EncodingContext$(this, printing)
     }
     var props = Object.getOwnPropertyNames(this)
-    var code = [$Symbol.literal]
+    var code = [symbolLiteral]
+    var first = true
     for (var i = 0; i < props.length; i++) {
+      first ? (first = false) : ctx.printing && code.push(symbolComma)
       var name = props[i]
-      code.push(encodeFieldName(name), $Symbol.pairing, ctx.encode(this[name]))
+      code.push(encodeFieldName(name), symbolPairing, ctx.encode(this[name]))
     }
     if (code.length < 2) {
-      code.push($Symbol.pairing) // (@:) for empty object
+      code.push(symbolPairing) // (@:) for empty object
     }
     var type = this.type instanceof ClassType$ ? this.type : typeOf(this)
     return ctx.end(this, type, new Tuple$(code))
@@ -296,7 +304,7 @@ module.exports = function objectIn ($void) {
 
   // Description
   link(proto, 'to-string', function () {
-    return thisCall(toCode.call(this), 'to-string')
+    return thisCall(toCode.call(this, true), 'to-string')
   })
 
   // Indexer:

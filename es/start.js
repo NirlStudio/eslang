@@ -90,6 +90,11 @@ function initializeSharedSymbols ($void) {
   for (key in $void.$app) {
     sharedSymbolOf(key)
   }
+  $void.operatorSymbols = new Set(
+    Object.keys($void.staticOperators).map(key =>
+      sharedSymbolOf(key)
+    )
+  )
 }
 
 module.exports = function start (stdout) {

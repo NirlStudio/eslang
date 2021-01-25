@@ -22,14 +22,23 @@ module.exports = function iterate ($void) {
   }
 
   // try to get an iterator function for an entity
-  var iterateOfGeneric = $void.iterateOfGeneric = function (iterator) {
+  var iterateOfGeneric = $void.iterateOfGeneric = function (iterator, expandValue) {
     if (!iterator || typeof iterator.next !== 'function') {
-      // TODO: give a warning
       return null
     }
 
     var current
-    return function next (inSitu) {
+    return expandValue ? function (inSitu) {
+      if (typeof current !== 'undefined' &&
+        typeof inSitu !== 'undefined' && boolValueOf(inSitu)) {
+        return current
+      }
+      if (current === null) {
+        return null
+      }
+      var step = iterator.next()
+      return (current = !step || step.done ? null : step.value)
+    } : function (inSitu) {
       if (typeof current !== 'undefined' &&
         typeof inSitu !== 'undefined' && boolValueOf(inSitu)) {
         return current
@@ -418,7 +427,7 @@ module.exports = function iterate ($void) {
 
   // Description
   var tupleToString = $.tuple.proto['to-string']
-  var emptyCodeStr = tupleToString.call(emptyCode)
+  var emptyCodeStr = '(iterator empty)'
   link(proto, 'to-string', function (separator) {
     return !this.next ? emptyCodeStr
       : tupleToString.call(toCode.call(this))

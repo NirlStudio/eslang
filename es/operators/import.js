@@ -11,6 +11,7 @@ module.exports = function import_ ($void) {
   var execute = $void.execute
   var evaluate = $void.evaluate
   var isObject = $void.isObject
+  var ownsProperty = $void.ownsProperty
   var safelyAssign = $void.safelyAssign
   var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
@@ -112,7 +113,7 @@ module.exports = function import_ ($void) {
     for (var key in exporting) {
       // inner fields will not be copied by statement like:
       //   (var * (import "module"))
-      if (!key.startsWith('-')) {
+      if (!key.startsWith('-') && ownsProperty(exporting, key)) {
         ref[key] = exporting[key]
       }
     }
@@ -155,7 +156,9 @@ module.exports = function import_ ($void) {
     if (!module_.exporting) {
       module_.exporting = Object.create($Object.proto)
     }
-    Object.assign(module_.exporting, module_.props)
+    if (!module_.isNative) {
+      Object.assign(module_.exporting, module_.props)
+    }
     return module_
   }
 
