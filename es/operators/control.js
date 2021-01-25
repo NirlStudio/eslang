@@ -141,8 +141,9 @@ module.exports = function control ($void) {
 
   // (for value in iterable body) OR
   // (for (value) in iterable body) OR
-  // (for (value index) in iterable/array body) OR
-  // (for (key value) in iterable/map body)
+  // (for (value1, value2, ...) in iterable body) OR
+  // (for (value index) in an-array body) OR
+  // (for (key value) in a-map-or-object body)
   function forEach (space, clause, fields, next, offset) {
     var clist = clause.$
     var length = clist.length
