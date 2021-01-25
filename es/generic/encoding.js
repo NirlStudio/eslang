@@ -7,8 +7,7 @@
 //  - anything defined in type cannot be overridden in instance
 //  - object.proto.* will allow the overridden and ensure the consistency and type safe.
 
-// polyfill Map & Array.prototype.indexOf
-var createIndex = typeof Map === 'function' ? function () {
+var createIndex = function () {
   var index = new Map()
   return {
     get: index.get.bind(index),
@@ -18,51 +17,6 @@ var createIndex = typeof Map === 'function' ? function () {
     },
     add: function (key, value) {
       index.set(key, value)
-      return value
-    }
-  }
-} : typeof Array.prototype.indexOf === 'function' ? function () {
-  var keys = []
-  var values = []
-  return {
-    get: function (key) {
-      var offset = keys.indexOf(key)
-      if (offset >= 0) {
-        return values[offset]
-      }
-    },
-    set: function (key, value) {
-      var offset = keys.indexOf(key)
-      return offset >= 0 ? (values[offset] = value) : this.add(key, value)
-    },
-    add: function (key, value) {
-      keys.push(key)
-      values.push(value)
-      return value
-    }
-  }
-} : function () {
-  var keys = []
-  var values = []
-  return {
-    get: function (key) {
-      for (var i = keys.length - 1; i >= 0; i--) {
-        if (keys[i] === key) {
-          return values[i]
-        }
-      }
-    },
-    set: function (key, value) {
-      for (var i = keys.length - 1; i >= 0; i--) {
-        if (keys[i] === key) {
-          return (values[i] = value)
-        }
-      }
-      return this.add(key, value)
-    },
-    add: function (key, value) {
-      keys.push(key)
-      values.push(value)
       return value
     }
   }
@@ -83,6 +37,9 @@ module.exports = function encodingIn ($void) {
   var symbolLocals = sharedSymbolOf('_')
   var symbolObject = sharedSymbolOf('object')
   var symbolClass = sharedSymbolOf('class')
+  var symbolAppend = sharedSymbolOf('append')
+  var symbolAssign = sharedSymbolOf('assign')
+  var symbolAttach = sharedSymbolOf('attach')
 
   var normalize = function (type) {
     type = type['to-code']()
@@ -106,10 +63,10 @@ module.exports = function encodingIn ($void) {
       }
     }
     return type === $Array
-      ? new Tuple$([ref, $Symbol.of('append'), code])
+      ? new Tuple$([ref, symbolAppend, code])
       : type === $Object || (type = normalize(type)) === symbolObject
-        ? new Tuple$([symbolObject, $Symbol.of('assign'), ref, code])
-        : new Tuple$([symbolClass, $Symbol.of('attach'), ref, code])
+        ? new Tuple$([symbolObject, symbolAssign, ref, code])
+        : new Tuple$([symbolClass, symbolAttach, ref, code])
   }
 
   $void.EncodingContext = function (root) {

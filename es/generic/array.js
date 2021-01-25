@@ -153,7 +153,7 @@ module.exports = function arrayIn ($void) {
     })
     var current
     begin = 0; end = indices.length
-    return function (inSitu) {
+    return function next (inSitu) {
       if (typeof current !== 'undefined' &&
         typeof inSitu !== 'undefined' && boolValueOf(inSitu)) {
         return current

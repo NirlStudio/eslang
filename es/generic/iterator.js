@@ -21,6 +21,27 @@ module.exports = function iterate ($void) {
       : isApplicable(source = thisCall(source, 'iterate')) ? source : null
   }
 
+  // try to get an iterator function for an entity
+  var iterateOfGeneric = $void.iterateOfGeneric = function (iterator) {
+    if (!iterator || typeof iterator.next !== 'function') {
+      // TODO: give a warning
+      return null
+    }
+
+    var current
+    return function next (inSitu) {
+      if (typeof current !== 'undefined' &&
+        typeof inSitu !== 'undefined' && boolValueOf(inSitu)) {
+        return current
+      }
+      if (current === null) {
+        return null
+      }
+      var step = iterator.next()
+      return (current = !step || step.done ? null : [step.value])
+    }
+  }
+
   // create an empty iterator.
   var empty = link(Type, 'empty', new Iterator$(null))
 
@@ -30,6 +51,12 @@ module.exports = function iterate ($void) {
       return iterable
     }
     var next = iterateOf(iterable)
+    return next ? new Iterator$(next) : empty
+  }, true)
+
+  // create an iterator object for an native iterator.
+  link(Type, 'of-generic', function (iterator) {
+    var next = iterateOfGeneric(iterator)
     return next ? new Iterator$(next) : empty
   }, true)
 

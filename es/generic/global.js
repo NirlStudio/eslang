@@ -41,16 +41,4 @@ module.exports = function globalIn ($void) {
   $export($, sharedSymbolOf('descending').key, 1)
   $export($, sharedSymbolOf('equivalent').key, 0)
   $export($, sharedSymbolOf('ascending').key, -1)
-
-  // ensure type name symbols are shared.
-  var typeNames = [
-    'type',
-    'bool', 'string', 'number', 'date', 'range',
-    'symbol', 'tuple',
-    'operator', 'lambda', 'function',
-    'array', 'iterator', 'promise', 'object', 'class'
-  ]
-  for (var i = 0; i < typeNames.length; i++) {
-    sharedSymbolOf(typeNames[i])
-  }
 }

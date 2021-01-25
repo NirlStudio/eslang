@@ -113,6 +113,8 @@ module.exports = function testIn ($void) {
       ;(typeof console.log === 'undefined' ? failed : passed)('console.log')
       ;(typeof console.warn === 'undefined' ? failed : passed)('console.warn')
     }
+
+    ;(((a, b) => (a + b))(...[1, 2]) !== 3 ? failed : passed)('spread operator: ...')
   }
 
   function checkRuntime () {
@@ -157,7 +159,7 @@ module.exports = function testIn ($void) {
       'symbol', 'tuple',
       'operator', 'lambda', 'function',
       'iterator', 'promise',
-      'array', 'object', 'class'
+      'array', 'object', 'set', 'map', 'class'
     ])
 
     checkFunctions($, '[Espresso / functions] ', [

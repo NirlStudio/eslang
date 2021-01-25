@@ -221,6 +221,12 @@ module.exports = function () {
   }
   Object$.prototype = $.object.proto
 
+  // A collection of unique values indexed by themselves.
+  create('set')
+
+  // A collection of key-value pairs indexed by unique keys.
+  create('map')
+
   /*
     The Evolution.
   */

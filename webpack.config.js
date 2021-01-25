@@ -81,7 +81,7 @@ module.exports = (env, options) => {
     output: {
       filename: `${name}.js`,
       path: path.resolve(__dirname, 'dist/www'),
-      sourceMapFilename: `${name}.map`
+      sourceMapFilename: '[file].map'
     },
     devtool: 'source-map',
     devServer: {

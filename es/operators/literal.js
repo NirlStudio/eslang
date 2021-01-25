@@ -12,14 +12,18 @@ module.exports = function literal ($void) {
   var thisCall = $void.thisCall
   var evaluate = $void.evaluate
   var arraySet = $.array.proto.set
+  var sharedSymbolOf = $void.sharedSymbolOf
   var staticOperator = $void.staticOperator
 
-  var symbolPairing = $Symbol.pairing
   var symbolAll = $Symbol.all
   var symbolLiteral = $Symbol.literal
-  var symbolArray = $Symbol.of('array')
-  var symbolObject = $Symbol.of('object')
-  var symbolClass = $Symbol.of('class')
+  var symbolPairing = $Symbol.pairing
+
+  var symbolMap = sharedSymbolOf('map')
+  var symbolSet = sharedSymbolOf('set')
+  var symbolArray = sharedSymbolOf('array')
+  var symbolClass = sharedSymbolOf('class')
+  var symbolObject = sharedSymbolOf('object')
 
   // late binding
   var $warn = function warn () {
@@ -44,6 +48,30 @@ module.exports = function literal ($void) {
       }
     }
     return result
+  }
+
+  // (@:set value ...)
+  function setCreate (space, clist, offset) {
+    var result = new Set()
+    while (offset < clist.length) {
+      result.add(evaluate(clist[offset++], space))
+    }
+    return result
+  }
+
+  // (@:map symbol: value ...)
+  function mapCreate (space, clist, offset) {
+    var map = new Map()
+    var length = clist.length
+    while (offset < length) {
+      var key = evaluate(clist[offset++], space)
+      if (clist[offset++] === symbolPairing && offset < length) {
+        map.set(key, evaluate(clist[offset++], space))
+      } else {
+        map.set(key, null)
+      }
+    }
+    return map
   }
 
   // (@ symbol: value ...)
@@ -116,7 +144,11 @@ module.exports = function literal ($void) {
         : type === symbolAll || type === symbolArray
           // mandatory array: (@:* ...) (@:array ...)
           ? arrayCreate(space, clist, 3)
-          // class instance: (@:a-class ...)
-          : tryToCreateInstance(space, clist, evaluate(type, space), 3)
+          // set literal: (@:set ...)
+          : type === symbolSet ? setCreate(space, clist, 3)
+            // set literal: (@:set ...)
+            : type === symbolMap ? mapCreate(space, clist, 3)
+              // class instance: (@:a-class ...)
+              : tryToCreateInstance(space, clist, evaluate(type, space), 3)
   })
 }

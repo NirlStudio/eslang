@@ -25,6 +25,9 @@ function initializeSpace ($void) {
 
   require('./generic/array')($void)
   require('./generic/object')($void)
+  require('./generic/set')($void)
+  require('./generic/map')($void)
+
   require('./generic/class')($void)
 
   require('./generic/global')($void)
@@ -78,6 +81,17 @@ function initializeOperators ($void) {
   require('./operators/generator')($void)
 }
 
+function initializeSharedSymbols ($void) {
+  var sharedSymbolOf = $void.sharedSymbolOf
+  var key
+  for (key in $void.$) {
+    sharedSymbolOf(key)
+  }
+  for (key in $void.$app) {
+    sharedSymbolOf(key)
+  }
+}
+
 module.exports = function start (stdout) {
   // Hello, world.
   var $void = require('./generic/genesis')()
@@ -97,6 +111,9 @@ module.exports = function start (stdout) {
 
   // assemble & publish operators
   initializeOperators($void)
+
+  // cache symbols for all global entities.
+  initializeSharedSymbols($void)
 
   return $void
 }

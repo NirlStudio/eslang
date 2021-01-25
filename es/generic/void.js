@@ -8,6 +8,8 @@ function createEmptyOperation () {
 
 module.exports = function voidSetup ($void) {
   var $ = $void.$
+  var $Map = $.map
+  var $Set = $.set
   var $Tuple = $.tuple
   var $Bool = $.bool
   var $Date = $.date
@@ -55,27 +57,8 @@ module.exports = function voidSetup ($void) {
   $void.safelyBind = safelyBind
 
   // support native new operator on a constructor function
-  var newInstance = function (A, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) {
-    switch (arguments.length) {
-      case 0: return null
-      case 1: return new A()
-      case 2: return new A(b)
-      case 3: return new A(b, c)
-      case 4: return new A(b, c, d)
-      case 5: return new A(b, c, d, e)
-      case 6: return new A(b, c, d, e, f)
-      case 7: return new A(b, c, d, e, f, g)
-      case 8: return new A(b, c, d, e, f, g, h)
-      case 9: return new A(b, c, d, e, f, g, h, i)
-      case 10: return new A(b, c, d, e, f, g, h, i, j)
-      case 11: return new A(b, c, d, e, f, g, h, i, j, k)
-      case 12: return new A(b, c, d, e, f, g, h, i, j, k, l)
-      case 13: return new A(b, c, d, e, f, g, h, i, j, k, l, m)
-      case 14: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n)
-      case 15: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-      case 16: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
-      default: return new A(b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
-    }
+  var newInstance = function (T) {
+    return new T(...Array.prototype.slice(arguments, 1))
   }
   $void.newInstance = newInstance
 
@@ -189,12 +172,15 @@ module.exports = function voidSetup ($void) {
           : entity.type === $Operator ? $Operator
             : $Function
       case 'object':
+        // TODO: use symbol to inject type?
         return entity instanceof Type$$
           ? Object.getPrototypeOf(entity).type || $Object
           : Array.isArray(entity) ? $Array
             : entity instanceof Date ? $Date
               : entity instanceof Promise$ ? $Promise
-                : $Object
+                : entity instanceof Set ? $Set
+                  : entity instanceof Map ? $Map
+                    : $Object
       default:
         return null
     }
