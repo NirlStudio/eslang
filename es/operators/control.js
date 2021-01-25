@@ -125,7 +125,7 @@ module.exports = function control ($void) {
   // iterator-based loop
   // (for iterable body) - in this case, a variable name '_' is used.
   // (for i in iterable body)
-  // (for (i, j) in iterable body)
+  // (for (i, j, ...) in iterable body)
   staticOperator('for', function (space, clause) {
     var clist = clause.$
     var length = clist.length
@@ -141,7 +141,8 @@ module.exports = function control ($void) {
 
   // (for value in iterable body) OR
   // (for (value) in iterable body) OR
-  // (for (key value) in iterable body)
+  // (for (value index) in iterable/array body) OR
+  // (for (key value) in iterable/map body)
   function forEach (space, clause, fields, next, offset) {
     var clist = clause.$
     var length = clist.length

@@ -294,7 +294,7 @@ module.exports = function tupleIn ($void) {
           list.push(item.key)
         } else {
           first ? (first = false)
-            : isLiteral && i > 1 ? (isLiteral = false) : list.push(' ')
+            : isLiteral && i === 2 ? (isLiteral = false) : list.push(' ')
           list.push($void.thisCall(item, 'to-string'))
         }
       }
