@@ -1,3 +1,3 @@
 export io (import "./io");
-export style (import "./style");
+export style (import "./styles");
 export test (import "./test");

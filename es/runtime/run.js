@@ -11,16 +11,28 @@ module.exports = function run ($void) {
   var atomicArrayOf = $void.atomicArrayOf
 
   // late binding: transient wrappers
-  var isRemote = function $isRemote () {
-    isRemote = $void.loader.isRemote.bind($void.loader)
-    return isRemote.apply(null, arguments)
-  }
   var isAbsolutePath = function $isAbsolutePath () {
-    isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    if (!$void.$path.http) {
+      isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    } else {
+      isAbsolutePath = function $$isAbsolutePath (path) {
+        return $void.$path.http.isAbsolute(path) ||
+          $void.$path.isAbsolute(path)
+      }
+    }
     return isAbsolutePath.apply(null, arguments)
   }
   var resolvePath = function $resolvePath () {
-    resolvePath = $void.$path.resolve.bind($void.$path)
+    var $path = $void.$path
+    if (!$path.http) {
+      resolvePath = $path.resolve.bind($path)
+    } else {
+      resolvePath = function $$resolvePath (base) {
+        return $path.http.isAbsolute(base)
+          ? $path.http.resolve.apply($path.http, arguments)
+          : $path.resolve.apply($path, arguments)
+      }
+    }
     return resolvePath.apply(null, arguments)
   }
 
@@ -40,8 +52,7 @@ module.exports = function run ($void) {
 
     // try to resolve the uri for source
     appUri = completeFile(appUri)
-    var uri = isAbsolutePath(appUri) || isRemote(appUri) ? appUri
-      : resolvePath(appHome, appUri)
+    var uri = isAbsolutePath(appUri) ? appUri : resolvePath(appHome, appUri)
     if (typeof uri !== 'string') {
       warn('run', 'failed to resolve app at', uri)
       return null

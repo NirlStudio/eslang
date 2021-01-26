@@ -67,7 +67,6 @@ module.exports = function formatIn ($void) {
     }
     var value, error
     try {
-      // TODO: to be replaced a to native unescape processor.
       value = JSON.parse(source)
     } catch (err) {
       error = err

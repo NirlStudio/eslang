@@ -18,11 +18,26 @@ module.exports = function space ($void) {
     return moduleCreate.apply(null, arguments)
   }
   var dirname = function $dirname () {
-    dirname = $void.$path.dirname.bind($void.$path)
+    if (!$void.$path.http) {
+      dirname = $void.$path.dirname.bind($void.$path)
+    } else {
+      dirname = function $$dirname (path) {
+        return $void.$path.http.isAbsolute(path)
+          ? $void.$path.http.dirname(path)
+          : $void.$path.dirname(path)
+      }
+    }
     return dirname.apply(null, arguments)
   }
   var isAbsolutePath = function $isAbsolutePath () {
-    isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    if (!$void.$path.http) {
+      isAbsolutePath = $void.$path.isAbsolute.bind($void.$path)
+    } else {
+      isAbsolutePath = function $$isAbsolutePath (path) {
+        return $void.$path.http.isAbsolute(path) ||
+          $void.$path.isAbsolute(path)
+      }
+    }
     return isAbsolutePath.apply(null, arguments)
   }
 
@@ -211,7 +226,7 @@ module.exports = function space ($void) {
         return this.context[key]
       }
       if (typeof exporting[key] !== 'undefined') {
-        warn('export', 're-exporting', key)
+        warn('export/a', 're-exporting', key)
         return this.exporting[key]
       }
       app[key] = value // make app exports available for whole app.

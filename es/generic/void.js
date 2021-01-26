@@ -186,7 +186,6 @@ module.exports = function voidSetup ($void) {
           : entity.type === $Operator ? $Operator
             : $Function
       case 'object':
-        // TODO: use symbol to inject type?
         return entity instanceof Type$$
           ? Object.getPrototypeOf(entity).type || $Object
           : Array.isArray(entity) ? $Array

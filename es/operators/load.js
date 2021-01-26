@@ -43,7 +43,8 @@ module.exports = function load ($void) {
     var doc = $void.loader.load(uri)
     var text = doc[0]
     if (!text) {
-      warn('load', 'failed to load', target, 'for', doc[1])
+      warn('load', 'failed to load:', target, 'for:', doc[1][0], doc[1][1],
+        '\n', doc[1])
       return null
     }
     // compile text

@@ -503,7 +503,7 @@ module.exports = function testIn ($void) {
     eval_(1, '(export x 1)')
     eval_(2, '(export x 1) (export y 2)')
     eval_(2, '(export (x y) (@ x: 1 y: 2). y')
-    eval_(2, '(export * (@ x: 1 y: 2). y')
+    eval_(2, '(export * (@ a: 1 b: 2). b')
   }
 
   function checkOperators () {

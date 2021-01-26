@@ -189,7 +189,7 @@ module.exports = function promiseIn ($void) {
 
   // guard espresso promises to ignore unhandled rejections.
   ignoreUnhandledRejectionsBy(function (excuse, promise) {
-    // TODO: create warnings
+    $void.$warn('promise', 'unhandled rejection found.', [excuse, promise])
     return promise.excusable === true
   })
 
