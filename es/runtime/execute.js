@@ -19,9 +19,8 @@ module.exports = function execute ($void) {
         }
         throw signal
       }
-      warn('execute', 'unknown error:', signal,
-        'with', args, 'for', code, 'from', uri
-      )
+      warn('execute', 'unknown error:', signal.code || signal.message,
+        'with', args, 'for', code, 'from', uri, '\n', signal)
       return [null, null]
     }
   }

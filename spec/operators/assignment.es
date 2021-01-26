@@ -630,10 +630,10 @@
     (assert null x).
 
     (locon x 1)
-    (assert 100 x).
+    (assert null x).
 
-    (local x 1)
-    (assert 100 x).
+    (local x 10)
+    (assert null x).
   ).
   (should "(locon sym value) returns value and declares a const sym in current scope with value of value." (= ()
     (var value_ (locon x 100).

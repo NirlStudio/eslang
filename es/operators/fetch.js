@@ -42,14 +42,10 @@ module.exports = function load ($void) {
 
   function fetch (loader, baseDir, target) {
     if (!target || typeof target !== 'string') {
-      warn('fetch', 'invalid module url.', target)
+      warn('fetch', 'invalid module url:', target)
       return promiseOfRejected(target)
     }
     target = completeFile(target)
-    if (!target.endsWith('.es')) {
-      warn('fetch', 'only supports Espresso modules.', target)
-      return promiseOfRejected(target)
-    }
     if (!loader.isRemote(target)) {
       target = [baseDir, target].join('/')
     }

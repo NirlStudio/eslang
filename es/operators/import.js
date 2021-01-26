@@ -80,7 +80,7 @@ module.exports = function import_ ($void) {
         : module_ ? referModule(module_) : imported
     }
     if (!(fields instanceof Tuple$)) {
-      warn('import', 'invalid field descriptor.', fields)
+      warn('import', 'invalid field descriptor:', fields)
       return null
     }
 

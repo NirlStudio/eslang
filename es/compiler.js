@@ -54,7 +54,7 @@ module.exports = function compilerIn ($void) {
       waiter && waiter()
       if (stack.length > 1) {
         warn('compiler', 'open statements are not properly closed.',
-          [lastToken, srcUri || srcText])
+          '\n', [lastToken, srcUri || srcText])
         endAll(null, lastToken[2])
       }
       tryToRaise()
@@ -152,8 +152,8 @@ module.exports = function compilerIn ($void) {
       var args = formatPattern(pattern)
       if (!(args.length > 1)) {
         if (pattern.indexOf('"') < 0) {
-          warn('compiler', 'unnecessary format string.',
-            pattern, ['format', pattern, source, srcUri || srcText])
+          warn('compiler', 'unnecessary format string:', pattern,
+            '\n', ['format', pattern, source, srcUri || srcText])
         }
         return pushValue(args[0], source)
       }
@@ -183,7 +183,7 @@ module.exports = function compilerIn ($void) {
             endMatched(value, source)
           } else {
             warn('compiler', 'extra enclosing ")." is found and ignored.',
-              [lastToken, ['symbol', value, source], srcUri || srcText])
+              '\n', [lastToken, ['symbol', value, source], srcUri || srcText])
           }
           return true
         default:
@@ -246,7 +246,7 @@ module.exports = function compilerIn ($void) {
     function endClause () {
       if (stack.length < 2) {
         warn('compiler', 'extra enclosing parentheses is found and ignored.',
-          [lastToken, srcUri || srcText])
+          '\n', [lastToken, srcUri || srcText])
         return // allow & ignore extra enclosing parentheses
       }
       endTopWith()
@@ -255,7 +255,7 @@ module.exports = function compilerIn ($void) {
     function endMatched (value, source) {
       if (stack.length < 2) {
         warn('compiler', 'extra ")," is found and ignored.',
-          [lastToken, ['symbol', value, source], srcUri || srcText])
+          '\n', [lastToken, ['symbol', value, source], srcUri || srcText])
         return // allow & ignore extra enclosing parentheses
       }
       lastToken[2][0] >= 0 // the indent value of ')'

@@ -33,7 +33,7 @@ module.exports = function $io ($void) {
       return path
     }
     if (!Array.isArray(path)) {
-      warn('io:' + method, 'argument path is not a string or strings.', [path])
+      warn('io:' + method, 'argument path is not a string or strings.', path)
       return null
     }
     path = path.slice()

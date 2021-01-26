@@ -225,13 +225,6 @@ module.exports = function tupleIn ($void) {
   })
 
   // expand to a string list as an enclosed expression or a series of expressions.
-  var punctuations = new Set([
-    $Symbol.begin,
-    $Symbol.end,
-    $Symbol.comma,
-    $Symbol.semicolon,
-    $Symbol.pairing
-  ])
   var encode = function (list, indent, padding) {
     if (!Array.isArray(list)) {
       list = []
@@ -287,7 +280,7 @@ module.exports = function tupleIn ($void) {
           encode.call(item, list, indent, padding)
         }
       } else {
-        if (punctuations.has(item)) {
+        if ($void.punctuations.has(item)) {
           list.push(item.key)
         } else if ($void.operatorSymbols.has(item) && i < 1) {
           first = false

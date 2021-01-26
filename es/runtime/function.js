@@ -18,9 +18,18 @@ module.exports = function function_ ($void) {
   var createFunctionSpace = $void.createFunctionSpace
   var createEmptyOperation = $void.createEmptyOperation
 
-  var alignWithGeneric = isFunctionLengthWritable()
-    ? alignWithGenericDefault
-    : alignWithGenericFallback
+  function alignWithGeneric (func, paramNo) {
+    return paramNo > 0 ? Object.defineProperties(func, {
+      length: {
+        value: paramNo
+      },
+      name: {
+        value: undefined
+      }
+    }) : Object.defineProperty(func, 'name', {
+      value: undefined
+    })
+  }
 
   function evaluate (tbody, scope) {
     var retval = evaluate_(tbody, scope)
@@ -72,7 +81,8 @@ module.exports = function function_ ($void) {
             }
             throw signal
           }
-          warn('lambda:eval', 'unexpected error:', signal)
+          warn('lambda:eval', 'unexpected error:',
+            signal.code || signal.message, '\n', signal)
           return null
         }
       }
@@ -126,7 +136,8 @@ module.exports = function function_ ($void) {
           }
           throw signal
         }
-        warn('stambda:eval', 'unexpected error:', signal)
+        warn('stambda:eval', 'unexpected error:',
+          signal.code || signal.message, '\n', signal)
         return null
       }
     }
@@ -183,7 +194,8 @@ module.exports = function function_ ($void) {
             }
             throw signal
           } // for unexpected errors
-          warn('function:eval', 'unexpected error:', signal)
+          warn('function:eval', 'unexpected error:',
+            signal.code || signal.message, '\n', signal)
           return null
         }
       }
@@ -224,36 +236,5 @@ module.exports = function function_ ($void) {
       }
     }
     return args.length > 0 ? [args, new Tuple$(code)] : [[], $Tuple.empty]
-  }
-
-  function isFunctionLengthWritable () {
-    var func = function () {}
-    try {
-      Object.defineProperty(func, 'length', { value: 2 })
-      return true
-    } catch (err) {
-      // fortunately, this should only happen in IE, ...
-      warn('runtime/function', 'function\'s length is not writable.', err)
-      return false
-    }
-  }
-
-  function alignWithGenericDefault (func, paramNo) {
-    return paramNo > 0 ? Object.defineProperties(func, {
-      length: {
-        value: paramNo
-      },
-      name: {
-        value: undefined
-      }
-    }) : Object.defineProperty(func, 'name', {
-      value: undefined
-    })
-  }
-
-  function alignWithGenericFallback (func, paramNo) {
-    Object.defineProperty(func, 'length', { value: paramNo })
-    return !func.name ? func
-      : Object.defineProperty(func, 'name', { value: undefined })
   }
 }

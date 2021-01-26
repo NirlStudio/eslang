@@ -82,14 +82,21 @@ function initializeOperators ($void) {
 }
 
 function initializeSharedSymbols ($void) {
+  var $Symbol = $void.$.symbol
   var sharedSymbolOf = $void.sharedSymbolOf
-  var key
-  for (key in $void.$) {
-    sharedSymbolOf(key)
-  }
-  for (key in $void.$app) {
-    sharedSymbolOf(key)
-  }
+
+  $void.punctuations = new Set([
+    $Symbol.begin,
+    $Symbol.end,
+    $Symbol.comma,
+    $Symbol.semicolon,
+    $Symbol.pairing,
+    sharedSymbolOf('['),
+    sharedSymbolOf(']'),
+    sharedSymbolOf('{'),
+    sharedSymbolOf('}')
+  ])
+
   $void.operatorSymbols = new Set(
     Object.keys($void.staticOperators).map(key =>
       sharedSymbolOf(key)

@@ -51,7 +51,7 @@ module.exports = function formatIn ($void) {
 
   link($.string, 'unescape', function (source) {
     if (typeof source !== 'string') {
-      warn('string:unescape', 'a string source should be a string.',
+      warn('string:unescape', 'a string source should be a string:', typeof source,
         '\n', source)
       return null
     }
@@ -76,13 +76,15 @@ module.exports = function formatIn ($void) {
       return value
     }
     warn('string:unescape', '[JSON] invalid string input: ',
-      (error && error.message) || 'unknown error.', '\n', source)
+      (error && (error.code || error.message)) || 'unknown error.',
+      '\n', [source, error])
     return source.substring(1, source.length - 1)
   }, true)
 
   link($.string, 'format', function (pattern) {
     if (typeof pattern !== 'string') {
-      warn('string:format', 'the pattern must be a string.', pattern)
+      warn('string:format', 'the pattern must be a string:', typeof pattern,
+        '\n', pattern)
       return null
     }
     var args = []
@@ -104,7 +106,7 @@ module.exports = function formatIn ($void) {
       end = pattern.indexOf('}', i)
       if (end < i) {
         end = pattern.length
-        warn('string:format', 'missing an ending "}".', pattern, i)
+        warn('string:format', 'missing an ending "}".', '\n', [pattern, i])
       }
       placeholder = pattern.substring(i, end)
       i = end + 1
@@ -122,12 +124,12 @@ module.exports = function formatIn ($void) {
         offset = counter
       }
       if (typeof offset !== 'number') {
-        warn('string:format', 'invalid offset value gets ignored',
-          pattern, i, placeholder.substring(0, end))
+        warn('string:format', 'invalid offset value gets ignored.',
+          '\n', [pattern, i, placeholder.substring(0, end)])
         offset = counter
       } else if (offset >= args.length) {
-        warn('string:format', 'offset value is out of range',
-          pattern, offset, args.length - 1)
+        warn('string:format', 'offset value is out of range:', offset,
+          '\n', [pattern, offset, args.length - 1])
       }
       fmt = end < placeholder.length ? placeholder.substring(end + 1) : null
       values.push(formatValue(args, offset, arguments[offset + 1], fmt, thisCall))

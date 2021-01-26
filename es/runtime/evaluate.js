@@ -12,6 +12,20 @@ module.exports = function evaluate ($void) {
   var symbolSubject = $.symbol.subject
   var staticOperators = $void.staticOperators
 
+  function invokeOperator (predicate, clause, space, subject) {
+    try {
+      var result = predicate(space, clause, subject)
+      return typeof result === 'undefined' ? null : result
+    } catch (signal) {
+      if (signal instanceof Signal$) {
+        throw signal
+      }
+      warn('evaluate', 'unknown signal:[', signal.code || signal.message,
+        '] when evaluating operator:', clause, '\n', signal)
+      return null
+    }
+  }
+
   $void.evaluate = function evaluate (clause, space) {
     if (!(clause instanceof Tuple$)) {
       return clause instanceof Symbol$ ? space.resolve(clause.key) : clause
@@ -56,7 +70,7 @@ module.exports = function evaluate ($void) {
         }
         offset = 2
       } else if (staticOperators[subject.key]) { // static operators
-        return staticOperators[subject.key](space, clause)
+        return invokeOperator(staticOperators[subject.key], clause, space)
       } else { // a common symbol
         subject = space.resolve(subject.key)
       }
@@ -68,7 +82,7 @@ module.exports = function evaluate ($void) {
     var predicate
     if (typeof subject === 'function' && implicitSubject) {
       if (subject.type === $Operator) {
-        return subject(space, clause)
+        return invokeOperator(subject, clause, space)
       }
       predicate = subject
       subject = null
@@ -109,7 +123,7 @@ module.exports = function evaluate ($void) {
 
     // pass the original clause if the predicate is an operator.
     if (predicate.type === $Operator) {
-      return predicate(space, clause, subject)
+      return invokeOperator(predicate, clause, space, subject)
     }
 
     // evaluate arguments.
@@ -125,7 +139,8 @@ module.exports = function evaluate ($void) {
       if (signal instanceof Signal$) {
         throw signal
       }
-      warn('evaluate', 'unknown signal:', signal, 'when evaluating', clause)
+      warn('evaluate', 'unknown signal:[', signal.code || signal.message,
+        '] when evaluating function/lambda:', clause, '\n', signal)
       return null
     }
   }

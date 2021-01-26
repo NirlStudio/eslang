@@ -39,6 +39,7 @@ blue "describe";
 gray " and operators "; blue "help";
 (export help (=? (subject, topic)
   "try '(help)' or 'help;' to ask for help."
+  debug ((. get-help) "help";
   local "content" ((. get-help) (subject key) (topic key);
   (if (content is-empty)
     "not available."; false

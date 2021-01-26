@@ -5,29 +5,29 @@ module.exports = function module$native ($void, packer) {
   var native = Object.create(null)
   var runtimeModules = require('./modules')($void)
 
-  native.resolve = function (moduleUri, moduleDir, appHome, appDir, userHome) {
-    if (runtimeModules.has(moduleUri)) {
-      return moduleUri
+  native.resolve = function (target, srcModuleDir, appHome, appDir, userHome) {
+    if (runtimeModules.has(target)) {
+      return target
     }
 
     if (!packer) {
-      warn('module-native', 'no module packer provided.', [moduleUri, moduleDir])
+      warn('module:native', 'no module packer provided.',
+        '\n', [target, srcModuleDir, appHome, appDir, userHome])
       return null
     }
 
     try {
-      var request = moduleUri.substring(1)
-      var moduleId = packer.resolve(request, moduleDir)
+      var request = target.substring(1) // skip leading '$'
+      var moduleId = packer.resolve(request, srcModuleDir)
       if (moduleId) {
         return '$' + moduleId
       }
-      warn('module-native', 'failed to resolve native module.', [
-        moduleUri, moduleDir, appHome, appDir, userHome
-      ])
+      warn('module:native', 'failed to resolve module.', request,
+        '\n', [target, srcModuleDir, appHome, appDir, userHome])
     } catch (err) {
-      warn('module-native', 'error in resolving native module.', [
-        err, moduleUri, moduleDir, appHome, appDir, userHome
-      ])
+      warn('module:native', 'error:', err.code || err.message,
+        'in resolving native module.', request,
+        '\n', [target, srcModuleDir, appHome, appDir, userHome])
     }
     return null
   }

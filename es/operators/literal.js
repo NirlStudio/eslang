@@ -108,7 +108,7 @@ module.exports = function literal ($void) {
 
   function tryToCreateInstance (space, clist, type, offset) {
     if (!(type instanceof ClassType$)) {
-      $warn('@-literal', 'invalid literal type', [typeof type, type])
+      $warn('@-literal', 'invalid literal type:', typeof type, type)
       type = $Object // downgrade an unknown type to a common object.
     }
     return objectCreate(space, clist, type, offset)

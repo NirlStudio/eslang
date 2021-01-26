@@ -141,7 +141,7 @@ module.exports = function tokenizerIn ($void) {
       }
       if (c === '\t') {
         warn('tokenizer', 'TAB-space is not suggested in indention.',
-          [srcUri || srcText, lineNo, lineOffset, indenting])
+          '\n', [srcUri || srcText, lineNo, lineOffset, indenting])
       }
       clauseIndent = ++indenting
     }
@@ -157,7 +157,7 @@ module.exports = function tokenizerIn ($void) {
       return function (c) {
         if (typeof c === 'undefined') { // unexpected ending
           warn('tokenizer', 'a string value is not properly closed.',
-            [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
+            '\n', [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
           return raiseValue()
         }
         if (c === '\r') { // skip '\r' anyway

@@ -16,7 +16,7 @@ module.exports = function run ($void) {
       // try to compile & evaluate
       code = compile(expr)
       if (!(code instanceof Tuple$)) {
-        warn('eval', 'invalid code', code)
+        warn('eval', 'invalid code:', code)
         return null
       }
     } else if (expr instanceof Tuple$) {
