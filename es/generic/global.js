@@ -8,10 +8,8 @@ module.exports = function globalIn ($void) {
   // an empty symbol to be resolve to null.
   $export($, '', null)
 
-  // special empty symbols
+  // special empty symbol.
   $export($, '...', null)
-  // a readable alias of '...'
-  $export($, 'etc', null)
 
   // constant values
   $export($, 'null', null)
@@ -24,10 +22,6 @@ module.exports = function globalIn ($void) {
   $export($, ')', sharedSymbolOf(')'))
   $export($, ',', sharedSymbolOf(','))
   $export($, ';', sharedSymbolOf(';'))
-  $export($, '.', sharedSymbolOf('.'))
-  $export($, '@', sharedSymbolOf('@'))
-  $export($, ':', sharedSymbolOf(':'))
-  $export($, '$', sharedSymbolOf('$'))
   $export($, '#', sharedSymbolOf('#'))
   $export($, '[', sharedSymbolOf('['))
   $export($, ']', sharedSymbolOf(']'))

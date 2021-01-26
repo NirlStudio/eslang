@@ -29,7 +29,8 @@ module.exports = function arithmetic ($void) {
     var sym = clist[1]
     if (sym instanceof Symbol$) { // (++ symbol)
       var value = space.resolve(sym.key)
-      return space.let(sym.key, typeof value === 'number' ? value + 1 : 1)
+      space.let(sym.key, value = typeof value === 'number' ? value + 1 : 1)
+      return value
     }
     // as a normal plus-one operation
     sym = evaluate(sym, space)
@@ -47,7 +48,8 @@ module.exports = function arithmetic ($void) {
     var sym = clist[1]
     if (sym instanceof Symbol$) { // (-- symbol)
       var value = space.resolve(sym.key)
-      return space.let(sym.key, typeof value === 'number' ? value - 1 : -1)
+      space.let(sym.key, value = typeof value === 'number' ? value - 1 : -1)
+      return value
     }
     // as a normal minus-one operation
     sym = evaluate(sym, space)

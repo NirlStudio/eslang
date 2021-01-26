@@ -29,7 +29,15 @@ module.exports = function voidSetup ($void) {
   var Promise$ = $void.Promise
   var operator = $void.operator
   var ClassType$ = $void.ClassType
+
+  var defineConst = $void.defineConst
   var isApplicable = $void.isApplicable
+
+  // all symbols used as global entities and static operators
+  var reservedSymbols = $void.reservedSymbols = Object.create(null)
+  Object.keys($).forEach(key => {
+    reservedSymbols[key] = true
+  })
 
   // a temporary space to keep app-only global functions.
   $void.$app = Object.create(null)
@@ -100,8 +108,8 @@ module.exports = function voidSetup ($void) {
   // directly in core evaluation function.
   function staticOperator (name, impl, entity) {
     // export an alternative entity or make it a pure symbol.
-    typeof entity !== 'undefined' ? $export($, name, entity)
-      : ($[name] = sharedSymbolOf(name))
+    $export($, name, typeof entity !== 'undefined' ? entity
+      : sharedSymbolOf(name))
     // export the implementation.
     $void.staticOperators[name] = operator(impl, $Tuple.operator)
     return impl
@@ -116,8 +124,14 @@ module.exports = function voidSetup ($void) {
   $void.regexConstants = /^(null|true|false)$/
   $void.constantValues = Object.assign(Object.create(null), {
     'null': null,
+
     'true': true,
-    'false': false
+    'false': false,
+
+    '0': 0,
+    '1': 1,
+    '2': 2,
+    '3': 3
   })
 
   var regexNumber = $void.regexNumber
@@ -236,7 +250,9 @@ module.exports = function voidSetup ($void) {
   // to export an entity to a space.
   function $export (space, name, entity) {
     // ensure exported names are shared.
+    reservedSymbols[name] = true
     sharedSymbolOf(name)
+
     // automatically bind null for static methods
     if (isApplicable(entity)) {
       entity = bindThis(null, entity)
@@ -245,7 +261,7 @@ module.exports = function voidSetup ($void) {
     if (entity && typeof entity === 'object') {
       entity.seal ? entity.seal() : Object.freeze(entity)
     }
-    return (space[name] = entity)
+    return defineConst(space, name, entity)
   }
   $void.export = $export
 

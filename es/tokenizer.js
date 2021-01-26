@@ -233,7 +233,7 @@ module.exports = function tokenizerIn ($void) {
       } else {
         pendingText += ')'
         warn('tokenizer', 'a block comment is not properly closed.',
-          [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
+          '\n', [srcUri || srcText, lineNo, lineOffset, pendingLine, pendingOffset])
       }
       parse('comment', pendingText,
         [pendingIndent, pendingLine, pendingOffset, lineNo, lineOffset])

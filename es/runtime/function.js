@@ -18,6 +18,8 @@ module.exports = function function_ ($void) {
   var createFunctionSpace = $void.createFunctionSpace
   var createEmptyOperation = $void.createEmptyOperation
 
+  var symbolEtcKey = $Symbol.etc.key
+
   function alignWithGeneric (func, paramNo) {
     return paramNo > 0 ? Object.defineProperties(func, {
       length: {
@@ -61,8 +63,18 @@ module.exports = function function_ ($void) {
     var $lambda = function () {
       var scope = createScope()
       // populate arguments
-      for (var i = 0; i < params.length; i++) {
-        scope.local[params[i]] = i < arguments.length ? arguments[i] : null
+      for (var i = 0, shift = 0, shiftAt = 0; i < params.length; i++) {
+        var param = params[i]
+        if (param === symbolEtcKey) {
+          if (!shift) {
+            shift = arguments.length - params.length
+            shiftAt = i
+          }
+        } else {
+          var j = i + shift
+          scope.var(param,
+            j >= shiftAt && j < arguments.length ? arguments[j] : null)
+        }
       }
       scope.prepare($lambda, this, Array.prototype.slice.call(arguments))
       // execution
@@ -121,9 +133,8 @@ module.exports = function function_ ($void) {
       if (key) {
         key === 'this'
           ? (scope.context.this = this)
-          : (scope.local[key] =
-            typeof arguments[0] === 'undefined' ? null : arguments[0]
-          )
+          : scope.var(key,
+            typeof arguments[0] === 'undefined' ? null : arguments[0])
       }
       // execution
       try {
@@ -174,8 +185,18 @@ module.exports = function function_ ($void) {
     var $func = function () {
       var scope = createFunctionSpace(parent)
       // populate arguments
-      for (var i = 0; i < params.length; i++) {
-        scope.local[params[i]] = i < arguments.length ? arguments[i] : null
+      for (var i = 0, shift = 0, shiftAt = 0; i < params.length; i++) {
+        var param = params[i]
+        if (param === symbolEtcKey) {
+          if (!shift) {
+            shift = arguments.length - params.length
+            shiftAt = i
+          }
+        } else {
+          var j = i + shift
+          scope.var(param,
+            j >= shiftAt && j < arguments.length ? arguments[j] : null)
+        }
       }
       scope.prepare($func, this, Array.prototype.slice.call(arguments))
       // execution
@@ -208,7 +229,7 @@ module.exports = function function_ ($void) {
     var args = count === 0 ? [] : count === 1 ? [value] : value
     scope.prepare(me, t, args)
     for (var i = 0; i < params.length; i++) {
-      scope.local[params[i]] = i < args.length ? args[i] : null
+      scope.var(params[i], i < args.length ? args[i] : null)
     }
     return scope
   }

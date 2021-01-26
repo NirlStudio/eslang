@@ -36,12 +36,6 @@
   ).
 
   (define "Ordering" (=> ()
-    (var compares-to (= pairs
-      (for pair in pairs
-        (assert 1 ((pair 0) compares-to (pair 1).
-        (assert -1 ((pair 1) compares-to (pair 0).
-      ).
-    ).
     (should "a common number can be compared with other common numbers." (=> ()
       (compare (@
         (@ 1 0)

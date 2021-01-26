@@ -31,7 +31,7 @@ module.exports = function () {
 
   /* Nameless beginning of heaven and earth, the famous mother of all things. */
   function naming (type, name) {
-    $[name] = type
+    defineConst($, name, type)
     type.name = name
     return type
   }
@@ -41,7 +41,7 @@ module.exports = function () {
   /* ... called the light “day,”  */
   naming(Type, 'type')
   /* ... and the darkness he called “night.” */
-  $.null = null
+  defineConst($, 'null', null)
 
   // The logical noumenon of null is not accessible directly, otherwise it will
   // cause some confusion in evaluation process.
@@ -277,7 +277,7 @@ module.exports = function () {
   $void.defineConst = defineConst
   function defineConst (ctx, key, value) {
     Object.defineProperty(ctx, key, {
-      enumerable: false,
+      enumerable: true,
       configurable: false,
       writable: false,
       value: value

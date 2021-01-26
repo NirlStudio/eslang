@@ -4,10 +4,13 @@ module.exports = function space ($void) {
   var $ = $void.$
   var $Object = $.object
   var ClassInst$ = $void.ClassInst
+  var warn = $void.$warn
   var isObject = $void.isObject
   var indexerOf = $void.indexerOf
   var defineConst = $void.defineConst
   var ownsProperty = $void.ownsProperty
+
+  var reservedSymbols = $void.reservedSymbols
 
   // late binding: transient wrappers
   var moduleCreate = function $moduleCreate () {
@@ -65,18 +68,38 @@ module.exports = function space ($void) {
       return typeof $[key] === 'undefined' ? null : $[key]
     },
     var: function (key, value) {
+      if (reservedSymbols[key]) {
+        warn('var', 'reserved symbol:', key)
+        return $[key]
+      }
       return (this.local[key] = value)
     },
     const: function (key, value) {
+      if (reservedSymbols[key]) {
+        warn('const', 'reserved symbol:', key)
+        return $[key]
+      }
       return defineConst(this.local, key, value)
     },
     lvar: function (key, value) {
+      if (reservedSymbols[key]) {
+        warn('local', 'reserved symbol:', key)
+        return $[key]
+      }
       return (this.context[key] = value)
     },
     lconst: function (key, value) {
+      if (reservedSymbols[key]) {
+        warn('locon', 'reserved symbol:', key)
+        return $[key]
+      }
       return defineConst(this.context, key, value)
     },
     let: function (key, value) {
+      if (reservedSymbols[key]) {
+        warn('let', 'reserved symbol:', key)
+        return $[key]
+      }
       if (ownsProperty(this.local, key)) {
         return (this.local[key] = value)
       }
@@ -98,8 +121,13 @@ module.exports = function space ($void) {
       return (this.local[key] = value)
     },
     export: function (key, value) {
-      this.exporting && typeof this.exporting[key] === 'undefined' &&
-        (this.exporting[key] = value)
+      if (this.exporting) {
+        if (typeof this.exporting[key] === 'undefined') {
+          this.exporting[key] = value
+        } else {
+          warn('export', 're-exporting', key)
+        }
+      }
       return this.var(key, value)
     },
     populate: function (ctx) {
@@ -115,6 +143,10 @@ module.exports = function space ($void) {
       var keys = Object.getOwnPropertyNames(ctx)
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i]
+        if (reservedSymbols[key]) {
+          warn('var/p', 'reserved symbol:', key)
+          continue
+        }
         switch (key) {
           case 'this':
             this.context.this = ctx.this
@@ -128,6 +160,7 @@ module.exports = function space ($void) {
             break
           default:
             this.local[key] = ctx[key]
+            break
         }
       }
     },

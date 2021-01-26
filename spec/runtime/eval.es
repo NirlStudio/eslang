@@ -8,7 +8,7 @@
     (var x 100)
     (assert null (eval (`x).
 
-    (let descending 100)
+    (assert 1 (let descending 100).
     (assert 1 (eval (`descending).
   ).
   (define "(eval a-string)" (= ()
