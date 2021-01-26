@@ -52,11 +52,7 @@ module.exports = function space ($void) {
   }
   Space$.prototype = Object.assign(Object.create(null), {
     resolve: function (key) {
-      var value = $[key]
-      if (typeof value !== 'undefined') {
-        return value
-      }
-      value = this.context[key]
+      var value = this.context[key]
       if (typeof value !== 'undefined') {
         return value
       }
@@ -70,35 +66,35 @@ module.exports = function space ($void) {
     var: function (key, value) {
       if (reservedSymbols[key]) {
         warn('var', 'reserved symbol:', key)
-        return $[key]
+        return this.context[key]
       }
       return (this.local[key] = value)
     },
     const: function (key, value) {
       if (reservedSymbols[key]) {
         warn('const', 'reserved symbol:', key)
-        return $[key]
+        return this.context[key]
       }
       return defineConst(this.local, key, value)
     },
     lvar: function (key, value) {
       if (reservedSymbols[key]) {
         warn('local', 'reserved symbol:', key)
-        return $[key]
+        return this.context[key]
       }
       return (this.context[key] = value)
     },
     lconst: function (key, value) {
       if (reservedSymbols[key]) {
         warn('locon', 'reserved symbol:', key)
-        return $[key]
+        return this.context[key]
       }
       return defineConst(this.context, key, value)
     },
     let: function (key, value) {
       if (reservedSymbols[key]) {
         warn('let', 'reserved symbol:', key)
-        return $[key]
+        return this.context[key]
       }
       if (ownsProperty(this.local, key)) {
         return (this.local[key] = value)
@@ -122,12 +118,14 @@ module.exports = function space ($void) {
     },
     export: function (key, value) {
       if (this.exporting) {
-        if (typeof this.exporting[key] === 'undefined') {
-          this.exporting[key] = value
-        } else {
+        if (typeof this.exporting[key] !== 'undefined') {
           warn('export', 're-exporting', key)
+          return this.exporting[key]
         }
+        this.exporting[key] = value
       }
+      // it's not encouraged to use a reserved symbol in a module's exports.
+      // e.g. caller's (var * (import ...)) will not be able to work reliably.
       return this.var(key, value)
     },
     populate: function (ctx) {
@@ -208,11 +206,17 @@ module.exports = function space ($void) {
     app.modules = moduleCreate(space)
     space.app = app
     space.export = function (key, value) {
-      if (typeof exporting[key] === 'undefined') {
-        app[key] = value
-        exporting[key] = value
+      if (reservedSymbols[key]) {
+        warn('export/a', 'reserved symbol:', key)
+        return this.context[key]
       }
-      return space.var(key, value)
+      if (typeof exporting[key] !== 'undefined') {
+        warn('export', 're-exporting', key)
+        return this.exporting[key]
+      }
+      app[key] = value // make app exports available for whole app.
+      exporting[key] = value
+      return (local[key] = value)
     }
     return space
   }
