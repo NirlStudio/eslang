@@ -1,5 +1,5 @@
 # Espresso Script Language - eslang
-## A simple &amp; expressive script language, which is inspired by Lisp, Python, JavaScript and many other great languages.
+### A simple &amp; expressive script language, which is inspired by Lisp, Python, JavaScript and many other great languages.
 ```lisp
 print "Hello, world!";
 
@@ -11,7 +11,7 @@ printf "Hello, world!\n", "green bold underline";
 ```
 
 # Try it online
-## [Espresso Web Shell](https://eslang.dev)
+### [Espresso Web Shell](https://eslang.dev)
 ```lisp
 help; # for help.
 
@@ -70,23 +70,25 @@ npm i -g eslang
 es selftest # optional
 ```
 
-## run an example, or your own code:
+### run an example, or your own code:
 ```shell
-es examples/qsort1
+> es examples/qsort1
 
 # or run the example test suite
-es test examples/test
+> es test examples/test
 
 # or just
-es test examples
+> es test examples
 
 ```
 
-## REPL in terminal:
+### REPL in terminal:
 ```shell
-es
+> es
+
 ```
-## You can do [almost the same things](#try-it-online) after calling
+
+### You can do [almost the same things](#try-it-online) after calling
 ```lisp
 fetch "https://eslang.dev/@";
 
@@ -178,27 +180,27 @@ _note: Actually, in the real world, a program breaks because we make it so, but 
 
 
 ## Some tips for ES lang patrons
-### - Look for what you need, ignore what you do not understand.
-### - Do what you can do anywhere and anytime.
-### - Use convention over restriction. So it can be broken in a clean way, not an ugly way, when someone have to.
-### - Consider types as a kind information to help to optimise, not to restrict.
+- Look for what you need, ignore what you do not understand.
+- Do what you can do anywhere and anytime.
+- Use convention over restriction. So it can be broken in a clean way, not an ugly way, when someone have to.
+- Consider types as a kind information to help to optimise, not to restrict.
 
 
 ## You can use it to
-### create both you backend and frontend applications.
-### build your own programming lang or just create a different dialect, e.g: make it fully localized to your own language.
+- create both you backend and frontend applications.
+- build your own programming lang or just create a different dialect, e.g: make it fully localized to your own language.
 
 
 ## You can help to
-### - Test it in various OSes and browsers.
-### - Use it in your projects.
-### - Recommend it to your friends.
-### - Create documentation & tools.
-### - Report bugs and help to fix.
-### - Request for features.
-### - Create interpreters in other native languages
+- Test it in various OSes and browsers.
+- Use it in your projects.
+- Recommend it to your friends.
+- Create documentation & tools.
+- Report bugs and help to fix.
+- Request for features.
+- Create interpreters in other native languages
   - Java, Go, Rust, Python, C#, C, etc
-### - ...
+- ...
 
 
 **Enjoy the Espresso.**
